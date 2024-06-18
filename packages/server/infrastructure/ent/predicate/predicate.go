@@ -6,5 +6,35 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
+// AdminUser is the predicate function for adminuser builders.
+type AdminUser func(*sql.Selector)
+
+// Comment is the predicate function for comment builders.
+type Comment func(*sql.Selector)
+
+// CommentAttachment is the predicate function for commentattachment builders.
+type CommentAttachment func(*sql.Selector)
+
+// CommentLike is the predicate function for commentlike builders.
+type CommentLike func(*sql.Selector)
+
+// Forum is the predicate function for forum builders.
+type Forum func(*sql.Selector)
+
+// ForumLike is the predicate function for forumlike builders.
+type ForumLike func(*sql.Selector)
+
+// Topic is the predicate function for topic builders.
+type Topic func(*sql.Selector)
+
+// TopicLike is the predicate function for topiclike builders.
+type TopicLike func(*sql.Selector)
+
 // User is the predicate function for user builders.
 type User func(*sql.Selector)
+
+// UserCommentNotification is the predicate function for usercommentnotification builders.
+type UserCommentNotification func(*sql.Selector)
+
+// UserTopicNotification is the predicate function for usertopicnotification builders.
+type UserTopicNotification func(*sql.Selector)

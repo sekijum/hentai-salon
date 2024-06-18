@@ -7,7 +7,17 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"server/infrastructure/ent/adminuser"
+	"server/infrastructure/ent/comment"
+	"server/infrastructure/ent/commentattachment"
+	"server/infrastructure/ent/commentlike"
+	"server/infrastructure/ent/forum"
+	"server/infrastructure/ent/forumlike"
+	"server/infrastructure/ent/topic"
+	"server/infrastructure/ent/topiclike"
 	"server/infrastructure/ent/user"
+	"server/infrastructure/ent/usercommentnotification"
+	"server/infrastructure/ent/usertopicnotification"
 	"sync"
 
 	"entgo.io/ent"
@@ -73,7 +83,17 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			user.Table: user.ValidColumn,
+			adminuser.Table:               adminuser.ValidColumn,
+			comment.Table:                 comment.ValidColumn,
+			commentattachment.Table:       commentattachment.ValidColumn,
+			commentlike.Table:             commentlike.ValidColumn,
+			forum.Table:                   forum.ValidColumn,
+			forumlike.Table:               forumlike.ValidColumn,
+			topic.Table:                   topic.ValidColumn,
+			topiclike.Table:               topiclike.ValidColumn,
+			user.Table:                    user.ValidColumn,
+			usercommentnotification.Table: usercommentnotification.ValidColumn,
+			usertopicnotification.Table:   usertopicnotification.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

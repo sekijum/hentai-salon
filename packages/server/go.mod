@@ -3,14 +3,15 @@ module server
 go 1.22.3
 
 require (
-	ariga.io/atlas v0.24.0
 	entgo.io/ent v0.13.1
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/joho/godotenv v1.4.0
+	github.com/mattn/go-sqlite3 v1.14.16
 )
 
 require (
+	ariga.io/atlas v0.24.0 // indirect
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/agext/levenshtein v1.2.1 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect

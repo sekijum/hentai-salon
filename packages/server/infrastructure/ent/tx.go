@@ -12,8 +12,28 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
+	// AdminUser is the client for interacting with the AdminUser builders.
+	AdminUser *AdminUserClient
+	// Comment is the client for interacting with the Comment builders.
+	Comment *CommentClient
+	// CommentAttachment is the client for interacting with the CommentAttachment builders.
+	CommentAttachment *CommentAttachmentClient
+	// CommentLike is the client for interacting with the CommentLike builders.
+	CommentLike *CommentLikeClient
+	// Forum is the client for interacting with the Forum builders.
+	Forum *ForumClient
+	// ForumLike is the client for interacting with the ForumLike builders.
+	ForumLike *ForumLikeClient
+	// Topic is the client for interacting with the Topic builders.
+	Topic *TopicClient
+	// TopicLike is the client for interacting with the TopicLike builders.
+	TopicLike *TopicLikeClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
+	// UserCommentNotification is the client for interacting with the UserCommentNotification builders.
+	UserCommentNotification *UserCommentNotificationClient
+	// UserTopicNotification is the client for interacting with the UserTopicNotification builders.
+	UserTopicNotification *UserTopicNotificationClient
 
 	// lazily loaded.
 	client     *Client
@@ -145,7 +165,17 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
+	tx.AdminUser = NewAdminUserClient(tx.config)
+	tx.Comment = NewCommentClient(tx.config)
+	tx.CommentAttachment = NewCommentAttachmentClient(tx.config)
+	tx.CommentLike = NewCommentLikeClient(tx.config)
+	tx.Forum = NewForumClient(tx.config)
+	tx.ForumLike = NewForumLikeClient(tx.config)
+	tx.Topic = NewTopicClient(tx.config)
+	tx.TopicLike = NewTopicLikeClient(tx.config)
 	tx.User = NewUserClient(tx.config)
+	tx.UserCommentNotification = NewUserCommentNotificationClient(tx.config)
+	tx.UserTopicNotification = NewUserTopicNotificationClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.
@@ -155,7 +185,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: User.QueryXXX(), the query will be executed
+// applies a query, for example: AdminUser.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.

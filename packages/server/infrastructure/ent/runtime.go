@@ -3,22 +3,117 @@
 package ent
 
 import (
+	"server/infrastructure/ent/adminuser"
+	"server/infrastructure/ent/comment"
+	"server/infrastructure/ent/commentattachment"
+	"server/infrastructure/ent/commentlike"
+	"server/infrastructure/ent/forum"
+	"server/infrastructure/ent/forumlike"
 	"server/infrastructure/ent/schema"
+	"server/infrastructure/ent/topic"
+	"server/infrastructure/ent/topiclike"
 	"server/infrastructure/ent/user"
+	"server/infrastructure/ent/usercommentnotification"
+	"server/infrastructure/ent/usertopicnotification"
+	"time"
 )
 
 // The init function reads all schema descriptors with runtime code
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	adminuserFields := schema.AdminUser{}.Fields()
+	_ = adminuserFields
+	// adminuserDescCreatedAt is the schema descriptor for created_at field.
+	adminuserDescCreatedAt := adminuserFields[3].Descriptor()
+	// adminuser.DefaultCreatedAt holds the default value on creation for the created_at field.
+	adminuser.DefaultCreatedAt = adminuserDescCreatedAt.Default.(func() time.Time)
+	commentFields := schema.Comment{}.Fields()
+	_ = commentFields
+	// commentDescCreatedAt is the schema descriptor for created_at field.
+	commentDescCreatedAt := commentFields[6].Descriptor()
+	// comment.DefaultCreatedAt holds the default value on creation for the created_at field.
+	comment.DefaultCreatedAt = commentDescCreatedAt.Default.(func() time.Time)
+	// commentDescUpdatedAt is the schema descriptor for updated_at field.
+	commentDescUpdatedAt := commentFields[7].Descriptor()
+	// comment.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	comment.DefaultUpdatedAt = commentDescUpdatedAt.Default.(func() time.Time)
+	// comment.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	comment.UpdateDefaultUpdatedAt = commentDescUpdatedAt.UpdateDefault.(func() time.Time)
+	commentattachmentFields := schema.CommentAttachment{}.Fields()
+	_ = commentattachmentFields
+	// commentattachmentDescCreatedAt is the schema descriptor for created_at field.
+	commentattachmentDescCreatedAt := commentattachmentFields[4].Descriptor()
+	// commentattachment.DefaultCreatedAt holds the default value on creation for the created_at field.
+	commentattachment.DefaultCreatedAt = commentattachmentDescCreatedAt.Default.(func() time.Time)
+	commentlikeFields := schema.CommentLike{}.Fields()
+	_ = commentlikeFields
+	// commentlikeDescCreatedAt is the schema descriptor for created_at field.
+	commentlikeDescCreatedAt := commentlikeFields[3].Descriptor()
+	// commentlike.DefaultCreatedAt holds the default value on creation for the created_at field.
+	commentlike.DefaultCreatedAt = commentlikeDescCreatedAt.Default.(func() time.Time)
+	forumFields := schema.Forum{}.Fields()
+	_ = forumFields
+	// forumDescCreatedAt is the schema descriptor for created_at field.
+	forumDescCreatedAt := forumFields[5].Descriptor()
+	// forum.DefaultCreatedAt holds the default value on creation for the created_at field.
+	forum.DefaultCreatedAt = forumDescCreatedAt.Default.(func() time.Time)
+	// forumDescUpdatedAt is the schema descriptor for updated_at field.
+	forumDescUpdatedAt := forumFields[6].Descriptor()
+	// forum.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	forum.DefaultUpdatedAt = forumDescUpdatedAt.Default.(func() time.Time)
+	// forum.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	forum.UpdateDefaultUpdatedAt = forumDescUpdatedAt.UpdateDefault.(func() time.Time)
+	forumlikeFields := schema.ForumLike{}.Fields()
+	_ = forumlikeFields
+	// forumlikeDescCreatedAt is the schema descriptor for created_at field.
+	forumlikeDescCreatedAt := forumlikeFields[3].Descriptor()
+	// forumlike.DefaultCreatedAt holds the default value on creation for the created_at field.
+	forumlike.DefaultCreatedAt = forumlikeDescCreatedAt.Default.(func() time.Time)
+	topicFields := schema.Topic{}.Fields()
+	_ = topicFields
+	// topicDescIsDefault is the schema descriptor for is_default field.
+	topicDescIsDefault := topicFields[5].Descriptor()
+	// topic.DefaultIsDefault holds the default value on creation for the is_default field.
+	topic.DefaultIsDefault = topicDescIsDefault.Default.(bool)
+	// topicDescCreatedAt is the schema descriptor for created_at field.
+	topicDescCreatedAt := topicFields[7].Descriptor()
+	// topic.DefaultCreatedAt holds the default value on creation for the created_at field.
+	topic.DefaultCreatedAt = topicDescCreatedAt.Default.(func() time.Time)
+	// topicDescUpdatedAt is the schema descriptor for updated_at field.
+	topicDescUpdatedAt := topicFields[8].Descriptor()
+	// topic.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	topic.DefaultUpdatedAt = topicDescUpdatedAt.Default.(func() time.Time)
+	// topic.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	topic.UpdateDefaultUpdatedAt = topicDescUpdatedAt.UpdateDefault.(func() time.Time)
+	topiclikeFields := schema.TopicLike{}.Fields()
+	_ = topiclikeFields
+	// topiclikeDescCreatedAt is the schema descriptor for created_at field.
+	topiclikeDescCreatedAt := topiclikeFields[3].Descriptor()
+	// topiclike.DefaultCreatedAt holds the default value on creation for the created_at field.
+	topiclike.DefaultCreatedAt = topiclikeDescCreatedAt.Default.(func() time.Time)
 	userFields := schema.User{}.Fields()
 	_ = userFields
-	// userDescName is the schema descriptor for name field.
-	userDescName := userFields[1].Descriptor()
-	// user.NameValidator is a validator for the "name" field. It is called by the builders before save.
-	user.NameValidator = userDescName.Validators[0].(func(string) error)
-	// userDescEmail is the schema descriptor for email field.
-	userDescEmail := userFields[2].Descriptor()
-	// user.EmailValidator is a validator for the "email" field. It is called by the builders before save.
-	user.EmailValidator = userDescEmail.Validators[0].(func(string) error)
+	// userDescCreatedAt is the schema descriptor for created_at field.
+	userDescCreatedAt := userFields[7].Descriptor()
+	// user.DefaultCreatedAt holds the default value on creation for the created_at field.
+	user.DefaultCreatedAt = userDescCreatedAt.Default.(func() time.Time)
+	// userDescUpdatedAt is the schema descriptor for updated_at field.
+	userDescUpdatedAt := userFields[8].Descriptor()
+	// user.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	user.DefaultUpdatedAt = userDescUpdatedAt.Default.(func() time.Time)
+	// user.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	user.UpdateDefaultUpdatedAt = userDescUpdatedAt.UpdateDefault.(func() time.Time)
+	usercommentnotificationFields := schema.UserCommentNotification{}.Fields()
+	_ = usercommentnotificationFields
+	// usercommentnotificationDescCreatedAt is the schema descriptor for created_at field.
+	usercommentnotificationDescCreatedAt := usercommentnotificationFields[3].Descriptor()
+	// usercommentnotification.DefaultCreatedAt holds the default value on creation for the created_at field.
+	usercommentnotification.DefaultCreatedAt = usercommentnotificationDescCreatedAt.Default.(func() time.Time)
+	usertopicnotificationFields := schema.UserTopicNotification{}.Fields()
+	_ = usertopicnotificationFields
+	// usertopicnotificationDescCreatedAt is the schema descriptor for created_at field.
+	usertopicnotificationDescCreatedAt := usertopicnotificationFields[3].Descriptor()
+	// usertopicnotification.DefaultCreatedAt holds the default value on creation for the created_at field.
+	usertopicnotification.DefaultCreatedAt = usertopicnotificationDescCreatedAt.Default.(func() time.Time)
 }

@@ -6,8 +6,17 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"server/infrastructure/ent/comment"
+	"server/infrastructure/ent/commentlike"
+	"server/infrastructure/ent/forum"
+	"server/infrastructure/ent/forumlike"
 	"server/infrastructure/ent/predicate"
+	"server/infrastructure/ent/topic"
+	"server/infrastructure/ent/topiclike"
 	"server/infrastructure/ent/user"
+	"server/infrastructure/ent/usercommentnotification"
+	"server/infrastructure/ent/usertopicnotification"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -27,16 +36,16 @@ func (uu *UserUpdate) Where(ps ...predicate.User) *UserUpdate {
 	return uu
 }
 
-// SetName sets the "name" field.
-func (uu *UserUpdate) SetName(s string) *UserUpdate {
-	uu.mutation.SetName(s)
+// SetUsername sets the "username" field.
+func (uu *UserUpdate) SetUsername(s string) *UserUpdate {
+	uu.mutation.SetUsername(s)
 	return uu
 }
 
-// SetNillableName sets the "name" field if the given value is not nil.
-func (uu *UserUpdate) SetNillableName(s *string) *UserUpdate {
+// SetNillableUsername sets the "username" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableUsername(s *string) *UserUpdate {
 	if s != nil {
-		uu.SetName(*s)
+		uu.SetUsername(*s)
 	}
 	return uu
 }
@@ -55,13 +64,390 @@ func (uu *UserUpdate) SetNillableEmail(s *string) *UserUpdate {
 	return uu
 }
 
+// SetPassword sets the "password" field.
+func (uu *UserUpdate) SetPassword(s string) *UserUpdate {
+	uu.mutation.SetPassword(s)
+	return uu
+}
+
+// SetNillablePassword sets the "password" field if the given value is not nil.
+func (uu *UserUpdate) SetNillablePassword(s *string) *UserUpdate {
+	if s != nil {
+		uu.SetPassword(*s)
+	}
+	return uu
+}
+
+// SetDisplayName sets the "display_name" field.
+func (uu *UserUpdate) SetDisplayName(s string) *UserUpdate {
+	uu.mutation.SetDisplayName(s)
+	return uu
+}
+
+// SetNillableDisplayName sets the "display_name" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableDisplayName(s *string) *UserUpdate {
+	if s != nil {
+		uu.SetDisplayName(*s)
+	}
+	return uu
+}
+
+// ClearDisplayName clears the value of the "display_name" field.
+func (uu *UserUpdate) ClearDisplayName() *UserUpdate {
+	uu.mutation.ClearDisplayName()
+	return uu
+}
+
+// SetAvatar sets the "avatar" field.
+func (uu *UserUpdate) SetAvatar(s string) *UserUpdate {
+	uu.mutation.SetAvatar(s)
+	return uu
+}
+
+// SetNillableAvatar sets the "avatar" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableAvatar(s *string) *UserUpdate {
+	if s != nil {
+		uu.SetAvatar(*s)
+	}
+	return uu
+}
+
+// ClearAvatar clears the value of the "avatar" field.
+func (uu *UserUpdate) ClearAvatar() *UserUpdate {
+	uu.mutation.ClearAvatar()
+	return uu
+}
+
+// SetStatus sets the "status" field.
+func (uu *UserUpdate) SetStatus(u user.Status) *UserUpdate {
+	uu.mutation.SetStatus(u)
+	return uu
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableStatus(u *user.Status) *UserUpdate {
+	if u != nil {
+		uu.SetStatus(*u)
+	}
+	return uu
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (uu *UserUpdate) SetCreatedAt(t time.Time) *UserUpdate {
+	uu.mutation.SetCreatedAt(t)
+	return uu
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableCreatedAt(t *time.Time) *UserUpdate {
+	if t != nil {
+		uu.SetCreatedAt(*t)
+	}
+	return uu
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (uu *UserUpdate) SetUpdatedAt(t time.Time) *UserUpdate {
+	uu.mutation.SetUpdatedAt(t)
+	return uu
+}
+
+// AddForumIDs adds the "forums" edge to the Forum entity by IDs.
+func (uu *UserUpdate) AddForumIDs(ids ...int) *UserUpdate {
+	uu.mutation.AddForumIDs(ids...)
+	return uu
+}
+
+// AddForums adds the "forums" edges to the Forum entity.
+func (uu *UserUpdate) AddForums(f ...*Forum) *UserUpdate {
+	ids := make([]int, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return uu.AddForumIDs(ids...)
+}
+
+// AddTopicIDs adds the "topics" edge to the Topic entity by IDs.
+func (uu *UserUpdate) AddTopicIDs(ids ...int) *UserUpdate {
+	uu.mutation.AddTopicIDs(ids...)
+	return uu
+}
+
+// AddTopics adds the "topics" edges to the Topic entity.
+func (uu *UserUpdate) AddTopics(t ...*Topic) *UserUpdate {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return uu.AddTopicIDs(ids...)
+}
+
+// AddCommentIDs adds the "comments" edge to the Comment entity by IDs.
+func (uu *UserUpdate) AddCommentIDs(ids ...int) *UserUpdate {
+	uu.mutation.AddCommentIDs(ids...)
+	return uu
+}
+
+// AddComments adds the "comments" edges to the Comment entity.
+func (uu *UserUpdate) AddComments(c ...*Comment) *UserUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uu.AddCommentIDs(ids...)
+}
+
+// AddUserTopicNotificationIDs adds the "user_topic_notifications" edge to the UserTopicNotification entity by IDs.
+func (uu *UserUpdate) AddUserTopicNotificationIDs(ids ...int) *UserUpdate {
+	uu.mutation.AddUserTopicNotificationIDs(ids...)
+	return uu
+}
+
+// AddUserTopicNotifications adds the "user_topic_notifications" edges to the UserTopicNotification entity.
+func (uu *UserUpdate) AddUserTopicNotifications(u ...*UserTopicNotification) *UserUpdate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return uu.AddUserTopicNotificationIDs(ids...)
+}
+
+// AddUserCommentNotificationIDs adds the "user_comment_notifications" edge to the UserCommentNotification entity by IDs.
+func (uu *UserUpdate) AddUserCommentNotificationIDs(ids ...int) *UserUpdate {
+	uu.mutation.AddUserCommentNotificationIDs(ids...)
+	return uu
+}
+
+// AddUserCommentNotifications adds the "user_comment_notifications" edges to the UserCommentNotification entity.
+func (uu *UserUpdate) AddUserCommentNotifications(u ...*UserCommentNotification) *UserUpdate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return uu.AddUserCommentNotificationIDs(ids...)
+}
+
+// AddForumLikeIDs adds the "forum_likes" edge to the ForumLike entity by IDs.
+func (uu *UserUpdate) AddForumLikeIDs(ids ...int) *UserUpdate {
+	uu.mutation.AddForumLikeIDs(ids...)
+	return uu
+}
+
+// AddForumLikes adds the "forum_likes" edges to the ForumLike entity.
+func (uu *UserUpdate) AddForumLikes(f ...*ForumLike) *UserUpdate {
+	ids := make([]int, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return uu.AddForumLikeIDs(ids...)
+}
+
+// AddTopicLikeIDs adds the "topic_likes" edge to the TopicLike entity by IDs.
+func (uu *UserUpdate) AddTopicLikeIDs(ids ...int) *UserUpdate {
+	uu.mutation.AddTopicLikeIDs(ids...)
+	return uu
+}
+
+// AddTopicLikes adds the "topic_likes" edges to the TopicLike entity.
+func (uu *UserUpdate) AddTopicLikes(t ...*TopicLike) *UserUpdate {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return uu.AddTopicLikeIDs(ids...)
+}
+
+// AddCommentLikeIDs adds the "comment_likes" edge to the CommentLike entity by IDs.
+func (uu *UserUpdate) AddCommentLikeIDs(ids ...int) *UserUpdate {
+	uu.mutation.AddCommentLikeIDs(ids...)
+	return uu
+}
+
+// AddCommentLikes adds the "comment_likes" edges to the CommentLike entity.
+func (uu *UserUpdate) AddCommentLikes(c ...*CommentLike) *UserUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uu.AddCommentLikeIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uu *UserUpdate) Mutation() *UserMutation {
 	return uu.mutation
 }
 
+// ClearForums clears all "forums" edges to the Forum entity.
+func (uu *UserUpdate) ClearForums() *UserUpdate {
+	uu.mutation.ClearForums()
+	return uu
+}
+
+// RemoveForumIDs removes the "forums" edge to Forum entities by IDs.
+func (uu *UserUpdate) RemoveForumIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveForumIDs(ids...)
+	return uu
+}
+
+// RemoveForums removes "forums" edges to Forum entities.
+func (uu *UserUpdate) RemoveForums(f ...*Forum) *UserUpdate {
+	ids := make([]int, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return uu.RemoveForumIDs(ids...)
+}
+
+// ClearTopics clears all "topics" edges to the Topic entity.
+func (uu *UserUpdate) ClearTopics() *UserUpdate {
+	uu.mutation.ClearTopics()
+	return uu
+}
+
+// RemoveTopicIDs removes the "topics" edge to Topic entities by IDs.
+func (uu *UserUpdate) RemoveTopicIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveTopicIDs(ids...)
+	return uu
+}
+
+// RemoveTopics removes "topics" edges to Topic entities.
+func (uu *UserUpdate) RemoveTopics(t ...*Topic) *UserUpdate {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return uu.RemoveTopicIDs(ids...)
+}
+
+// ClearComments clears all "comments" edges to the Comment entity.
+func (uu *UserUpdate) ClearComments() *UserUpdate {
+	uu.mutation.ClearComments()
+	return uu
+}
+
+// RemoveCommentIDs removes the "comments" edge to Comment entities by IDs.
+func (uu *UserUpdate) RemoveCommentIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveCommentIDs(ids...)
+	return uu
+}
+
+// RemoveComments removes "comments" edges to Comment entities.
+func (uu *UserUpdate) RemoveComments(c ...*Comment) *UserUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uu.RemoveCommentIDs(ids...)
+}
+
+// ClearUserTopicNotifications clears all "user_topic_notifications" edges to the UserTopicNotification entity.
+func (uu *UserUpdate) ClearUserTopicNotifications() *UserUpdate {
+	uu.mutation.ClearUserTopicNotifications()
+	return uu
+}
+
+// RemoveUserTopicNotificationIDs removes the "user_topic_notifications" edge to UserTopicNotification entities by IDs.
+func (uu *UserUpdate) RemoveUserTopicNotificationIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveUserTopicNotificationIDs(ids...)
+	return uu
+}
+
+// RemoveUserTopicNotifications removes "user_topic_notifications" edges to UserTopicNotification entities.
+func (uu *UserUpdate) RemoveUserTopicNotifications(u ...*UserTopicNotification) *UserUpdate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return uu.RemoveUserTopicNotificationIDs(ids...)
+}
+
+// ClearUserCommentNotifications clears all "user_comment_notifications" edges to the UserCommentNotification entity.
+func (uu *UserUpdate) ClearUserCommentNotifications() *UserUpdate {
+	uu.mutation.ClearUserCommentNotifications()
+	return uu
+}
+
+// RemoveUserCommentNotificationIDs removes the "user_comment_notifications" edge to UserCommentNotification entities by IDs.
+func (uu *UserUpdate) RemoveUserCommentNotificationIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveUserCommentNotificationIDs(ids...)
+	return uu
+}
+
+// RemoveUserCommentNotifications removes "user_comment_notifications" edges to UserCommentNotification entities.
+func (uu *UserUpdate) RemoveUserCommentNotifications(u ...*UserCommentNotification) *UserUpdate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return uu.RemoveUserCommentNotificationIDs(ids...)
+}
+
+// ClearForumLikes clears all "forum_likes" edges to the ForumLike entity.
+func (uu *UserUpdate) ClearForumLikes() *UserUpdate {
+	uu.mutation.ClearForumLikes()
+	return uu
+}
+
+// RemoveForumLikeIDs removes the "forum_likes" edge to ForumLike entities by IDs.
+func (uu *UserUpdate) RemoveForumLikeIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveForumLikeIDs(ids...)
+	return uu
+}
+
+// RemoveForumLikes removes "forum_likes" edges to ForumLike entities.
+func (uu *UserUpdate) RemoveForumLikes(f ...*ForumLike) *UserUpdate {
+	ids := make([]int, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return uu.RemoveForumLikeIDs(ids...)
+}
+
+// ClearTopicLikes clears all "topic_likes" edges to the TopicLike entity.
+func (uu *UserUpdate) ClearTopicLikes() *UserUpdate {
+	uu.mutation.ClearTopicLikes()
+	return uu
+}
+
+// RemoveTopicLikeIDs removes the "topic_likes" edge to TopicLike entities by IDs.
+func (uu *UserUpdate) RemoveTopicLikeIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveTopicLikeIDs(ids...)
+	return uu
+}
+
+// RemoveTopicLikes removes "topic_likes" edges to TopicLike entities.
+func (uu *UserUpdate) RemoveTopicLikes(t ...*TopicLike) *UserUpdate {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return uu.RemoveTopicLikeIDs(ids...)
+}
+
+// ClearCommentLikes clears all "comment_likes" edges to the CommentLike entity.
+func (uu *UserUpdate) ClearCommentLikes() *UserUpdate {
+	uu.mutation.ClearCommentLikes()
+	return uu
+}
+
+// RemoveCommentLikeIDs removes the "comment_likes" edge to CommentLike entities by IDs.
+func (uu *UserUpdate) RemoveCommentLikeIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveCommentLikeIDs(ids...)
+	return uu
+}
+
+// RemoveCommentLikes removes "comment_likes" edges to CommentLike entities.
+func (uu *UserUpdate) RemoveCommentLikes(c ...*CommentLike) *UserUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uu.RemoveCommentLikeIDs(ids...)
+}
+
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (uu *UserUpdate) Save(ctx context.Context) (int, error) {
+	uu.defaults()
 	return withHooks(ctx, uu.sqlSave, uu.mutation, uu.hooks)
 }
 
@@ -87,16 +473,19 @@ func (uu *UserUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (uu *UserUpdate) defaults() {
+	if _, ok := uu.mutation.UpdatedAt(); !ok {
+		v := user.UpdateDefaultUpdatedAt()
+		uu.mutation.SetUpdatedAt(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (uu *UserUpdate) check() error {
-	if v, ok := uu.mutation.Name(); ok {
-		if err := user.NameValidator(v); err != nil {
-			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "User.name": %w`, err)}
-		}
-	}
-	if v, ok := uu.mutation.Email(); ok {
-		if err := user.EmailValidator(v); err != nil {
-			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "User.email": %w`, err)}
+	if v, ok := uu.mutation.Status(); ok {
+		if err := user.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "User.status": %w`, err)}
 		}
 	}
 	return nil
@@ -114,11 +503,395 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := uu.mutation.Name(); ok {
-		_spec.SetField(user.FieldName, field.TypeString, value)
+	if value, ok := uu.mutation.Username(); ok {
+		_spec.SetField(user.FieldUsername, field.TypeString, value)
 	}
 	if value, ok := uu.mutation.Email(); ok {
 		_spec.SetField(user.FieldEmail, field.TypeString, value)
+	}
+	if value, ok := uu.mutation.Password(); ok {
+		_spec.SetField(user.FieldPassword, field.TypeString, value)
+	}
+	if value, ok := uu.mutation.DisplayName(); ok {
+		_spec.SetField(user.FieldDisplayName, field.TypeString, value)
+	}
+	if uu.mutation.DisplayNameCleared() {
+		_spec.ClearField(user.FieldDisplayName, field.TypeString)
+	}
+	if value, ok := uu.mutation.Avatar(); ok {
+		_spec.SetField(user.FieldAvatar, field.TypeString, value)
+	}
+	if uu.mutation.AvatarCleared() {
+		_spec.ClearField(user.FieldAvatar, field.TypeString)
+	}
+	if value, ok := uu.mutation.Status(); ok {
+		_spec.SetField(user.FieldStatus, field.TypeEnum, value)
+	}
+	if value, ok := uu.mutation.CreatedAt(); ok {
+		_spec.SetField(user.FieldCreatedAt, field.TypeTime, value)
+	}
+	if value, ok := uu.mutation.UpdatedAt(); ok {
+		_spec.SetField(user.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if uu.mutation.ForumsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ForumsTable,
+			Columns: []string{user.ForumsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(forum.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedForumsIDs(); len(nodes) > 0 && !uu.mutation.ForumsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ForumsTable,
+			Columns: []string{user.ForumsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(forum.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.ForumsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ForumsTable,
+			Columns: []string{user.ForumsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(forum.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uu.mutation.TopicsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.TopicsTable,
+			Columns: []string{user.TopicsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(topic.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedTopicsIDs(); len(nodes) > 0 && !uu.mutation.TopicsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.TopicsTable,
+			Columns: []string{user.TopicsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(topic.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.TopicsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.TopicsTable,
+			Columns: []string{user.TopicsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(topic.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uu.mutation.CommentsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.CommentsTable,
+			Columns: []string{user.CommentsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedCommentsIDs(); len(nodes) > 0 && !uu.mutation.CommentsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.CommentsTable,
+			Columns: []string{user.CommentsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.CommentsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.CommentsTable,
+			Columns: []string{user.CommentsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uu.mutation.UserTopicNotificationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserTopicNotificationsTable,
+			Columns: []string{user.UserTopicNotificationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(usertopicnotification.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedUserTopicNotificationsIDs(); len(nodes) > 0 && !uu.mutation.UserTopicNotificationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserTopicNotificationsTable,
+			Columns: []string{user.UserTopicNotificationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(usertopicnotification.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.UserTopicNotificationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserTopicNotificationsTable,
+			Columns: []string{user.UserTopicNotificationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(usertopicnotification.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uu.mutation.UserCommentNotificationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserCommentNotificationsTable,
+			Columns: []string{user.UserCommentNotificationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(usercommentnotification.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedUserCommentNotificationsIDs(); len(nodes) > 0 && !uu.mutation.UserCommentNotificationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserCommentNotificationsTable,
+			Columns: []string{user.UserCommentNotificationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(usercommentnotification.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.UserCommentNotificationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserCommentNotificationsTable,
+			Columns: []string{user.UserCommentNotificationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(usercommentnotification.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uu.mutation.ForumLikesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ForumLikesTable,
+			Columns: []string{user.ForumLikesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(forumlike.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedForumLikesIDs(); len(nodes) > 0 && !uu.mutation.ForumLikesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ForumLikesTable,
+			Columns: []string{user.ForumLikesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(forumlike.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.ForumLikesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ForumLikesTable,
+			Columns: []string{user.ForumLikesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(forumlike.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uu.mutation.TopicLikesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.TopicLikesTable,
+			Columns: []string{user.TopicLikesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(topiclike.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedTopicLikesIDs(); len(nodes) > 0 && !uu.mutation.TopicLikesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.TopicLikesTable,
+			Columns: []string{user.TopicLikesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(topiclike.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.TopicLikesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.TopicLikesTable,
+			Columns: []string{user.TopicLikesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(topiclike.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uu.mutation.CommentLikesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.CommentLikesTable,
+			Columns: []string{user.CommentLikesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(commentlike.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedCommentLikesIDs(); len(nodes) > 0 && !uu.mutation.CommentLikesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.CommentLikesTable,
+			Columns: []string{user.CommentLikesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(commentlike.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.CommentLikesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.CommentLikesTable,
+			Columns: []string{user.CommentLikesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(commentlike.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -140,16 +913,16 @@ type UserUpdateOne struct {
 	mutation *UserMutation
 }
 
-// SetName sets the "name" field.
-func (uuo *UserUpdateOne) SetName(s string) *UserUpdateOne {
-	uuo.mutation.SetName(s)
+// SetUsername sets the "username" field.
+func (uuo *UserUpdateOne) SetUsername(s string) *UserUpdateOne {
+	uuo.mutation.SetUsername(s)
 	return uuo
 }
 
-// SetNillableName sets the "name" field if the given value is not nil.
-func (uuo *UserUpdateOne) SetNillableName(s *string) *UserUpdateOne {
+// SetNillableUsername sets the "username" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableUsername(s *string) *UserUpdateOne {
 	if s != nil {
-		uuo.SetName(*s)
+		uuo.SetUsername(*s)
 	}
 	return uuo
 }
@@ -168,9 +941,385 @@ func (uuo *UserUpdateOne) SetNillableEmail(s *string) *UserUpdateOne {
 	return uuo
 }
 
+// SetPassword sets the "password" field.
+func (uuo *UserUpdateOne) SetPassword(s string) *UserUpdateOne {
+	uuo.mutation.SetPassword(s)
+	return uuo
+}
+
+// SetNillablePassword sets the "password" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillablePassword(s *string) *UserUpdateOne {
+	if s != nil {
+		uuo.SetPassword(*s)
+	}
+	return uuo
+}
+
+// SetDisplayName sets the "display_name" field.
+func (uuo *UserUpdateOne) SetDisplayName(s string) *UserUpdateOne {
+	uuo.mutation.SetDisplayName(s)
+	return uuo
+}
+
+// SetNillableDisplayName sets the "display_name" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableDisplayName(s *string) *UserUpdateOne {
+	if s != nil {
+		uuo.SetDisplayName(*s)
+	}
+	return uuo
+}
+
+// ClearDisplayName clears the value of the "display_name" field.
+func (uuo *UserUpdateOne) ClearDisplayName() *UserUpdateOne {
+	uuo.mutation.ClearDisplayName()
+	return uuo
+}
+
+// SetAvatar sets the "avatar" field.
+func (uuo *UserUpdateOne) SetAvatar(s string) *UserUpdateOne {
+	uuo.mutation.SetAvatar(s)
+	return uuo
+}
+
+// SetNillableAvatar sets the "avatar" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableAvatar(s *string) *UserUpdateOne {
+	if s != nil {
+		uuo.SetAvatar(*s)
+	}
+	return uuo
+}
+
+// ClearAvatar clears the value of the "avatar" field.
+func (uuo *UserUpdateOne) ClearAvatar() *UserUpdateOne {
+	uuo.mutation.ClearAvatar()
+	return uuo
+}
+
+// SetStatus sets the "status" field.
+func (uuo *UserUpdateOne) SetStatus(u user.Status) *UserUpdateOne {
+	uuo.mutation.SetStatus(u)
+	return uuo
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableStatus(u *user.Status) *UserUpdateOne {
+	if u != nil {
+		uuo.SetStatus(*u)
+	}
+	return uuo
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (uuo *UserUpdateOne) SetCreatedAt(t time.Time) *UserUpdateOne {
+	uuo.mutation.SetCreatedAt(t)
+	return uuo
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableCreatedAt(t *time.Time) *UserUpdateOne {
+	if t != nil {
+		uuo.SetCreatedAt(*t)
+	}
+	return uuo
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (uuo *UserUpdateOne) SetUpdatedAt(t time.Time) *UserUpdateOne {
+	uuo.mutation.SetUpdatedAt(t)
+	return uuo
+}
+
+// AddForumIDs adds the "forums" edge to the Forum entity by IDs.
+func (uuo *UserUpdateOne) AddForumIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.AddForumIDs(ids...)
+	return uuo
+}
+
+// AddForums adds the "forums" edges to the Forum entity.
+func (uuo *UserUpdateOne) AddForums(f ...*Forum) *UserUpdateOne {
+	ids := make([]int, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return uuo.AddForumIDs(ids...)
+}
+
+// AddTopicIDs adds the "topics" edge to the Topic entity by IDs.
+func (uuo *UserUpdateOne) AddTopicIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.AddTopicIDs(ids...)
+	return uuo
+}
+
+// AddTopics adds the "topics" edges to the Topic entity.
+func (uuo *UserUpdateOne) AddTopics(t ...*Topic) *UserUpdateOne {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return uuo.AddTopicIDs(ids...)
+}
+
+// AddCommentIDs adds the "comments" edge to the Comment entity by IDs.
+func (uuo *UserUpdateOne) AddCommentIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.AddCommentIDs(ids...)
+	return uuo
+}
+
+// AddComments adds the "comments" edges to the Comment entity.
+func (uuo *UserUpdateOne) AddComments(c ...*Comment) *UserUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uuo.AddCommentIDs(ids...)
+}
+
+// AddUserTopicNotificationIDs adds the "user_topic_notifications" edge to the UserTopicNotification entity by IDs.
+func (uuo *UserUpdateOne) AddUserTopicNotificationIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.AddUserTopicNotificationIDs(ids...)
+	return uuo
+}
+
+// AddUserTopicNotifications adds the "user_topic_notifications" edges to the UserTopicNotification entity.
+func (uuo *UserUpdateOne) AddUserTopicNotifications(u ...*UserTopicNotification) *UserUpdateOne {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return uuo.AddUserTopicNotificationIDs(ids...)
+}
+
+// AddUserCommentNotificationIDs adds the "user_comment_notifications" edge to the UserCommentNotification entity by IDs.
+func (uuo *UserUpdateOne) AddUserCommentNotificationIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.AddUserCommentNotificationIDs(ids...)
+	return uuo
+}
+
+// AddUserCommentNotifications adds the "user_comment_notifications" edges to the UserCommentNotification entity.
+func (uuo *UserUpdateOne) AddUserCommentNotifications(u ...*UserCommentNotification) *UserUpdateOne {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return uuo.AddUserCommentNotificationIDs(ids...)
+}
+
+// AddForumLikeIDs adds the "forum_likes" edge to the ForumLike entity by IDs.
+func (uuo *UserUpdateOne) AddForumLikeIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.AddForumLikeIDs(ids...)
+	return uuo
+}
+
+// AddForumLikes adds the "forum_likes" edges to the ForumLike entity.
+func (uuo *UserUpdateOne) AddForumLikes(f ...*ForumLike) *UserUpdateOne {
+	ids := make([]int, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return uuo.AddForumLikeIDs(ids...)
+}
+
+// AddTopicLikeIDs adds the "topic_likes" edge to the TopicLike entity by IDs.
+func (uuo *UserUpdateOne) AddTopicLikeIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.AddTopicLikeIDs(ids...)
+	return uuo
+}
+
+// AddTopicLikes adds the "topic_likes" edges to the TopicLike entity.
+func (uuo *UserUpdateOne) AddTopicLikes(t ...*TopicLike) *UserUpdateOne {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return uuo.AddTopicLikeIDs(ids...)
+}
+
+// AddCommentLikeIDs adds the "comment_likes" edge to the CommentLike entity by IDs.
+func (uuo *UserUpdateOne) AddCommentLikeIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.AddCommentLikeIDs(ids...)
+	return uuo
+}
+
+// AddCommentLikes adds the "comment_likes" edges to the CommentLike entity.
+func (uuo *UserUpdateOne) AddCommentLikes(c ...*CommentLike) *UserUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uuo.AddCommentLikeIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uuo *UserUpdateOne) Mutation() *UserMutation {
 	return uuo.mutation
+}
+
+// ClearForums clears all "forums" edges to the Forum entity.
+func (uuo *UserUpdateOne) ClearForums() *UserUpdateOne {
+	uuo.mutation.ClearForums()
+	return uuo
+}
+
+// RemoveForumIDs removes the "forums" edge to Forum entities by IDs.
+func (uuo *UserUpdateOne) RemoveForumIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveForumIDs(ids...)
+	return uuo
+}
+
+// RemoveForums removes "forums" edges to Forum entities.
+func (uuo *UserUpdateOne) RemoveForums(f ...*Forum) *UserUpdateOne {
+	ids := make([]int, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return uuo.RemoveForumIDs(ids...)
+}
+
+// ClearTopics clears all "topics" edges to the Topic entity.
+func (uuo *UserUpdateOne) ClearTopics() *UserUpdateOne {
+	uuo.mutation.ClearTopics()
+	return uuo
+}
+
+// RemoveTopicIDs removes the "topics" edge to Topic entities by IDs.
+func (uuo *UserUpdateOne) RemoveTopicIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveTopicIDs(ids...)
+	return uuo
+}
+
+// RemoveTopics removes "topics" edges to Topic entities.
+func (uuo *UserUpdateOne) RemoveTopics(t ...*Topic) *UserUpdateOne {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return uuo.RemoveTopicIDs(ids...)
+}
+
+// ClearComments clears all "comments" edges to the Comment entity.
+func (uuo *UserUpdateOne) ClearComments() *UserUpdateOne {
+	uuo.mutation.ClearComments()
+	return uuo
+}
+
+// RemoveCommentIDs removes the "comments" edge to Comment entities by IDs.
+func (uuo *UserUpdateOne) RemoveCommentIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveCommentIDs(ids...)
+	return uuo
+}
+
+// RemoveComments removes "comments" edges to Comment entities.
+func (uuo *UserUpdateOne) RemoveComments(c ...*Comment) *UserUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uuo.RemoveCommentIDs(ids...)
+}
+
+// ClearUserTopicNotifications clears all "user_topic_notifications" edges to the UserTopicNotification entity.
+func (uuo *UserUpdateOne) ClearUserTopicNotifications() *UserUpdateOne {
+	uuo.mutation.ClearUserTopicNotifications()
+	return uuo
+}
+
+// RemoveUserTopicNotificationIDs removes the "user_topic_notifications" edge to UserTopicNotification entities by IDs.
+func (uuo *UserUpdateOne) RemoveUserTopicNotificationIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveUserTopicNotificationIDs(ids...)
+	return uuo
+}
+
+// RemoveUserTopicNotifications removes "user_topic_notifications" edges to UserTopicNotification entities.
+func (uuo *UserUpdateOne) RemoveUserTopicNotifications(u ...*UserTopicNotification) *UserUpdateOne {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return uuo.RemoveUserTopicNotificationIDs(ids...)
+}
+
+// ClearUserCommentNotifications clears all "user_comment_notifications" edges to the UserCommentNotification entity.
+func (uuo *UserUpdateOne) ClearUserCommentNotifications() *UserUpdateOne {
+	uuo.mutation.ClearUserCommentNotifications()
+	return uuo
+}
+
+// RemoveUserCommentNotificationIDs removes the "user_comment_notifications" edge to UserCommentNotification entities by IDs.
+func (uuo *UserUpdateOne) RemoveUserCommentNotificationIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveUserCommentNotificationIDs(ids...)
+	return uuo
+}
+
+// RemoveUserCommentNotifications removes "user_comment_notifications" edges to UserCommentNotification entities.
+func (uuo *UserUpdateOne) RemoveUserCommentNotifications(u ...*UserCommentNotification) *UserUpdateOne {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return uuo.RemoveUserCommentNotificationIDs(ids...)
+}
+
+// ClearForumLikes clears all "forum_likes" edges to the ForumLike entity.
+func (uuo *UserUpdateOne) ClearForumLikes() *UserUpdateOne {
+	uuo.mutation.ClearForumLikes()
+	return uuo
+}
+
+// RemoveForumLikeIDs removes the "forum_likes" edge to ForumLike entities by IDs.
+func (uuo *UserUpdateOne) RemoveForumLikeIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveForumLikeIDs(ids...)
+	return uuo
+}
+
+// RemoveForumLikes removes "forum_likes" edges to ForumLike entities.
+func (uuo *UserUpdateOne) RemoveForumLikes(f ...*ForumLike) *UserUpdateOne {
+	ids := make([]int, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return uuo.RemoveForumLikeIDs(ids...)
+}
+
+// ClearTopicLikes clears all "topic_likes" edges to the TopicLike entity.
+func (uuo *UserUpdateOne) ClearTopicLikes() *UserUpdateOne {
+	uuo.mutation.ClearTopicLikes()
+	return uuo
+}
+
+// RemoveTopicLikeIDs removes the "topic_likes" edge to TopicLike entities by IDs.
+func (uuo *UserUpdateOne) RemoveTopicLikeIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveTopicLikeIDs(ids...)
+	return uuo
+}
+
+// RemoveTopicLikes removes "topic_likes" edges to TopicLike entities.
+func (uuo *UserUpdateOne) RemoveTopicLikes(t ...*TopicLike) *UserUpdateOne {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return uuo.RemoveTopicLikeIDs(ids...)
+}
+
+// ClearCommentLikes clears all "comment_likes" edges to the CommentLike entity.
+func (uuo *UserUpdateOne) ClearCommentLikes() *UserUpdateOne {
+	uuo.mutation.ClearCommentLikes()
+	return uuo
+}
+
+// RemoveCommentLikeIDs removes the "comment_likes" edge to CommentLike entities by IDs.
+func (uuo *UserUpdateOne) RemoveCommentLikeIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveCommentLikeIDs(ids...)
+	return uuo
+}
+
+// RemoveCommentLikes removes "comment_likes" edges to CommentLike entities.
+func (uuo *UserUpdateOne) RemoveCommentLikes(c ...*CommentLike) *UserUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uuo.RemoveCommentLikeIDs(ids...)
 }
 
 // Where appends a list predicates to the UserUpdate builder.
@@ -188,6 +1337,7 @@ func (uuo *UserUpdateOne) Select(field string, fields ...string) *UserUpdateOne 
 
 // Save executes the query and returns the updated User entity.
 func (uuo *UserUpdateOne) Save(ctx context.Context) (*User, error) {
+	uuo.defaults()
 	return withHooks(ctx, uuo.sqlSave, uuo.mutation, uuo.hooks)
 }
 
@@ -213,16 +1363,19 @@ func (uuo *UserUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (uuo *UserUpdateOne) defaults() {
+	if _, ok := uuo.mutation.UpdatedAt(); !ok {
+		v := user.UpdateDefaultUpdatedAt()
+		uuo.mutation.SetUpdatedAt(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (uuo *UserUpdateOne) check() error {
-	if v, ok := uuo.mutation.Name(); ok {
-		if err := user.NameValidator(v); err != nil {
-			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "User.name": %w`, err)}
-		}
-	}
-	if v, ok := uuo.mutation.Email(); ok {
-		if err := user.EmailValidator(v); err != nil {
-			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "User.email": %w`, err)}
+	if v, ok := uuo.mutation.Status(); ok {
+		if err := user.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "User.status": %w`, err)}
 		}
 	}
 	return nil
@@ -257,11 +1410,395 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			}
 		}
 	}
-	if value, ok := uuo.mutation.Name(); ok {
-		_spec.SetField(user.FieldName, field.TypeString, value)
+	if value, ok := uuo.mutation.Username(); ok {
+		_spec.SetField(user.FieldUsername, field.TypeString, value)
 	}
 	if value, ok := uuo.mutation.Email(); ok {
 		_spec.SetField(user.FieldEmail, field.TypeString, value)
+	}
+	if value, ok := uuo.mutation.Password(); ok {
+		_spec.SetField(user.FieldPassword, field.TypeString, value)
+	}
+	if value, ok := uuo.mutation.DisplayName(); ok {
+		_spec.SetField(user.FieldDisplayName, field.TypeString, value)
+	}
+	if uuo.mutation.DisplayNameCleared() {
+		_spec.ClearField(user.FieldDisplayName, field.TypeString)
+	}
+	if value, ok := uuo.mutation.Avatar(); ok {
+		_spec.SetField(user.FieldAvatar, field.TypeString, value)
+	}
+	if uuo.mutation.AvatarCleared() {
+		_spec.ClearField(user.FieldAvatar, field.TypeString)
+	}
+	if value, ok := uuo.mutation.Status(); ok {
+		_spec.SetField(user.FieldStatus, field.TypeEnum, value)
+	}
+	if value, ok := uuo.mutation.CreatedAt(); ok {
+		_spec.SetField(user.FieldCreatedAt, field.TypeTime, value)
+	}
+	if value, ok := uuo.mutation.UpdatedAt(); ok {
+		_spec.SetField(user.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if uuo.mutation.ForumsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ForumsTable,
+			Columns: []string{user.ForumsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(forum.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedForumsIDs(); len(nodes) > 0 && !uuo.mutation.ForumsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ForumsTable,
+			Columns: []string{user.ForumsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(forum.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.ForumsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ForumsTable,
+			Columns: []string{user.ForumsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(forum.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.TopicsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.TopicsTable,
+			Columns: []string{user.TopicsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(topic.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedTopicsIDs(); len(nodes) > 0 && !uuo.mutation.TopicsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.TopicsTable,
+			Columns: []string{user.TopicsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(topic.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.TopicsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.TopicsTable,
+			Columns: []string{user.TopicsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(topic.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.CommentsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.CommentsTable,
+			Columns: []string{user.CommentsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedCommentsIDs(); len(nodes) > 0 && !uuo.mutation.CommentsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.CommentsTable,
+			Columns: []string{user.CommentsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.CommentsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.CommentsTable,
+			Columns: []string{user.CommentsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.UserTopicNotificationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserTopicNotificationsTable,
+			Columns: []string{user.UserTopicNotificationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(usertopicnotification.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedUserTopicNotificationsIDs(); len(nodes) > 0 && !uuo.mutation.UserTopicNotificationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserTopicNotificationsTable,
+			Columns: []string{user.UserTopicNotificationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(usertopicnotification.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.UserTopicNotificationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserTopicNotificationsTable,
+			Columns: []string{user.UserTopicNotificationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(usertopicnotification.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.UserCommentNotificationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserCommentNotificationsTable,
+			Columns: []string{user.UserCommentNotificationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(usercommentnotification.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedUserCommentNotificationsIDs(); len(nodes) > 0 && !uuo.mutation.UserCommentNotificationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserCommentNotificationsTable,
+			Columns: []string{user.UserCommentNotificationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(usercommentnotification.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.UserCommentNotificationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserCommentNotificationsTable,
+			Columns: []string{user.UserCommentNotificationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(usercommentnotification.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.ForumLikesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ForumLikesTable,
+			Columns: []string{user.ForumLikesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(forumlike.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedForumLikesIDs(); len(nodes) > 0 && !uuo.mutation.ForumLikesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ForumLikesTable,
+			Columns: []string{user.ForumLikesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(forumlike.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.ForumLikesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ForumLikesTable,
+			Columns: []string{user.ForumLikesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(forumlike.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.TopicLikesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.TopicLikesTable,
+			Columns: []string{user.TopicLikesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(topiclike.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedTopicLikesIDs(); len(nodes) > 0 && !uuo.mutation.TopicLikesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.TopicLikesTable,
+			Columns: []string{user.TopicLikesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(topiclike.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.TopicLikesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.TopicLikesTable,
+			Columns: []string{user.TopicLikesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(topiclike.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.CommentLikesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.CommentLikesTable,
+			Columns: []string{user.CommentLikesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(commentlike.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedCommentLikesIDs(); len(nodes) > 0 && !uuo.mutation.CommentLikesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.CommentLikesTable,
+			Columns: []string{user.CommentLikesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(commentlike.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.CommentLikesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.CommentLikesTable,
+			Columns: []string{user.CommentLikesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(commentlike.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &User{config: uuo.config}
 	_spec.Assign = _node.assignValues

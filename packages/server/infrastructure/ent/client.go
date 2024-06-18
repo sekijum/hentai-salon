@@ -11,11 +11,22 @@ import (
 
 	"server/infrastructure/ent/migrate"
 
+	"server/infrastructure/ent/adminuser"
+	"server/infrastructure/ent/comment"
+	"server/infrastructure/ent/commentattachment"
+	"server/infrastructure/ent/commentlike"
+	"server/infrastructure/ent/forum"
+	"server/infrastructure/ent/forumlike"
+	"server/infrastructure/ent/topic"
+	"server/infrastructure/ent/topiclike"
 	"server/infrastructure/ent/user"
+	"server/infrastructure/ent/usercommentnotification"
+	"server/infrastructure/ent/usertopicnotification"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 // Client is the client that holds all ent builders.
@@ -23,8 +34,28 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
+	// AdminUser is the client for interacting with the AdminUser builders.
+	AdminUser *AdminUserClient
+	// Comment is the client for interacting with the Comment builders.
+	Comment *CommentClient
+	// CommentAttachment is the client for interacting with the CommentAttachment builders.
+	CommentAttachment *CommentAttachmentClient
+	// CommentLike is the client for interacting with the CommentLike builders.
+	CommentLike *CommentLikeClient
+	// Forum is the client for interacting with the Forum builders.
+	Forum *ForumClient
+	// ForumLike is the client for interacting with the ForumLike builders.
+	ForumLike *ForumLikeClient
+	// Topic is the client for interacting with the Topic builders.
+	Topic *TopicClient
+	// TopicLike is the client for interacting with the TopicLike builders.
+	TopicLike *TopicLikeClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
+	// UserCommentNotification is the client for interacting with the UserCommentNotification builders.
+	UserCommentNotification *UserCommentNotificationClient
+	// UserTopicNotification is the client for interacting with the UserTopicNotification builders.
+	UserTopicNotification *UserTopicNotificationClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -36,7 +67,17 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
+	c.AdminUser = NewAdminUserClient(c.config)
+	c.Comment = NewCommentClient(c.config)
+	c.CommentAttachment = NewCommentAttachmentClient(c.config)
+	c.CommentLike = NewCommentLikeClient(c.config)
+	c.Forum = NewForumClient(c.config)
+	c.ForumLike = NewForumLikeClient(c.config)
+	c.Topic = NewTopicClient(c.config)
+	c.TopicLike = NewTopicLikeClient(c.config)
 	c.User = NewUserClient(c.config)
+	c.UserCommentNotification = NewUserCommentNotificationClient(c.config)
+	c.UserTopicNotification = NewUserTopicNotificationClient(c.config)
 }
 
 type (
@@ -127,9 +168,19 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:    ctx,
-		config: cfg,
-		User:   NewUserClient(cfg),
+		ctx:                     ctx,
+		config:                  cfg,
+		AdminUser:               NewAdminUserClient(cfg),
+		Comment:                 NewCommentClient(cfg),
+		CommentAttachment:       NewCommentAttachmentClient(cfg),
+		CommentLike:             NewCommentLikeClient(cfg),
+		Forum:                   NewForumClient(cfg),
+		ForumLike:               NewForumLikeClient(cfg),
+		Topic:                   NewTopicClient(cfg),
+		TopicLike:               NewTopicLikeClient(cfg),
+		User:                    NewUserClient(cfg),
+		UserCommentNotification: NewUserCommentNotificationClient(cfg),
+		UserTopicNotification:   NewUserTopicNotificationClient(cfg),
 	}, nil
 }
 
@@ -147,16 +198,26 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:    ctx,
-		config: cfg,
-		User:   NewUserClient(cfg),
+		ctx:                     ctx,
+		config:                  cfg,
+		AdminUser:               NewAdminUserClient(cfg),
+		Comment:                 NewCommentClient(cfg),
+		CommentAttachment:       NewCommentAttachmentClient(cfg),
+		CommentLike:             NewCommentLikeClient(cfg),
+		Forum:                   NewForumClient(cfg),
+		ForumLike:               NewForumLikeClient(cfg),
+		Topic:                   NewTopicClient(cfg),
+		TopicLike:               NewTopicLikeClient(cfg),
+		User:                    NewUserClient(cfg),
+		UserCommentNotification: NewUserCommentNotificationClient(cfg),
+		UserTopicNotification:   NewUserTopicNotificationClient(cfg),
 	}, nil
 }
 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		User.
+//		AdminUser.
 //		Query().
 //		Count(ctx)
 func (c *Client) Debug() *Client {
@@ -178,22 +239,1470 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
-	c.User.Use(hooks...)
+	for _, n := range []interface{ Use(...Hook) }{
+		c.AdminUser, c.Comment, c.CommentAttachment, c.CommentLike, c.Forum,
+		c.ForumLike, c.Topic, c.TopicLike, c.User, c.UserCommentNotification,
+		c.UserTopicNotification,
+	} {
+		n.Use(hooks...)
+	}
 }
 
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
-	c.User.Intercept(interceptors...)
+	for _, n := range []interface{ Intercept(...Interceptor) }{
+		c.AdminUser, c.Comment, c.CommentAttachment, c.CommentLike, c.Forum,
+		c.ForumLike, c.Topic, c.TopicLike, c.User, c.UserCommentNotification,
+		c.UserTopicNotification,
+	} {
+		n.Intercept(interceptors...)
+	}
 }
 
 // Mutate implements the ent.Mutator interface.
 func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
+	case *AdminUserMutation:
+		return c.AdminUser.mutate(ctx, m)
+	case *CommentMutation:
+		return c.Comment.mutate(ctx, m)
+	case *CommentAttachmentMutation:
+		return c.CommentAttachment.mutate(ctx, m)
+	case *CommentLikeMutation:
+		return c.CommentLike.mutate(ctx, m)
+	case *ForumMutation:
+		return c.Forum.mutate(ctx, m)
+	case *ForumLikeMutation:
+		return c.ForumLike.mutate(ctx, m)
+	case *TopicMutation:
+		return c.Topic.mutate(ctx, m)
+	case *TopicLikeMutation:
+		return c.TopicLike.mutate(ctx, m)
 	case *UserMutation:
 		return c.User.mutate(ctx, m)
+	case *UserCommentNotificationMutation:
+		return c.UserCommentNotification.mutate(ctx, m)
+	case *UserTopicNotificationMutation:
+		return c.UserTopicNotification.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
+	}
+}
+
+// AdminUserClient is a client for the AdminUser schema.
+type AdminUserClient struct {
+	config
+}
+
+// NewAdminUserClient returns a client for the AdminUser from the given config.
+func NewAdminUserClient(c config) *AdminUserClient {
+	return &AdminUserClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `adminuser.Hooks(f(g(h())))`.
+func (c *AdminUserClient) Use(hooks ...Hook) {
+	c.hooks.AdminUser = append(c.hooks.AdminUser, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `adminuser.Intercept(f(g(h())))`.
+func (c *AdminUserClient) Intercept(interceptors ...Interceptor) {
+	c.inters.AdminUser = append(c.inters.AdminUser, interceptors...)
+}
+
+// Create returns a builder for creating a AdminUser entity.
+func (c *AdminUserClient) Create() *AdminUserCreate {
+	mutation := newAdminUserMutation(c.config, OpCreate)
+	return &AdminUserCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of AdminUser entities.
+func (c *AdminUserClient) CreateBulk(builders ...*AdminUserCreate) *AdminUserCreateBulk {
+	return &AdminUserCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *AdminUserClient) MapCreateBulk(slice any, setFunc func(*AdminUserCreate, int)) *AdminUserCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &AdminUserCreateBulk{err: fmt.Errorf("calling to AdminUserClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*AdminUserCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &AdminUserCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for AdminUser.
+func (c *AdminUserClient) Update() *AdminUserUpdate {
+	mutation := newAdminUserMutation(c.config, OpUpdate)
+	return &AdminUserUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *AdminUserClient) UpdateOne(au *AdminUser) *AdminUserUpdateOne {
+	mutation := newAdminUserMutation(c.config, OpUpdateOne, withAdminUser(au))
+	return &AdminUserUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *AdminUserClient) UpdateOneID(id int) *AdminUserUpdateOne {
+	mutation := newAdminUserMutation(c.config, OpUpdateOne, withAdminUserID(id))
+	return &AdminUserUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for AdminUser.
+func (c *AdminUserClient) Delete() *AdminUserDelete {
+	mutation := newAdminUserMutation(c.config, OpDelete)
+	return &AdminUserDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *AdminUserClient) DeleteOne(au *AdminUser) *AdminUserDeleteOne {
+	return c.DeleteOneID(au.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *AdminUserClient) DeleteOneID(id int) *AdminUserDeleteOne {
+	builder := c.Delete().Where(adminuser.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &AdminUserDeleteOne{builder}
+}
+
+// Query returns a query builder for AdminUser.
+func (c *AdminUserClient) Query() *AdminUserQuery {
+	return &AdminUserQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeAdminUser},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a AdminUser entity by its id.
+func (c *AdminUserClient) Get(ctx context.Context, id int) (*AdminUser, error) {
+	return c.Query().Where(adminuser.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *AdminUserClient) GetX(ctx context.Context, id int) *AdminUser {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *AdminUserClient) Hooks() []Hook {
+	return c.hooks.AdminUser
+}
+
+// Interceptors returns the client interceptors.
+func (c *AdminUserClient) Interceptors() []Interceptor {
+	return c.inters.AdminUser
+}
+
+func (c *AdminUserClient) mutate(ctx context.Context, m *AdminUserMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&AdminUserCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&AdminUserUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&AdminUserUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&AdminUserDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown AdminUser mutation op: %q", m.Op())
+	}
+}
+
+// CommentClient is a client for the Comment schema.
+type CommentClient struct {
+	config
+}
+
+// NewCommentClient returns a client for the Comment from the given config.
+func NewCommentClient(c config) *CommentClient {
+	return &CommentClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `comment.Hooks(f(g(h())))`.
+func (c *CommentClient) Use(hooks ...Hook) {
+	c.hooks.Comment = append(c.hooks.Comment, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `comment.Intercept(f(g(h())))`.
+func (c *CommentClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Comment = append(c.inters.Comment, interceptors...)
+}
+
+// Create returns a builder for creating a Comment entity.
+func (c *CommentClient) Create() *CommentCreate {
+	mutation := newCommentMutation(c.config, OpCreate)
+	return &CommentCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Comment entities.
+func (c *CommentClient) CreateBulk(builders ...*CommentCreate) *CommentCreateBulk {
+	return &CommentCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *CommentClient) MapCreateBulk(slice any, setFunc func(*CommentCreate, int)) *CommentCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &CommentCreateBulk{err: fmt.Errorf("calling to CommentClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*CommentCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &CommentCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Comment.
+func (c *CommentClient) Update() *CommentUpdate {
+	mutation := newCommentMutation(c.config, OpUpdate)
+	return &CommentUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *CommentClient) UpdateOne(co *Comment) *CommentUpdateOne {
+	mutation := newCommentMutation(c.config, OpUpdateOne, withComment(co))
+	return &CommentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *CommentClient) UpdateOneID(id int) *CommentUpdateOne {
+	mutation := newCommentMutation(c.config, OpUpdateOne, withCommentID(id))
+	return &CommentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Comment.
+func (c *CommentClient) Delete() *CommentDelete {
+	mutation := newCommentMutation(c.config, OpDelete)
+	return &CommentDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *CommentClient) DeleteOne(co *Comment) *CommentDeleteOne {
+	return c.DeleteOneID(co.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *CommentClient) DeleteOneID(id int) *CommentDeleteOne {
+	builder := c.Delete().Where(comment.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &CommentDeleteOne{builder}
+}
+
+// Query returns a query builder for Comment.
+func (c *CommentClient) Query() *CommentQuery {
+	return &CommentQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeComment},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Comment entity by its id.
+func (c *CommentClient) Get(ctx context.Context, id int) (*Comment, error) {
+	return c.Query().Where(comment.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *CommentClient) GetX(ctx context.Context, id int) *Comment {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryTopic queries the topic edge of a Comment.
+func (c *CommentClient) QueryTopic(co *Comment) *TopicQuery {
+	query := (&TopicClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := co.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(comment.Table, comment.FieldID, id),
+			sqlgraph.To(topic.Table, topic.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, comment.TopicTable, comment.TopicColumn),
+		)
+		fromV = sqlgraph.Neighbors(co.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUser queries the user edge of a Comment.
+func (c *CommentClient) QueryUser(co *Comment) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := co.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(comment.Table, comment.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, comment.UserTable, comment.UserColumn),
+		)
+		fromV = sqlgraph.Neighbors(co.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryParent queries the parent edge of a Comment.
+func (c *CommentClient) QueryParent(co *Comment) *CommentQuery {
+	query := (&CommentClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := co.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(comment.Table, comment.FieldID, id),
+			sqlgraph.To(comment.Table, comment.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, comment.ParentTable, comment.ParentColumn),
+		)
+		fromV = sqlgraph.Neighbors(co.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryReplies queries the replies edge of a Comment.
+func (c *CommentClient) QueryReplies(co *Comment) *CommentQuery {
+	query := (&CommentClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := co.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(comment.Table, comment.FieldID, id),
+			sqlgraph.To(comment.Table, comment.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, comment.RepliesTable, comment.RepliesColumn),
+		)
+		fromV = sqlgraph.Neighbors(co.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCommentLikes queries the comment_likes edge of a Comment.
+func (c *CommentClient) QueryCommentLikes(co *Comment) *CommentLikeQuery {
+	query := (&CommentLikeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := co.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(comment.Table, comment.FieldID, id),
+			sqlgraph.To(commentlike.Table, commentlike.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, comment.CommentLikesTable, comment.CommentLikesColumn),
+		)
+		fromV = sqlgraph.Neighbors(co.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCommentAttachments queries the comment_attachments edge of a Comment.
+func (c *CommentClient) QueryCommentAttachments(co *Comment) *CommentAttachmentQuery {
+	query := (&CommentAttachmentClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := co.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(comment.Table, comment.FieldID, id),
+			sqlgraph.To(commentattachment.Table, commentattachment.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, comment.CommentAttachmentsTable, comment.CommentAttachmentsColumn),
+		)
+		fromV = sqlgraph.Neighbors(co.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUserCommentNotifications queries the user_comment_notifications edge of a Comment.
+func (c *CommentClient) QueryUserCommentNotifications(co *Comment) *UserCommentNotificationQuery {
+	query := (&UserCommentNotificationClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := co.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(comment.Table, comment.FieldID, id),
+			sqlgraph.To(usercommentnotification.Table, usercommentnotification.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, comment.UserCommentNotificationsTable, comment.UserCommentNotificationsColumn),
+		)
+		fromV = sqlgraph.Neighbors(co.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *CommentClient) Hooks() []Hook {
+	return c.hooks.Comment
+}
+
+// Interceptors returns the client interceptors.
+func (c *CommentClient) Interceptors() []Interceptor {
+	return c.inters.Comment
+}
+
+func (c *CommentClient) mutate(ctx context.Context, m *CommentMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&CommentCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&CommentUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&CommentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&CommentDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Comment mutation op: %q", m.Op())
+	}
+}
+
+// CommentAttachmentClient is a client for the CommentAttachment schema.
+type CommentAttachmentClient struct {
+	config
+}
+
+// NewCommentAttachmentClient returns a client for the CommentAttachment from the given config.
+func NewCommentAttachmentClient(c config) *CommentAttachmentClient {
+	return &CommentAttachmentClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `commentattachment.Hooks(f(g(h())))`.
+func (c *CommentAttachmentClient) Use(hooks ...Hook) {
+	c.hooks.CommentAttachment = append(c.hooks.CommentAttachment, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `commentattachment.Intercept(f(g(h())))`.
+func (c *CommentAttachmentClient) Intercept(interceptors ...Interceptor) {
+	c.inters.CommentAttachment = append(c.inters.CommentAttachment, interceptors...)
+}
+
+// Create returns a builder for creating a CommentAttachment entity.
+func (c *CommentAttachmentClient) Create() *CommentAttachmentCreate {
+	mutation := newCommentAttachmentMutation(c.config, OpCreate)
+	return &CommentAttachmentCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of CommentAttachment entities.
+func (c *CommentAttachmentClient) CreateBulk(builders ...*CommentAttachmentCreate) *CommentAttachmentCreateBulk {
+	return &CommentAttachmentCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *CommentAttachmentClient) MapCreateBulk(slice any, setFunc func(*CommentAttachmentCreate, int)) *CommentAttachmentCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &CommentAttachmentCreateBulk{err: fmt.Errorf("calling to CommentAttachmentClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*CommentAttachmentCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &CommentAttachmentCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for CommentAttachment.
+func (c *CommentAttachmentClient) Update() *CommentAttachmentUpdate {
+	mutation := newCommentAttachmentMutation(c.config, OpUpdate)
+	return &CommentAttachmentUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *CommentAttachmentClient) UpdateOne(ca *CommentAttachment) *CommentAttachmentUpdateOne {
+	mutation := newCommentAttachmentMutation(c.config, OpUpdateOne, withCommentAttachment(ca))
+	return &CommentAttachmentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *CommentAttachmentClient) UpdateOneID(id int) *CommentAttachmentUpdateOne {
+	mutation := newCommentAttachmentMutation(c.config, OpUpdateOne, withCommentAttachmentID(id))
+	return &CommentAttachmentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for CommentAttachment.
+func (c *CommentAttachmentClient) Delete() *CommentAttachmentDelete {
+	mutation := newCommentAttachmentMutation(c.config, OpDelete)
+	return &CommentAttachmentDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *CommentAttachmentClient) DeleteOne(ca *CommentAttachment) *CommentAttachmentDeleteOne {
+	return c.DeleteOneID(ca.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *CommentAttachmentClient) DeleteOneID(id int) *CommentAttachmentDeleteOne {
+	builder := c.Delete().Where(commentattachment.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &CommentAttachmentDeleteOne{builder}
+}
+
+// Query returns a query builder for CommentAttachment.
+func (c *CommentAttachmentClient) Query() *CommentAttachmentQuery {
+	return &CommentAttachmentQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeCommentAttachment},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a CommentAttachment entity by its id.
+func (c *CommentAttachmentClient) Get(ctx context.Context, id int) (*CommentAttachment, error) {
+	return c.Query().Where(commentattachment.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *CommentAttachmentClient) GetX(ctx context.Context, id int) *CommentAttachment {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryComment queries the comment edge of a CommentAttachment.
+func (c *CommentAttachmentClient) QueryComment(ca *CommentAttachment) *CommentQuery {
+	query := (&CommentClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ca.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(commentattachment.Table, commentattachment.FieldID, id),
+			sqlgraph.To(comment.Table, comment.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, commentattachment.CommentTable, commentattachment.CommentColumn),
+		)
+		fromV = sqlgraph.Neighbors(ca.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *CommentAttachmentClient) Hooks() []Hook {
+	return c.hooks.CommentAttachment
+}
+
+// Interceptors returns the client interceptors.
+func (c *CommentAttachmentClient) Interceptors() []Interceptor {
+	return c.inters.CommentAttachment
+}
+
+func (c *CommentAttachmentClient) mutate(ctx context.Context, m *CommentAttachmentMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&CommentAttachmentCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&CommentAttachmentUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&CommentAttachmentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&CommentAttachmentDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown CommentAttachment mutation op: %q", m.Op())
+	}
+}
+
+// CommentLikeClient is a client for the CommentLike schema.
+type CommentLikeClient struct {
+	config
+}
+
+// NewCommentLikeClient returns a client for the CommentLike from the given config.
+func NewCommentLikeClient(c config) *CommentLikeClient {
+	return &CommentLikeClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `commentlike.Hooks(f(g(h())))`.
+func (c *CommentLikeClient) Use(hooks ...Hook) {
+	c.hooks.CommentLike = append(c.hooks.CommentLike, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `commentlike.Intercept(f(g(h())))`.
+func (c *CommentLikeClient) Intercept(interceptors ...Interceptor) {
+	c.inters.CommentLike = append(c.inters.CommentLike, interceptors...)
+}
+
+// Create returns a builder for creating a CommentLike entity.
+func (c *CommentLikeClient) Create() *CommentLikeCreate {
+	mutation := newCommentLikeMutation(c.config, OpCreate)
+	return &CommentLikeCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of CommentLike entities.
+func (c *CommentLikeClient) CreateBulk(builders ...*CommentLikeCreate) *CommentLikeCreateBulk {
+	return &CommentLikeCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *CommentLikeClient) MapCreateBulk(slice any, setFunc func(*CommentLikeCreate, int)) *CommentLikeCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &CommentLikeCreateBulk{err: fmt.Errorf("calling to CommentLikeClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*CommentLikeCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &CommentLikeCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for CommentLike.
+func (c *CommentLikeClient) Update() *CommentLikeUpdate {
+	mutation := newCommentLikeMutation(c.config, OpUpdate)
+	return &CommentLikeUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *CommentLikeClient) UpdateOne(cl *CommentLike) *CommentLikeUpdateOne {
+	mutation := newCommentLikeMutation(c.config, OpUpdateOne, withCommentLike(cl))
+	return &CommentLikeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *CommentLikeClient) UpdateOneID(id int) *CommentLikeUpdateOne {
+	mutation := newCommentLikeMutation(c.config, OpUpdateOne, withCommentLikeID(id))
+	return &CommentLikeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for CommentLike.
+func (c *CommentLikeClient) Delete() *CommentLikeDelete {
+	mutation := newCommentLikeMutation(c.config, OpDelete)
+	return &CommentLikeDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *CommentLikeClient) DeleteOne(cl *CommentLike) *CommentLikeDeleteOne {
+	return c.DeleteOneID(cl.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *CommentLikeClient) DeleteOneID(id int) *CommentLikeDeleteOne {
+	builder := c.Delete().Where(commentlike.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &CommentLikeDeleteOne{builder}
+}
+
+// Query returns a query builder for CommentLike.
+func (c *CommentLikeClient) Query() *CommentLikeQuery {
+	return &CommentLikeQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeCommentLike},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a CommentLike entity by its id.
+func (c *CommentLikeClient) Get(ctx context.Context, id int) (*CommentLike, error) {
+	return c.Query().Where(commentlike.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *CommentLikeClient) GetX(ctx context.Context, id int) *CommentLike {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryComment queries the comment edge of a CommentLike.
+func (c *CommentLikeClient) QueryComment(cl *CommentLike) *CommentQuery {
+	query := (&CommentClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := cl.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(commentlike.Table, commentlike.FieldID, id),
+			sqlgraph.To(comment.Table, comment.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, commentlike.CommentTable, commentlike.CommentColumn),
+		)
+		fromV = sqlgraph.Neighbors(cl.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUser queries the user edge of a CommentLike.
+func (c *CommentLikeClient) QueryUser(cl *CommentLike) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := cl.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(commentlike.Table, commentlike.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, commentlike.UserTable, commentlike.UserColumn),
+		)
+		fromV = sqlgraph.Neighbors(cl.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *CommentLikeClient) Hooks() []Hook {
+	return c.hooks.CommentLike
+}
+
+// Interceptors returns the client interceptors.
+func (c *CommentLikeClient) Interceptors() []Interceptor {
+	return c.inters.CommentLike
+}
+
+func (c *CommentLikeClient) mutate(ctx context.Context, m *CommentLikeMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&CommentLikeCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&CommentLikeUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&CommentLikeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&CommentLikeDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown CommentLike mutation op: %q", m.Op())
+	}
+}
+
+// ForumClient is a client for the Forum schema.
+type ForumClient struct {
+	config
+}
+
+// NewForumClient returns a client for the Forum from the given config.
+func NewForumClient(c config) *ForumClient {
+	return &ForumClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `forum.Hooks(f(g(h())))`.
+func (c *ForumClient) Use(hooks ...Hook) {
+	c.hooks.Forum = append(c.hooks.Forum, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `forum.Intercept(f(g(h())))`.
+func (c *ForumClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Forum = append(c.inters.Forum, interceptors...)
+}
+
+// Create returns a builder for creating a Forum entity.
+func (c *ForumClient) Create() *ForumCreate {
+	mutation := newForumMutation(c.config, OpCreate)
+	return &ForumCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Forum entities.
+func (c *ForumClient) CreateBulk(builders ...*ForumCreate) *ForumCreateBulk {
+	return &ForumCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ForumClient) MapCreateBulk(slice any, setFunc func(*ForumCreate, int)) *ForumCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ForumCreateBulk{err: fmt.Errorf("calling to ForumClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ForumCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ForumCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Forum.
+func (c *ForumClient) Update() *ForumUpdate {
+	mutation := newForumMutation(c.config, OpUpdate)
+	return &ForumUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ForumClient) UpdateOne(f *Forum) *ForumUpdateOne {
+	mutation := newForumMutation(c.config, OpUpdateOne, withForum(f))
+	return &ForumUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ForumClient) UpdateOneID(id int) *ForumUpdateOne {
+	mutation := newForumMutation(c.config, OpUpdateOne, withForumID(id))
+	return &ForumUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Forum.
+func (c *ForumClient) Delete() *ForumDelete {
+	mutation := newForumMutation(c.config, OpDelete)
+	return &ForumDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ForumClient) DeleteOne(f *Forum) *ForumDeleteOne {
+	return c.DeleteOneID(f.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ForumClient) DeleteOneID(id int) *ForumDeleteOne {
+	builder := c.Delete().Where(forum.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ForumDeleteOne{builder}
+}
+
+// Query returns a query builder for Forum.
+func (c *ForumClient) Query() *ForumQuery {
+	return &ForumQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeForum},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Forum entity by its id.
+func (c *ForumClient) Get(ctx context.Context, id int) (*Forum, error) {
+	return c.Query().Where(forum.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ForumClient) GetX(ctx context.Context, id int) *Forum {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryUser queries the user edge of a Forum.
+func (c *ForumClient) QueryUser(f *Forum) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := f.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(forum.Table, forum.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, forum.UserTable, forum.UserColumn),
+		)
+		fromV = sqlgraph.Neighbors(f.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryTopics queries the topics edge of a Forum.
+func (c *ForumClient) QueryTopics(f *Forum) *TopicQuery {
+	query := (&TopicClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := f.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(forum.Table, forum.FieldID, id),
+			sqlgraph.To(topic.Table, topic.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, forum.TopicsTable, forum.TopicsColumn),
+		)
+		fromV = sqlgraph.Neighbors(f.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryForumLikes queries the forum_likes edge of a Forum.
+func (c *ForumClient) QueryForumLikes(f *Forum) *ForumLikeQuery {
+	query := (&ForumLikeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := f.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(forum.Table, forum.FieldID, id),
+			sqlgraph.To(forumlike.Table, forumlike.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, forum.ForumLikesTable, forum.ForumLikesColumn),
+		)
+		fromV = sqlgraph.Neighbors(f.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *ForumClient) Hooks() []Hook {
+	return c.hooks.Forum
+}
+
+// Interceptors returns the client interceptors.
+func (c *ForumClient) Interceptors() []Interceptor {
+	return c.inters.Forum
+}
+
+func (c *ForumClient) mutate(ctx context.Context, m *ForumMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ForumCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ForumUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ForumUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ForumDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Forum mutation op: %q", m.Op())
+	}
+}
+
+// ForumLikeClient is a client for the ForumLike schema.
+type ForumLikeClient struct {
+	config
+}
+
+// NewForumLikeClient returns a client for the ForumLike from the given config.
+func NewForumLikeClient(c config) *ForumLikeClient {
+	return &ForumLikeClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `forumlike.Hooks(f(g(h())))`.
+func (c *ForumLikeClient) Use(hooks ...Hook) {
+	c.hooks.ForumLike = append(c.hooks.ForumLike, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `forumlike.Intercept(f(g(h())))`.
+func (c *ForumLikeClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ForumLike = append(c.inters.ForumLike, interceptors...)
+}
+
+// Create returns a builder for creating a ForumLike entity.
+func (c *ForumLikeClient) Create() *ForumLikeCreate {
+	mutation := newForumLikeMutation(c.config, OpCreate)
+	return &ForumLikeCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ForumLike entities.
+func (c *ForumLikeClient) CreateBulk(builders ...*ForumLikeCreate) *ForumLikeCreateBulk {
+	return &ForumLikeCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ForumLikeClient) MapCreateBulk(slice any, setFunc func(*ForumLikeCreate, int)) *ForumLikeCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ForumLikeCreateBulk{err: fmt.Errorf("calling to ForumLikeClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ForumLikeCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ForumLikeCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ForumLike.
+func (c *ForumLikeClient) Update() *ForumLikeUpdate {
+	mutation := newForumLikeMutation(c.config, OpUpdate)
+	return &ForumLikeUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ForumLikeClient) UpdateOne(fl *ForumLike) *ForumLikeUpdateOne {
+	mutation := newForumLikeMutation(c.config, OpUpdateOne, withForumLike(fl))
+	return &ForumLikeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ForumLikeClient) UpdateOneID(id int) *ForumLikeUpdateOne {
+	mutation := newForumLikeMutation(c.config, OpUpdateOne, withForumLikeID(id))
+	return &ForumLikeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ForumLike.
+func (c *ForumLikeClient) Delete() *ForumLikeDelete {
+	mutation := newForumLikeMutation(c.config, OpDelete)
+	return &ForumLikeDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ForumLikeClient) DeleteOne(fl *ForumLike) *ForumLikeDeleteOne {
+	return c.DeleteOneID(fl.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ForumLikeClient) DeleteOneID(id int) *ForumLikeDeleteOne {
+	builder := c.Delete().Where(forumlike.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ForumLikeDeleteOne{builder}
+}
+
+// Query returns a query builder for ForumLike.
+func (c *ForumLikeClient) Query() *ForumLikeQuery {
+	return &ForumLikeQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeForumLike},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ForumLike entity by its id.
+func (c *ForumLikeClient) Get(ctx context.Context, id int) (*ForumLike, error) {
+	return c.Query().Where(forumlike.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ForumLikeClient) GetX(ctx context.Context, id int) *ForumLike {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryForum queries the forum edge of a ForumLike.
+func (c *ForumLikeClient) QueryForum(fl *ForumLike) *ForumQuery {
+	query := (&ForumClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := fl.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(forumlike.Table, forumlike.FieldID, id),
+			sqlgraph.To(forum.Table, forum.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, forumlike.ForumTable, forumlike.ForumColumn),
+		)
+		fromV = sqlgraph.Neighbors(fl.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUser queries the user edge of a ForumLike.
+func (c *ForumLikeClient) QueryUser(fl *ForumLike) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := fl.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(forumlike.Table, forumlike.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, forumlike.UserTable, forumlike.UserColumn),
+		)
+		fromV = sqlgraph.Neighbors(fl.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *ForumLikeClient) Hooks() []Hook {
+	return c.hooks.ForumLike
+}
+
+// Interceptors returns the client interceptors.
+func (c *ForumLikeClient) Interceptors() []Interceptor {
+	return c.inters.ForumLike
+}
+
+func (c *ForumLikeClient) mutate(ctx context.Context, m *ForumLikeMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ForumLikeCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ForumLikeUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ForumLikeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ForumLikeDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ForumLike mutation op: %q", m.Op())
+	}
+}
+
+// TopicClient is a client for the Topic schema.
+type TopicClient struct {
+	config
+}
+
+// NewTopicClient returns a client for the Topic from the given config.
+func NewTopicClient(c config) *TopicClient {
+	return &TopicClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `topic.Hooks(f(g(h())))`.
+func (c *TopicClient) Use(hooks ...Hook) {
+	c.hooks.Topic = append(c.hooks.Topic, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `topic.Intercept(f(g(h())))`.
+func (c *TopicClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Topic = append(c.inters.Topic, interceptors...)
+}
+
+// Create returns a builder for creating a Topic entity.
+func (c *TopicClient) Create() *TopicCreate {
+	mutation := newTopicMutation(c.config, OpCreate)
+	return &TopicCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Topic entities.
+func (c *TopicClient) CreateBulk(builders ...*TopicCreate) *TopicCreateBulk {
+	return &TopicCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *TopicClient) MapCreateBulk(slice any, setFunc func(*TopicCreate, int)) *TopicCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &TopicCreateBulk{err: fmt.Errorf("calling to TopicClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*TopicCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &TopicCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Topic.
+func (c *TopicClient) Update() *TopicUpdate {
+	mutation := newTopicMutation(c.config, OpUpdate)
+	return &TopicUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *TopicClient) UpdateOne(t *Topic) *TopicUpdateOne {
+	mutation := newTopicMutation(c.config, OpUpdateOne, withTopic(t))
+	return &TopicUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *TopicClient) UpdateOneID(id int) *TopicUpdateOne {
+	mutation := newTopicMutation(c.config, OpUpdateOne, withTopicID(id))
+	return &TopicUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Topic.
+func (c *TopicClient) Delete() *TopicDelete {
+	mutation := newTopicMutation(c.config, OpDelete)
+	return &TopicDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *TopicClient) DeleteOne(t *Topic) *TopicDeleteOne {
+	return c.DeleteOneID(t.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *TopicClient) DeleteOneID(id int) *TopicDeleteOne {
+	builder := c.Delete().Where(topic.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &TopicDeleteOne{builder}
+}
+
+// Query returns a query builder for Topic.
+func (c *TopicClient) Query() *TopicQuery {
+	return &TopicQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeTopic},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Topic entity by its id.
+func (c *TopicClient) Get(ctx context.Context, id int) (*Topic, error) {
+	return c.Query().Where(topic.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *TopicClient) GetX(ctx context.Context, id int) *Topic {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryForum queries the forum edge of a Topic.
+func (c *TopicClient) QueryForum(t *Topic) *ForumQuery {
+	query := (&ForumClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := t.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(topic.Table, topic.FieldID, id),
+			sqlgraph.To(forum.Table, forum.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, topic.ForumTable, topic.ForumColumn),
+		)
+		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUser queries the user edge of a Topic.
+func (c *TopicClient) QueryUser(t *Topic) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := t.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(topic.Table, topic.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, topic.UserTable, topic.UserColumn),
+		)
+		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryComments queries the comments edge of a Topic.
+func (c *TopicClient) QueryComments(t *Topic) *CommentQuery {
+	query := (&CommentClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := t.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(topic.Table, topic.FieldID, id),
+			sqlgraph.To(comment.Table, comment.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, topic.CommentsTable, topic.CommentsColumn),
+		)
+		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryTopicLikes queries the topic_likes edge of a Topic.
+func (c *TopicClient) QueryTopicLikes(t *Topic) *TopicLikeQuery {
+	query := (&TopicLikeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := t.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(topic.Table, topic.FieldID, id),
+			sqlgraph.To(topiclike.Table, topiclike.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, topic.TopicLikesTable, topic.TopicLikesColumn),
+		)
+		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUserTopicNotifications queries the user_topic_notifications edge of a Topic.
+func (c *TopicClient) QueryUserTopicNotifications(t *Topic) *UserTopicNotificationQuery {
+	query := (&UserTopicNotificationClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := t.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(topic.Table, topic.FieldID, id),
+			sqlgraph.To(usertopicnotification.Table, usertopicnotification.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, topic.UserTopicNotificationsTable, topic.UserTopicNotificationsColumn),
+		)
+		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *TopicClient) Hooks() []Hook {
+	return c.hooks.Topic
+}
+
+// Interceptors returns the client interceptors.
+func (c *TopicClient) Interceptors() []Interceptor {
+	return c.inters.Topic
+}
+
+func (c *TopicClient) mutate(ctx context.Context, m *TopicMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&TopicCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&TopicUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&TopicUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&TopicDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Topic mutation op: %q", m.Op())
+	}
+}
+
+// TopicLikeClient is a client for the TopicLike schema.
+type TopicLikeClient struct {
+	config
+}
+
+// NewTopicLikeClient returns a client for the TopicLike from the given config.
+func NewTopicLikeClient(c config) *TopicLikeClient {
+	return &TopicLikeClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `topiclike.Hooks(f(g(h())))`.
+func (c *TopicLikeClient) Use(hooks ...Hook) {
+	c.hooks.TopicLike = append(c.hooks.TopicLike, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `topiclike.Intercept(f(g(h())))`.
+func (c *TopicLikeClient) Intercept(interceptors ...Interceptor) {
+	c.inters.TopicLike = append(c.inters.TopicLike, interceptors...)
+}
+
+// Create returns a builder for creating a TopicLike entity.
+func (c *TopicLikeClient) Create() *TopicLikeCreate {
+	mutation := newTopicLikeMutation(c.config, OpCreate)
+	return &TopicLikeCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of TopicLike entities.
+func (c *TopicLikeClient) CreateBulk(builders ...*TopicLikeCreate) *TopicLikeCreateBulk {
+	return &TopicLikeCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *TopicLikeClient) MapCreateBulk(slice any, setFunc func(*TopicLikeCreate, int)) *TopicLikeCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &TopicLikeCreateBulk{err: fmt.Errorf("calling to TopicLikeClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*TopicLikeCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &TopicLikeCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for TopicLike.
+func (c *TopicLikeClient) Update() *TopicLikeUpdate {
+	mutation := newTopicLikeMutation(c.config, OpUpdate)
+	return &TopicLikeUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *TopicLikeClient) UpdateOne(tl *TopicLike) *TopicLikeUpdateOne {
+	mutation := newTopicLikeMutation(c.config, OpUpdateOne, withTopicLike(tl))
+	return &TopicLikeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *TopicLikeClient) UpdateOneID(id int) *TopicLikeUpdateOne {
+	mutation := newTopicLikeMutation(c.config, OpUpdateOne, withTopicLikeID(id))
+	return &TopicLikeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for TopicLike.
+func (c *TopicLikeClient) Delete() *TopicLikeDelete {
+	mutation := newTopicLikeMutation(c.config, OpDelete)
+	return &TopicLikeDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *TopicLikeClient) DeleteOne(tl *TopicLike) *TopicLikeDeleteOne {
+	return c.DeleteOneID(tl.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *TopicLikeClient) DeleteOneID(id int) *TopicLikeDeleteOne {
+	builder := c.Delete().Where(topiclike.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &TopicLikeDeleteOne{builder}
+}
+
+// Query returns a query builder for TopicLike.
+func (c *TopicLikeClient) Query() *TopicLikeQuery {
+	return &TopicLikeQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeTopicLike},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a TopicLike entity by its id.
+func (c *TopicLikeClient) Get(ctx context.Context, id int) (*TopicLike, error) {
+	return c.Query().Where(topiclike.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *TopicLikeClient) GetX(ctx context.Context, id int) *TopicLike {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryTopic queries the topic edge of a TopicLike.
+func (c *TopicLikeClient) QueryTopic(tl *TopicLike) *TopicQuery {
+	query := (&TopicClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := tl.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(topiclike.Table, topiclike.FieldID, id),
+			sqlgraph.To(topic.Table, topic.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, topiclike.TopicTable, topiclike.TopicColumn),
+		)
+		fromV = sqlgraph.Neighbors(tl.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUser queries the user edge of a TopicLike.
+func (c *TopicLikeClient) QueryUser(tl *TopicLike) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := tl.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(topiclike.Table, topiclike.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, topiclike.UserTable, topiclike.UserColumn),
+		)
+		fromV = sqlgraph.Neighbors(tl.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *TopicLikeClient) Hooks() []Hook {
+	return c.hooks.TopicLike
+}
+
+// Interceptors returns the client interceptors.
+func (c *TopicLikeClient) Interceptors() []Interceptor {
+	return c.inters.TopicLike
+}
+
+func (c *TopicLikeClient) mutate(ctx context.Context, m *TopicLikeMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&TopicLikeCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&TopicLikeUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&TopicLikeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&TopicLikeDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown TopicLike mutation op: %q", m.Op())
 	}
 }
 
@@ -305,6 +1814,134 @@ func (c *UserClient) GetX(ctx context.Context, id int) *User {
 	return obj
 }
 
+// QueryForums queries the forums edge of a User.
+func (c *UserClient) QueryForums(u *User) *ForumQuery {
+	query := (&ForumClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(forum.Table, forum.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.ForumsTable, user.ForumsColumn),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryTopics queries the topics edge of a User.
+func (c *UserClient) QueryTopics(u *User) *TopicQuery {
+	query := (&TopicClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(topic.Table, topic.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.TopicsTable, user.TopicsColumn),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryComments queries the comments edge of a User.
+func (c *UserClient) QueryComments(u *User) *CommentQuery {
+	query := (&CommentClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(comment.Table, comment.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.CommentsTable, user.CommentsColumn),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUserTopicNotifications queries the user_topic_notifications edge of a User.
+func (c *UserClient) QueryUserTopicNotifications(u *User) *UserTopicNotificationQuery {
+	query := (&UserTopicNotificationClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(usertopicnotification.Table, usertopicnotification.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.UserTopicNotificationsTable, user.UserTopicNotificationsColumn),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUserCommentNotifications queries the user_comment_notifications edge of a User.
+func (c *UserClient) QueryUserCommentNotifications(u *User) *UserCommentNotificationQuery {
+	query := (&UserCommentNotificationClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(usercommentnotification.Table, usercommentnotification.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.UserCommentNotificationsTable, user.UserCommentNotificationsColumn),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryForumLikes queries the forum_likes edge of a User.
+func (c *UserClient) QueryForumLikes(u *User) *ForumLikeQuery {
+	query := (&ForumLikeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(forumlike.Table, forumlike.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.ForumLikesTable, user.ForumLikesColumn),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryTopicLikes queries the topic_likes edge of a User.
+func (c *UserClient) QueryTopicLikes(u *User) *TopicLikeQuery {
+	query := (&TopicLikeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(topiclike.Table, topiclike.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.TopicLikesTable, user.TopicLikesColumn),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCommentLikes queries the comment_likes edge of a User.
+func (c *UserClient) QueryCommentLikes(u *User) *CommentLikeQuery {
+	query := (&CommentLikeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(commentlike.Table, commentlike.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.CommentLikesTable, user.CommentLikesColumn),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *UserClient) Hooks() []Hook {
 	return c.hooks.User
@@ -330,12 +1967,345 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 	}
 }
 
+// UserCommentNotificationClient is a client for the UserCommentNotification schema.
+type UserCommentNotificationClient struct {
+	config
+}
+
+// NewUserCommentNotificationClient returns a client for the UserCommentNotification from the given config.
+func NewUserCommentNotificationClient(c config) *UserCommentNotificationClient {
+	return &UserCommentNotificationClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `usercommentnotification.Hooks(f(g(h())))`.
+func (c *UserCommentNotificationClient) Use(hooks ...Hook) {
+	c.hooks.UserCommentNotification = append(c.hooks.UserCommentNotification, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `usercommentnotification.Intercept(f(g(h())))`.
+func (c *UserCommentNotificationClient) Intercept(interceptors ...Interceptor) {
+	c.inters.UserCommentNotification = append(c.inters.UserCommentNotification, interceptors...)
+}
+
+// Create returns a builder for creating a UserCommentNotification entity.
+func (c *UserCommentNotificationClient) Create() *UserCommentNotificationCreate {
+	mutation := newUserCommentNotificationMutation(c.config, OpCreate)
+	return &UserCommentNotificationCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of UserCommentNotification entities.
+func (c *UserCommentNotificationClient) CreateBulk(builders ...*UserCommentNotificationCreate) *UserCommentNotificationCreateBulk {
+	return &UserCommentNotificationCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *UserCommentNotificationClient) MapCreateBulk(slice any, setFunc func(*UserCommentNotificationCreate, int)) *UserCommentNotificationCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &UserCommentNotificationCreateBulk{err: fmt.Errorf("calling to UserCommentNotificationClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*UserCommentNotificationCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &UserCommentNotificationCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for UserCommentNotification.
+func (c *UserCommentNotificationClient) Update() *UserCommentNotificationUpdate {
+	mutation := newUserCommentNotificationMutation(c.config, OpUpdate)
+	return &UserCommentNotificationUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *UserCommentNotificationClient) UpdateOne(ucn *UserCommentNotification) *UserCommentNotificationUpdateOne {
+	mutation := newUserCommentNotificationMutation(c.config, OpUpdateOne, withUserCommentNotification(ucn))
+	return &UserCommentNotificationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *UserCommentNotificationClient) UpdateOneID(id int) *UserCommentNotificationUpdateOne {
+	mutation := newUserCommentNotificationMutation(c.config, OpUpdateOne, withUserCommentNotificationID(id))
+	return &UserCommentNotificationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for UserCommentNotification.
+func (c *UserCommentNotificationClient) Delete() *UserCommentNotificationDelete {
+	mutation := newUserCommentNotificationMutation(c.config, OpDelete)
+	return &UserCommentNotificationDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *UserCommentNotificationClient) DeleteOne(ucn *UserCommentNotification) *UserCommentNotificationDeleteOne {
+	return c.DeleteOneID(ucn.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *UserCommentNotificationClient) DeleteOneID(id int) *UserCommentNotificationDeleteOne {
+	builder := c.Delete().Where(usercommentnotification.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &UserCommentNotificationDeleteOne{builder}
+}
+
+// Query returns a query builder for UserCommentNotification.
+func (c *UserCommentNotificationClient) Query() *UserCommentNotificationQuery {
+	return &UserCommentNotificationQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeUserCommentNotification},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a UserCommentNotification entity by its id.
+func (c *UserCommentNotificationClient) Get(ctx context.Context, id int) (*UserCommentNotification, error) {
+	return c.Query().Where(usercommentnotification.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *UserCommentNotificationClient) GetX(ctx context.Context, id int) *UserCommentNotification {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryUser queries the user edge of a UserCommentNotification.
+func (c *UserCommentNotificationClient) QueryUser(ucn *UserCommentNotification) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ucn.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(usercommentnotification.Table, usercommentnotification.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, usercommentnotification.UserTable, usercommentnotification.UserColumn),
+		)
+		fromV = sqlgraph.Neighbors(ucn.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryComment queries the comment edge of a UserCommentNotification.
+func (c *UserCommentNotificationClient) QueryComment(ucn *UserCommentNotification) *CommentQuery {
+	query := (&CommentClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ucn.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(usercommentnotification.Table, usercommentnotification.FieldID, id),
+			sqlgraph.To(comment.Table, comment.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, usercommentnotification.CommentTable, usercommentnotification.CommentColumn),
+		)
+		fromV = sqlgraph.Neighbors(ucn.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *UserCommentNotificationClient) Hooks() []Hook {
+	return c.hooks.UserCommentNotification
+}
+
+// Interceptors returns the client interceptors.
+func (c *UserCommentNotificationClient) Interceptors() []Interceptor {
+	return c.inters.UserCommentNotification
+}
+
+func (c *UserCommentNotificationClient) mutate(ctx context.Context, m *UserCommentNotificationMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&UserCommentNotificationCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&UserCommentNotificationUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&UserCommentNotificationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&UserCommentNotificationDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown UserCommentNotification mutation op: %q", m.Op())
+	}
+}
+
+// UserTopicNotificationClient is a client for the UserTopicNotification schema.
+type UserTopicNotificationClient struct {
+	config
+}
+
+// NewUserTopicNotificationClient returns a client for the UserTopicNotification from the given config.
+func NewUserTopicNotificationClient(c config) *UserTopicNotificationClient {
+	return &UserTopicNotificationClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `usertopicnotification.Hooks(f(g(h())))`.
+func (c *UserTopicNotificationClient) Use(hooks ...Hook) {
+	c.hooks.UserTopicNotification = append(c.hooks.UserTopicNotification, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `usertopicnotification.Intercept(f(g(h())))`.
+func (c *UserTopicNotificationClient) Intercept(interceptors ...Interceptor) {
+	c.inters.UserTopicNotification = append(c.inters.UserTopicNotification, interceptors...)
+}
+
+// Create returns a builder for creating a UserTopicNotification entity.
+func (c *UserTopicNotificationClient) Create() *UserTopicNotificationCreate {
+	mutation := newUserTopicNotificationMutation(c.config, OpCreate)
+	return &UserTopicNotificationCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of UserTopicNotification entities.
+func (c *UserTopicNotificationClient) CreateBulk(builders ...*UserTopicNotificationCreate) *UserTopicNotificationCreateBulk {
+	return &UserTopicNotificationCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *UserTopicNotificationClient) MapCreateBulk(slice any, setFunc func(*UserTopicNotificationCreate, int)) *UserTopicNotificationCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &UserTopicNotificationCreateBulk{err: fmt.Errorf("calling to UserTopicNotificationClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*UserTopicNotificationCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &UserTopicNotificationCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for UserTopicNotification.
+func (c *UserTopicNotificationClient) Update() *UserTopicNotificationUpdate {
+	mutation := newUserTopicNotificationMutation(c.config, OpUpdate)
+	return &UserTopicNotificationUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *UserTopicNotificationClient) UpdateOne(utn *UserTopicNotification) *UserTopicNotificationUpdateOne {
+	mutation := newUserTopicNotificationMutation(c.config, OpUpdateOne, withUserTopicNotification(utn))
+	return &UserTopicNotificationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *UserTopicNotificationClient) UpdateOneID(id int) *UserTopicNotificationUpdateOne {
+	mutation := newUserTopicNotificationMutation(c.config, OpUpdateOne, withUserTopicNotificationID(id))
+	return &UserTopicNotificationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for UserTopicNotification.
+func (c *UserTopicNotificationClient) Delete() *UserTopicNotificationDelete {
+	mutation := newUserTopicNotificationMutation(c.config, OpDelete)
+	return &UserTopicNotificationDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *UserTopicNotificationClient) DeleteOne(utn *UserTopicNotification) *UserTopicNotificationDeleteOne {
+	return c.DeleteOneID(utn.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *UserTopicNotificationClient) DeleteOneID(id int) *UserTopicNotificationDeleteOne {
+	builder := c.Delete().Where(usertopicnotification.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &UserTopicNotificationDeleteOne{builder}
+}
+
+// Query returns a query builder for UserTopicNotification.
+func (c *UserTopicNotificationClient) Query() *UserTopicNotificationQuery {
+	return &UserTopicNotificationQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeUserTopicNotification},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a UserTopicNotification entity by its id.
+func (c *UserTopicNotificationClient) Get(ctx context.Context, id int) (*UserTopicNotification, error) {
+	return c.Query().Where(usertopicnotification.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *UserTopicNotificationClient) GetX(ctx context.Context, id int) *UserTopicNotification {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryUser queries the user edge of a UserTopicNotification.
+func (c *UserTopicNotificationClient) QueryUser(utn *UserTopicNotification) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := utn.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(usertopicnotification.Table, usertopicnotification.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, usertopicnotification.UserTable, usertopicnotification.UserColumn),
+		)
+		fromV = sqlgraph.Neighbors(utn.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryTopic queries the topic edge of a UserTopicNotification.
+func (c *UserTopicNotificationClient) QueryTopic(utn *UserTopicNotification) *TopicQuery {
+	query := (&TopicClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := utn.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(usertopicnotification.Table, usertopicnotification.FieldID, id),
+			sqlgraph.To(topic.Table, topic.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, usertopicnotification.TopicTable, usertopicnotification.TopicColumn),
+		)
+		fromV = sqlgraph.Neighbors(utn.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *UserTopicNotificationClient) Hooks() []Hook {
+	return c.hooks.UserTopicNotification
+}
+
+// Interceptors returns the client interceptors.
+func (c *UserTopicNotificationClient) Interceptors() []Interceptor {
+	return c.inters.UserTopicNotification
+}
+
+func (c *UserTopicNotificationClient) mutate(ctx context.Context, m *UserTopicNotificationMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&UserTopicNotificationCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&UserTopicNotificationUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&UserTopicNotificationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&UserTopicNotificationDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown UserTopicNotification mutation op: %q", m.Op())
+	}
+}
+
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		User []ent.Hook
+		AdminUser, Comment, CommentAttachment, CommentLike, Forum, ForumLike, Topic,
+		TopicLike, User, UserCommentNotification, UserTopicNotification []ent.Hook
 	}
 	inters struct {
-		User []ent.Interceptor
+		AdminUser, Comment, CommentAttachment, CommentLike, Forum, ForumLike, Topic,
+		TopicLike, User, UserCommentNotification,
+		UserTopicNotification []ent.Interceptor
 	}
 )
