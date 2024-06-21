@@ -6,22 +6,17 @@ import (
     "time"
 )
 
-// AdminUser holds the schema definition for the AdminUser entity.
 type AdminUser struct {
     ent.Schema
 }
 
-// Fields of the AdminUser.
 func (AdminUser) Fields() []ent.Field {
     return []ent.Field{
-        field.Int("id").Unique().Immutable().StorageKey("id"),
-        field.String("email").Unique(),
+        field.Int("id").Unique().Immutable(),
+        field.String("userName").Unique().StorageKey("user_name").MaxLen(20),
+        field.String("email").Unique().MaxLen(254),
         field.String("password"),
-        field.Time("created_at").Default(time.Now),
+        field.Time("createdAt").Default(time.Now).StorageKey("created_at"),
+        field.Time("updatedAt").Default(time.Now).UpdateDefault(time.Now).StorageKey("updated_at"),
     }
-}
-
-// Edges of the AdminUser.
-func (AdminUser) Edges() []ent.Edge {
-    return []ent.Edge{}
 }

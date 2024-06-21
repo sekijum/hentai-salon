@@ -7,34 +7,32 @@ import (
     "time"
 )
 
-// Comment holds the schema definition for the Comment entity.
 type Comment struct {
     ent.Schema
 }
 
-// Fields of the Comment.
 func (Comment) Fields() []ent.Field {
     return []ent.Field{
-        field.Int("id").Unique().Immutable().StorageKey("id"),
-        field.Int("topic_id"),
-        field.Int("user_id"),
-        field.Int("parent_id").Optional(),
-        field.Text("content"),
-        field.Enum("status").Values("Visible", "Hidden", "Deleted", "Disapproved").Default("Visible"),
-        field.Time("created_at").Default(time.Now),
-        field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),
+        field.Int("id").Unique().Immutable(),
+        field.Int("topicId").StorageKey("topic_id"),
+        field.Int("parentId").Optional().StorageKey("parent_id").Comment("親コメントID（リプライの場合）"),
+        field.Int("userId").Optional().StorageKey("user_id").Comment("ログインユーザーの場合"),
+        field.String("guestName").Optional().StorageKey("guest_name").MaxLen(20).Comment("ゲストユーザーの場合"),
+        field.Text("message"),
+        field.Enum("status").Values("Visible", "Disapproved").Default("Visible"),
+        field.Time("createdAt").Default(time.Now).StorageKey("created_at"),
+        field.Time("updatedAt").Default(time.Now).UpdateDefault(time.Now).StorageKey("updated_at"),
     }
 }
 
-// Edges of the Comment.
 func (Comment) Edges() []ent.Edge {
     return []ent.Edge{
-        edge.From("topic", Topic.Type).Ref("comments").Unique().Field("topic_id").Required(),
-        edge.From("user", User.Type).Ref("comments").Unique().Field("user_id").Required(),
-        edge.From("parent", Comment.Type).Ref("replies").Unique().Field("parent_id"),
+        edge.From("topic", Topic.Type).Ref("comments").Unique().Field("topicId").Required(),
+        edge.From("author", User.Type).Ref("comments").Unique().Field("userId"),
+        edge.From("parent", Comment.Type).Ref("replies").Unique().Field("parentId"),
         edge.To("replies", Comment.Type),
-        edge.To("comment_likes", CommentLike.Type),
         edge.To("comment_attachments", CommentAttachment.Type),
-        edge.To("user_comment_notifications", UserCommentNotification.Type),
+        edge.From("liked_users", User.Type).Ref("liked_comments").Through("user_comment_like", UserCommentLike.Type),
+        edge.From("subscribed_users", User.Type).Ref("subscribed_comments").Through("user_comment_subscription", UserCommentSubscription.Type),
     }
 }

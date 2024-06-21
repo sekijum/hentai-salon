@@ -8,10 +8,8 @@ import (
 	"fmt"
 	"server/infrastructure/ent/comment"
 	"server/infrastructure/ent/commentattachment"
-	"server/infrastructure/ent/commentlike"
 	"server/infrastructure/ent/topic"
 	"server/infrastructure/ent/user"
-	"server/infrastructure/ent/usercommentnotification"
 	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -25,35 +23,57 @@ type CommentCreate struct {
 	hooks    []Hook
 }
 
-// SetTopicID sets the "topic_id" field.
-func (cc *CommentCreate) SetTopicID(i int) *CommentCreate {
-	cc.mutation.SetTopicID(i)
+// SetTopicId sets the "topicId" field.
+func (cc *CommentCreate) SetTopicId(i int) *CommentCreate {
+	cc.mutation.SetTopicId(i)
 	return cc
 }
 
-// SetUserID sets the "user_id" field.
-func (cc *CommentCreate) SetUserID(i int) *CommentCreate {
-	cc.mutation.SetUserID(i)
+// SetParentId sets the "parentId" field.
+func (cc *CommentCreate) SetParentId(i int) *CommentCreate {
+	cc.mutation.SetParentId(i)
 	return cc
 }
 
-// SetParentID sets the "parent_id" field.
-func (cc *CommentCreate) SetParentID(i int) *CommentCreate {
-	cc.mutation.SetParentID(i)
-	return cc
-}
-
-// SetNillableParentID sets the "parent_id" field if the given value is not nil.
-func (cc *CommentCreate) SetNillableParentID(i *int) *CommentCreate {
+// SetNillableParentId sets the "parentId" field if the given value is not nil.
+func (cc *CommentCreate) SetNillableParentId(i *int) *CommentCreate {
 	if i != nil {
-		cc.SetParentID(*i)
+		cc.SetParentId(*i)
 	}
 	return cc
 }
 
-// SetContent sets the "content" field.
-func (cc *CommentCreate) SetContent(s string) *CommentCreate {
-	cc.mutation.SetContent(s)
+// SetUserId sets the "userId" field.
+func (cc *CommentCreate) SetUserId(i int) *CommentCreate {
+	cc.mutation.SetUserId(i)
+	return cc
+}
+
+// SetNillableUserId sets the "userId" field if the given value is not nil.
+func (cc *CommentCreate) SetNillableUserId(i *int) *CommentCreate {
+	if i != nil {
+		cc.SetUserId(*i)
+	}
+	return cc
+}
+
+// SetGuestName sets the "guestName" field.
+func (cc *CommentCreate) SetGuestName(s string) *CommentCreate {
+	cc.mutation.SetGuestName(s)
+	return cc
+}
+
+// SetNillableGuestName sets the "guestName" field if the given value is not nil.
+func (cc *CommentCreate) SetNillableGuestName(s *string) *CommentCreate {
+	if s != nil {
+		cc.SetGuestName(*s)
+	}
+	return cc
+}
+
+// SetMessage sets the "message" field.
+func (cc *CommentCreate) SetMessage(s string) *CommentCreate {
+	cc.mutation.SetMessage(s)
 	return cc
 }
 
@@ -71,13 +91,13 @@ func (cc *CommentCreate) SetNillableStatus(c *comment.Status) *CommentCreate {
 	return cc
 }
 
-// SetCreatedAt sets the "created_at" field.
+// SetCreatedAt sets the "createdAt" field.
 func (cc *CommentCreate) SetCreatedAt(t time.Time) *CommentCreate {
 	cc.mutation.SetCreatedAt(t)
 	return cc
 }
 
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
 func (cc *CommentCreate) SetNillableCreatedAt(t *time.Time) *CommentCreate {
 	if t != nil {
 		cc.SetCreatedAt(*t)
@@ -85,13 +105,13 @@ func (cc *CommentCreate) SetNillableCreatedAt(t *time.Time) *CommentCreate {
 	return cc
 }
 
-// SetUpdatedAt sets the "updated_at" field.
+// SetUpdatedAt sets the "updatedAt" field.
 func (cc *CommentCreate) SetUpdatedAt(t time.Time) *CommentCreate {
 	cc.mutation.SetUpdatedAt(t)
 	return cc
 }
 
-// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+// SetNillableUpdatedAt sets the "updatedAt" field if the given value is not nil.
 func (cc *CommentCreate) SetNillableUpdatedAt(t *time.Time) *CommentCreate {
 	if t != nil {
 		cc.SetUpdatedAt(*t)
@@ -105,14 +125,48 @@ func (cc *CommentCreate) SetID(i int) *CommentCreate {
 	return cc
 }
 
+// SetTopicID sets the "topic" edge to the Topic entity by ID.
+func (cc *CommentCreate) SetTopicID(id int) *CommentCreate {
+	cc.mutation.SetTopicID(id)
+	return cc
+}
+
 // SetTopic sets the "topic" edge to the Topic entity.
 func (cc *CommentCreate) SetTopic(t *Topic) *CommentCreate {
 	return cc.SetTopicID(t.ID)
 }
 
-// SetUser sets the "user" edge to the User entity.
-func (cc *CommentCreate) SetUser(u *User) *CommentCreate {
-	return cc.SetUserID(u.ID)
+// SetAuthorID sets the "author" edge to the User entity by ID.
+func (cc *CommentCreate) SetAuthorID(id int) *CommentCreate {
+	cc.mutation.SetAuthorID(id)
+	return cc
+}
+
+// SetNillableAuthorID sets the "author" edge to the User entity by ID if the given value is not nil.
+func (cc *CommentCreate) SetNillableAuthorID(id *int) *CommentCreate {
+	if id != nil {
+		cc = cc.SetAuthorID(*id)
+	}
+	return cc
+}
+
+// SetAuthor sets the "author" edge to the User entity.
+func (cc *CommentCreate) SetAuthor(u *User) *CommentCreate {
+	return cc.SetAuthorID(u.ID)
+}
+
+// SetParentID sets the "parent" edge to the Comment entity by ID.
+func (cc *CommentCreate) SetParentID(id int) *CommentCreate {
+	cc.mutation.SetParentID(id)
+	return cc
+}
+
+// SetNillableParentID sets the "parent" edge to the Comment entity by ID if the given value is not nil.
+func (cc *CommentCreate) SetNillableParentID(id *int) *CommentCreate {
+	if id != nil {
+		cc = cc.SetParentID(*id)
+	}
+	return cc
 }
 
 // SetParent sets the "parent" edge to the Comment entity.
@@ -135,21 +189,6 @@ func (cc *CommentCreate) AddReplies(c ...*Comment) *CommentCreate {
 	return cc.AddReplyIDs(ids...)
 }
 
-// AddCommentLikeIDs adds the "comment_likes" edge to the CommentLike entity by IDs.
-func (cc *CommentCreate) AddCommentLikeIDs(ids ...int) *CommentCreate {
-	cc.mutation.AddCommentLikeIDs(ids...)
-	return cc
-}
-
-// AddCommentLikes adds the "comment_likes" edges to the CommentLike entity.
-func (cc *CommentCreate) AddCommentLikes(c ...*CommentLike) *CommentCreate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return cc.AddCommentLikeIDs(ids...)
-}
-
 // AddCommentAttachmentIDs adds the "comment_attachments" edge to the CommentAttachment entity by IDs.
 func (cc *CommentCreate) AddCommentAttachmentIDs(ids ...int) *CommentCreate {
 	cc.mutation.AddCommentAttachmentIDs(ids...)
@@ -165,19 +204,34 @@ func (cc *CommentCreate) AddCommentAttachments(c ...*CommentAttachment) *Comment
 	return cc.AddCommentAttachmentIDs(ids...)
 }
 
-// AddUserCommentNotificationIDs adds the "user_comment_notifications" edge to the UserCommentNotification entity by IDs.
-func (cc *CommentCreate) AddUserCommentNotificationIDs(ids ...int) *CommentCreate {
-	cc.mutation.AddUserCommentNotificationIDs(ids...)
+// AddLikedUserIDs adds the "liked_users" edge to the User entity by IDs.
+func (cc *CommentCreate) AddLikedUserIDs(ids ...int) *CommentCreate {
+	cc.mutation.AddLikedUserIDs(ids...)
 	return cc
 }
 
-// AddUserCommentNotifications adds the "user_comment_notifications" edges to the UserCommentNotification entity.
-func (cc *CommentCreate) AddUserCommentNotifications(u ...*UserCommentNotification) *CommentCreate {
+// AddLikedUsers adds the "liked_users" edges to the User entity.
+func (cc *CommentCreate) AddLikedUsers(u ...*User) *CommentCreate {
 	ids := make([]int, len(u))
 	for i := range u {
 		ids[i] = u[i].ID
 	}
-	return cc.AddUserCommentNotificationIDs(ids...)
+	return cc.AddLikedUserIDs(ids...)
+}
+
+// AddSubscribedUserIDs adds the "subscribed_users" edge to the User entity by IDs.
+func (cc *CommentCreate) AddSubscribedUserIDs(ids ...int) *CommentCreate {
+	cc.mutation.AddSubscribedUserIDs(ids...)
+	return cc
+}
+
+// AddSubscribedUsers adds the "subscribed_users" edges to the User entity.
+func (cc *CommentCreate) AddSubscribedUsers(u ...*User) *CommentCreate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return cc.AddSubscribedUserIDs(ids...)
 }
 
 // Mutation returns the CommentMutation object of the builder.
@@ -231,14 +285,16 @@ func (cc *CommentCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (cc *CommentCreate) check() error {
-	if _, ok := cc.mutation.TopicID(); !ok {
-		return &ValidationError{Name: "topic_id", err: errors.New(`ent: missing required field "Comment.topic_id"`)}
+	if _, ok := cc.mutation.TopicId(); !ok {
+		return &ValidationError{Name: "topicId", err: errors.New(`ent: missing required field "Comment.topicId"`)}
 	}
-	if _, ok := cc.mutation.UserID(); !ok {
-		return &ValidationError{Name: "user_id", err: errors.New(`ent: missing required field "Comment.user_id"`)}
+	if v, ok := cc.mutation.GuestName(); ok {
+		if err := comment.GuestNameValidator(v); err != nil {
+			return &ValidationError{Name: "guestName", err: fmt.Errorf(`ent: validator failed for field "Comment.guestName": %w`, err)}
+		}
 	}
-	if _, ok := cc.mutation.Content(); !ok {
-		return &ValidationError{Name: "content", err: errors.New(`ent: missing required field "Comment.content"`)}
+	if _, ok := cc.mutation.Message(); !ok {
+		return &ValidationError{Name: "message", err: errors.New(`ent: missing required field "Comment.message"`)}
 	}
 	if _, ok := cc.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Comment.status"`)}
@@ -249,16 +305,13 @@ func (cc *CommentCreate) check() error {
 		}
 	}
 	if _, ok := cc.mutation.CreatedAt(); !ok {
-		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Comment.created_at"`)}
+		return &ValidationError{Name: "createdAt", err: errors.New(`ent: missing required field "Comment.createdAt"`)}
 	}
 	if _, ok := cc.mutation.UpdatedAt(); !ok {
-		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Comment.updated_at"`)}
+		return &ValidationError{Name: "updatedAt", err: errors.New(`ent: missing required field "Comment.updatedAt"`)}
 	}
 	if _, ok := cc.mutation.TopicID(); !ok {
 		return &ValidationError{Name: "topic", err: errors.New(`ent: missing required edge "Comment.topic"`)}
-	}
-	if _, ok := cc.mutation.UserID(); !ok {
-		return &ValidationError{Name: "user", err: errors.New(`ent: missing required edge "Comment.user"`)}
 	}
 	return nil
 }
@@ -292,9 +345,13 @@ func (cc *CommentCreate) createSpec() (*Comment, *sqlgraph.CreateSpec) {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
-	if value, ok := cc.mutation.Content(); ok {
-		_spec.SetField(comment.FieldContent, field.TypeString, value)
-		_node.Content = value
+	if value, ok := cc.mutation.GuestName(); ok {
+		_spec.SetField(comment.FieldGuestName, field.TypeString, value)
+		_node.GuestName = value
+	}
+	if value, ok := cc.mutation.Message(); ok {
+		_spec.SetField(comment.FieldMessage, field.TypeString, value)
+		_node.Message = value
 	}
 	if value, ok := cc.mutation.Status(); ok {
 		_spec.SetField(comment.FieldStatus, field.TypeEnum, value)
@@ -322,15 +379,15 @@ func (cc *CommentCreate) createSpec() (*Comment, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.TopicID = nodes[0]
+		_node.TopicId = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := cc.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := cc.mutation.AuthorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   comment.UserTable,
-			Columns: []string{comment.UserColumn},
+			Table:   comment.AuthorTable,
+			Columns: []string{comment.AuthorColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
@@ -339,7 +396,7 @@ func (cc *CommentCreate) createSpec() (*Comment, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.UserID = nodes[0]
+		_node.UserId = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := cc.mutation.ParentIDs(); len(nodes) > 0 {
@@ -356,7 +413,7 @@ func (cc *CommentCreate) createSpec() (*Comment, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.ParentID = nodes[0]
+		_node.ParentId = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := cc.mutation.RepliesIDs(); len(nodes) > 0 {
@@ -368,22 +425,6 @@ func (cc *CommentCreate) createSpec() (*Comment, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := cc.mutation.CommentLikesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   comment.CommentLikesTable,
-			Columns: []string{comment.CommentLikesColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(commentlike.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -407,20 +448,44 @@ func (cc *CommentCreate) createSpec() (*Comment, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := cc.mutation.UserCommentNotificationsIDs(); len(nodes) > 0 {
+	if nodes := cc.mutation.LikedUsersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   comment.UserCommentNotificationsTable,
-			Columns: []string{comment.UserCommentNotificationsColumn},
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   comment.LikedUsersTable,
+			Columns: comment.LikedUsersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(usercommentnotification.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		createE := &UserCommentLikeCreate{config: cc.config, mutation: newUserCommentLikeMutation(cc.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := cc.mutation.SubscribedUsersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   comment.SubscribedUsersTable,
+			Columns: comment.SubscribedUsersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		createE := &UserCommentSubscriptionCreate{config: cc.config, mutation: newUserCommentSubscriptionMutation(cc.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

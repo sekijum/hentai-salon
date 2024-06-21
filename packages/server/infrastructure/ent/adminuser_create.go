@@ -20,6 +20,12 @@ type AdminUserCreate struct {
 	hooks    []Hook
 }
 
+// SetUserName sets the "userName" field.
+func (auc *AdminUserCreate) SetUserName(s string) *AdminUserCreate {
+	auc.mutation.SetUserName(s)
+	return auc
+}
+
 // SetEmail sets the "email" field.
 func (auc *AdminUserCreate) SetEmail(s string) *AdminUserCreate {
 	auc.mutation.SetEmail(s)
@@ -32,16 +38,30 @@ func (auc *AdminUserCreate) SetPassword(s string) *AdminUserCreate {
 	return auc
 }
 
-// SetCreatedAt sets the "created_at" field.
+// SetCreatedAt sets the "createdAt" field.
 func (auc *AdminUserCreate) SetCreatedAt(t time.Time) *AdminUserCreate {
 	auc.mutation.SetCreatedAt(t)
 	return auc
 }
 
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
 func (auc *AdminUserCreate) SetNillableCreatedAt(t *time.Time) *AdminUserCreate {
 	if t != nil {
 		auc.SetCreatedAt(*t)
+	}
+	return auc
+}
+
+// SetUpdatedAt sets the "updatedAt" field.
+func (auc *AdminUserCreate) SetUpdatedAt(t time.Time) *AdminUserCreate {
+	auc.mutation.SetUpdatedAt(t)
+	return auc
+}
+
+// SetNillableUpdatedAt sets the "updatedAt" field if the given value is not nil.
+func (auc *AdminUserCreate) SetNillableUpdatedAt(t *time.Time) *AdminUserCreate {
+	if t != nil {
+		auc.SetUpdatedAt(*t)
 	}
 	return auc
 }
@@ -91,18 +111,38 @@ func (auc *AdminUserCreate) defaults() {
 		v := adminuser.DefaultCreatedAt()
 		auc.mutation.SetCreatedAt(v)
 	}
+	if _, ok := auc.mutation.UpdatedAt(); !ok {
+		v := adminuser.DefaultUpdatedAt()
+		auc.mutation.SetUpdatedAt(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (auc *AdminUserCreate) check() error {
+	if _, ok := auc.mutation.UserName(); !ok {
+		return &ValidationError{Name: "userName", err: errors.New(`ent: missing required field "AdminUser.userName"`)}
+	}
+	if v, ok := auc.mutation.UserName(); ok {
+		if err := adminuser.UserNameValidator(v); err != nil {
+			return &ValidationError{Name: "userName", err: fmt.Errorf(`ent: validator failed for field "AdminUser.userName": %w`, err)}
+		}
+	}
 	if _, ok := auc.mutation.Email(); !ok {
 		return &ValidationError{Name: "email", err: errors.New(`ent: missing required field "AdminUser.email"`)}
+	}
+	if v, ok := auc.mutation.Email(); ok {
+		if err := adminuser.EmailValidator(v); err != nil {
+			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "AdminUser.email": %w`, err)}
+		}
 	}
 	if _, ok := auc.mutation.Password(); !ok {
 		return &ValidationError{Name: "password", err: errors.New(`ent: missing required field "AdminUser.password"`)}
 	}
 	if _, ok := auc.mutation.CreatedAt(); !ok {
-		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "AdminUser.created_at"`)}
+		return &ValidationError{Name: "createdAt", err: errors.New(`ent: missing required field "AdminUser.createdAt"`)}
+	}
+	if _, ok := auc.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updatedAt", err: errors.New(`ent: missing required field "AdminUser.updatedAt"`)}
 	}
 	return nil
 }
@@ -136,6 +176,10 @@ func (auc *AdminUserCreate) createSpec() (*AdminUser, *sqlgraph.CreateSpec) {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
+	if value, ok := auc.mutation.UserName(); ok {
+		_spec.SetField(adminuser.FieldUserName, field.TypeString, value)
+		_node.UserName = value
+	}
 	if value, ok := auc.mutation.Email(); ok {
 		_spec.SetField(adminuser.FieldEmail, field.TypeString, value)
 		_node.Email = value
@@ -147,6 +191,10 @@ func (auc *AdminUserCreate) createSpec() (*AdminUser, *sqlgraph.CreateSpec) {
 	if value, ok := auc.mutation.CreatedAt(); ok {
 		_spec.SetField(adminuser.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
+	}
+	if value, ok := auc.mutation.UpdatedAt(); ok {
+		_spec.SetField(adminuser.FieldUpdatedAt, field.TypeTime, value)
+		_node.UpdatedAt = value
 	}
 	return _node, _spec
 }

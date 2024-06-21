@@ -8,11 +8,9 @@ import (
 	"fmt"
 	"server/infrastructure/ent/comment"
 	"server/infrastructure/ent/commentattachment"
-	"server/infrastructure/ent/commentlike"
 	"server/infrastructure/ent/predicate"
 	"server/infrastructure/ent/topic"
 	"server/infrastructure/ent/user"
-	"server/infrastructure/ent/usercommentnotification"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -33,64 +31,90 @@ func (cu *CommentUpdate) Where(ps ...predicate.Comment) *CommentUpdate {
 	return cu
 }
 
-// SetTopicID sets the "topic_id" field.
-func (cu *CommentUpdate) SetTopicID(i int) *CommentUpdate {
-	cu.mutation.SetTopicID(i)
+// SetTopicId sets the "topicId" field.
+func (cu *CommentUpdate) SetTopicId(i int) *CommentUpdate {
+	cu.mutation.SetTopicId(i)
 	return cu
 }
 
-// SetNillableTopicID sets the "topic_id" field if the given value is not nil.
-func (cu *CommentUpdate) SetNillableTopicID(i *int) *CommentUpdate {
+// SetNillableTopicId sets the "topicId" field if the given value is not nil.
+func (cu *CommentUpdate) SetNillableTopicId(i *int) *CommentUpdate {
 	if i != nil {
-		cu.SetTopicID(*i)
+		cu.SetTopicId(*i)
 	}
 	return cu
 }
 
-// SetUserID sets the "user_id" field.
-func (cu *CommentUpdate) SetUserID(i int) *CommentUpdate {
-	cu.mutation.SetUserID(i)
+// SetParentId sets the "parentId" field.
+func (cu *CommentUpdate) SetParentId(i int) *CommentUpdate {
+	cu.mutation.SetParentId(i)
 	return cu
 }
 
-// SetNillableUserID sets the "user_id" field if the given value is not nil.
-func (cu *CommentUpdate) SetNillableUserID(i *int) *CommentUpdate {
+// SetNillableParentId sets the "parentId" field if the given value is not nil.
+func (cu *CommentUpdate) SetNillableParentId(i *int) *CommentUpdate {
 	if i != nil {
-		cu.SetUserID(*i)
+		cu.SetParentId(*i)
 	}
 	return cu
 }
 
-// SetParentID sets the "parent_id" field.
-func (cu *CommentUpdate) SetParentID(i int) *CommentUpdate {
-	cu.mutation.SetParentID(i)
+// ClearParentId clears the value of the "parentId" field.
+func (cu *CommentUpdate) ClearParentId() *CommentUpdate {
+	cu.mutation.ClearParentId()
 	return cu
 }
 
-// SetNillableParentID sets the "parent_id" field if the given value is not nil.
-func (cu *CommentUpdate) SetNillableParentID(i *int) *CommentUpdate {
+// SetUserId sets the "userId" field.
+func (cu *CommentUpdate) SetUserId(i int) *CommentUpdate {
+	cu.mutation.SetUserId(i)
+	return cu
+}
+
+// SetNillableUserId sets the "userId" field if the given value is not nil.
+func (cu *CommentUpdate) SetNillableUserId(i *int) *CommentUpdate {
 	if i != nil {
-		cu.SetParentID(*i)
+		cu.SetUserId(*i)
 	}
 	return cu
 }
 
-// ClearParentID clears the value of the "parent_id" field.
-func (cu *CommentUpdate) ClearParentID() *CommentUpdate {
-	cu.mutation.ClearParentID()
+// ClearUserId clears the value of the "userId" field.
+func (cu *CommentUpdate) ClearUserId() *CommentUpdate {
+	cu.mutation.ClearUserId()
 	return cu
 }
 
-// SetContent sets the "content" field.
-func (cu *CommentUpdate) SetContent(s string) *CommentUpdate {
-	cu.mutation.SetContent(s)
+// SetGuestName sets the "guestName" field.
+func (cu *CommentUpdate) SetGuestName(s string) *CommentUpdate {
+	cu.mutation.SetGuestName(s)
 	return cu
 }
 
-// SetNillableContent sets the "content" field if the given value is not nil.
-func (cu *CommentUpdate) SetNillableContent(s *string) *CommentUpdate {
+// SetNillableGuestName sets the "guestName" field if the given value is not nil.
+func (cu *CommentUpdate) SetNillableGuestName(s *string) *CommentUpdate {
 	if s != nil {
-		cu.SetContent(*s)
+		cu.SetGuestName(*s)
+	}
+	return cu
+}
+
+// ClearGuestName clears the value of the "guestName" field.
+func (cu *CommentUpdate) ClearGuestName() *CommentUpdate {
+	cu.mutation.ClearGuestName()
+	return cu
+}
+
+// SetMessage sets the "message" field.
+func (cu *CommentUpdate) SetMessage(s string) *CommentUpdate {
+	cu.mutation.SetMessage(s)
+	return cu
+}
+
+// SetNillableMessage sets the "message" field if the given value is not nil.
+func (cu *CommentUpdate) SetNillableMessage(s *string) *CommentUpdate {
+	if s != nil {
+		cu.SetMessage(*s)
 	}
 	return cu
 }
@@ -109,13 +133,13 @@ func (cu *CommentUpdate) SetNillableStatus(c *comment.Status) *CommentUpdate {
 	return cu
 }
 
-// SetCreatedAt sets the "created_at" field.
+// SetCreatedAt sets the "createdAt" field.
 func (cu *CommentUpdate) SetCreatedAt(t time.Time) *CommentUpdate {
 	cu.mutation.SetCreatedAt(t)
 	return cu
 }
 
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
 func (cu *CommentUpdate) SetNillableCreatedAt(t *time.Time) *CommentUpdate {
 	if t != nil {
 		cu.SetCreatedAt(*t)
@@ -123,9 +147,15 @@ func (cu *CommentUpdate) SetNillableCreatedAt(t *time.Time) *CommentUpdate {
 	return cu
 }
 
-// SetUpdatedAt sets the "updated_at" field.
+// SetUpdatedAt sets the "updatedAt" field.
 func (cu *CommentUpdate) SetUpdatedAt(t time.Time) *CommentUpdate {
 	cu.mutation.SetUpdatedAt(t)
+	return cu
+}
+
+// SetTopicID sets the "topic" edge to the Topic entity by ID.
+func (cu *CommentUpdate) SetTopicID(id int) *CommentUpdate {
+	cu.mutation.SetTopicID(id)
 	return cu
 }
 
@@ -134,9 +164,37 @@ func (cu *CommentUpdate) SetTopic(t *Topic) *CommentUpdate {
 	return cu.SetTopicID(t.ID)
 }
 
-// SetUser sets the "user" edge to the User entity.
-func (cu *CommentUpdate) SetUser(u *User) *CommentUpdate {
-	return cu.SetUserID(u.ID)
+// SetAuthorID sets the "author" edge to the User entity by ID.
+func (cu *CommentUpdate) SetAuthorID(id int) *CommentUpdate {
+	cu.mutation.SetAuthorID(id)
+	return cu
+}
+
+// SetNillableAuthorID sets the "author" edge to the User entity by ID if the given value is not nil.
+func (cu *CommentUpdate) SetNillableAuthorID(id *int) *CommentUpdate {
+	if id != nil {
+		cu = cu.SetAuthorID(*id)
+	}
+	return cu
+}
+
+// SetAuthor sets the "author" edge to the User entity.
+func (cu *CommentUpdate) SetAuthor(u *User) *CommentUpdate {
+	return cu.SetAuthorID(u.ID)
+}
+
+// SetParentID sets the "parent" edge to the Comment entity by ID.
+func (cu *CommentUpdate) SetParentID(id int) *CommentUpdate {
+	cu.mutation.SetParentID(id)
+	return cu
+}
+
+// SetNillableParentID sets the "parent" edge to the Comment entity by ID if the given value is not nil.
+func (cu *CommentUpdate) SetNillableParentID(id *int) *CommentUpdate {
+	if id != nil {
+		cu = cu.SetParentID(*id)
+	}
+	return cu
 }
 
 // SetParent sets the "parent" edge to the Comment entity.
@@ -159,21 +217,6 @@ func (cu *CommentUpdate) AddReplies(c ...*Comment) *CommentUpdate {
 	return cu.AddReplyIDs(ids...)
 }
 
-// AddCommentLikeIDs adds the "comment_likes" edge to the CommentLike entity by IDs.
-func (cu *CommentUpdate) AddCommentLikeIDs(ids ...int) *CommentUpdate {
-	cu.mutation.AddCommentLikeIDs(ids...)
-	return cu
-}
-
-// AddCommentLikes adds the "comment_likes" edges to the CommentLike entity.
-func (cu *CommentUpdate) AddCommentLikes(c ...*CommentLike) *CommentUpdate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return cu.AddCommentLikeIDs(ids...)
-}
-
 // AddCommentAttachmentIDs adds the "comment_attachments" edge to the CommentAttachment entity by IDs.
 func (cu *CommentUpdate) AddCommentAttachmentIDs(ids ...int) *CommentUpdate {
 	cu.mutation.AddCommentAttachmentIDs(ids...)
@@ -189,19 +232,34 @@ func (cu *CommentUpdate) AddCommentAttachments(c ...*CommentAttachment) *Comment
 	return cu.AddCommentAttachmentIDs(ids...)
 }
 
-// AddUserCommentNotificationIDs adds the "user_comment_notifications" edge to the UserCommentNotification entity by IDs.
-func (cu *CommentUpdate) AddUserCommentNotificationIDs(ids ...int) *CommentUpdate {
-	cu.mutation.AddUserCommentNotificationIDs(ids...)
+// AddLikedUserIDs adds the "liked_users" edge to the User entity by IDs.
+func (cu *CommentUpdate) AddLikedUserIDs(ids ...int) *CommentUpdate {
+	cu.mutation.AddLikedUserIDs(ids...)
 	return cu
 }
 
-// AddUserCommentNotifications adds the "user_comment_notifications" edges to the UserCommentNotification entity.
-func (cu *CommentUpdate) AddUserCommentNotifications(u ...*UserCommentNotification) *CommentUpdate {
+// AddLikedUsers adds the "liked_users" edges to the User entity.
+func (cu *CommentUpdate) AddLikedUsers(u ...*User) *CommentUpdate {
 	ids := make([]int, len(u))
 	for i := range u {
 		ids[i] = u[i].ID
 	}
-	return cu.AddUserCommentNotificationIDs(ids...)
+	return cu.AddLikedUserIDs(ids...)
+}
+
+// AddSubscribedUserIDs adds the "subscribed_users" edge to the User entity by IDs.
+func (cu *CommentUpdate) AddSubscribedUserIDs(ids ...int) *CommentUpdate {
+	cu.mutation.AddSubscribedUserIDs(ids...)
+	return cu
+}
+
+// AddSubscribedUsers adds the "subscribed_users" edges to the User entity.
+func (cu *CommentUpdate) AddSubscribedUsers(u ...*User) *CommentUpdate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return cu.AddSubscribedUserIDs(ids...)
 }
 
 // Mutation returns the CommentMutation object of the builder.
@@ -215,9 +273,9 @@ func (cu *CommentUpdate) ClearTopic() *CommentUpdate {
 	return cu
 }
 
-// ClearUser clears the "user" edge to the User entity.
-func (cu *CommentUpdate) ClearUser() *CommentUpdate {
-	cu.mutation.ClearUser()
+// ClearAuthor clears the "author" edge to the User entity.
+func (cu *CommentUpdate) ClearAuthor() *CommentUpdate {
+	cu.mutation.ClearAuthor()
 	return cu
 }
 
@@ -248,27 +306,6 @@ func (cu *CommentUpdate) RemoveReplies(c ...*Comment) *CommentUpdate {
 	return cu.RemoveReplyIDs(ids...)
 }
 
-// ClearCommentLikes clears all "comment_likes" edges to the CommentLike entity.
-func (cu *CommentUpdate) ClearCommentLikes() *CommentUpdate {
-	cu.mutation.ClearCommentLikes()
-	return cu
-}
-
-// RemoveCommentLikeIDs removes the "comment_likes" edge to CommentLike entities by IDs.
-func (cu *CommentUpdate) RemoveCommentLikeIDs(ids ...int) *CommentUpdate {
-	cu.mutation.RemoveCommentLikeIDs(ids...)
-	return cu
-}
-
-// RemoveCommentLikes removes "comment_likes" edges to CommentLike entities.
-func (cu *CommentUpdate) RemoveCommentLikes(c ...*CommentLike) *CommentUpdate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return cu.RemoveCommentLikeIDs(ids...)
-}
-
 // ClearCommentAttachments clears all "comment_attachments" edges to the CommentAttachment entity.
 func (cu *CommentUpdate) ClearCommentAttachments() *CommentUpdate {
 	cu.mutation.ClearCommentAttachments()
@@ -290,25 +327,46 @@ func (cu *CommentUpdate) RemoveCommentAttachments(c ...*CommentAttachment) *Comm
 	return cu.RemoveCommentAttachmentIDs(ids...)
 }
 
-// ClearUserCommentNotifications clears all "user_comment_notifications" edges to the UserCommentNotification entity.
-func (cu *CommentUpdate) ClearUserCommentNotifications() *CommentUpdate {
-	cu.mutation.ClearUserCommentNotifications()
+// ClearLikedUsers clears all "liked_users" edges to the User entity.
+func (cu *CommentUpdate) ClearLikedUsers() *CommentUpdate {
+	cu.mutation.ClearLikedUsers()
 	return cu
 }
 
-// RemoveUserCommentNotificationIDs removes the "user_comment_notifications" edge to UserCommentNotification entities by IDs.
-func (cu *CommentUpdate) RemoveUserCommentNotificationIDs(ids ...int) *CommentUpdate {
-	cu.mutation.RemoveUserCommentNotificationIDs(ids...)
+// RemoveLikedUserIDs removes the "liked_users" edge to User entities by IDs.
+func (cu *CommentUpdate) RemoveLikedUserIDs(ids ...int) *CommentUpdate {
+	cu.mutation.RemoveLikedUserIDs(ids...)
 	return cu
 }
 
-// RemoveUserCommentNotifications removes "user_comment_notifications" edges to UserCommentNotification entities.
-func (cu *CommentUpdate) RemoveUserCommentNotifications(u ...*UserCommentNotification) *CommentUpdate {
+// RemoveLikedUsers removes "liked_users" edges to User entities.
+func (cu *CommentUpdate) RemoveLikedUsers(u ...*User) *CommentUpdate {
 	ids := make([]int, len(u))
 	for i := range u {
 		ids[i] = u[i].ID
 	}
-	return cu.RemoveUserCommentNotificationIDs(ids...)
+	return cu.RemoveLikedUserIDs(ids...)
+}
+
+// ClearSubscribedUsers clears all "subscribed_users" edges to the User entity.
+func (cu *CommentUpdate) ClearSubscribedUsers() *CommentUpdate {
+	cu.mutation.ClearSubscribedUsers()
+	return cu
+}
+
+// RemoveSubscribedUserIDs removes the "subscribed_users" edge to User entities by IDs.
+func (cu *CommentUpdate) RemoveSubscribedUserIDs(ids ...int) *CommentUpdate {
+	cu.mutation.RemoveSubscribedUserIDs(ids...)
+	return cu
+}
+
+// RemoveSubscribedUsers removes "subscribed_users" edges to User entities.
+func (cu *CommentUpdate) RemoveSubscribedUsers(u ...*User) *CommentUpdate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return cu.RemoveSubscribedUserIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -349,6 +407,11 @@ func (cu *CommentUpdate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (cu *CommentUpdate) check() error {
+	if v, ok := cu.mutation.GuestName(); ok {
+		if err := comment.GuestNameValidator(v); err != nil {
+			return &ValidationError{Name: "guestName", err: fmt.Errorf(`ent: validator failed for field "Comment.guestName": %w`, err)}
+		}
+	}
 	if v, ok := cu.mutation.Status(); ok {
 		if err := comment.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Comment.status": %w`, err)}
@@ -356,9 +419,6 @@ func (cu *CommentUpdate) check() error {
 	}
 	if _, ok := cu.mutation.TopicID(); cu.mutation.TopicCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Comment.topic"`)
-	}
-	if _, ok := cu.mutation.UserID(); cu.mutation.UserCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "Comment.user"`)
 	}
 	return nil
 }
@@ -375,8 +435,14 @@ func (cu *CommentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := cu.mutation.Content(); ok {
-		_spec.SetField(comment.FieldContent, field.TypeString, value)
+	if value, ok := cu.mutation.GuestName(); ok {
+		_spec.SetField(comment.FieldGuestName, field.TypeString, value)
+	}
+	if cu.mutation.GuestNameCleared() {
+		_spec.ClearField(comment.FieldGuestName, field.TypeString)
+	}
+	if value, ok := cu.mutation.Message(); ok {
+		_spec.SetField(comment.FieldMessage, field.TypeString, value)
 	}
 	if value, ok := cu.mutation.Status(); ok {
 		_spec.SetField(comment.FieldStatus, field.TypeEnum, value)
@@ -416,12 +482,12 @@ func (cu *CommentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if cu.mutation.UserCleared() {
+	if cu.mutation.AuthorCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   comment.UserTable,
-			Columns: []string{comment.UserColumn},
+			Table:   comment.AuthorTable,
+			Columns: []string{comment.AuthorColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
@@ -429,12 +495,12 @@ func (cu *CommentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cu.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := cu.mutation.AuthorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   comment.UserTable,
-			Columns: []string{comment.UserColumn},
+			Table:   comment.AuthorTable,
+			Columns: []string{comment.AuthorColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
@@ -519,51 +585,6 @@ func (cu *CommentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if cu.mutation.CommentLikesCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   comment.CommentLikesTable,
-			Columns: []string{comment.CommentLikesColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(commentlike.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cu.mutation.RemovedCommentLikesIDs(); len(nodes) > 0 && !cu.mutation.CommentLikesCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   comment.CommentLikesTable,
-			Columns: []string{comment.CommentLikesColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(commentlike.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cu.mutation.CommentLikesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   comment.CommentLikesTable,
-			Columns: []string{comment.CommentLikesColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(commentlike.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
 	if cu.mutation.CommentAttachmentsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -609,49 +630,118 @@ func (cu *CommentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if cu.mutation.UserCommentNotificationsCleared() {
+	if cu.mutation.LikedUsersCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   comment.UserCommentNotificationsTable,
-			Columns: []string{comment.UserCommentNotificationsColumn},
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   comment.LikedUsersTable,
+			Columns: comment.LikedUsersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(usercommentnotification.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
 			},
 		}
+		createE := &UserCommentLikeCreate{config: cu.config, mutation: newUserCommentLikeMutation(cu.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cu.mutation.RemovedUserCommentNotificationsIDs(); len(nodes) > 0 && !cu.mutation.UserCommentNotificationsCleared() {
+	if nodes := cu.mutation.RemovedLikedUsersIDs(); len(nodes) > 0 && !cu.mutation.LikedUsersCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   comment.UserCommentNotificationsTable,
-			Columns: []string{comment.UserCommentNotificationsColumn},
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   comment.LikedUsersTable,
+			Columns: comment.LikedUsersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(usercommentnotification.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		createE := &UserCommentLikeCreate{config: cu.config, mutation: newUserCommentLikeMutation(cu.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cu.mutation.UserCommentNotificationsIDs(); len(nodes) > 0 {
+	if nodes := cu.mutation.LikedUsersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   comment.UserCommentNotificationsTable,
-			Columns: []string{comment.UserCommentNotificationsColumn},
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   comment.LikedUsersTable,
+			Columns: comment.LikedUsersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(usercommentnotification.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		createE := &UserCommentLikeCreate{config: cu.config, mutation: newUserCommentLikeMutation(cu.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cu.mutation.SubscribedUsersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   comment.SubscribedUsersTable,
+			Columns: comment.SubscribedUsersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		createE := &UserCommentSubscriptionCreate{config: cu.config, mutation: newUserCommentSubscriptionMutation(cu.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.RemovedSubscribedUsersIDs(); len(nodes) > 0 && !cu.mutation.SubscribedUsersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   comment.SubscribedUsersTable,
+			Columns: comment.SubscribedUsersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		createE := &UserCommentSubscriptionCreate{config: cu.config, mutation: newUserCommentSubscriptionMutation(cu.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.SubscribedUsersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   comment.SubscribedUsersTable,
+			Columns: comment.SubscribedUsersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		createE := &UserCommentSubscriptionCreate{config: cu.config, mutation: newUserCommentSubscriptionMutation(cu.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, cu.driver, _spec); err != nil {
@@ -674,64 +764,90 @@ type CommentUpdateOne struct {
 	mutation *CommentMutation
 }
 
-// SetTopicID sets the "topic_id" field.
-func (cuo *CommentUpdateOne) SetTopicID(i int) *CommentUpdateOne {
-	cuo.mutation.SetTopicID(i)
+// SetTopicId sets the "topicId" field.
+func (cuo *CommentUpdateOne) SetTopicId(i int) *CommentUpdateOne {
+	cuo.mutation.SetTopicId(i)
 	return cuo
 }
 
-// SetNillableTopicID sets the "topic_id" field if the given value is not nil.
-func (cuo *CommentUpdateOne) SetNillableTopicID(i *int) *CommentUpdateOne {
+// SetNillableTopicId sets the "topicId" field if the given value is not nil.
+func (cuo *CommentUpdateOne) SetNillableTopicId(i *int) *CommentUpdateOne {
 	if i != nil {
-		cuo.SetTopicID(*i)
+		cuo.SetTopicId(*i)
 	}
 	return cuo
 }
 
-// SetUserID sets the "user_id" field.
-func (cuo *CommentUpdateOne) SetUserID(i int) *CommentUpdateOne {
-	cuo.mutation.SetUserID(i)
+// SetParentId sets the "parentId" field.
+func (cuo *CommentUpdateOne) SetParentId(i int) *CommentUpdateOne {
+	cuo.mutation.SetParentId(i)
 	return cuo
 }
 
-// SetNillableUserID sets the "user_id" field if the given value is not nil.
-func (cuo *CommentUpdateOne) SetNillableUserID(i *int) *CommentUpdateOne {
+// SetNillableParentId sets the "parentId" field if the given value is not nil.
+func (cuo *CommentUpdateOne) SetNillableParentId(i *int) *CommentUpdateOne {
 	if i != nil {
-		cuo.SetUserID(*i)
+		cuo.SetParentId(*i)
 	}
 	return cuo
 }
 
-// SetParentID sets the "parent_id" field.
-func (cuo *CommentUpdateOne) SetParentID(i int) *CommentUpdateOne {
-	cuo.mutation.SetParentID(i)
+// ClearParentId clears the value of the "parentId" field.
+func (cuo *CommentUpdateOne) ClearParentId() *CommentUpdateOne {
+	cuo.mutation.ClearParentId()
 	return cuo
 }
 
-// SetNillableParentID sets the "parent_id" field if the given value is not nil.
-func (cuo *CommentUpdateOne) SetNillableParentID(i *int) *CommentUpdateOne {
+// SetUserId sets the "userId" field.
+func (cuo *CommentUpdateOne) SetUserId(i int) *CommentUpdateOne {
+	cuo.mutation.SetUserId(i)
+	return cuo
+}
+
+// SetNillableUserId sets the "userId" field if the given value is not nil.
+func (cuo *CommentUpdateOne) SetNillableUserId(i *int) *CommentUpdateOne {
 	if i != nil {
-		cuo.SetParentID(*i)
+		cuo.SetUserId(*i)
 	}
 	return cuo
 }
 
-// ClearParentID clears the value of the "parent_id" field.
-func (cuo *CommentUpdateOne) ClearParentID() *CommentUpdateOne {
-	cuo.mutation.ClearParentID()
+// ClearUserId clears the value of the "userId" field.
+func (cuo *CommentUpdateOne) ClearUserId() *CommentUpdateOne {
+	cuo.mutation.ClearUserId()
 	return cuo
 }
 
-// SetContent sets the "content" field.
-func (cuo *CommentUpdateOne) SetContent(s string) *CommentUpdateOne {
-	cuo.mutation.SetContent(s)
+// SetGuestName sets the "guestName" field.
+func (cuo *CommentUpdateOne) SetGuestName(s string) *CommentUpdateOne {
+	cuo.mutation.SetGuestName(s)
 	return cuo
 }
 
-// SetNillableContent sets the "content" field if the given value is not nil.
-func (cuo *CommentUpdateOne) SetNillableContent(s *string) *CommentUpdateOne {
+// SetNillableGuestName sets the "guestName" field if the given value is not nil.
+func (cuo *CommentUpdateOne) SetNillableGuestName(s *string) *CommentUpdateOne {
 	if s != nil {
-		cuo.SetContent(*s)
+		cuo.SetGuestName(*s)
+	}
+	return cuo
+}
+
+// ClearGuestName clears the value of the "guestName" field.
+func (cuo *CommentUpdateOne) ClearGuestName() *CommentUpdateOne {
+	cuo.mutation.ClearGuestName()
+	return cuo
+}
+
+// SetMessage sets the "message" field.
+func (cuo *CommentUpdateOne) SetMessage(s string) *CommentUpdateOne {
+	cuo.mutation.SetMessage(s)
+	return cuo
+}
+
+// SetNillableMessage sets the "message" field if the given value is not nil.
+func (cuo *CommentUpdateOne) SetNillableMessage(s *string) *CommentUpdateOne {
+	if s != nil {
+		cuo.SetMessage(*s)
 	}
 	return cuo
 }
@@ -750,13 +866,13 @@ func (cuo *CommentUpdateOne) SetNillableStatus(c *comment.Status) *CommentUpdate
 	return cuo
 }
 
-// SetCreatedAt sets the "created_at" field.
+// SetCreatedAt sets the "createdAt" field.
 func (cuo *CommentUpdateOne) SetCreatedAt(t time.Time) *CommentUpdateOne {
 	cuo.mutation.SetCreatedAt(t)
 	return cuo
 }
 
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
 func (cuo *CommentUpdateOne) SetNillableCreatedAt(t *time.Time) *CommentUpdateOne {
 	if t != nil {
 		cuo.SetCreatedAt(*t)
@@ -764,9 +880,15 @@ func (cuo *CommentUpdateOne) SetNillableCreatedAt(t *time.Time) *CommentUpdateOn
 	return cuo
 }
 
-// SetUpdatedAt sets the "updated_at" field.
+// SetUpdatedAt sets the "updatedAt" field.
 func (cuo *CommentUpdateOne) SetUpdatedAt(t time.Time) *CommentUpdateOne {
 	cuo.mutation.SetUpdatedAt(t)
+	return cuo
+}
+
+// SetTopicID sets the "topic" edge to the Topic entity by ID.
+func (cuo *CommentUpdateOne) SetTopicID(id int) *CommentUpdateOne {
+	cuo.mutation.SetTopicID(id)
 	return cuo
 }
 
@@ -775,9 +897,37 @@ func (cuo *CommentUpdateOne) SetTopic(t *Topic) *CommentUpdateOne {
 	return cuo.SetTopicID(t.ID)
 }
 
-// SetUser sets the "user" edge to the User entity.
-func (cuo *CommentUpdateOne) SetUser(u *User) *CommentUpdateOne {
-	return cuo.SetUserID(u.ID)
+// SetAuthorID sets the "author" edge to the User entity by ID.
+func (cuo *CommentUpdateOne) SetAuthorID(id int) *CommentUpdateOne {
+	cuo.mutation.SetAuthorID(id)
+	return cuo
+}
+
+// SetNillableAuthorID sets the "author" edge to the User entity by ID if the given value is not nil.
+func (cuo *CommentUpdateOne) SetNillableAuthorID(id *int) *CommentUpdateOne {
+	if id != nil {
+		cuo = cuo.SetAuthorID(*id)
+	}
+	return cuo
+}
+
+// SetAuthor sets the "author" edge to the User entity.
+func (cuo *CommentUpdateOne) SetAuthor(u *User) *CommentUpdateOne {
+	return cuo.SetAuthorID(u.ID)
+}
+
+// SetParentID sets the "parent" edge to the Comment entity by ID.
+func (cuo *CommentUpdateOne) SetParentID(id int) *CommentUpdateOne {
+	cuo.mutation.SetParentID(id)
+	return cuo
+}
+
+// SetNillableParentID sets the "parent" edge to the Comment entity by ID if the given value is not nil.
+func (cuo *CommentUpdateOne) SetNillableParentID(id *int) *CommentUpdateOne {
+	if id != nil {
+		cuo = cuo.SetParentID(*id)
+	}
+	return cuo
 }
 
 // SetParent sets the "parent" edge to the Comment entity.
@@ -800,21 +950,6 @@ func (cuo *CommentUpdateOne) AddReplies(c ...*Comment) *CommentUpdateOne {
 	return cuo.AddReplyIDs(ids...)
 }
 
-// AddCommentLikeIDs adds the "comment_likes" edge to the CommentLike entity by IDs.
-func (cuo *CommentUpdateOne) AddCommentLikeIDs(ids ...int) *CommentUpdateOne {
-	cuo.mutation.AddCommentLikeIDs(ids...)
-	return cuo
-}
-
-// AddCommentLikes adds the "comment_likes" edges to the CommentLike entity.
-func (cuo *CommentUpdateOne) AddCommentLikes(c ...*CommentLike) *CommentUpdateOne {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return cuo.AddCommentLikeIDs(ids...)
-}
-
 // AddCommentAttachmentIDs adds the "comment_attachments" edge to the CommentAttachment entity by IDs.
 func (cuo *CommentUpdateOne) AddCommentAttachmentIDs(ids ...int) *CommentUpdateOne {
 	cuo.mutation.AddCommentAttachmentIDs(ids...)
@@ -830,19 +965,34 @@ func (cuo *CommentUpdateOne) AddCommentAttachments(c ...*CommentAttachment) *Com
 	return cuo.AddCommentAttachmentIDs(ids...)
 }
 
-// AddUserCommentNotificationIDs adds the "user_comment_notifications" edge to the UserCommentNotification entity by IDs.
-func (cuo *CommentUpdateOne) AddUserCommentNotificationIDs(ids ...int) *CommentUpdateOne {
-	cuo.mutation.AddUserCommentNotificationIDs(ids...)
+// AddLikedUserIDs adds the "liked_users" edge to the User entity by IDs.
+func (cuo *CommentUpdateOne) AddLikedUserIDs(ids ...int) *CommentUpdateOne {
+	cuo.mutation.AddLikedUserIDs(ids...)
 	return cuo
 }
 
-// AddUserCommentNotifications adds the "user_comment_notifications" edges to the UserCommentNotification entity.
-func (cuo *CommentUpdateOne) AddUserCommentNotifications(u ...*UserCommentNotification) *CommentUpdateOne {
+// AddLikedUsers adds the "liked_users" edges to the User entity.
+func (cuo *CommentUpdateOne) AddLikedUsers(u ...*User) *CommentUpdateOne {
 	ids := make([]int, len(u))
 	for i := range u {
 		ids[i] = u[i].ID
 	}
-	return cuo.AddUserCommentNotificationIDs(ids...)
+	return cuo.AddLikedUserIDs(ids...)
+}
+
+// AddSubscribedUserIDs adds the "subscribed_users" edge to the User entity by IDs.
+func (cuo *CommentUpdateOne) AddSubscribedUserIDs(ids ...int) *CommentUpdateOne {
+	cuo.mutation.AddSubscribedUserIDs(ids...)
+	return cuo
+}
+
+// AddSubscribedUsers adds the "subscribed_users" edges to the User entity.
+func (cuo *CommentUpdateOne) AddSubscribedUsers(u ...*User) *CommentUpdateOne {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return cuo.AddSubscribedUserIDs(ids...)
 }
 
 // Mutation returns the CommentMutation object of the builder.
@@ -856,9 +1006,9 @@ func (cuo *CommentUpdateOne) ClearTopic() *CommentUpdateOne {
 	return cuo
 }
 
-// ClearUser clears the "user" edge to the User entity.
-func (cuo *CommentUpdateOne) ClearUser() *CommentUpdateOne {
-	cuo.mutation.ClearUser()
+// ClearAuthor clears the "author" edge to the User entity.
+func (cuo *CommentUpdateOne) ClearAuthor() *CommentUpdateOne {
+	cuo.mutation.ClearAuthor()
 	return cuo
 }
 
@@ -889,27 +1039,6 @@ func (cuo *CommentUpdateOne) RemoveReplies(c ...*Comment) *CommentUpdateOne {
 	return cuo.RemoveReplyIDs(ids...)
 }
 
-// ClearCommentLikes clears all "comment_likes" edges to the CommentLike entity.
-func (cuo *CommentUpdateOne) ClearCommentLikes() *CommentUpdateOne {
-	cuo.mutation.ClearCommentLikes()
-	return cuo
-}
-
-// RemoveCommentLikeIDs removes the "comment_likes" edge to CommentLike entities by IDs.
-func (cuo *CommentUpdateOne) RemoveCommentLikeIDs(ids ...int) *CommentUpdateOne {
-	cuo.mutation.RemoveCommentLikeIDs(ids...)
-	return cuo
-}
-
-// RemoveCommentLikes removes "comment_likes" edges to CommentLike entities.
-func (cuo *CommentUpdateOne) RemoveCommentLikes(c ...*CommentLike) *CommentUpdateOne {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return cuo.RemoveCommentLikeIDs(ids...)
-}
-
 // ClearCommentAttachments clears all "comment_attachments" edges to the CommentAttachment entity.
 func (cuo *CommentUpdateOne) ClearCommentAttachments() *CommentUpdateOne {
 	cuo.mutation.ClearCommentAttachments()
@@ -931,25 +1060,46 @@ func (cuo *CommentUpdateOne) RemoveCommentAttachments(c ...*CommentAttachment) *
 	return cuo.RemoveCommentAttachmentIDs(ids...)
 }
 
-// ClearUserCommentNotifications clears all "user_comment_notifications" edges to the UserCommentNotification entity.
-func (cuo *CommentUpdateOne) ClearUserCommentNotifications() *CommentUpdateOne {
-	cuo.mutation.ClearUserCommentNotifications()
+// ClearLikedUsers clears all "liked_users" edges to the User entity.
+func (cuo *CommentUpdateOne) ClearLikedUsers() *CommentUpdateOne {
+	cuo.mutation.ClearLikedUsers()
 	return cuo
 }
 
-// RemoveUserCommentNotificationIDs removes the "user_comment_notifications" edge to UserCommentNotification entities by IDs.
-func (cuo *CommentUpdateOne) RemoveUserCommentNotificationIDs(ids ...int) *CommentUpdateOne {
-	cuo.mutation.RemoveUserCommentNotificationIDs(ids...)
+// RemoveLikedUserIDs removes the "liked_users" edge to User entities by IDs.
+func (cuo *CommentUpdateOne) RemoveLikedUserIDs(ids ...int) *CommentUpdateOne {
+	cuo.mutation.RemoveLikedUserIDs(ids...)
 	return cuo
 }
 
-// RemoveUserCommentNotifications removes "user_comment_notifications" edges to UserCommentNotification entities.
-func (cuo *CommentUpdateOne) RemoveUserCommentNotifications(u ...*UserCommentNotification) *CommentUpdateOne {
+// RemoveLikedUsers removes "liked_users" edges to User entities.
+func (cuo *CommentUpdateOne) RemoveLikedUsers(u ...*User) *CommentUpdateOne {
 	ids := make([]int, len(u))
 	for i := range u {
 		ids[i] = u[i].ID
 	}
-	return cuo.RemoveUserCommentNotificationIDs(ids...)
+	return cuo.RemoveLikedUserIDs(ids...)
+}
+
+// ClearSubscribedUsers clears all "subscribed_users" edges to the User entity.
+func (cuo *CommentUpdateOne) ClearSubscribedUsers() *CommentUpdateOne {
+	cuo.mutation.ClearSubscribedUsers()
+	return cuo
+}
+
+// RemoveSubscribedUserIDs removes the "subscribed_users" edge to User entities by IDs.
+func (cuo *CommentUpdateOne) RemoveSubscribedUserIDs(ids ...int) *CommentUpdateOne {
+	cuo.mutation.RemoveSubscribedUserIDs(ids...)
+	return cuo
+}
+
+// RemoveSubscribedUsers removes "subscribed_users" edges to User entities.
+func (cuo *CommentUpdateOne) RemoveSubscribedUsers(u ...*User) *CommentUpdateOne {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return cuo.RemoveSubscribedUserIDs(ids...)
 }
 
 // Where appends a list predicates to the CommentUpdate builder.
@@ -1003,6 +1153,11 @@ func (cuo *CommentUpdateOne) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (cuo *CommentUpdateOne) check() error {
+	if v, ok := cuo.mutation.GuestName(); ok {
+		if err := comment.GuestNameValidator(v); err != nil {
+			return &ValidationError{Name: "guestName", err: fmt.Errorf(`ent: validator failed for field "Comment.guestName": %w`, err)}
+		}
+	}
 	if v, ok := cuo.mutation.Status(); ok {
 		if err := comment.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Comment.status": %w`, err)}
@@ -1010,9 +1165,6 @@ func (cuo *CommentUpdateOne) check() error {
 	}
 	if _, ok := cuo.mutation.TopicID(); cuo.mutation.TopicCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Comment.topic"`)
-	}
-	if _, ok := cuo.mutation.UserID(); cuo.mutation.UserCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "Comment.user"`)
 	}
 	return nil
 }
@@ -1046,8 +1198,14 @@ func (cuo *CommentUpdateOne) sqlSave(ctx context.Context) (_node *Comment, err e
 			}
 		}
 	}
-	if value, ok := cuo.mutation.Content(); ok {
-		_spec.SetField(comment.FieldContent, field.TypeString, value)
+	if value, ok := cuo.mutation.GuestName(); ok {
+		_spec.SetField(comment.FieldGuestName, field.TypeString, value)
+	}
+	if cuo.mutation.GuestNameCleared() {
+		_spec.ClearField(comment.FieldGuestName, field.TypeString)
+	}
+	if value, ok := cuo.mutation.Message(); ok {
+		_spec.SetField(comment.FieldMessage, field.TypeString, value)
 	}
 	if value, ok := cuo.mutation.Status(); ok {
 		_spec.SetField(comment.FieldStatus, field.TypeEnum, value)
@@ -1087,12 +1245,12 @@ func (cuo *CommentUpdateOne) sqlSave(ctx context.Context) (_node *Comment, err e
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if cuo.mutation.UserCleared() {
+	if cuo.mutation.AuthorCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   comment.UserTable,
-			Columns: []string{comment.UserColumn},
+			Table:   comment.AuthorTable,
+			Columns: []string{comment.AuthorColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
@@ -1100,12 +1258,12 @@ func (cuo *CommentUpdateOne) sqlSave(ctx context.Context) (_node *Comment, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cuo.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := cuo.mutation.AuthorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   comment.UserTable,
-			Columns: []string{comment.UserColumn},
+			Table:   comment.AuthorTable,
+			Columns: []string{comment.AuthorColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
@@ -1190,51 +1348,6 @@ func (cuo *CommentUpdateOne) sqlSave(ctx context.Context) (_node *Comment, err e
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if cuo.mutation.CommentLikesCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   comment.CommentLikesTable,
-			Columns: []string{comment.CommentLikesColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(commentlike.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cuo.mutation.RemovedCommentLikesIDs(); len(nodes) > 0 && !cuo.mutation.CommentLikesCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   comment.CommentLikesTable,
-			Columns: []string{comment.CommentLikesColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(commentlike.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cuo.mutation.CommentLikesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   comment.CommentLikesTable,
-			Columns: []string{comment.CommentLikesColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(commentlike.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
 	if cuo.mutation.CommentAttachmentsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -1280,49 +1393,118 @@ func (cuo *CommentUpdateOne) sqlSave(ctx context.Context) (_node *Comment, err e
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if cuo.mutation.UserCommentNotificationsCleared() {
+	if cuo.mutation.LikedUsersCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   comment.UserCommentNotificationsTable,
-			Columns: []string{comment.UserCommentNotificationsColumn},
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   comment.LikedUsersTable,
+			Columns: comment.LikedUsersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(usercommentnotification.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
 			},
 		}
+		createE := &UserCommentLikeCreate{config: cuo.config, mutation: newUserCommentLikeMutation(cuo.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cuo.mutation.RemovedUserCommentNotificationsIDs(); len(nodes) > 0 && !cuo.mutation.UserCommentNotificationsCleared() {
+	if nodes := cuo.mutation.RemovedLikedUsersIDs(); len(nodes) > 0 && !cuo.mutation.LikedUsersCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   comment.UserCommentNotificationsTable,
-			Columns: []string{comment.UserCommentNotificationsColumn},
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   comment.LikedUsersTable,
+			Columns: comment.LikedUsersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(usercommentnotification.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		createE := &UserCommentLikeCreate{config: cuo.config, mutation: newUserCommentLikeMutation(cuo.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cuo.mutation.UserCommentNotificationsIDs(); len(nodes) > 0 {
+	if nodes := cuo.mutation.LikedUsersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   comment.UserCommentNotificationsTable,
-			Columns: []string{comment.UserCommentNotificationsColumn},
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   comment.LikedUsersTable,
+			Columns: comment.LikedUsersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(usercommentnotification.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		createE := &UserCommentLikeCreate{config: cuo.config, mutation: newUserCommentLikeMutation(cuo.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cuo.mutation.SubscribedUsersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   comment.SubscribedUsersTable,
+			Columns: comment.SubscribedUsersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		createE := &UserCommentSubscriptionCreate{config: cuo.config, mutation: newUserCommentSubscriptionMutation(cuo.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.RemovedSubscribedUsersIDs(); len(nodes) > 0 && !cuo.mutation.SubscribedUsersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   comment.SubscribedUsersTable,
+			Columns: comment.SubscribedUsersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		createE := &UserCommentSubscriptionCreate{config: cuo.config, mutation: newUserCommentSubscriptionMutation(cuo.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.SubscribedUsersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   comment.SubscribedUsersTable,
+			Columns: comment.SubscribedUsersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		createE := &UserCommentSubscriptionCreate{config: cuo.config, mutation: newUserCommentSubscriptionMutation(cuo.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Comment{config: cuo.config}

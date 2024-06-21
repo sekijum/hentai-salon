@@ -15,33 +15,42 @@ const (
 	Label = "forum"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldUserID holds the string denoting the user_id field in the database.
-	FieldUserID = "user_id"
-	// FieldName holds the string denoting the name field in the database.
-	FieldName = "name"
+	// FieldUserId holds the string denoting the userid field in the database.
+	FieldUserId = "user_id"
+	// FieldTitle holds the string denoting the title field in the database.
+	FieldTitle = "title"
 	// FieldDescription holds the string denoting the description field in the database.
 	FieldDescription = "description"
+	// FieldThumbnailUrl holds the string denoting the thumbnailurl field in the database.
+	FieldThumbnailUrl = "thumbnail_url"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
-	// FieldCreatedAt holds the string denoting the created_at field in the database.
+	// FieldCreatedAt holds the string denoting the createdat field in the database.
 	FieldCreatedAt = "created_at"
-	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
+	// FieldUpdatedAt holds the string denoting the updatedat field in the database.
 	FieldUpdatedAt = "updated_at"
-	// EdgeUser holds the string denoting the user edge name in mutations.
-	EdgeUser = "user"
+	// EdgeLikedUsers holds the string denoting the liked_users edge name in mutations.
+	EdgeLikedUsers = "liked_users"
+	// EdgeSubscribedUsers holds the string denoting the subscribed_users edge name in mutations.
+	EdgeSubscribedUsers = "subscribed_users"
 	// EdgeTopics holds the string denoting the topics edge name in mutations.
 	EdgeTopics = "topics"
-	// EdgeForumLikes holds the string denoting the forum_likes edge name in mutations.
-	EdgeForumLikes = "forum_likes"
+	// EdgeUserForumLike holds the string denoting the user_forum_like edge name in mutations.
+	EdgeUserForumLike = "user_forum_like"
+	// EdgeUserForumSubscription holds the string denoting the user_forum_subscription edge name in mutations.
+	EdgeUserForumSubscription = "user_forum_subscription"
 	// Table holds the table name of the forum in the database.
 	Table = "forums"
-	// UserTable is the table that holds the user relation/edge.
-	UserTable = "forums"
-	// UserInverseTable is the table name for the User entity.
+	// LikedUsersTable is the table that holds the liked_users relation/edge. The primary key declared below.
+	LikedUsersTable = "user_forum_subscriptions"
+	// LikedUsersInverseTable is the table name for the User entity.
 	// It exists in this package in order to avoid circular dependency with the "user" package.
-	UserInverseTable = "users"
-	// UserColumn is the table column denoting the user relation/edge.
-	UserColumn = "user_id"
+	LikedUsersInverseTable = "users"
+	// SubscribedUsersTable is the table that holds the subscribed_users relation/edge. The primary key declared below.
+	SubscribedUsersTable = "user_forum_likes"
+	// SubscribedUsersInverseTable is the table name for the User entity.
+	// It exists in this package in order to avoid circular dependency with the "user" package.
+	SubscribedUsersInverseTable = "users"
 	// TopicsTable is the table that holds the topics relation/edge.
 	TopicsTable = "topics"
 	// TopicsInverseTable is the table name for the Topic entity.
@@ -49,25 +58,48 @@ const (
 	TopicsInverseTable = "topics"
 	// TopicsColumn is the table column denoting the topics relation/edge.
 	TopicsColumn = "forum_id"
-	// ForumLikesTable is the table that holds the forum_likes relation/edge.
-	ForumLikesTable = "forum_likes"
-	// ForumLikesInverseTable is the table name for the ForumLike entity.
-	// It exists in this package in order to avoid circular dependency with the "forumlike" package.
-	ForumLikesInverseTable = "forum_likes"
-	// ForumLikesColumn is the table column denoting the forum_likes relation/edge.
-	ForumLikesColumn = "forum_id"
+	// UserForumLikeTable is the table that holds the user_forum_like relation/edge.
+	UserForumLikeTable = "user_forum_subscriptions"
+	// UserForumLikeInverseTable is the table name for the UserForumSubscription entity.
+	// It exists in this package in order to avoid circular dependency with the "userforumsubscription" package.
+	UserForumLikeInverseTable = "user_forum_subscriptions"
+	// UserForumLikeColumn is the table column denoting the user_forum_like relation/edge.
+	UserForumLikeColumn = "forum_id"
+	// UserForumSubscriptionTable is the table that holds the user_forum_subscription relation/edge.
+	UserForumSubscriptionTable = "user_forum_likes"
+	// UserForumSubscriptionInverseTable is the table name for the UserForumLike entity.
+	// It exists in this package in order to avoid circular dependency with the "userforumlike" package.
+	UserForumSubscriptionInverseTable = "user_forum_likes"
+	// UserForumSubscriptionColumn is the table column denoting the user_forum_subscription relation/edge.
+	UserForumSubscriptionColumn = "forum_id"
 )
 
 // Columns holds all SQL columns for forum fields.
 var Columns = []string{
 	FieldID,
-	FieldUserID,
-	FieldName,
+	FieldUserId,
+	FieldTitle,
 	FieldDescription,
+	FieldThumbnailUrl,
 	FieldStatus,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
+
+// ForeignKeys holds the SQL foreign-keys that are owned by the "forums"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"user_forums",
+}
+
+var (
+	// LikedUsersPrimaryKey and LikedUsersColumn2 are the table columns denoting the
+	// primary key for the liked_users relation (M2M).
+	LikedUsersPrimaryKey = []string{"userId", "forumId"}
+	// SubscribedUsersPrimaryKey and SubscribedUsersColumn2 are the table columns denoting the
+	// primary key for the subscribed_users relation (M2M).
+	SubscribedUsersPrimaryKey = []string{"userId", "forumId"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -76,15 +108,24 @@ func ValidColumn(column string) bool {
 			return true
 		}
 	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
+			return true
+		}
+	}
 	return false
 }
 
 var (
-	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
+	// TitleValidator is a validator for the "title" field. It is called by the builders before save.
+	TitleValidator func(string) error
+	// DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
+	DescriptionValidator func(string) error
+	// DefaultCreatedAt holds the default value on creation for the "createdAt" field.
 	DefaultCreatedAt func() time.Time
-	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
+	// DefaultUpdatedAt holds the default value on creation for the "updatedAt" field.
 	DefaultUpdatedAt func() time.Time
-	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
+	// UpdateDefaultUpdatedAt holds the default value on update for the "updatedAt" field.
 	UpdateDefaultUpdatedAt func() time.Time
 )
 
@@ -96,10 +137,9 @@ const DefaultStatus = StatusPublic
 
 // Status values.
 const (
-	StatusPublic      Status = "Public"
-	StatusPrivate     Status = "Private"
-	StatusArchived    Status = "Archived"
-	StatusDisapproved Status = "Disapproved"
+	StatusPublic   Status = "Public"
+	StatusPrivate  Status = "Private"
+	StatusArchived Status = "Archived"
 )
 
 func (s Status) String() string {
@@ -109,7 +149,7 @@ func (s Status) String() string {
 // StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
 func StatusValidator(s Status) error {
 	switch s {
-	case StatusPublic, StatusPrivate, StatusArchived, StatusDisapproved:
+	case StatusPublic, StatusPrivate, StatusArchived:
 		return nil
 	default:
 		return fmt.Errorf("forum: invalid enum value for status field: %q", s)
@@ -124,14 +164,14 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// ByUserID orders the results by the user_id field.
-func ByUserID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUserID, opts...).ToFunc()
+// ByUserId orders the results by the userId field.
+func ByUserId(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUserId, opts...).ToFunc()
 }
 
-// ByName orders the results by the name field.
-func ByName(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldName, opts...).ToFunc()
+// ByTitle orders the results by the title field.
+func ByTitle(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTitle, opts...).ToFunc()
 }
 
 // ByDescription orders the results by the description field.
@@ -139,25 +179,51 @@ func ByDescription(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDescription, opts...).ToFunc()
 }
 
+// ByThumbnailUrl orders the results by the thumbnailUrl field.
+func ByThumbnailUrl(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldThumbnailUrl, opts...).ToFunc()
+}
+
 // ByStatus orders the results by the status field.
 func ByStatus(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStatus, opts...).ToFunc()
 }
 
-// ByCreatedAt orders the results by the created_at field.
+// ByCreatedAt orders the results by the createdAt field.
 func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
 }
 
-// ByUpdatedAt orders the results by the updated_at field.
+// ByUpdatedAt orders the results by the updatedAt field.
 func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
 }
 
-// ByUserField orders the results by user field.
-func ByUserField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByLikedUsersCount orders the results by liked_users count.
+func ByLikedUsersCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newUserStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborsCount(s, newLikedUsersStep(), opts...)
+	}
+}
+
+// ByLikedUsers orders the results by liked_users terms.
+func ByLikedUsers(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newLikedUsersStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// BySubscribedUsersCount orders the results by subscribed_users count.
+func BySubscribedUsersCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newSubscribedUsersStep(), opts...)
+	}
+}
+
+// BySubscribedUsers orders the results by subscribed_users terms.
+func BySubscribedUsers(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSubscribedUsersStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -175,24 +241,45 @@ func ByTopics(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
-// ByForumLikesCount orders the results by forum_likes count.
-func ByForumLikesCount(opts ...sql.OrderTermOption) OrderOption {
+// ByUserForumLikeCount orders the results by user_forum_like count.
+func ByUserForumLikeCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newForumLikesStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newUserForumLikeStep(), opts...)
 	}
 }
 
-// ByForumLikes orders the results by forum_likes terms.
-func ByForumLikes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByUserForumLike orders the results by user_forum_like terms.
+func ByUserForumLike(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newForumLikesStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newUserForumLikeStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
-func newUserStep() *sqlgraph.Step {
+
+// ByUserForumSubscriptionCount orders the results by user_forum_subscription count.
+func ByUserForumSubscriptionCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newUserForumSubscriptionStep(), opts...)
+	}
+}
+
+// ByUserForumSubscription orders the results by user_forum_subscription terms.
+func ByUserForumSubscription(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newUserForumSubscriptionStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newLikedUsersStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(UserInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, UserTable, UserColumn),
+		sqlgraph.To(LikedUsersInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, LikedUsersTable, LikedUsersPrimaryKey...),
+	)
+}
+func newSubscribedUsersStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SubscribedUsersInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, SubscribedUsersTable, SubscribedUsersPrimaryKey...),
 	)
 }
 func newTopicsStep() *sqlgraph.Step {
@@ -202,10 +289,17 @@ func newTopicsStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.O2M, false, TopicsTable, TopicsColumn),
 	)
 }
-func newForumLikesStep() *sqlgraph.Step {
+func newUserForumLikeStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ForumLikesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, ForumLikesTable, ForumLikesColumn),
+		sqlgraph.To(UserForumLikeInverseTable, UserForumLikeColumn),
+		sqlgraph.Edge(sqlgraph.O2M, true, UserForumLikeTable, UserForumLikeColumn),
+	)
+}
+func newUserForumSubscriptionStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(UserForumSubscriptionInverseTable, UserForumSubscriptionColumn),
+		sqlgraph.Edge(sqlgraph.O2M, true, UserForumSubscriptionTable, UserForumSubscriptionColumn),
 	)
 }

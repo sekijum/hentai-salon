@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"server/infrastructure/ent/forum"
-	"server/infrastructure/ent/forumlike"
 	"server/infrastructure/ent/topic"
 	"server/infrastructure/ent/user"
 	"time"
@@ -23,15 +22,15 @@ type ForumCreate struct {
 	hooks    []Hook
 }
 
-// SetUserID sets the "user_id" field.
-func (fc *ForumCreate) SetUserID(i int) *ForumCreate {
-	fc.mutation.SetUserID(i)
+// SetUserId sets the "userId" field.
+func (fc *ForumCreate) SetUserId(i int) *ForumCreate {
+	fc.mutation.SetUserId(i)
 	return fc
 }
 
-// SetName sets the "name" field.
-func (fc *ForumCreate) SetName(s string) *ForumCreate {
-	fc.mutation.SetName(s)
+// SetTitle sets the "title" field.
+func (fc *ForumCreate) SetTitle(s string) *ForumCreate {
+	fc.mutation.SetTitle(s)
 	return fc
 }
 
@@ -45,6 +44,20 @@ func (fc *ForumCreate) SetDescription(s string) *ForumCreate {
 func (fc *ForumCreate) SetNillableDescription(s *string) *ForumCreate {
 	if s != nil {
 		fc.SetDescription(*s)
+	}
+	return fc
+}
+
+// SetThumbnailUrl sets the "thumbnailUrl" field.
+func (fc *ForumCreate) SetThumbnailUrl(s string) *ForumCreate {
+	fc.mutation.SetThumbnailUrl(s)
+	return fc
+}
+
+// SetNillableThumbnailUrl sets the "thumbnailUrl" field if the given value is not nil.
+func (fc *ForumCreate) SetNillableThumbnailUrl(s *string) *ForumCreate {
+	if s != nil {
+		fc.SetThumbnailUrl(*s)
 	}
 	return fc
 }
@@ -63,13 +76,13 @@ func (fc *ForumCreate) SetNillableStatus(f *forum.Status) *ForumCreate {
 	return fc
 }
 
-// SetCreatedAt sets the "created_at" field.
+// SetCreatedAt sets the "createdAt" field.
 func (fc *ForumCreate) SetCreatedAt(t time.Time) *ForumCreate {
 	fc.mutation.SetCreatedAt(t)
 	return fc
 }
 
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
 func (fc *ForumCreate) SetNillableCreatedAt(t *time.Time) *ForumCreate {
 	if t != nil {
 		fc.SetCreatedAt(*t)
@@ -77,13 +90,13 @@ func (fc *ForumCreate) SetNillableCreatedAt(t *time.Time) *ForumCreate {
 	return fc
 }
 
-// SetUpdatedAt sets the "updated_at" field.
+// SetUpdatedAt sets the "updatedAt" field.
 func (fc *ForumCreate) SetUpdatedAt(t time.Time) *ForumCreate {
 	fc.mutation.SetUpdatedAt(t)
 	return fc
 }
 
-// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+// SetNillableUpdatedAt sets the "updatedAt" field if the given value is not nil.
 func (fc *ForumCreate) SetNillableUpdatedAt(t *time.Time) *ForumCreate {
 	if t != nil {
 		fc.SetUpdatedAt(*t)
@@ -97,9 +110,34 @@ func (fc *ForumCreate) SetID(i int) *ForumCreate {
 	return fc
 }
 
-// SetUser sets the "user" edge to the User entity.
-func (fc *ForumCreate) SetUser(u *User) *ForumCreate {
-	return fc.SetUserID(u.ID)
+// AddLikedUserIDs adds the "liked_users" edge to the User entity by IDs.
+func (fc *ForumCreate) AddLikedUserIDs(ids ...int) *ForumCreate {
+	fc.mutation.AddLikedUserIDs(ids...)
+	return fc
+}
+
+// AddLikedUsers adds the "liked_users" edges to the User entity.
+func (fc *ForumCreate) AddLikedUsers(u ...*User) *ForumCreate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return fc.AddLikedUserIDs(ids...)
+}
+
+// AddSubscribedUserIDs adds the "subscribed_users" edge to the User entity by IDs.
+func (fc *ForumCreate) AddSubscribedUserIDs(ids ...int) *ForumCreate {
+	fc.mutation.AddSubscribedUserIDs(ids...)
+	return fc
+}
+
+// AddSubscribedUsers adds the "subscribed_users" edges to the User entity.
+func (fc *ForumCreate) AddSubscribedUsers(u ...*User) *ForumCreate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return fc.AddSubscribedUserIDs(ids...)
 }
 
 // AddTopicIDs adds the "topics" edge to the Topic entity by IDs.
@@ -115,21 +153,6 @@ func (fc *ForumCreate) AddTopics(t ...*Topic) *ForumCreate {
 		ids[i] = t[i].ID
 	}
 	return fc.AddTopicIDs(ids...)
-}
-
-// AddForumLikeIDs adds the "forum_likes" edge to the ForumLike entity by IDs.
-func (fc *ForumCreate) AddForumLikeIDs(ids ...int) *ForumCreate {
-	fc.mutation.AddForumLikeIDs(ids...)
-	return fc
-}
-
-// AddForumLikes adds the "forum_likes" edges to the ForumLike entity.
-func (fc *ForumCreate) AddForumLikes(f ...*ForumLike) *ForumCreate {
-	ids := make([]int, len(f))
-	for i := range f {
-		ids[i] = f[i].ID
-	}
-	return fc.AddForumLikeIDs(ids...)
 }
 
 // Mutation returns the ForumMutation object of the builder.
@@ -183,11 +206,21 @@ func (fc *ForumCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (fc *ForumCreate) check() error {
-	if _, ok := fc.mutation.UserID(); !ok {
-		return &ValidationError{Name: "user_id", err: errors.New(`ent: missing required field "Forum.user_id"`)}
+	if _, ok := fc.mutation.UserId(); !ok {
+		return &ValidationError{Name: "userId", err: errors.New(`ent: missing required field "Forum.userId"`)}
 	}
-	if _, ok := fc.mutation.Name(); !ok {
-		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Forum.name"`)}
+	if _, ok := fc.mutation.Title(); !ok {
+		return &ValidationError{Name: "title", err: errors.New(`ent: missing required field "Forum.title"`)}
+	}
+	if v, ok := fc.mutation.Title(); ok {
+		if err := forum.TitleValidator(v); err != nil {
+			return &ValidationError{Name: "title", err: fmt.Errorf(`ent: validator failed for field "Forum.title": %w`, err)}
+		}
+	}
+	if v, ok := fc.mutation.Description(); ok {
+		if err := forum.DescriptionValidator(v); err != nil {
+			return &ValidationError{Name: "description", err: fmt.Errorf(`ent: validator failed for field "Forum.description": %w`, err)}
+		}
 	}
 	if _, ok := fc.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Forum.status"`)}
@@ -198,13 +231,10 @@ func (fc *ForumCreate) check() error {
 		}
 	}
 	if _, ok := fc.mutation.CreatedAt(); !ok {
-		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Forum.created_at"`)}
+		return &ValidationError{Name: "createdAt", err: errors.New(`ent: missing required field "Forum.createdAt"`)}
 	}
 	if _, ok := fc.mutation.UpdatedAt(); !ok {
-		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Forum.updated_at"`)}
-	}
-	if _, ok := fc.mutation.UserID(); !ok {
-		return &ValidationError{Name: "user", err: errors.New(`ent: missing required edge "Forum.user"`)}
+		return &ValidationError{Name: "updatedAt", err: errors.New(`ent: missing required field "Forum.updatedAt"`)}
 	}
 	return nil
 }
@@ -238,13 +268,21 @@ func (fc *ForumCreate) createSpec() (*Forum, *sqlgraph.CreateSpec) {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
-	if value, ok := fc.mutation.Name(); ok {
-		_spec.SetField(forum.FieldName, field.TypeString, value)
-		_node.Name = value
+	if value, ok := fc.mutation.UserId(); ok {
+		_spec.SetField(forum.FieldUserId, field.TypeInt, value)
+		_node.UserId = value
+	}
+	if value, ok := fc.mutation.Title(); ok {
+		_spec.SetField(forum.FieldTitle, field.TypeString, value)
+		_node.Title = value
 	}
 	if value, ok := fc.mutation.Description(); ok {
 		_spec.SetField(forum.FieldDescription, field.TypeString, value)
 		_node.Description = value
+	}
+	if value, ok := fc.mutation.ThumbnailUrl(); ok {
+		_spec.SetField(forum.FieldThumbnailUrl, field.TypeString, value)
+		_node.ThumbnailUrl = value
 	}
 	if value, ok := fc.mutation.Status(); ok {
 		_spec.SetField(forum.FieldStatus, field.TypeEnum, value)
@@ -258,12 +296,12 @@ func (fc *ForumCreate) createSpec() (*Forum, *sqlgraph.CreateSpec) {
 		_spec.SetField(forum.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
-	if nodes := fc.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := fc.mutation.LikedUsersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   forum.UserTable,
-			Columns: []string{forum.UserColumn},
+			Table:   forum.LikedUsersTable,
+			Columns: forum.LikedUsersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
@@ -272,7 +310,30 @@ func (fc *ForumCreate) createSpec() (*Forum, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.UserID = nodes[0]
+		createE := &UserForumSubscriptionCreate{config: fc.config, mutation: newUserForumSubscriptionMutation(fc.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := fc.mutation.SubscribedUsersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   forum.SubscribedUsersTable,
+			Columns: forum.SubscribedUsersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		createE := &UserForumLikeCreate{config: fc.config, mutation: newUserForumLikeMutation(fc.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := fc.mutation.TopicsIDs(); len(nodes) > 0 {
@@ -284,22 +345,6 @@ func (fc *ForumCreate) createSpec() (*Forum, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(topic.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := fc.mutation.ForumLikesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   forum.ForumLikesTable,
-			Columns: []string{forum.ForumLikesColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(forumlike.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

@@ -17,12 +17,16 @@ type AdminUser struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
+	// UserName holds the value of the "userName" field.
+	UserName string `json:"userName,omitempty"`
 	// Email holds the value of the "email" field.
 	Email string `json:"email,omitempty"`
 	// Password holds the value of the "password" field.
 	Password string `json:"password,omitempty"`
-	// CreatedAt holds the value of the "created_at" field.
-	CreatedAt    time.Time `json:"created_at,omitempty"`
+	// CreatedAt holds the value of the "createdAt" field.
+	CreatedAt time.Time `json:"createdAt,omitempty"`
+	// UpdatedAt holds the value of the "updatedAt" field.
+	UpdatedAt    time.Time `json:"updatedAt,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -33,9 +37,9 @@ func (*AdminUser) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case adminuser.FieldID:
 			values[i] = new(sql.NullInt64)
-		case adminuser.FieldEmail, adminuser.FieldPassword:
+		case adminuser.FieldUserName, adminuser.FieldEmail, adminuser.FieldPassword:
 			values[i] = new(sql.NullString)
-		case adminuser.FieldCreatedAt:
+		case adminuser.FieldCreatedAt, adminuser.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -58,6 +62,12 @@ func (au *AdminUser) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			au.ID = int(value.Int64)
+		case adminuser.FieldUserName:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field userName", values[i])
+			} else if value.Valid {
+				au.UserName = value.String
+			}
 		case adminuser.FieldEmail:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field email", values[i])
@@ -72,9 +82,15 @@ func (au *AdminUser) assignValues(columns []string, values []any) error {
 			}
 		case adminuser.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field created_at", values[i])
+				return fmt.Errorf("unexpected type %T for field createdAt", values[i])
 			} else if value.Valid {
 				au.CreatedAt = value.Time
+			}
+		case adminuser.FieldUpdatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field updatedAt", values[i])
+			} else if value.Valid {
+				au.UpdatedAt = value.Time
 			}
 		default:
 			au.selectValues.Set(columns[i], values[i])
@@ -112,14 +128,20 @@ func (au *AdminUser) String() string {
 	var builder strings.Builder
 	builder.WriteString("AdminUser(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", au.ID))
+	builder.WriteString("userName=")
+	builder.WriteString(au.UserName)
+	builder.WriteString(", ")
 	builder.WriteString("email=")
 	builder.WriteString(au.Email)
 	builder.WriteString(", ")
 	builder.WriteString("password=")
 	builder.WriteString(au.Password)
 	builder.WriteString(", ")
-	builder.WriteString("created_at=")
+	builder.WriteString("createdAt=")
 	builder.WriteString(au.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("updatedAt=")
+	builder.WriteString(au.UpdatedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

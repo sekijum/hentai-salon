@@ -7,14 +7,9 @@ import (
 	"errors"
 	"fmt"
 	"server/infrastructure/ent/comment"
-	"server/infrastructure/ent/commentlike"
 	"server/infrastructure/ent/forum"
-	"server/infrastructure/ent/forumlike"
 	"server/infrastructure/ent/topic"
-	"server/infrastructure/ent/topiclike"
 	"server/infrastructure/ent/user"
-	"server/infrastructure/ent/usercommentnotification"
-	"server/infrastructure/ent/usertopicnotification"
 	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -28,9 +23,9 @@ type UserCreate struct {
 	hooks    []Hook
 }
 
-// SetUsername sets the "username" field.
-func (uc *UserCreate) SetUsername(s string) *UserCreate {
-	uc.mutation.SetUsername(s)
+// SetUserName sets the "userName" field.
+func (uc *UserCreate) SetUserName(s string) *UserCreate {
+	uc.mutation.SetUserName(s)
 	return uc
 }
 
@@ -46,13 +41,13 @@ func (uc *UserCreate) SetPassword(s string) *UserCreate {
 	return uc
 }
 
-// SetDisplayName sets the "display_name" field.
+// SetDisplayName sets the "displayName" field.
 func (uc *UserCreate) SetDisplayName(s string) *UserCreate {
 	uc.mutation.SetDisplayName(s)
 	return uc
 }
 
-// SetNillableDisplayName sets the "display_name" field if the given value is not nil.
+// SetNillableDisplayName sets the "displayName" field if the given value is not nil.
 func (uc *UserCreate) SetNillableDisplayName(s *string) *UserCreate {
 	if s != nil {
 		uc.SetDisplayName(*s)
@@ -60,16 +55,16 @@ func (uc *UserCreate) SetNillableDisplayName(s *string) *UserCreate {
 	return uc
 }
 
-// SetAvatar sets the "avatar" field.
-func (uc *UserCreate) SetAvatar(s string) *UserCreate {
-	uc.mutation.SetAvatar(s)
+// SetAvatarUrl sets the "avatarUrl" field.
+func (uc *UserCreate) SetAvatarUrl(s string) *UserCreate {
+	uc.mutation.SetAvatarUrl(s)
 	return uc
 }
 
-// SetNillableAvatar sets the "avatar" field if the given value is not nil.
-func (uc *UserCreate) SetNillableAvatar(s *string) *UserCreate {
+// SetNillableAvatarUrl sets the "avatarUrl" field if the given value is not nil.
+func (uc *UserCreate) SetNillableAvatarUrl(s *string) *UserCreate {
 	if s != nil {
-		uc.SetAvatar(*s)
+		uc.SetAvatarUrl(*s)
 	}
 	return uc
 }
@@ -88,13 +83,13 @@ func (uc *UserCreate) SetNillableStatus(u *user.Status) *UserCreate {
 	return uc
 }
 
-// SetCreatedAt sets the "created_at" field.
+// SetCreatedAt sets the "createdAt" field.
 func (uc *UserCreate) SetCreatedAt(t time.Time) *UserCreate {
 	uc.mutation.SetCreatedAt(t)
 	return uc
 }
 
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
 func (uc *UserCreate) SetNillableCreatedAt(t *time.Time) *UserCreate {
 	if t != nil {
 		uc.SetCreatedAt(*t)
@@ -102,13 +97,13 @@ func (uc *UserCreate) SetNillableCreatedAt(t *time.Time) *UserCreate {
 	return uc
 }
 
-// SetUpdatedAt sets the "updated_at" field.
+// SetUpdatedAt sets the "updatedAt" field.
 func (uc *UserCreate) SetUpdatedAt(t time.Time) *UserCreate {
 	uc.mutation.SetUpdatedAt(t)
 	return uc
 }
 
-// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+// SetNillableUpdatedAt sets the "updatedAt" field if the given value is not nil.
 func (uc *UserCreate) SetNillableUpdatedAt(t *time.Time) *UserCreate {
 	if t != nil {
 		uc.SetUpdatedAt(*t)
@@ -167,79 +162,94 @@ func (uc *UserCreate) AddComments(c ...*Comment) *UserCreate {
 	return uc.AddCommentIDs(ids...)
 }
 
-// AddUserTopicNotificationIDs adds the "user_topic_notifications" edge to the UserTopicNotification entity by IDs.
-func (uc *UserCreate) AddUserTopicNotificationIDs(ids ...int) *UserCreate {
-	uc.mutation.AddUserTopicNotificationIDs(ids...)
+// AddLikedForumIDs adds the "liked_forums" edge to the Forum entity by IDs.
+func (uc *UserCreate) AddLikedForumIDs(ids ...int) *UserCreate {
+	uc.mutation.AddLikedForumIDs(ids...)
 	return uc
 }
 
-// AddUserTopicNotifications adds the "user_topic_notifications" edges to the UserTopicNotification entity.
-func (uc *UserCreate) AddUserTopicNotifications(u ...*UserTopicNotification) *UserCreate {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
-	}
-	return uc.AddUserTopicNotificationIDs(ids...)
-}
-
-// AddUserCommentNotificationIDs adds the "user_comment_notifications" edge to the UserCommentNotification entity by IDs.
-func (uc *UserCreate) AddUserCommentNotificationIDs(ids ...int) *UserCreate {
-	uc.mutation.AddUserCommentNotificationIDs(ids...)
-	return uc
-}
-
-// AddUserCommentNotifications adds the "user_comment_notifications" edges to the UserCommentNotification entity.
-func (uc *UserCreate) AddUserCommentNotifications(u ...*UserCommentNotification) *UserCreate {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
-	}
-	return uc.AddUserCommentNotificationIDs(ids...)
-}
-
-// AddForumLikeIDs adds the "forum_likes" edge to the ForumLike entity by IDs.
-func (uc *UserCreate) AddForumLikeIDs(ids ...int) *UserCreate {
-	uc.mutation.AddForumLikeIDs(ids...)
-	return uc
-}
-
-// AddForumLikes adds the "forum_likes" edges to the ForumLike entity.
-func (uc *UserCreate) AddForumLikes(f ...*ForumLike) *UserCreate {
+// AddLikedForums adds the "liked_forums" edges to the Forum entity.
+func (uc *UserCreate) AddLikedForums(f ...*Forum) *UserCreate {
 	ids := make([]int, len(f))
 	for i := range f {
 		ids[i] = f[i].ID
 	}
-	return uc.AddForumLikeIDs(ids...)
+	return uc.AddLikedForumIDs(ids...)
 }
 
-// AddTopicLikeIDs adds the "topic_likes" edge to the TopicLike entity by IDs.
-func (uc *UserCreate) AddTopicLikeIDs(ids ...int) *UserCreate {
-	uc.mutation.AddTopicLikeIDs(ids...)
+// AddLikedTopicIDs adds the "liked_topics" edge to the Topic entity by IDs.
+func (uc *UserCreate) AddLikedTopicIDs(ids ...int) *UserCreate {
+	uc.mutation.AddLikedTopicIDs(ids...)
 	return uc
 }
 
-// AddTopicLikes adds the "topic_likes" edges to the TopicLike entity.
-func (uc *UserCreate) AddTopicLikes(t ...*TopicLike) *UserCreate {
+// AddLikedTopics adds the "liked_topics" edges to the Topic entity.
+func (uc *UserCreate) AddLikedTopics(t ...*Topic) *UserCreate {
 	ids := make([]int, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
 	}
-	return uc.AddTopicLikeIDs(ids...)
+	return uc.AddLikedTopicIDs(ids...)
 }
 
-// AddCommentLikeIDs adds the "comment_likes" edge to the CommentLike entity by IDs.
-func (uc *UserCreate) AddCommentLikeIDs(ids ...int) *UserCreate {
-	uc.mutation.AddCommentLikeIDs(ids...)
+// AddLikedCommentIDs adds the "liked_comments" edge to the Comment entity by IDs.
+func (uc *UserCreate) AddLikedCommentIDs(ids ...int) *UserCreate {
+	uc.mutation.AddLikedCommentIDs(ids...)
 	return uc
 }
 
-// AddCommentLikes adds the "comment_likes" edges to the CommentLike entity.
-func (uc *UserCreate) AddCommentLikes(c ...*CommentLike) *UserCreate {
+// AddLikedComments adds the "liked_comments" edges to the Comment entity.
+func (uc *UserCreate) AddLikedComments(c ...*Comment) *UserCreate {
 	ids := make([]int, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
 	}
-	return uc.AddCommentLikeIDs(ids...)
+	return uc.AddLikedCommentIDs(ids...)
+}
+
+// AddSubscribedForumIDs adds the "subscribed_forums" edge to the Forum entity by IDs.
+func (uc *UserCreate) AddSubscribedForumIDs(ids ...int) *UserCreate {
+	uc.mutation.AddSubscribedForumIDs(ids...)
+	return uc
+}
+
+// AddSubscribedForums adds the "subscribed_forums" edges to the Forum entity.
+func (uc *UserCreate) AddSubscribedForums(f ...*Forum) *UserCreate {
+	ids := make([]int, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return uc.AddSubscribedForumIDs(ids...)
+}
+
+// AddSubscribedTopicIDs adds the "subscribed_topics" edge to the Topic entity by IDs.
+func (uc *UserCreate) AddSubscribedTopicIDs(ids ...int) *UserCreate {
+	uc.mutation.AddSubscribedTopicIDs(ids...)
+	return uc
+}
+
+// AddSubscribedTopics adds the "subscribed_topics" edges to the Topic entity.
+func (uc *UserCreate) AddSubscribedTopics(t ...*Topic) *UserCreate {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return uc.AddSubscribedTopicIDs(ids...)
+}
+
+// AddSubscribedCommentIDs adds the "subscribed_comments" edge to the Comment entity by IDs.
+func (uc *UserCreate) AddSubscribedCommentIDs(ids ...int) *UserCreate {
+	uc.mutation.AddSubscribedCommentIDs(ids...)
+	return uc
+}
+
+// AddSubscribedComments adds the "subscribed_comments" edges to the Comment entity.
+func (uc *UserCreate) AddSubscribedComments(c ...*Comment) *UserCreate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uc.AddSubscribedCommentIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -293,14 +303,29 @@ func (uc *UserCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (uc *UserCreate) check() error {
-	if _, ok := uc.mutation.Username(); !ok {
-		return &ValidationError{Name: "username", err: errors.New(`ent: missing required field "User.username"`)}
+	if _, ok := uc.mutation.UserName(); !ok {
+		return &ValidationError{Name: "userName", err: errors.New(`ent: missing required field "User.userName"`)}
+	}
+	if v, ok := uc.mutation.UserName(); ok {
+		if err := user.UserNameValidator(v); err != nil {
+			return &ValidationError{Name: "userName", err: fmt.Errorf(`ent: validator failed for field "User.userName": %w`, err)}
+		}
 	}
 	if _, ok := uc.mutation.Email(); !ok {
 		return &ValidationError{Name: "email", err: errors.New(`ent: missing required field "User.email"`)}
 	}
+	if v, ok := uc.mutation.Email(); ok {
+		if err := user.EmailValidator(v); err != nil {
+			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "User.email": %w`, err)}
+		}
+	}
 	if _, ok := uc.mutation.Password(); !ok {
 		return &ValidationError{Name: "password", err: errors.New(`ent: missing required field "User.password"`)}
+	}
+	if v, ok := uc.mutation.DisplayName(); ok {
+		if err := user.DisplayNameValidator(v); err != nil {
+			return &ValidationError{Name: "displayName", err: fmt.Errorf(`ent: validator failed for field "User.displayName": %w`, err)}
+		}
 	}
 	if _, ok := uc.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "User.status"`)}
@@ -311,10 +336,10 @@ func (uc *UserCreate) check() error {
 		}
 	}
 	if _, ok := uc.mutation.CreatedAt(); !ok {
-		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "User.created_at"`)}
+		return &ValidationError{Name: "createdAt", err: errors.New(`ent: missing required field "User.createdAt"`)}
 	}
 	if _, ok := uc.mutation.UpdatedAt(); !ok {
-		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "User.updated_at"`)}
+		return &ValidationError{Name: "updatedAt", err: errors.New(`ent: missing required field "User.updatedAt"`)}
 	}
 	return nil
 }
@@ -348,9 +373,9 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
-	if value, ok := uc.mutation.Username(); ok {
-		_spec.SetField(user.FieldUsername, field.TypeString, value)
-		_node.Username = value
+	if value, ok := uc.mutation.UserName(); ok {
+		_spec.SetField(user.FieldUserName, field.TypeString, value)
+		_node.UserName = value
 	}
 	if value, ok := uc.mutation.Email(); ok {
 		_spec.SetField(user.FieldEmail, field.TypeString, value)
@@ -364,9 +389,9 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_spec.SetField(user.FieldDisplayName, field.TypeString, value)
 		_node.DisplayName = value
 	}
-	if value, ok := uc.mutation.Avatar(); ok {
-		_spec.SetField(user.FieldAvatar, field.TypeString, value)
-		_node.Avatar = value
+	if value, ok := uc.mutation.AvatarUrl(); ok {
+		_spec.SetField(user.FieldAvatarUrl, field.TypeString, value)
+		_node.AvatarUrl = value
 	}
 	if value, ok := uc.mutation.Status(); ok {
 		_spec.SetField(user.FieldStatus, field.TypeEnum, value)
@@ -428,84 +453,124 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := uc.mutation.UserTopicNotificationsIDs(); len(nodes) > 0 {
+	if nodes := uc.mutation.LikedForumsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   user.UserTopicNotificationsTable,
-			Columns: []string{user.UserTopicNotificationsColumn},
+			Table:   user.LikedForumsTable,
+			Columns: user.LikedForumsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(usertopicnotification.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(forum.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		createE := &UserForumLikeCreate{config: uc.config, mutation: newUserForumLikeMutation(uc.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := uc.mutation.UserCommentNotificationsIDs(); len(nodes) > 0 {
+	if nodes := uc.mutation.LikedTopicsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   user.UserCommentNotificationsTable,
-			Columns: []string{user.UserCommentNotificationsColumn},
+			Table:   user.LikedTopicsTable,
+			Columns: user.LikedTopicsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(usercommentnotification.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(topic.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		createE := &UserTopicLikeCreate{config: uc.config, mutation: newUserTopicLikeMutation(uc.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := uc.mutation.ForumLikesIDs(); len(nodes) > 0 {
+	if nodes := uc.mutation.LikedCommentsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   user.ForumLikesTable,
-			Columns: []string{user.ForumLikesColumn},
+			Table:   user.LikedCommentsTable,
+			Columns: user.LikedCommentsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(forumlike.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		createE := &UserCommentLikeCreate{config: uc.config, mutation: newUserCommentLikeMutation(uc.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := uc.mutation.TopicLikesIDs(); len(nodes) > 0 {
+	if nodes := uc.mutation.SubscribedForumsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   user.TopicLikesTable,
-			Columns: []string{user.TopicLikesColumn},
+			Table:   user.SubscribedForumsTable,
+			Columns: user.SubscribedForumsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(topiclike.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(forum.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		createE := &UserForumSubscriptionCreate{config: uc.config, mutation: newUserForumSubscriptionMutation(uc.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := uc.mutation.CommentLikesIDs(); len(nodes) > 0 {
+	if nodes := uc.mutation.SubscribedTopicsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   user.CommentLikesTable,
-			Columns: []string{user.CommentLikesColumn},
+			Table:   user.SubscribedTopicsTable,
+			Columns: user.SubscribedTopicsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(commentlike.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(topic.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		createE := &UserTopicSubscriptionCreate{config: uc.config, mutation: newUserTopicSubscriptionMutation(uc.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := uc.mutation.SubscribedCommentsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   user.SubscribedCommentsTable,
+			Columns: user.SubscribedCommentsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		createE := &UserCommentSubscriptionCreate{config: uc.config, mutation: newUserCommentSubscriptionMutation(uc.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

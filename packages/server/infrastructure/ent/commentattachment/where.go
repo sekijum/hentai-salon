@@ -4,7 +4,6 @@ package commentattachment
 
 import (
 	"server/infrastructure/ent/predicate"
-	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -55,104 +54,144 @@ func IDLTE(id int) predicate.CommentAttachment {
 	return predicate.CommentAttachment(sql.FieldLTE(FieldID, id))
 }
 
-// CommentID applies equality check predicate on the "comment_id" field. It's identical to CommentIDEQ.
-func CommentID(v int) predicate.CommentAttachment {
-	return predicate.CommentAttachment(sql.FieldEQ(FieldCommentID, v))
+// CommentId applies equality check predicate on the "commentId" field. It's identical to CommentIdEQ.
+func CommentId(v int) predicate.CommentAttachment {
+	return predicate.CommentAttachment(sql.FieldEQ(FieldCommentId, v))
 }
 
-// Path applies equality check predicate on the "path" field. It's identical to PathEQ.
-func Path(v string) predicate.CommentAttachment {
-	return predicate.CommentAttachment(sql.FieldEQ(FieldPath, v))
+// URL applies equality check predicate on the "url" field. It's identical to URLEQ.
+func URL(v string) predicate.CommentAttachment {
+	return predicate.CommentAttachment(sql.FieldEQ(FieldURL, v))
 }
 
-// CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
-func CreatedAt(v time.Time) predicate.CommentAttachment {
-	return predicate.CommentAttachment(sql.FieldEQ(FieldCreatedAt, v))
+// Order applies equality check predicate on the "order" field. It's identical to OrderEQ.
+func Order(v int) predicate.CommentAttachment {
+	return predicate.CommentAttachment(sql.FieldEQ(FieldOrder, v))
 }
 
-// CommentIDEQ applies the EQ predicate on the "comment_id" field.
-func CommentIDEQ(v int) predicate.CommentAttachment {
-	return predicate.CommentAttachment(sql.FieldEQ(FieldCommentID, v))
+// CommentIdEQ applies the EQ predicate on the "commentId" field.
+func CommentIdEQ(v int) predicate.CommentAttachment {
+	return predicate.CommentAttachment(sql.FieldEQ(FieldCommentId, v))
 }
 
-// CommentIDNEQ applies the NEQ predicate on the "comment_id" field.
-func CommentIDNEQ(v int) predicate.CommentAttachment {
-	return predicate.CommentAttachment(sql.FieldNEQ(FieldCommentID, v))
+// CommentIdNEQ applies the NEQ predicate on the "commentId" field.
+func CommentIdNEQ(v int) predicate.CommentAttachment {
+	return predicate.CommentAttachment(sql.FieldNEQ(FieldCommentId, v))
 }
 
-// CommentIDIn applies the In predicate on the "comment_id" field.
-func CommentIDIn(vs ...int) predicate.CommentAttachment {
-	return predicate.CommentAttachment(sql.FieldIn(FieldCommentID, vs...))
+// CommentIdIn applies the In predicate on the "commentId" field.
+func CommentIdIn(vs ...int) predicate.CommentAttachment {
+	return predicate.CommentAttachment(sql.FieldIn(FieldCommentId, vs...))
 }
 
-// CommentIDNotIn applies the NotIn predicate on the "comment_id" field.
-func CommentIDNotIn(vs ...int) predicate.CommentAttachment {
-	return predicate.CommentAttachment(sql.FieldNotIn(FieldCommentID, vs...))
+// CommentIdNotIn applies the NotIn predicate on the "commentId" field.
+func CommentIdNotIn(vs ...int) predicate.CommentAttachment {
+	return predicate.CommentAttachment(sql.FieldNotIn(FieldCommentId, vs...))
 }
 
-// PathEQ applies the EQ predicate on the "path" field.
-func PathEQ(v string) predicate.CommentAttachment {
-	return predicate.CommentAttachment(sql.FieldEQ(FieldPath, v))
+// URLEQ applies the EQ predicate on the "url" field.
+func URLEQ(v string) predicate.CommentAttachment {
+	return predicate.CommentAttachment(sql.FieldEQ(FieldURL, v))
 }
 
-// PathNEQ applies the NEQ predicate on the "path" field.
-func PathNEQ(v string) predicate.CommentAttachment {
-	return predicate.CommentAttachment(sql.FieldNEQ(FieldPath, v))
+// URLNEQ applies the NEQ predicate on the "url" field.
+func URLNEQ(v string) predicate.CommentAttachment {
+	return predicate.CommentAttachment(sql.FieldNEQ(FieldURL, v))
 }
 
-// PathIn applies the In predicate on the "path" field.
-func PathIn(vs ...string) predicate.CommentAttachment {
-	return predicate.CommentAttachment(sql.FieldIn(FieldPath, vs...))
+// URLIn applies the In predicate on the "url" field.
+func URLIn(vs ...string) predicate.CommentAttachment {
+	return predicate.CommentAttachment(sql.FieldIn(FieldURL, vs...))
 }
 
-// PathNotIn applies the NotIn predicate on the "path" field.
-func PathNotIn(vs ...string) predicate.CommentAttachment {
-	return predicate.CommentAttachment(sql.FieldNotIn(FieldPath, vs...))
+// URLNotIn applies the NotIn predicate on the "url" field.
+func URLNotIn(vs ...string) predicate.CommentAttachment {
+	return predicate.CommentAttachment(sql.FieldNotIn(FieldURL, vs...))
 }
 
-// PathGT applies the GT predicate on the "path" field.
-func PathGT(v string) predicate.CommentAttachment {
-	return predicate.CommentAttachment(sql.FieldGT(FieldPath, v))
+// URLGT applies the GT predicate on the "url" field.
+func URLGT(v string) predicate.CommentAttachment {
+	return predicate.CommentAttachment(sql.FieldGT(FieldURL, v))
 }
 
-// PathGTE applies the GTE predicate on the "path" field.
-func PathGTE(v string) predicate.CommentAttachment {
-	return predicate.CommentAttachment(sql.FieldGTE(FieldPath, v))
+// URLGTE applies the GTE predicate on the "url" field.
+func URLGTE(v string) predicate.CommentAttachment {
+	return predicate.CommentAttachment(sql.FieldGTE(FieldURL, v))
 }
 
-// PathLT applies the LT predicate on the "path" field.
-func PathLT(v string) predicate.CommentAttachment {
-	return predicate.CommentAttachment(sql.FieldLT(FieldPath, v))
+// URLLT applies the LT predicate on the "url" field.
+func URLLT(v string) predicate.CommentAttachment {
+	return predicate.CommentAttachment(sql.FieldLT(FieldURL, v))
 }
 
-// PathLTE applies the LTE predicate on the "path" field.
-func PathLTE(v string) predicate.CommentAttachment {
-	return predicate.CommentAttachment(sql.FieldLTE(FieldPath, v))
+// URLLTE applies the LTE predicate on the "url" field.
+func URLLTE(v string) predicate.CommentAttachment {
+	return predicate.CommentAttachment(sql.FieldLTE(FieldURL, v))
 }
 
-// PathContains applies the Contains predicate on the "path" field.
-func PathContains(v string) predicate.CommentAttachment {
-	return predicate.CommentAttachment(sql.FieldContains(FieldPath, v))
+// URLContains applies the Contains predicate on the "url" field.
+func URLContains(v string) predicate.CommentAttachment {
+	return predicate.CommentAttachment(sql.FieldContains(FieldURL, v))
 }
 
-// PathHasPrefix applies the HasPrefix predicate on the "path" field.
-func PathHasPrefix(v string) predicate.CommentAttachment {
-	return predicate.CommentAttachment(sql.FieldHasPrefix(FieldPath, v))
+// URLHasPrefix applies the HasPrefix predicate on the "url" field.
+func URLHasPrefix(v string) predicate.CommentAttachment {
+	return predicate.CommentAttachment(sql.FieldHasPrefix(FieldURL, v))
 }
 
-// PathHasSuffix applies the HasSuffix predicate on the "path" field.
-func PathHasSuffix(v string) predicate.CommentAttachment {
-	return predicate.CommentAttachment(sql.FieldHasSuffix(FieldPath, v))
+// URLHasSuffix applies the HasSuffix predicate on the "url" field.
+func URLHasSuffix(v string) predicate.CommentAttachment {
+	return predicate.CommentAttachment(sql.FieldHasSuffix(FieldURL, v))
 }
 
-// PathEqualFold applies the EqualFold predicate on the "path" field.
-func PathEqualFold(v string) predicate.CommentAttachment {
-	return predicate.CommentAttachment(sql.FieldEqualFold(FieldPath, v))
+// URLEqualFold applies the EqualFold predicate on the "url" field.
+func URLEqualFold(v string) predicate.CommentAttachment {
+	return predicate.CommentAttachment(sql.FieldEqualFold(FieldURL, v))
 }
 
-// PathContainsFold applies the ContainsFold predicate on the "path" field.
-func PathContainsFold(v string) predicate.CommentAttachment {
-	return predicate.CommentAttachment(sql.FieldContainsFold(FieldPath, v))
+// URLContainsFold applies the ContainsFold predicate on the "url" field.
+func URLContainsFold(v string) predicate.CommentAttachment {
+	return predicate.CommentAttachment(sql.FieldContainsFold(FieldURL, v))
+}
+
+// OrderEQ applies the EQ predicate on the "order" field.
+func OrderEQ(v int) predicate.CommentAttachment {
+	return predicate.CommentAttachment(sql.FieldEQ(FieldOrder, v))
+}
+
+// OrderNEQ applies the NEQ predicate on the "order" field.
+func OrderNEQ(v int) predicate.CommentAttachment {
+	return predicate.CommentAttachment(sql.FieldNEQ(FieldOrder, v))
+}
+
+// OrderIn applies the In predicate on the "order" field.
+func OrderIn(vs ...int) predicate.CommentAttachment {
+	return predicate.CommentAttachment(sql.FieldIn(FieldOrder, vs...))
+}
+
+// OrderNotIn applies the NotIn predicate on the "order" field.
+func OrderNotIn(vs ...int) predicate.CommentAttachment {
+	return predicate.CommentAttachment(sql.FieldNotIn(FieldOrder, vs...))
+}
+
+// OrderGT applies the GT predicate on the "order" field.
+func OrderGT(v int) predicate.CommentAttachment {
+	return predicate.CommentAttachment(sql.FieldGT(FieldOrder, v))
+}
+
+// OrderGTE applies the GTE predicate on the "order" field.
+func OrderGTE(v int) predicate.CommentAttachment {
+	return predicate.CommentAttachment(sql.FieldGTE(FieldOrder, v))
+}
+
+// OrderLT applies the LT predicate on the "order" field.
+func OrderLT(v int) predicate.CommentAttachment {
+	return predicate.CommentAttachment(sql.FieldLT(FieldOrder, v))
+}
+
+// OrderLTE applies the LTE predicate on the "order" field.
+func OrderLTE(v int) predicate.CommentAttachment {
+	return predicate.CommentAttachment(sql.FieldLTE(FieldOrder, v))
 }
 
 // TypeEQ applies the EQ predicate on the "type" field.
@@ -173,46 +212,6 @@ func TypeIn(vs ...Type) predicate.CommentAttachment {
 // TypeNotIn applies the NotIn predicate on the "type" field.
 func TypeNotIn(vs ...Type) predicate.CommentAttachment {
 	return predicate.CommentAttachment(sql.FieldNotIn(FieldType, vs...))
-}
-
-// CreatedAtEQ applies the EQ predicate on the "created_at" field.
-func CreatedAtEQ(v time.Time) predicate.CommentAttachment {
-	return predicate.CommentAttachment(sql.FieldEQ(FieldCreatedAt, v))
-}
-
-// CreatedAtNEQ applies the NEQ predicate on the "created_at" field.
-func CreatedAtNEQ(v time.Time) predicate.CommentAttachment {
-	return predicate.CommentAttachment(sql.FieldNEQ(FieldCreatedAt, v))
-}
-
-// CreatedAtIn applies the In predicate on the "created_at" field.
-func CreatedAtIn(vs ...time.Time) predicate.CommentAttachment {
-	return predicate.CommentAttachment(sql.FieldIn(FieldCreatedAt, vs...))
-}
-
-// CreatedAtNotIn applies the NotIn predicate on the "created_at" field.
-func CreatedAtNotIn(vs ...time.Time) predicate.CommentAttachment {
-	return predicate.CommentAttachment(sql.FieldNotIn(FieldCreatedAt, vs...))
-}
-
-// CreatedAtGT applies the GT predicate on the "created_at" field.
-func CreatedAtGT(v time.Time) predicate.CommentAttachment {
-	return predicate.CommentAttachment(sql.FieldGT(FieldCreatedAt, v))
-}
-
-// CreatedAtGTE applies the GTE predicate on the "created_at" field.
-func CreatedAtGTE(v time.Time) predicate.CommentAttachment {
-	return predicate.CommentAttachment(sql.FieldGTE(FieldCreatedAt, v))
-}
-
-// CreatedAtLT applies the LT predicate on the "created_at" field.
-func CreatedAtLT(v time.Time) predicate.CommentAttachment {
-	return predicate.CommentAttachment(sql.FieldLT(FieldCreatedAt, v))
-}
-
-// CreatedAtLTE applies the LTE predicate on the "created_at" field.
-func CreatedAtLTE(v time.Time) predicate.CommentAttachment {
-	return predicate.CommentAttachment(sql.FieldLTE(FieldCreatedAt, v))
 }
 
 // HasComment applies the HasEdge predicate on the "comment" edge.

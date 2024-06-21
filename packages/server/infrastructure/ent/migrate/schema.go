@@ -11,9 +11,11 @@ var (
 	// AdminUsersColumns holds the columns for the "admin_users" table.
 	AdminUsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "email", Type: field.TypeString, Unique: true},
+		{Name: "user_name", Type: field.TypeString, Unique: true, Size: 20},
+		{Name: "email", Type: field.TypeString, Unique: true, Size: 254},
 		{Name: "password", Type: field.TypeString},
 		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
 	}
 	// AdminUsersTable holds the schema information for the "admin_users" table.
 	AdminUsersTable = &schema.Table{
@@ -24,13 +26,14 @@ var (
 	// CommentsColumns holds the columns for the "comments" table.
 	CommentsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "content", Type: field.TypeString, Size: 2147483647},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"Visible", "Hidden", "Deleted", "Disapproved"}, Default: "Visible"},
+		{Name: "guest_name", Type: field.TypeString, Nullable: true, Size: 20},
+		{Name: "message", Type: field.TypeString, Size: 2147483647},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"Visible", "Disapproved"}, Default: "Visible"},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "parent_id", Type: field.TypeInt, Nullable: true},
 		{Name: "topic_id", Type: field.TypeInt},
-		{Name: "user_id", Type: field.TypeInt},
+		{Name: "user_id", Type: field.TypeInt, Nullable: true},
 	}
 	// CommentsTable holds the schema information for the "comments" table.
 	CommentsTable = &schema.Table{
@@ -40,30 +43,30 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "comments_comments_replies",
-				Columns:    []*schema.Column{CommentsColumns[5]},
+				Columns:    []*schema.Column{CommentsColumns[6]},
 				RefColumns: []*schema.Column{CommentsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "comments_topics_comments",
-				Columns:    []*schema.Column{CommentsColumns[6]},
+				Columns:    []*schema.Column{CommentsColumns[7]},
 				RefColumns: []*schema.Column{TopicsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "comments_users_comments",
-				Columns:    []*schema.Column{CommentsColumns[7]},
+				Columns:    []*schema.Column{CommentsColumns[8]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
-				OnDelete:   schema.NoAction,
+				OnDelete:   schema.SetNull,
 			},
 		},
 	}
 	// CommentAttachmentsColumns holds the columns for the "comment_attachments" table.
 	CommentAttachmentsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "path", Type: field.TypeString},
+		{Name: "url", Type: field.TypeString},
+		{Name: "order", Type: field.TypeInt, Default: 0},
 		{Name: "type", Type: field.TypeEnum, Enums: []string{"image", "video"}},
-		{Name: "created_at", Type: field.TypeTime},
 		{Name: "comment_id", Type: field.TypeInt},
 	}
 	// CommentAttachmentsTable holds the schema information for the "comment_attachments" table.
@@ -80,42 +83,17 @@ var (
 			},
 		},
 	}
-	// CommentLikesColumns holds the columns for the "comment_likes" table.
-	CommentLikesColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "created_at", Type: field.TypeTime},
-		{Name: "comment_id", Type: field.TypeInt},
-		{Name: "user_id", Type: field.TypeInt},
-	}
-	// CommentLikesTable holds the schema information for the "comment_likes" table.
-	CommentLikesTable = &schema.Table{
-		Name:       "comment_likes",
-		Columns:    CommentLikesColumns,
-		PrimaryKey: []*schema.Column{CommentLikesColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "comment_likes_comments_comment_likes",
-				Columns:    []*schema.Column{CommentLikesColumns[2]},
-				RefColumns: []*schema.Column{CommentsColumns[0]},
-				OnDelete:   schema.NoAction,
-			},
-			{
-				Symbol:     "comment_likes_users_comment_likes",
-				Columns:    []*schema.Column{CommentLikesColumns[3]},
-				RefColumns: []*schema.Column{UsersColumns[0]},
-				OnDelete:   schema.NoAction,
-			},
-		},
-	}
 	// ForumsColumns holds the columns for the "forums" table.
 	ForumsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "name", Type: field.TypeString},
-		{Name: "description", Type: field.TypeString, Nullable: true},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"Public", "Private", "Archived", "Disapproved"}, Default: "Public"},
+		{Name: "user_id", Type: field.TypeInt},
+		{Name: "title", Type: field.TypeString, Size: 50},
+		{Name: "description", Type: field.TypeString, Nullable: true, Size: 255},
+		{Name: "thumbnail_url", Type: field.TypeString, Nullable: true},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"Public", "Private", "Archived"}, Default: "Public"},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "user_id", Type: field.TypeInt},
+		{Name: "user_forums", Type: field.TypeInt, Nullable: true},
 	}
 	// ForumsTable holds the schema information for the "forums" table.
 	ForumsTable = &schema.Table{
@@ -125,50 +103,25 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "forums_users_forums",
-				Columns:    []*schema.Column{ForumsColumns[6]},
+				Columns:    []*schema.Column{ForumsColumns[8]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
-				OnDelete:   schema.NoAction,
-			},
-		},
-	}
-	// ForumLikesColumns holds the columns for the "forum_likes" table.
-	ForumLikesColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "created_at", Type: field.TypeTime},
-		{Name: "forum_id", Type: field.TypeInt},
-		{Name: "user_id", Type: field.TypeInt},
-	}
-	// ForumLikesTable holds the schema information for the "forum_likes" table.
-	ForumLikesTable = &schema.Table{
-		Name:       "forum_likes",
-		Columns:    ForumLikesColumns,
-		PrimaryKey: []*schema.Column{ForumLikesColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "forum_likes_forums_forum_likes",
-				Columns:    []*schema.Column{ForumLikesColumns[2]},
-				RefColumns: []*schema.Column{ForumsColumns[0]},
-				OnDelete:   schema.NoAction,
-			},
-			{
-				Symbol:     "forum_likes_users_forum_likes",
-				Columns:    []*schema.Column{ForumLikesColumns[3]},
-				RefColumns: []*schema.Column{UsersColumns[0]},
-				OnDelete:   schema.NoAction,
+				OnDelete:   schema.SetNull,
 			},
 		},
 	}
 	// TopicsColumns holds the columns for the "topics" table.
 	TopicsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "title", Type: field.TypeString},
-		{Name: "content", Type: field.TypeString, Size: 2147483647},
-		{Name: "is_default", Type: field.TypeBool, Default: false},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"Open", "Closed", "Archived", "Disapproved"}, Default: "Open"},
+		{Name: "title", Type: field.TypeString, Nullable: true, Size: 50},
+		{Name: "description", Type: field.TypeString, Nullable: true, Size: 255},
+		{Name: "thumbnail_url", Type: field.TypeString, Nullable: true},
+		{Name: "is_auto_generated", Type: field.TypeBool, Default: false},
+		{Name: "is_notify_on_comment", Type: field.TypeBool, Default: true},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"Open", "Closed", "Archived"}, Default: "Open"},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "forum_id", Type: field.TypeInt},
-		{Name: "user_id", Type: field.TypeInt, Nullable: true},
+		{Name: "user_id", Type: field.TypeInt},
 	}
 	// TopicsTable holds the schema information for the "topics" table.
 	TopicsTable = &schema.Table{
@@ -178,41 +131,58 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "topics_forums_topics",
-				Columns:    []*schema.Column{TopicsColumns[7]},
+				Columns:    []*schema.Column{TopicsColumns[9]},
 				RefColumns: []*schema.Column{ForumsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "topics_users_topics",
-				Columns:    []*schema.Column{TopicsColumns[8]},
+				Columns:    []*schema.Column{TopicsColumns[10]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.NoAction,
 			},
 		},
 	}
-	// TopicLikesColumns holds the columns for the "topic_likes" table.
-	TopicLikesColumns = []*schema.Column{
+	// TopicTagsColumns holds the columns for the "topic_tags" table.
+	TopicTagsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "name", Type: field.TypeString, Unique: true, Size: 20},
 		{Name: "created_at", Type: field.TypeTime},
-		{Name: "topic_id", Type: field.TypeInt},
-		{Name: "user_id", Type: field.TypeInt},
 	}
-	// TopicLikesTable holds the schema information for the "topic_likes" table.
-	TopicLikesTable = &schema.Table{
-		Name:       "topic_likes",
-		Columns:    TopicLikesColumns,
-		PrimaryKey: []*schema.Column{TopicLikesColumns[0]},
+	// TopicTagsTable holds the schema information for the "topic_tags" table.
+	TopicTagsTable = &schema.Table{
+		Name:       "topic_tags",
+		Columns:    TopicTagsColumns,
+		PrimaryKey: []*schema.Column{TopicTagsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "topictag_name",
+				Unique:  true,
+				Columns: []*schema.Column{TopicTagsColumns[1]},
+			},
+		},
+	}
+	// TopicTaggingsColumns holds the columns for the "topic_taggings" table.
+	TopicTaggingsColumns = []*schema.Column{
+		{Name: "topic_id", Type: field.TypeInt},
+		{Name: "tag_id", Type: field.TypeInt},
+	}
+	// TopicTaggingsTable holds the schema information for the "topic_taggings" table.
+	TopicTaggingsTable = &schema.Table{
+		Name:       "topic_taggings",
+		Columns:    TopicTaggingsColumns,
+		PrimaryKey: []*schema.Column{TopicTaggingsColumns[0], TopicTaggingsColumns[1]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "topic_likes_topics_topic_likes",
-				Columns:    []*schema.Column{TopicLikesColumns[2]},
+				Symbol:     "topic_taggings_topics_topic",
+				Columns:    []*schema.Column{TopicTaggingsColumns[0]},
 				RefColumns: []*schema.Column{TopicsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "topic_likes_users_topic_likes",
-				Columns:    []*schema.Column{TopicLikesColumns[3]},
-				RefColumns: []*schema.Column{UsersColumns[0]},
+				Symbol:     "topic_taggings_topic_tags_tag",
+				Columns:    []*schema.Column{TopicTaggingsColumns[1]},
+				RefColumns: []*schema.Column{TopicTagsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 		},
@@ -220,11 +190,11 @@ var (
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "username", Type: field.TypeString, Unique: true},
-		{Name: "email", Type: field.TypeString, Unique: true},
+		{Name: "user_name", Type: field.TypeString, Unique: true, Size: 20},
+		{Name: "email", Type: field.TypeString, Unique: true, Size: 254},
 		{Name: "password", Type: field.TypeString},
-		{Name: "display_name", Type: field.TypeString, Nullable: true},
-		{Name: "avatar", Type: field.TypeString, Nullable: true},
+		{Name: "display_name", Type: field.TypeString, Nullable: true, Size: 20},
+		{Name: "avatar_url", Type: field.TypeString, Nullable: true},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"Active", "Withdrawn", "Suspended", "Inactive"}, Default: "Active"},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
@@ -235,56 +205,164 @@ var (
 		Columns:    UsersColumns,
 		PrimaryKey: []*schema.Column{UsersColumns[0]},
 	}
-	// UserCommentNotificationsColumns holds the columns for the "user_comment_notifications" table.
-	UserCommentNotificationsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "created_at", Type: field.TypeTime},
-		{Name: "comment_id", Type: field.TypeInt},
+	// UserCommentLikesColumns holds the columns for the "user_comment_likes" table.
+	UserCommentLikesColumns = []*schema.Column{
+		{Name: "type", Type: field.TypeEnum, Enums: []string{"like", "dislike"}},
+		{Name: "liked_at", Type: field.TypeTime},
 		{Name: "user_id", Type: field.TypeInt},
+		{Name: "comment_id", Type: field.TypeInt},
 	}
-	// UserCommentNotificationsTable holds the schema information for the "user_comment_notifications" table.
-	UserCommentNotificationsTable = &schema.Table{
-		Name:       "user_comment_notifications",
-		Columns:    UserCommentNotificationsColumns,
-		PrimaryKey: []*schema.Column{UserCommentNotificationsColumns[0]},
+	// UserCommentLikesTable holds the schema information for the "user_comment_likes" table.
+	UserCommentLikesTable = &schema.Table{
+		Name:       "user_comment_likes",
+		Columns:    UserCommentLikesColumns,
+		PrimaryKey: []*schema.Column{UserCommentLikesColumns[2], UserCommentLikesColumns[3]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "user_comment_notifications_comments_user_comment_notifications",
-				Columns:    []*schema.Column{UserCommentNotificationsColumns[2]},
-				RefColumns: []*schema.Column{CommentsColumns[0]},
+				Symbol:     "user_comment_likes_users_user",
+				Columns:    []*schema.Column{UserCommentLikesColumns[2]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "user_comment_notifications_users_user_comment_notifications",
-				Columns:    []*schema.Column{UserCommentNotificationsColumns[3]},
-				RefColumns: []*schema.Column{UsersColumns[0]},
+				Symbol:     "user_comment_likes_comments_comment",
+				Columns:    []*schema.Column{UserCommentLikesColumns[3]},
+				RefColumns: []*schema.Column{CommentsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 		},
 	}
-	// UserTopicNotificationsColumns holds the columns for the "user_topic_notifications" table.
-	UserTopicNotificationsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "created_at", Type: field.TypeTime},
-		{Name: "topic_id", Type: field.TypeInt},
+	// UserCommentSubscriptionsColumns holds the columns for the "user_comment_subscriptions" table.
+	UserCommentSubscriptionsColumns = []*schema.Column{
+		{Name: "is_notified", Type: field.TypeBool, Default: true},
+		{Name: "subscribed_at", Type: field.TypeTime},
 		{Name: "user_id", Type: field.TypeInt},
+		{Name: "comment_id", Type: field.TypeInt},
 	}
-	// UserTopicNotificationsTable holds the schema information for the "user_topic_notifications" table.
-	UserTopicNotificationsTable = &schema.Table{
-		Name:       "user_topic_notifications",
-		Columns:    UserTopicNotificationsColumns,
-		PrimaryKey: []*schema.Column{UserTopicNotificationsColumns[0]},
+	// UserCommentSubscriptionsTable holds the schema information for the "user_comment_subscriptions" table.
+	UserCommentSubscriptionsTable = &schema.Table{
+		Name:       "user_comment_subscriptions",
+		Columns:    UserCommentSubscriptionsColumns,
+		PrimaryKey: []*schema.Column{UserCommentSubscriptionsColumns[2], UserCommentSubscriptionsColumns[3]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "user_topic_notifications_topics_user_topic_notifications",
-				Columns:    []*schema.Column{UserTopicNotificationsColumns[2]},
-				RefColumns: []*schema.Column{TopicsColumns[0]},
+				Symbol:     "user_comment_subscriptions_users_user",
+				Columns:    []*schema.Column{UserCommentSubscriptionsColumns[2]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "user_topic_notifications_users_user_topic_notifications",
-				Columns:    []*schema.Column{UserTopicNotificationsColumns[3]},
+				Symbol:     "user_comment_subscriptions_comments_comment",
+				Columns:    []*schema.Column{UserCommentSubscriptionsColumns[3]},
+				RefColumns: []*schema.Column{CommentsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
+	// UserForumLikesColumns holds the columns for the "user_forum_likes" table.
+	UserForumLikesColumns = []*schema.Column{
+		{Name: "type", Type: field.TypeEnum, Enums: []string{"like", "dislike"}},
+		{Name: "liked_at", Type: field.TypeTime},
+		{Name: "user_id", Type: field.TypeInt},
+		{Name: "forum_id", Type: field.TypeInt},
+	}
+	// UserForumLikesTable holds the schema information for the "user_forum_likes" table.
+	UserForumLikesTable = &schema.Table{
+		Name:       "user_forum_likes",
+		Columns:    UserForumLikesColumns,
+		PrimaryKey: []*schema.Column{UserForumLikesColumns[2], UserForumLikesColumns[3]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "user_forum_likes_users_user",
+				Columns:    []*schema.Column{UserForumLikesColumns[2]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "user_forum_likes_forums_forum",
+				Columns:    []*schema.Column{UserForumLikesColumns[3]},
+				RefColumns: []*schema.Column{ForumsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
+	// UserForumSubscriptionsColumns holds the columns for the "user_forum_subscriptions" table.
+	UserForumSubscriptionsColumns = []*schema.Column{
+		{Name: "is_notified", Type: field.TypeBool, Default: true},
+		{Name: "subscribed_at", Type: field.TypeTime},
+		{Name: "user_id", Type: field.TypeInt},
+		{Name: "forum_id", Type: field.TypeInt},
+	}
+	// UserForumSubscriptionsTable holds the schema information for the "user_forum_subscriptions" table.
+	UserForumSubscriptionsTable = &schema.Table{
+		Name:       "user_forum_subscriptions",
+		Columns:    UserForumSubscriptionsColumns,
+		PrimaryKey: []*schema.Column{UserForumSubscriptionsColumns[2], UserForumSubscriptionsColumns[3]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "user_forum_subscriptions_users_user",
+				Columns:    []*schema.Column{UserForumSubscriptionsColumns[2]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "user_forum_subscriptions_forums_forum",
+				Columns:    []*schema.Column{UserForumSubscriptionsColumns[3]},
+				RefColumns: []*schema.Column{ForumsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
+	// UserTopicLikesColumns holds the columns for the "user_topic_likes" table.
+	UserTopicLikesColumns = []*schema.Column{
+		{Name: "type", Type: field.TypeEnum, Enums: []string{"like", "dislike"}},
+		{Name: "liked_at", Type: field.TypeTime},
+		{Name: "user_id", Type: field.TypeInt},
+		{Name: "topic_id", Type: field.TypeInt},
+	}
+	// UserTopicLikesTable holds the schema information for the "user_topic_likes" table.
+	UserTopicLikesTable = &schema.Table{
+		Name:       "user_topic_likes",
+		Columns:    UserTopicLikesColumns,
+		PrimaryKey: []*schema.Column{UserTopicLikesColumns[2], UserTopicLikesColumns[3]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "user_topic_likes_users_user",
+				Columns:    []*schema.Column{UserTopicLikesColumns[2]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "user_topic_likes_topics_topic",
+				Columns:    []*schema.Column{UserTopicLikesColumns[3]},
+				RefColumns: []*schema.Column{TopicsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
+	// UserTopicSubscriptionsColumns holds the columns for the "user_topic_subscriptions" table.
+	UserTopicSubscriptionsColumns = []*schema.Column{
+		{Name: "is_notified", Type: field.TypeBool, Default: true},
+		{Name: "subscribed_at", Type: field.TypeTime},
+		{Name: "user_id", Type: field.TypeInt},
+		{Name: "topic_id", Type: field.TypeInt},
+	}
+	// UserTopicSubscriptionsTable holds the schema information for the "user_topic_subscriptions" table.
+	UserTopicSubscriptionsTable = &schema.Table{
+		Name:       "user_topic_subscriptions",
+		Columns:    UserTopicSubscriptionsColumns,
+		PrimaryKey: []*schema.Column{UserTopicSubscriptionsColumns[2], UserTopicSubscriptionsColumns[3]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "user_topic_subscriptions_users_user",
+				Columns:    []*schema.Column{UserTopicSubscriptionsColumns[2]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "user_topic_subscriptions_topics_topic",
+				Columns:    []*schema.Column{UserTopicSubscriptionsColumns[3]},
+				RefColumns: []*schema.Column{TopicsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 		},
@@ -294,14 +372,17 @@ var (
 		AdminUsersTable,
 		CommentsTable,
 		CommentAttachmentsTable,
-		CommentLikesTable,
 		ForumsTable,
-		ForumLikesTable,
 		TopicsTable,
-		TopicLikesTable,
+		TopicTagsTable,
+		TopicTaggingsTable,
 		UsersTable,
-		UserCommentNotificationsTable,
-		UserTopicNotificationsTable,
+		UserCommentLikesTable,
+		UserCommentSubscriptionsTable,
+		UserForumLikesTable,
+		UserForumSubscriptionsTable,
+		UserTopicLikesTable,
+		UserTopicSubscriptionsTable,
 	}
 )
 
@@ -310,17 +391,21 @@ func init() {
 	CommentsTable.ForeignKeys[1].RefTable = TopicsTable
 	CommentsTable.ForeignKeys[2].RefTable = UsersTable
 	CommentAttachmentsTable.ForeignKeys[0].RefTable = CommentsTable
-	CommentLikesTable.ForeignKeys[0].RefTable = CommentsTable
-	CommentLikesTable.ForeignKeys[1].RefTable = UsersTable
 	ForumsTable.ForeignKeys[0].RefTable = UsersTable
-	ForumLikesTable.ForeignKeys[0].RefTable = ForumsTable
-	ForumLikesTable.ForeignKeys[1].RefTable = UsersTable
 	TopicsTable.ForeignKeys[0].RefTable = ForumsTable
 	TopicsTable.ForeignKeys[1].RefTable = UsersTable
-	TopicLikesTable.ForeignKeys[0].RefTable = TopicsTable
-	TopicLikesTable.ForeignKeys[1].RefTable = UsersTable
-	UserCommentNotificationsTable.ForeignKeys[0].RefTable = CommentsTable
-	UserCommentNotificationsTable.ForeignKeys[1].RefTable = UsersTable
-	UserTopicNotificationsTable.ForeignKeys[0].RefTable = TopicsTable
-	UserTopicNotificationsTable.ForeignKeys[1].RefTable = UsersTable
+	TopicTaggingsTable.ForeignKeys[0].RefTable = TopicsTable
+	TopicTaggingsTable.ForeignKeys[1].RefTable = TopicTagsTable
+	UserCommentLikesTable.ForeignKeys[0].RefTable = UsersTable
+	UserCommentLikesTable.ForeignKeys[1].RefTable = CommentsTable
+	UserCommentSubscriptionsTable.ForeignKeys[0].RefTable = UsersTable
+	UserCommentSubscriptionsTable.ForeignKeys[1].RefTable = CommentsTable
+	UserForumLikesTable.ForeignKeys[0].RefTable = UsersTable
+	UserForumLikesTable.ForeignKeys[1].RefTable = ForumsTable
+	UserForumSubscriptionsTable.ForeignKeys[0].RefTable = UsersTable
+	UserForumSubscriptionsTable.ForeignKeys[1].RefTable = ForumsTable
+	UserTopicLikesTable.ForeignKeys[0].RefTable = UsersTable
+	UserTopicLikesTable.ForeignKeys[1].RefTable = TopicsTable
+	UserTopicSubscriptionsTable.ForeignKeys[0].RefTable = UsersTable
+	UserTopicSubscriptionsTable.ForeignKeys[1].RefTable = TopicsTable
 }

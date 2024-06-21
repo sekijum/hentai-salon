@@ -19,20 +19,22 @@ type Comment struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// TopicID holds the value of the "topic_id" field.
-	TopicID int `json:"topic_id,omitempty"`
-	// UserID holds the value of the "user_id" field.
-	UserID int `json:"user_id,omitempty"`
-	// ParentID holds the value of the "parent_id" field.
-	ParentID int `json:"parent_id,omitempty"`
-	// Content holds the value of the "content" field.
-	Content string `json:"content,omitempty"`
+	// TopicId holds the value of the "topicId" field.
+	TopicId int `json:"topicId,omitempty"`
+	// 親コメントID（リプライの場合）
+	ParentId int `json:"parentId,omitempty"`
+	// ログインユーザーの場合
+	UserId int `json:"userId,omitempty"`
+	// ゲストユーザーの場合
+	GuestName string `json:"guestName,omitempty"`
+	// Message holds the value of the "message" field.
+	Message string `json:"message,omitempty"`
 	// Status holds the value of the "status" field.
 	Status comment.Status `json:"status,omitempty"`
-	// CreatedAt holds the value of the "created_at" field.
-	CreatedAt time.Time `json:"created_at,omitempty"`
-	// UpdatedAt holds the value of the "updated_at" field.
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	// CreatedAt holds the value of the "createdAt" field.
+	CreatedAt time.Time `json:"createdAt,omitempty"`
+	// UpdatedAt holds the value of the "updatedAt" field.
+	UpdatedAt time.Time `json:"updatedAt,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CommentQuery when eager-loading is set.
 	Edges        CommentEdges `json:"edges"`
@@ -43,21 +45,25 @@ type Comment struct {
 type CommentEdges struct {
 	// Topic holds the value of the topic edge.
 	Topic *Topic `json:"topic,omitempty"`
-	// User holds the value of the user edge.
-	User *User `json:"user,omitempty"`
+	// Author holds the value of the author edge.
+	Author *User `json:"author,omitempty"`
 	// Parent holds the value of the parent edge.
 	Parent *Comment `json:"parent,omitempty"`
 	// Replies holds the value of the replies edge.
 	Replies []*Comment `json:"replies,omitempty"`
-	// CommentLikes holds the value of the comment_likes edge.
-	CommentLikes []*CommentLike `json:"comment_likes,omitempty"`
 	// CommentAttachments holds the value of the comment_attachments edge.
 	CommentAttachments []*CommentAttachment `json:"comment_attachments,omitempty"`
-	// UserCommentNotifications holds the value of the user_comment_notifications edge.
-	UserCommentNotifications []*UserCommentNotification `json:"user_comment_notifications,omitempty"`
+	// LikedUsers holds the value of the liked_users edge.
+	LikedUsers []*User `json:"liked_users,omitempty"`
+	// SubscribedUsers holds the value of the subscribed_users edge.
+	SubscribedUsers []*User `json:"subscribed_users,omitempty"`
+	// UserCommentLike holds the value of the user_comment_like edge.
+	UserCommentLike []*UserCommentLike `json:"user_comment_like,omitempty"`
+	// UserCommentSubscription holds the value of the user_comment_subscription edge.
+	UserCommentSubscription []*UserCommentSubscription `json:"user_comment_subscription,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [7]bool
+	loadedTypes [9]bool
 }
 
 // TopicOrErr returns the Topic value or an error if the edge
@@ -71,15 +77,15 @@ func (e CommentEdges) TopicOrErr() (*Topic, error) {
 	return nil, &NotLoadedError{edge: "topic"}
 }
 
-// UserOrErr returns the User value or an error if the edge
+// AuthorOrErr returns the Author value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e CommentEdges) UserOrErr() (*User, error) {
-	if e.User != nil {
-		return e.User, nil
+func (e CommentEdges) AuthorOrErr() (*User, error) {
+	if e.Author != nil {
+		return e.Author, nil
 	} else if e.loadedTypes[1] {
 		return nil, &NotFoundError{label: user.Label}
 	}
-	return nil, &NotLoadedError{edge: "user"}
+	return nil, &NotLoadedError{edge: "author"}
 }
 
 // ParentOrErr returns the Parent value or an error if the edge
@@ -102,31 +108,49 @@ func (e CommentEdges) RepliesOrErr() ([]*Comment, error) {
 	return nil, &NotLoadedError{edge: "replies"}
 }
 
-// CommentLikesOrErr returns the CommentLikes value or an error if the edge
-// was not loaded in eager-loading.
-func (e CommentEdges) CommentLikesOrErr() ([]*CommentLike, error) {
-	if e.loadedTypes[4] {
-		return e.CommentLikes, nil
-	}
-	return nil, &NotLoadedError{edge: "comment_likes"}
-}
-
 // CommentAttachmentsOrErr returns the CommentAttachments value or an error if the edge
 // was not loaded in eager-loading.
 func (e CommentEdges) CommentAttachmentsOrErr() ([]*CommentAttachment, error) {
-	if e.loadedTypes[5] {
+	if e.loadedTypes[4] {
 		return e.CommentAttachments, nil
 	}
 	return nil, &NotLoadedError{edge: "comment_attachments"}
 }
 
-// UserCommentNotificationsOrErr returns the UserCommentNotifications value or an error if the edge
+// LikedUsersOrErr returns the LikedUsers value or an error if the edge
 // was not loaded in eager-loading.
-func (e CommentEdges) UserCommentNotificationsOrErr() ([]*UserCommentNotification, error) {
-	if e.loadedTypes[6] {
-		return e.UserCommentNotifications, nil
+func (e CommentEdges) LikedUsersOrErr() ([]*User, error) {
+	if e.loadedTypes[5] {
+		return e.LikedUsers, nil
 	}
-	return nil, &NotLoadedError{edge: "user_comment_notifications"}
+	return nil, &NotLoadedError{edge: "liked_users"}
+}
+
+// SubscribedUsersOrErr returns the SubscribedUsers value or an error if the edge
+// was not loaded in eager-loading.
+func (e CommentEdges) SubscribedUsersOrErr() ([]*User, error) {
+	if e.loadedTypes[6] {
+		return e.SubscribedUsers, nil
+	}
+	return nil, &NotLoadedError{edge: "subscribed_users"}
+}
+
+// UserCommentLikeOrErr returns the UserCommentLike value or an error if the edge
+// was not loaded in eager-loading.
+func (e CommentEdges) UserCommentLikeOrErr() ([]*UserCommentLike, error) {
+	if e.loadedTypes[7] {
+		return e.UserCommentLike, nil
+	}
+	return nil, &NotLoadedError{edge: "user_comment_like"}
+}
+
+// UserCommentSubscriptionOrErr returns the UserCommentSubscription value or an error if the edge
+// was not loaded in eager-loading.
+func (e CommentEdges) UserCommentSubscriptionOrErr() ([]*UserCommentSubscription, error) {
+	if e.loadedTypes[8] {
+		return e.UserCommentSubscription, nil
+	}
+	return nil, &NotLoadedError{edge: "user_comment_subscription"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -134,9 +158,9 @@ func (*Comment) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case comment.FieldID, comment.FieldTopicID, comment.FieldUserID, comment.FieldParentID:
+		case comment.FieldID, comment.FieldTopicId, comment.FieldParentId, comment.FieldUserId:
 			values[i] = new(sql.NullInt64)
-		case comment.FieldContent, comment.FieldStatus:
+		case comment.FieldGuestName, comment.FieldMessage, comment.FieldStatus:
 			values[i] = new(sql.NullString)
 		case comment.FieldCreatedAt, comment.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -161,29 +185,35 @@ func (c *Comment) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			c.ID = int(value.Int64)
-		case comment.FieldTopicID:
+		case comment.FieldTopicId:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field topic_id", values[i])
+				return fmt.Errorf("unexpected type %T for field topicId", values[i])
 			} else if value.Valid {
-				c.TopicID = int(value.Int64)
+				c.TopicId = int(value.Int64)
 			}
-		case comment.FieldUserID:
+		case comment.FieldParentId:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field user_id", values[i])
+				return fmt.Errorf("unexpected type %T for field parentId", values[i])
 			} else if value.Valid {
-				c.UserID = int(value.Int64)
+				c.ParentId = int(value.Int64)
 			}
-		case comment.FieldParentID:
+		case comment.FieldUserId:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field parent_id", values[i])
+				return fmt.Errorf("unexpected type %T for field userId", values[i])
 			} else if value.Valid {
-				c.ParentID = int(value.Int64)
+				c.UserId = int(value.Int64)
 			}
-		case comment.FieldContent:
+		case comment.FieldGuestName:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field content", values[i])
+				return fmt.Errorf("unexpected type %T for field guestName", values[i])
 			} else if value.Valid {
-				c.Content = value.String
+				c.GuestName = value.String
+			}
+		case comment.FieldMessage:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field message", values[i])
+			} else if value.Valid {
+				c.Message = value.String
 			}
 		case comment.FieldStatus:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -193,13 +223,13 @@ func (c *Comment) assignValues(columns []string, values []any) error {
 			}
 		case comment.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field created_at", values[i])
+				return fmt.Errorf("unexpected type %T for field createdAt", values[i])
 			} else if value.Valid {
 				c.CreatedAt = value.Time
 			}
 		case comment.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
+				return fmt.Errorf("unexpected type %T for field updatedAt", values[i])
 			} else if value.Valid {
 				c.UpdatedAt = value.Time
 			}
@@ -221,9 +251,9 @@ func (c *Comment) QueryTopic() *TopicQuery {
 	return NewCommentClient(c.config).QueryTopic(c)
 }
 
-// QueryUser queries the "user" edge of the Comment entity.
-func (c *Comment) QueryUser() *UserQuery {
-	return NewCommentClient(c.config).QueryUser(c)
+// QueryAuthor queries the "author" edge of the Comment entity.
+func (c *Comment) QueryAuthor() *UserQuery {
+	return NewCommentClient(c.config).QueryAuthor(c)
 }
 
 // QueryParent queries the "parent" edge of the Comment entity.
@@ -236,19 +266,29 @@ func (c *Comment) QueryReplies() *CommentQuery {
 	return NewCommentClient(c.config).QueryReplies(c)
 }
 
-// QueryCommentLikes queries the "comment_likes" edge of the Comment entity.
-func (c *Comment) QueryCommentLikes() *CommentLikeQuery {
-	return NewCommentClient(c.config).QueryCommentLikes(c)
-}
-
 // QueryCommentAttachments queries the "comment_attachments" edge of the Comment entity.
 func (c *Comment) QueryCommentAttachments() *CommentAttachmentQuery {
 	return NewCommentClient(c.config).QueryCommentAttachments(c)
 }
 
-// QueryUserCommentNotifications queries the "user_comment_notifications" edge of the Comment entity.
-func (c *Comment) QueryUserCommentNotifications() *UserCommentNotificationQuery {
-	return NewCommentClient(c.config).QueryUserCommentNotifications(c)
+// QueryLikedUsers queries the "liked_users" edge of the Comment entity.
+func (c *Comment) QueryLikedUsers() *UserQuery {
+	return NewCommentClient(c.config).QueryLikedUsers(c)
+}
+
+// QuerySubscribedUsers queries the "subscribed_users" edge of the Comment entity.
+func (c *Comment) QuerySubscribedUsers() *UserQuery {
+	return NewCommentClient(c.config).QuerySubscribedUsers(c)
+}
+
+// QueryUserCommentLike queries the "user_comment_like" edge of the Comment entity.
+func (c *Comment) QueryUserCommentLike() *UserCommentLikeQuery {
+	return NewCommentClient(c.config).QueryUserCommentLike(c)
+}
+
+// QueryUserCommentSubscription queries the "user_comment_subscription" edge of the Comment entity.
+func (c *Comment) QueryUserCommentSubscription() *UserCommentSubscriptionQuery {
+	return NewCommentClient(c.config).QueryUserCommentSubscription(c)
 }
 
 // Update returns a builder for updating this Comment.
@@ -274,25 +314,28 @@ func (c *Comment) String() string {
 	var builder strings.Builder
 	builder.WriteString("Comment(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", c.ID))
-	builder.WriteString("topic_id=")
-	builder.WriteString(fmt.Sprintf("%v", c.TopicID))
+	builder.WriteString("topicId=")
+	builder.WriteString(fmt.Sprintf("%v", c.TopicId))
 	builder.WriteString(", ")
-	builder.WriteString("user_id=")
-	builder.WriteString(fmt.Sprintf("%v", c.UserID))
+	builder.WriteString("parentId=")
+	builder.WriteString(fmt.Sprintf("%v", c.ParentId))
 	builder.WriteString(", ")
-	builder.WriteString("parent_id=")
-	builder.WriteString(fmt.Sprintf("%v", c.ParentID))
+	builder.WriteString("userId=")
+	builder.WriteString(fmt.Sprintf("%v", c.UserId))
 	builder.WriteString(", ")
-	builder.WriteString("content=")
-	builder.WriteString(c.Content)
+	builder.WriteString("guestName=")
+	builder.WriteString(c.GuestName)
+	builder.WriteString(", ")
+	builder.WriteString("message=")
+	builder.WriteString(c.Message)
 	builder.WriteString(", ")
 	builder.WriteString("status=")
 	builder.WriteString(fmt.Sprintf("%v", c.Status))
 	builder.WriteString(", ")
-	builder.WriteString("created_at=")
+	builder.WriteString("createdAt=")
 	builder.WriteString(c.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
-	builder.WriteString("updated_at=")
+	builder.WriteString("updatedAt=")
 	builder.WriteString(c.UpdatedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()

@@ -5,7 +5,6 @@ package ent
 import (
 	"fmt"
 	"server/infrastructure/ent/forum"
-	"server/infrastructure/ent/user"
 	"strings"
 	"time"
 
@@ -18,64 +17,87 @@ type Forum struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// UserID holds the value of the "user_id" field.
-	UserID int `json:"user_id,omitempty"`
-	// Name holds the value of the "name" field.
-	Name string `json:"name,omitempty"`
+	// UserId holds the value of the "userId" field.
+	UserId int `json:"userId,omitempty"`
+	// Title holds the value of the "title" field.
+	Title string `json:"title,omitempty"`
 	// Description holds the value of the "description" field.
 	Description string `json:"description,omitempty"`
+	// ThumbnailUrl holds the value of the "thumbnailUrl" field.
+	ThumbnailUrl string `json:"thumbnailUrl,omitempty"`
 	// Status holds the value of the "status" field.
 	Status forum.Status `json:"status,omitempty"`
-	// CreatedAt holds the value of the "created_at" field.
-	CreatedAt time.Time `json:"created_at,omitempty"`
-	// UpdatedAt holds the value of the "updated_at" field.
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	// CreatedAt holds the value of the "createdAt" field.
+	CreatedAt time.Time `json:"createdAt,omitempty"`
+	// UpdatedAt holds the value of the "updatedAt" field.
+	UpdatedAt time.Time `json:"updatedAt,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ForumQuery when eager-loading is set.
 	Edges        ForumEdges `json:"edges"`
+	user_forums  *int
 	selectValues sql.SelectValues
 }
 
 // ForumEdges holds the relations/edges for other nodes in the graph.
 type ForumEdges struct {
-	// User holds the value of the user edge.
-	User *User `json:"user,omitempty"`
+	// LikedUsers holds the value of the liked_users edge.
+	LikedUsers []*User `json:"liked_users,omitempty"`
+	// SubscribedUsers holds the value of the subscribed_users edge.
+	SubscribedUsers []*User `json:"subscribed_users,omitempty"`
 	// Topics holds the value of the topics edge.
 	Topics []*Topic `json:"topics,omitempty"`
-	// ForumLikes holds the value of the forum_likes edge.
-	ForumLikes []*ForumLike `json:"forum_likes,omitempty"`
+	// UserForumLike holds the value of the user_forum_like edge.
+	UserForumLike []*UserForumSubscription `json:"user_forum_like,omitempty"`
+	// UserForumSubscription holds the value of the user_forum_subscription edge.
+	UserForumSubscription []*UserForumLike `json:"user_forum_subscription,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [5]bool
 }
 
-// UserOrErr returns the User value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e ForumEdges) UserOrErr() (*User, error) {
-	if e.User != nil {
-		return e.User, nil
-	} else if e.loadedTypes[0] {
-		return nil, &NotFoundError{label: user.Label}
+// LikedUsersOrErr returns the LikedUsers value or an error if the edge
+// was not loaded in eager-loading.
+func (e ForumEdges) LikedUsersOrErr() ([]*User, error) {
+	if e.loadedTypes[0] {
+		return e.LikedUsers, nil
 	}
-	return nil, &NotLoadedError{edge: "user"}
+	return nil, &NotLoadedError{edge: "liked_users"}
+}
+
+// SubscribedUsersOrErr returns the SubscribedUsers value or an error if the edge
+// was not loaded in eager-loading.
+func (e ForumEdges) SubscribedUsersOrErr() ([]*User, error) {
+	if e.loadedTypes[1] {
+		return e.SubscribedUsers, nil
+	}
+	return nil, &NotLoadedError{edge: "subscribed_users"}
 }
 
 // TopicsOrErr returns the Topics value or an error if the edge
 // was not loaded in eager-loading.
 func (e ForumEdges) TopicsOrErr() ([]*Topic, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[2] {
 		return e.Topics, nil
 	}
 	return nil, &NotLoadedError{edge: "topics"}
 }
 
-// ForumLikesOrErr returns the ForumLikes value or an error if the edge
+// UserForumLikeOrErr returns the UserForumLike value or an error if the edge
 // was not loaded in eager-loading.
-func (e ForumEdges) ForumLikesOrErr() ([]*ForumLike, error) {
-	if e.loadedTypes[2] {
-		return e.ForumLikes, nil
+func (e ForumEdges) UserForumLikeOrErr() ([]*UserForumSubscription, error) {
+	if e.loadedTypes[3] {
+		return e.UserForumLike, nil
 	}
-	return nil, &NotLoadedError{edge: "forum_likes"}
+	return nil, &NotLoadedError{edge: "user_forum_like"}
+}
+
+// UserForumSubscriptionOrErr returns the UserForumSubscription value or an error if the edge
+// was not loaded in eager-loading.
+func (e ForumEdges) UserForumSubscriptionOrErr() ([]*UserForumLike, error) {
+	if e.loadedTypes[4] {
+		return e.UserForumSubscription, nil
+	}
+	return nil, &NotLoadedError{edge: "user_forum_subscription"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -83,12 +105,14 @@ func (*Forum) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case forum.FieldID, forum.FieldUserID:
+		case forum.FieldID, forum.FieldUserId:
 			values[i] = new(sql.NullInt64)
-		case forum.FieldName, forum.FieldDescription, forum.FieldStatus:
+		case forum.FieldTitle, forum.FieldDescription, forum.FieldThumbnailUrl, forum.FieldStatus:
 			values[i] = new(sql.NullString)
 		case forum.FieldCreatedAt, forum.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
+		case forum.ForeignKeys[0]: // user_forums
+			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -110,23 +134,29 @@ func (f *Forum) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			f.ID = int(value.Int64)
-		case forum.FieldUserID:
+		case forum.FieldUserId:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field user_id", values[i])
+				return fmt.Errorf("unexpected type %T for field userId", values[i])
 			} else if value.Valid {
-				f.UserID = int(value.Int64)
+				f.UserId = int(value.Int64)
 			}
-		case forum.FieldName:
+		case forum.FieldTitle:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field name", values[i])
+				return fmt.Errorf("unexpected type %T for field title", values[i])
 			} else if value.Valid {
-				f.Name = value.String
+				f.Title = value.String
 			}
 		case forum.FieldDescription:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field description", values[i])
 			} else if value.Valid {
 				f.Description = value.String
+			}
+		case forum.FieldThumbnailUrl:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field thumbnailUrl", values[i])
+			} else if value.Valid {
+				f.ThumbnailUrl = value.String
 			}
 		case forum.FieldStatus:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -136,15 +166,22 @@ func (f *Forum) assignValues(columns []string, values []any) error {
 			}
 		case forum.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field created_at", values[i])
+				return fmt.Errorf("unexpected type %T for field createdAt", values[i])
 			} else if value.Valid {
 				f.CreatedAt = value.Time
 			}
 		case forum.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
+				return fmt.Errorf("unexpected type %T for field updatedAt", values[i])
 			} else if value.Valid {
 				f.UpdatedAt = value.Time
+			}
+		case forum.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field user_forums", value)
+			} else if value.Valid {
+				f.user_forums = new(int)
+				*f.user_forums = int(value.Int64)
 			}
 		default:
 			f.selectValues.Set(columns[i], values[i])
@@ -159,9 +196,14 @@ func (f *Forum) Value(name string) (ent.Value, error) {
 	return f.selectValues.Get(name)
 }
 
-// QueryUser queries the "user" edge of the Forum entity.
-func (f *Forum) QueryUser() *UserQuery {
-	return NewForumClient(f.config).QueryUser(f)
+// QueryLikedUsers queries the "liked_users" edge of the Forum entity.
+func (f *Forum) QueryLikedUsers() *UserQuery {
+	return NewForumClient(f.config).QueryLikedUsers(f)
+}
+
+// QuerySubscribedUsers queries the "subscribed_users" edge of the Forum entity.
+func (f *Forum) QuerySubscribedUsers() *UserQuery {
+	return NewForumClient(f.config).QuerySubscribedUsers(f)
 }
 
 // QueryTopics queries the "topics" edge of the Forum entity.
@@ -169,9 +211,14 @@ func (f *Forum) QueryTopics() *TopicQuery {
 	return NewForumClient(f.config).QueryTopics(f)
 }
 
-// QueryForumLikes queries the "forum_likes" edge of the Forum entity.
-func (f *Forum) QueryForumLikes() *ForumLikeQuery {
-	return NewForumClient(f.config).QueryForumLikes(f)
+// QueryUserForumLike queries the "user_forum_like" edge of the Forum entity.
+func (f *Forum) QueryUserForumLike() *UserForumSubscriptionQuery {
+	return NewForumClient(f.config).QueryUserForumLike(f)
+}
+
+// QueryUserForumSubscription queries the "user_forum_subscription" edge of the Forum entity.
+func (f *Forum) QueryUserForumSubscription() *UserForumLikeQuery {
+	return NewForumClient(f.config).QueryUserForumSubscription(f)
 }
 
 // Update returns a builder for updating this Forum.
@@ -197,22 +244,25 @@ func (f *Forum) String() string {
 	var builder strings.Builder
 	builder.WriteString("Forum(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", f.ID))
-	builder.WriteString("user_id=")
-	builder.WriteString(fmt.Sprintf("%v", f.UserID))
+	builder.WriteString("userId=")
+	builder.WriteString(fmt.Sprintf("%v", f.UserId))
 	builder.WriteString(", ")
-	builder.WriteString("name=")
-	builder.WriteString(f.Name)
+	builder.WriteString("title=")
+	builder.WriteString(f.Title)
 	builder.WriteString(", ")
 	builder.WriteString("description=")
 	builder.WriteString(f.Description)
 	builder.WriteString(", ")
+	builder.WriteString("thumbnailUrl=")
+	builder.WriteString(f.ThumbnailUrl)
+	builder.WriteString(", ")
 	builder.WriteString("status=")
 	builder.WriteString(fmt.Sprintf("%v", f.Status))
 	builder.WriteString(", ")
-	builder.WriteString("created_at=")
+	builder.WriteString("createdAt=")
 	builder.WriteString(f.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
-	builder.WriteString("updated_at=")
+	builder.WriteString("updatedAt=")
 	builder.WriteString(f.UpdatedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()

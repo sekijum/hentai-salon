@@ -9,7 +9,6 @@ import (
 	"server/infrastructure/ent/comment"
 	"server/infrastructure/ent/commentattachment"
 	"server/infrastructure/ent/predicate"
-	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -29,31 +28,52 @@ func (cau *CommentAttachmentUpdate) Where(ps ...predicate.CommentAttachment) *Co
 	return cau
 }
 
-// SetCommentID sets the "comment_id" field.
-func (cau *CommentAttachmentUpdate) SetCommentID(i int) *CommentAttachmentUpdate {
-	cau.mutation.SetCommentID(i)
+// SetCommentId sets the "commentId" field.
+func (cau *CommentAttachmentUpdate) SetCommentId(i int) *CommentAttachmentUpdate {
+	cau.mutation.SetCommentId(i)
 	return cau
 }
 
-// SetNillableCommentID sets the "comment_id" field if the given value is not nil.
-func (cau *CommentAttachmentUpdate) SetNillableCommentID(i *int) *CommentAttachmentUpdate {
+// SetNillableCommentId sets the "commentId" field if the given value is not nil.
+func (cau *CommentAttachmentUpdate) SetNillableCommentId(i *int) *CommentAttachmentUpdate {
 	if i != nil {
-		cau.SetCommentID(*i)
+		cau.SetCommentId(*i)
 	}
 	return cau
 }
 
-// SetPath sets the "path" field.
-func (cau *CommentAttachmentUpdate) SetPath(s string) *CommentAttachmentUpdate {
-	cau.mutation.SetPath(s)
+// SetURL sets the "url" field.
+func (cau *CommentAttachmentUpdate) SetURL(s string) *CommentAttachmentUpdate {
+	cau.mutation.SetURL(s)
 	return cau
 }
 
-// SetNillablePath sets the "path" field if the given value is not nil.
-func (cau *CommentAttachmentUpdate) SetNillablePath(s *string) *CommentAttachmentUpdate {
+// SetNillableURL sets the "url" field if the given value is not nil.
+func (cau *CommentAttachmentUpdate) SetNillableURL(s *string) *CommentAttachmentUpdate {
 	if s != nil {
-		cau.SetPath(*s)
+		cau.SetURL(*s)
 	}
+	return cau
+}
+
+// SetOrder sets the "order" field.
+func (cau *CommentAttachmentUpdate) SetOrder(i int) *CommentAttachmentUpdate {
+	cau.mutation.ResetOrder()
+	cau.mutation.SetOrder(i)
+	return cau
+}
+
+// SetNillableOrder sets the "order" field if the given value is not nil.
+func (cau *CommentAttachmentUpdate) SetNillableOrder(i *int) *CommentAttachmentUpdate {
+	if i != nil {
+		cau.SetOrder(*i)
+	}
+	return cau
+}
+
+// AddOrder adds i to the "order" field.
+func (cau *CommentAttachmentUpdate) AddOrder(i int) *CommentAttachmentUpdate {
+	cau.mutation.AddOrder(i)
 	return cau
 }
 
@@ -71,17 +91,9 @@ func (cau *CommentAttachmentUpdate) SetNillableType(c *commentattachment.Type) *
 	return cau
 }
 
-// SetCreatedAt sets the "created_at" field.
-func (cau *CommentAttachmentUpdate) SetCreatedAt(t time.Time) *CommentAttachmentUpdate {
-	cau.mutation.SetCreatedAt(t)
-	return cau
-}
-
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (cau *CommentAttachmentUpdate) SetNillableCreatedAt(t *time.Time) *CommentAttachmentUpdate {
-	if t != nil {
-		cau.SetCreatedAt(*t)
-	}
+// SetCommentID sets the "comment" edge to the Comment entity by ID.
+func (cau *CommentAttachmentUpdate) SetCommentID(id int) *CommentAttachmentUpdate {
+	cau.mutation.SetCommentID(id)
 	return cau
 }
 
@@ -153,14 +165,17 @@ func (cau *CommentAttachmentUpdate) sqlSave(ctx context.Context) (n int, err err
 			}
 		}
 	}
-	if value, ok := cau.mutation.Path(); ok {
-		_spec.SetField(commentattachment.FieldPath, field.TypeString, value)
+	if value, ok := cau.mutation.URL(); ok {
+		_spec.SetField(commentattachment.FieldURL, field.TypeString, value)
+	}
+	if value, ok := cau.mutation.Order(); ok {
+		_spec.SetField(commentattachment.FieldOrder, field.TypeInt, value)
+	}
+	if value, ok := cau.mutation.AddedOrder(); ok {
+		_spec.AddField(commentattachment.FieldOrder, field.TypeInt, value)
 	}
 	if value, ok := cau.mutation.GetType(); ok {
 		_spec.SetField(commentattachment.FieldType, field.TypeEnum, value)
-	}
-	if value, ok := cau.mutation.CreatedAt(); ok {
-		_spec.SetField(commentattachment.FieldCreatedAt, field.TypeTime, value)
 	}
 	if cau.mutation.CommentCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -211,31 +226,52 @@ type CommentAttachmentUpdateOne struct {
 	mutation *CommentAttachmentMutation
 }
 
-// SetCommentID sets the "comment_id" field.
-func (cauo *CommentAttachmentUpdateOne) SetCommentID(i int) *CommentAttachmentUpdateOne {
-	cauo.mutation.SetCommentID(i)
+// SetCommentId sets the "commentId" field.
+func (cauo *CommentAttachmentUpdateOne) SetCommentId(i int) *CommentAttachmentUpdateOne {
+	cauo.mutation.SetCommentId(i)
 	return cauo
 }
 
-// SetNillableCommentID sets the "comment_id" field if the given value is not nil.
-func (cauo *CommentAttachmentUpdateOne) SetNillableCommentID(i *int) *CommentAttachmentUpdateOne {
+// SetNillableCommentId sets the "commentId" field if the given value is not nil.
+func (cauo *CommentAttachmentUpdateOne) SetNillableCommentId(i *int) *CommentAttachmentUpdateOne {
 	if i != nil {
-		cauo.SetCommentID(*i)
+		cauo.SetCommentId(*i)
 	}
 	return cauo
 }
 
-// SetPath sets the "path" field.
-func (cauo *CommentAttachmentUpdateOne) SetPath(s string) *CommentAttachmentUpdateOne {
-	cauo.mutation.SetPath(s)
+// SetURL sets the "url" field.
+func (cauo *CommentAttachmentUpdateOne) SetURL(s string) *CommentAttachmentUpdateOne {
+	cauo.mutation.SetURL(s)
 	return cauo
 }
 
-// SetNillablePath sets the "path" field if the given value is not nil.
-func (cauo *CommentAttachmentUpdateOne) SetNillablePath(s *string) *CommentAttachmentUpdateOne {
+// SetNillableURL sets the "url" field if the given value is not nil.
+func (cauo *CommentAttachmentUpdateOne) SetNillableURL(s *string) *CommentAttachmentUpdateOne {
 	if s != nil {
-		cauo.SetPath(*s)
+		cauo.SetURL(*s)
 	}
+	return cauo
+}
+
+// SetOrder sets the "order" field.
+func (cauo *CommentAttachmentUpdateOne) SetOrder(i int) *CommentAttachmentUpdateOne {
+	cauo.mutation.ResetOrder()
+	cauo.mutation.SetOrder(i)
+	return cauo
+}
+
+// SetNillableOrder sets the "order" field if the given value is not nil.
+func (cauo *CommentAttachmentUpdateOne) SetNillableOrder(i *int) *CommentAttachmentUpdateOne {
+	if i != nil {
+		cauo.SetOrder(*i)
+	}
+	return cauo
+}
+
+// AddOrder adds i to the "order" field.
+func (cauo *CommentAttachmentUpdateOne) AddOrder(i int) *CommentAttachmentUpdateOne {
+	cauo.mutation.AddOrder(i)
 	return cauo
 }
 
@@ -253,17 +289,9 @@ func (cauo *CommentAttachmentUpdateOne) SetNillableType(c *commentattachment.Typ
 	return cauo
 }
 
-// SetCreatedAt sets the "created_at" field.
-func (cauo *CommentAttachmentUpdateOne) SetCreatedAt(t time.Time) *CommentAttachmentUpdateOne {
-	cauo.mutation.SetCreatedAt(t)
-	return cauo
-}
-
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (cauo *CommentAttachmentUpdateOne) SetNillableCreatedAt(t *time.Time) *CommentAttachmentUpdateOne {
-	if t != nil {
-		cauo.SetCreatedAt(*t)
-	}
+// SetCommentID sets the "comment" edge to the Comment entity by ID.
+func (cauo *CommentAttachmentUpdateOne) SetCommentID(id int) *CommentAttachmentUpdateOne {
+	cauo.mutation.SetCommentID(id)
 	return cauo
 }
 
@@ -365,14 +393,17 @@ func (cauo *CommentAttachmentUpdateOne) sqlSave(ctx context.Context) (_node *Com
 			}
 		}
 	}
-	if value, ok := cauo.mutation.Path(); ok {
-		_spec.SetField(commentattachment.FieldPath, field.TypeString, value)
+	if value, ok := cauo.mutation.URL(); ok {
+		_spec.SetField(commentattachment.FieldURL, field.TypeString, value)
+	}
+	if value, ok := cauo.mutation.Order(); ok {
+		_spec.SetField(commentattachment.FieldOrder, field.TypeInt, value)
+	}
+	if value, ok := cauo.mutation.AddedOrder(); ok {
+		_spec.AddField(commentattachment.FieldOrder, field.TypeInt, value)
 	}
 	if value, ok := cauo.mutation.GetType(); ok {
 		_spec.SetField(commentattachment.FieldType, field.TypeEnum, value)
-	}
-	if value, ok := cauo.mutation.CreatedAt(); ok {
-		_spec.SetField(commentattachment.FieldCreatedAt, field.TypeTime, value)
 	}
 	if cauo.mutation.CommentCleared() {
 		edge := &sqlgraph.EdgeSpec{

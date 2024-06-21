@@ -10,14 +10,17 @@ import (
 	"server/infrastructure/ent/adminuser"
 	"server/infrastructure/ent/comment"
 	"server/infrastructure/ent/commentattachment"
-	"server/infrastructure/ent/commentlike"
 	"server/infrastructure/ent/forum"
-	"server/infrastructure/ent/forumlike"
 	"server/infrastructure/ent/topic"
-	"server/infrastructure/ent/topiclike"
+	"server/infrastructure/ent/topictag"
+	"server/infrastructure/ent/topictagging"
 	"server/infrastructure/ent/user"
-	"server/infrastructure/ent/usercommentnotification"
-	"server/infrastructure/ent/usertopicnotification"
+	"server/infrastructure/ent/usercommentlike"
+	"server/infrastructure/ent/usercommentsubscription"
+	"server/infrastructure/ent/userforumlike"
+	"server/infrastructure/ent/userforumsubscription"
+	"server/infrastructure/ent/usertopiclike"
+	"server/infrastructure/ent/usertopicsubscription"
 	"sync"
 
 	"entgo.io/ent"
@@ -86,14 +89,17 @@ func checkColumn(table, column string) error {
 			adminuser.Table:               adminuser.ValidColumn,
 			comment.Table:                 comment.ValidColumn,
 			commentattachment.Table:       commentattachment.ValidColumn,
-			commentlike.Table:             commentlike.ValidColumn,
 			forum.Table:                   forum.ValidColumn,
-			forumlike.Table:               forumlike.ValidColumn,
 			topic.Table:                   topic.ValidColumn,
-			topiclike.Table:               topiclike.ValidColumn,
+			topictag.Table:                topictag.ValidColumn,
+			topictagging.Table:            topictagging.ValidColumn,
 			user.Table:                    user.ValidColumn,
-			usercommentnotification.Table: usercommentnotification.ValidColumn,
-			usertopicnotification.Table:   usertopicnotification.ValidColumn,
+			usercommentlike.Table:         usercommentlike.ValidColumn,
+			usercommentsubscription.Table: usercommentsubscription.ValidColumn,
+			userforumlike.Table:           userforumlike.ValidColumn,
+			userforumsubscription.Table:   userforumsubscription.ValidColumn,
+			usertopiclike.Table:           usertopiclike.ValidColumn,
+			usertopicsubscription.Table:   usertopicsubscription.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

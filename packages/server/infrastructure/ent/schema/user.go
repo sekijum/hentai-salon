@@ -7,36 +7,34 @@ import (
     "time"
 )
 
-// User holds the schema definition for the User entity.
 type User struct {
     ent.Schema
 }
 
-// Fields of the User.
 func (User) Fields() []ent.Field {
     return []ent.Field{
-        field.Int("id").Unique().Immutable().StorageKey("id"),
-        field.String("username").Unique(),
-        field.String("email").Unique(),
+        field.Int("id").Unique().Immutable(),
+        field.String("userName").Unique().StorageKey("user_name").MaxLen(20),
+        field.String("email").Unique().MaxLen(254),
         field.String("password"),
-        field.String("display_name").Optional(),
-        field.String("avatar").Optional(),
+        field.String("displayName").Optional().StorageKey("display_name").MaxLen(20),
+        field.String("avatarUrl").Optional().StorageKey("avatar_url"),
         field.Enum("status").Values("Active", "Withdrawn", "Suspended", "Inactive").Default("Active"),
-        field.Time("created_at").Default(time.Now),
-        field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),
+        field.Time("createdAt").Default(time.Now).StorageKey("created_at"),
+        field.Time("updatedAt").Default(time.Now).UpdateDefault(time.Now).StorageKey("updated_at"),
     }
 }
 
-// Edges of the User.
 func (User) Edges() []ent.Edge {
     return []ent.Edge{
         edge.To("forums", Forum.Type),
         edge.To("topics", Topic.Type),
         edge.To("comments", Comment.Type),
-        edge.To("user_topic_notifications", UserTopicNotification.Type),
-        edge.To("user_comment_notifications", UserCommentNotification.Type),
-        edge.To("forum_likes", ForumLike.Type),
-        edge.To("topic_likes", TopicLike.Type),
-        edge.To("comment_likes", CommentLike.Type),
+        edge.To("liked_forums", Forum.Type).Through("user_forum_like", UserForumLike.Type),
+        edge.To("liked_topics", Topic.Type).Through("user_topic_like", UserTopicLike.Type),
+        edge.To("liked_comments", Comment.Type).Through("user_comment_like", UserCommentLike.Type),
+        edge.To("subscribed_forums", Forum.Type).Through("user_forum_subscription", UserForumSubscription.Type),
+        edge.To("subscribed_topics", Topic.Type).Through("user_topic_subscription", UserTopicSubscription.Type),
+        edge.To("subscribed_comments", Comment.Type).Through("user_comment_subscription", UserCommentSubscription.Type),
     }
 }

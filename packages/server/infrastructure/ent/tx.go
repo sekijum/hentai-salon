@@ -18,22 +18,28 @@ type Tx struct {
 	Comment *CommentClient
 	// CommentAttachment is the client for interacting with the CommentAttachment builders.
 	CommentAttachment *CommentAttachmentClient
-	// CommentLike is the client for interacting with the CommentLike builders.
-	CommentLike *CommentLikeClient
 	// Forum is the client for interacting with the Forum builders.
 	Forum *ForumClient
-	// ForumLike is the client for interacting with the ForumLike builders.
-	ForumLike *ForumLikeClient
 	// Topic is the client for interacting with the Topic builders.
 	Topic *TopicClient
-	// TopicLike is the client for interacting with the TopicLike builders.
-	TopicLike *TopicLikeClient
+	// TopicTag is the client for interacting with the TopicTag builders.
+	TopicTag *TopicTagClient
+	// TopicTagging is the client for interacting with the TopicTagging builders.
+	TopicTagging *TopicTaggingClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
-	// UserCommentNotification is the client for interacting with the UserCommentNotification builders.
-	UserCommentNotification *UserCommentNotificationClient
-	// UserTopicNotification is the client for interacting with the UserTopicNotification builders.
-	UserTopicNotification *UserTopicNotificationClient
+	// UserCommentLike is the client for interacting with the UserCommentLike builders.
+	UserCommentLike *UserCommentLikeClient
+	// UserCommentSubscription is the client for interacting with the UserCommentSubscription builders.
+	UserCommentSubscription *UserCommentSubscriptionClient
+	// UserForumLike is the client for interacting with the UserForumLike builders.
+	UserForumLike *UserForumLikeClient
+	// UserForumSubscription is the client for interacting with the UserForumSubscription builders.
+	UserForumSubscription *UserForumSubscriptionClient
+	// UserTopicLike is the client for interacting with the UserTopicLike builders.
+	UserTopicLike *UserTopicLikeClient
+	// UserTopicSubscription is the client for interacting with the UserTopicSubscription builders.
+	UserTopicSubscription *UserTopicSubscriptionClient
 
 	// lazily loaded.
 	client     *Client
@@ -168,14 +174,17 @@ func (tx *Tx) init() {
 	tx.AdminUser = NewAdminUserClient(tx.config)
 	tx.Comment = NewCommentClient(tx.config)
 	tx.CommentAttachment = NewCommentAttachmentClient(tx.config)
-	tx.CommentLike = NewCommentLikeClient(tx.config)
 	tx.Forum = NewForumClient(tx.config)
-	tx.ForumLike = NewForumLikeClient(tx.config)
 	tx.Topic = NewTopicClient(tx.config)
-	tx.TopicLike = NewTopicLikeClient(tx.config)
+	tx.TopicTag = NewTopicTagClient(tx.config)
+	tx.TopicTagging = NewTopicTaggingClient(tx.config)
 	tx.User = NewUserClient(tx.config)
-	tx.UserCommentNotification = NewUserCommentNotificationClient(tx.config)
-	tx.UserTopicNotification = NewUserTopicNotificationClient(tx.config)
+	tx.UserCommentLike = NewUserCommentLikeClient(tx.config)
+	tx.UserCommentSubscription = NewUserCommentSubscriptionClient(tx.config)
+	tx.UserForumLike = NewUserForumLikeClient(tx.config)
+	tx.UserForumSubscription = NewUserForumSubscriptionClient(tx.config)
+	tx.UserTopicLike = NewUserTopicLikeClient(tx.config)
+	tx.UserTopicSubscription = NewUserTopicSubscriptionClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

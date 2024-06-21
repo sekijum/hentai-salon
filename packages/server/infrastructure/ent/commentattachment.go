@@ -7,7 +7,6 @@ import (
 	"server/infrastructure/ent/comment"
 	"server/infrastructure/ent/commentattachment"
 	"strings"
-	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -18,14 +17,14 @@ type CommentAttachment struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// CommentID holds the value of the "comment_id" field.
-	CommentID int `json:"comment_id,omitempty"`
-	// Path holds the value of the "path" field.
-	Path string `json:"path,omitempty"`
+	// CommentId holds the value of the "commentId" field.
+	CommentId int `json:"commentId,omitempty"`
+	// URL holds the value of the "url" field.
+	URL string `json:"url,omitempty"`
+	// Order holds the value of the "order" field.
+	Order int `json:"order,omitempty"`
 	// Type holds the value of the "type" field.
 	Type commentattachment.Type `json:"type,omitempty"`
-	// CreatedAt holds the value of the "created_at" field.
-	CreatedAt time.Time `json:"created_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CommentAttachmentQuery when eager-loading is set.
 	Edges        CommentAttachmentEdges `json:"edges"`
@@ -57,12 +56,10 @@ func (*CommentAttachment) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case commentattachment.FieldID, commentattachment.FieldCommentID:
+		case commentattachment.FieldID, commentattachment.FieldCommentId, commentattachment.FieldOrder:
 			values[i] = new(sql.NullInt64)
-		case commentattachment.FieldPath, commentattachment.FieldType:
+		case commentattachment.FieldURL, commentattachment.FieldType:
 			values[i] = new(sql.NullString)
-		case commentattachment.FieldCreatedAt:
-			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -84,29 +81,29 @@ func (ca *CommentAttachment) assignValues(columns []string, values []any) error 
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			ca.ID = int(value.Int64)
-		case commentattachment.FieldCommentID:
+		case commentattachment.FieldCommentId:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field comment_id", values[i])
+				return fmt.Errorf("unexpected type %T for field commentId", values[i])
 			} else if value.Valid {
-				ca.CommentID = int(value.Int64)
+				ca.CommentId = int(value.Int64)
 			}
-		case commentattachment.FieldPath:
+		case commentattachment.FieldURL:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field path", values[i])
+				return fmt.Errorf("unexpected type %T for field url", values[i])
 			} else if value.Valid {
-				ca.Path = value.String
+				ca.URL = value.String
+			}
+		case commentattachment.FieldOrder:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field order", values[i])
+			} else if value.Valid {
+				ca.Order = int(value.Int64)
 			}
 		case commentattachment.FieldType:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field type", values[i])
 			} else if value.Valid {
 				ca.Type = commentattachment.Type(value.String)
-			}
-		case commentattachment.FieldCreatedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field created_at", values[i])
-			} else if value.Valid {
-				ca.CreatedAt = value.Time
 			}
 		default:
 			ca.selectValues.Set(columns[i], values[i])
@@ -149,17 +146,17 @@ func (ca *CommentAttachment) String() string {
 	var builder strings.Builder
 	builder.WriteString("CommentAttachment(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", ca.ID))
-	builder.WriteString("comment_id=")
-	builder.WriteString(fmt.Sprintf("%v", ca.CommentID))
+	builder.WriteString("commentId=")
+	builder.WriteString(fmt.Sprintf("%v", ca.CommentId))
 	builder.WriteString(", ")
-	builder.WriteString("path=")
-	builder.WriteString(ca.Path)
+	builder.WriteString("url=")
+	builder.WriteString(ca.URL)
+	builder.WriteString(", ")
+	builder.WriteString("order=")
+	builder.WriteString(fmt.Sprintf("%v", ca.Order))
 	builder.WriteString(", ")
 	builder.WriteString("type=")
 	builder.WriteString(fmt.Sprintf("%v", ca.Type))
-	builder.WriteString(", ")
-	builder.WriteString("created_at=")
-	builder.WriteString(ca.CreatedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

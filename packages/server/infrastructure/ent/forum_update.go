@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"server/infrastructure/ent/forum"
-	"server/infrastructure/ent/forumlike"
 	"server/infrastructure/ent/predicate"
 	"server/infrastructure/ent/topic"
 	"server/infrastructure/ent/user"
@@ -31,30 +30,37 @@ func (fu *ForumUpdate) Where(ps ...predicate.Forum) *ForumUpdate {
 	return fu
 }
 
-// SetUserID sets the "user_id" field.
-func (fu *ForumUpdate) SetUserID(i int) *ForumUpdate {
-	fu.mutation.SetUserID(i)
+// SetUserId sets the "userId" field.
+func (fu *ForumUpdate) SetUserId(i int) *ForumUpdate {
+	fu.mutation.ResetUserId()
+	fu.mutation.SetUserId(i)
 	return fu
 }
 
-// SetNillableUserID sets the "user_id" field if the given value is not nil.
-func (fu *ForumUpdate) SetNillableUserID(i *int) *ForumUpdate {
+// SetNillableUserId sets the "userId" field if the given value is not nil.
+func (fu *ForumUpdate) SetNillableUserId(i *int) *ForumUpdate {
 	if i != nil {
-		fu.SetUserID(*i)
+		fu.SetUserId(*i)
 	}
 	return fu
 }
 
-// SetName sets the "name" field.
-func (fu *ForumUpdate) SetName(s string) *ForumUpdate {
-	fu.mutation.SetName(s)
+// AddUserId adds i to the "userId" field.
+func (fu *ForumUpdate) AddUserId(i int) *ForumUpdate {
+	fu.mutation.AddUserId(i)
 	return fu
 }
 
-// SetNillableName sets the "name" field if the given value is not nil.
-func (fu *ForumUpdate) SetNillableName(s *string) *ForumUpdate {
+// SetTitle sets the "title" field.
+func (fu *ForumUpdate) SetTitle(s string) *ForumUpdate {
+	fu.mutation.SetTitle(s)
+	return fu
+}
+
+// SetNillableTitle sets the "title" field if the given value is not nil.
+func (fu *ForumUpdate) SetNillableTitle(s *string) *ForumUpdate {
 	if s != nil {
-		fu.SetName(*s)
+		fu.SetTitle(*s)
 	}
 	return fu
 }
@@ -79,6 +85,26 @@ func (fu *ForumUpdate) ClearDescription() *ForumUpdate {
 	return fu
 }
 
+// SetThumbnailUrl sets the "thumbnailUrl" field.
+func (fu *ForumUpdate) SetThumbnailUrl(s string) *ForumUpdate {
+	fu.mutation.SetThumbnailUrl(s)
+	return fu
+}
+
+// SetNillableThumbnailUrl sets the "thumbnailUrl" field if the given value is not nil.
+func (fu *ForumUpdate) SetNillableThumbnailUrl(s *string) *ForumUpdate {
+	if s != nil {
+		fu.SetThumbnailUrl(*s)
+	}
+	return fu
+}
+
+// ClearThumbnailUrl clears the value of the "thumbnailUrl" field.
+func (fu *ForumUpdate) ClearThumbnailUrl() *ForumUpdate {
+	fu.mutation.ClearThumbnailUrl()
+	return fu
+}
+
 // SetStatus sets the "status" field.
 func (fu *ForumUpdate) SetStatus(f forum.Status) *ForumUpdate {
 	fu.mutation.SetStatus(f)
@@ -93,13 +119,13 @@ func (fu *ForumUpdate) SetNillableStatus(f *forum.Status) *ForumUpdate {
 	return fu
 }
 
-// SetCreatedAt sets the "created_at" field.
+// SetCreatedAt sets the "createdAt" field.
 func (fu *ForumUpdate) SetCreatedAt(t time.Time) *ForumUpdate {
 	fu.mutation.SetCreatedAt(t)
 	return fu
 }
 
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
 func (fu *ForumUpdate) SetNillableCreatedAt(t *time.Time) *ForumUpdate {
 	if t != nil {
 		fu.SetCreatedAt(*t)
@@ -107,15 +133,40 @@ func (fu *ForumUpdate) SetNillableCreatedAt(t *time.Time) *ForumUpdate {
 	return fu
 }
 
-// SetUpdatedAt sets the "updated_at" field.
+// SetUpdatedAt sets the "updatedAt" field.
 func (fu *ForumUpdate) SetUpdatedAt(t time.Time) *ForumUpdate {
 	fu.mutation.SetUpdatedAt(t)
 	return fu
 }
 
-// SetUser sets the "user" edge to the User entity.
-func (fu *ForumUpdate) SetUser(u *User) *ForumUpdate {
-	return fu.SetUserID(u.ID)
+// AddLikedUserIDs adds the "liked_users" edge to the User entity by IDs.
+func (fu *ForumUpdate) AddLikedUserIDs(ids ...int) *ForumUpdate {
+	fu.mutation.AddLikedUserIDs(ids...)
+	return fu
+}
+
+// AddLikedUsers adds the "liked_users" edges to the User entity.
+func (fu *ForumUpdate) AddLikedUsers(u ...*User) *ForumUpdate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return fu.AddLikedUserIDs(ids...)
+}
+
+// AddSubscribedUserIDs adds the "subscribed_users" edge to the User entity by IDs.
+func (fu *ForumUpdate) AddSubscribedUserIDs(ids ...int) *ForumUpdate {
+	fu.mutation.AddSubscribedUserIDs(ids...)
+	return fu
+}
+
+// AddSubscribedUsers adds the "subscribed_users" edges to the User entity.
+func (fu *ForumUpdate) AddSubscribedUsers(u ...*User) *ForumUpdate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return fu.AddSubscribedUserIDs(ids...)
 }
 
 // AddTopicIDs adds the "topics" edge to the Topic entity by IDs.
@@ -133,30 +184,51 @@ func (fu *ForumUpdate) AddTopics(t ...*Topic) *ForumUpdate {
 	return fu.AddTopicIDs(ids...)
 }
 
-// AddForumLikeIDs adds the "forum_likes" edge to the ForumLike entity by IDs.
-func (fu *ForumUpdate) AddForumLikeIDs(ids ...int) *ForumUpdate {
-	fu.mutation.AddForumLikeIDs(ids...)
-	return fu
-}
-
-// AddForumLikes adds the "forum_likes" edges to the ForumLike entity.
-func (fu *ForumUpdate) AddForumLikes(f ...*ForumLike) *ForumUpdate {
-	ids := make([]int, len(f))
-	for i := range f {
-		ids[i] = f[i].ID
-	}
-	return fu.AddForumLikeIDs(ids...)
-}
-
 // Mutation returns the ForumMutation object of the builder.
 func (fu *ForumUpdate) Mutation() *ForumMutation {
 	return fu.mutation
 }
 
-// ClearUser clears the "user" edge to the User entity.
-func (fu *ForumUpdate) ClearUser() *ForumUpdate {
-	fu.mutation.ClearUser()
+// ClearLikedUsers clears all "liked_users" edges to the User entity.
+func (fu *ForumUpdate) ClearLikedUsers() *ForumUpdate {
+	fu.mutation.ClearLikedUsers()
 	return fu
+}
+
+// RemoveLikedUserIDs removes the "liked_users" edge to User entities by IDs.
+func (fu *ForumUpdate) RemoveLikedUserIDs(ids ...int) *ForumUpdate {
+	fu.mutation.RemoveLikedUserIDs(ids...)
+	return fu
+}
+
+// RemoveLikedUsers removes "liked_users" edges to User entities.
+func (fu *ForumUpdate) RemoveLikedUsers(u ...*User) *ForumUpdate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return fu.RemoveLikedUserIDs(ids...)
+}
+
+// ClearSubscribedUsers clears all "subscribed_users" edges to the User entity.
+func (fu *ForumUpdate) ClearSubscribedUsers() *ForumUpdate {
+	fu.mutation.ClearSubscribedUsers()
+	return fu
+}
+
+// RemoveSubscribedUserIDs removes the "subscribed_users" edge to User entities by IDs.
+func (fu *ForumUpdate) RemoveSubscribedUserIDs(ids ...int) *ForumUpdate {
+	fu.mutation.RemoveSubscribedUserIDs(ids...)
+	return fu
+}
+
+// RemoveSubscribedUsers removes "subscribed_users" edges to User entities.
+func (fu *ForumUpdate) RemoveSubscribedUsers(u ...*User) *ForumUpdate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return fu.RemoveSubscribedUserIDs(ids...)
 }
 
 // ClearTopics clears all "topics" edges to the Topic entity.
@@ -178,27 +250,6 @@ func (fu *ForumUpdate) RemoveTopics(t ...*Topic) *ForumUpdate {
 		ids[i] = t[i].ID
 	}
 	return fu.RemoveTopicIDs(ids...)
-}
-
-// ClearForumLikes clears all "forum_likes" edges to the ForumLike entity.
-func (fu *ForumUpdate) ClearForumLikes() *ForumUpdate {
-	fu.mutation.ClearForumLikes()
-	return fu
-}
-
-// RemoveForumLikeIDs removes the "forum_likes" edge to ForumLike entities by IDs.
-func (fu *ForumUpdate) RemoveForumLikeIDs(ids ...int) *ForumUpdate {
-	fu.mutation.RemoveForumLikeIDs(ids...)
-	return fu
-}
-
-// RemoveForumLikes removes "forum_likes" edges to ForumLike entities.
-func (fu *ForumUpdate) RemoveForumLikes(f ...*ForumLike) *ForumUpdate {
-	ids := make([]int, len(f))
-	for i := range f {
-		ids[i] = f[i].ID
-	}
-	return fu.RemoveForumLikeIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -239,13 +290,20 @@ func (fu *ForumUpdate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (fu *ForumUpdate) check() error {
+	if v, ok := fu.mutation.Title(); ok {
+		if err := forum.TitleValidator(v); err != nil {
+			return &ValidationError{Name: "title", err: fmt.Errorf(`ent: validator failed for field "Forum.title": %w`, err)}
+		}
+	}
+	if v, ok := fu.mutation.Description(); ok {
+		if err := forum.DescriptionValidator(v); err != nil {
+			return &ValidationError{Name: "description", err: fmt.Errorf(`ent: validator failed for field "Forum.description": %w`, err)}
+		}
+	}
 	if v, ok := fu.mutation.Status(); ok {
 		if err := forum.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Forum.status": %w`, err)}
 		}
-	}
-	if _, ok := fu.mutation.UserID(); fu.mutation.UserCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "Forum.user"`)
 	}
 	return nil
 }
@@ -262,14 +320,26 @@ func (fu *ForumUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := fu.mutation.Name(); ok {
-		_spec.SetField(forum.FieldName, field.TypeString, value)
+	if value, ok := fu.mutation.UserId(); ok {
+		_spec.SetField(forum.FieldUserId, field.TypeInt, value)
+	}
+	if value, ok := fu.mutation.AddedUserId(); ok {
+		_spec.AddField(forum.FieldUserId, field.TypeInt, value)
+	}
+	if value, ok := fu.mutation.Title(); ok {
+		_spec.SetField(forum.FieldTitle, field.TypeString, value)
 	}
 	if value, ok := fu.mutation.Description(); ok {
 		_spec.SetField(forum.FieldDescription, field.TypeString, value)
 	}
 	if fu.mutation.DescriptionCleared() {
 		_spec.ClearField(forum.FieldDescription, field.TypeString)
+	}
+	if value, ok := fu.mutation.ThumbnailUrl(); ok {
+		_spec.SetField(forum.FieldThumbnailUrl, field.TypeString, value)
+	}
+	if fu.mutation.ThumbnailUrlCleared() {
+		_spec.ClearField(forum.FieldThumbnailUrl, field.TypeString)
 	}
 	if value, ok := fu.mutation.Status(); ok {
 		_spec.SetField(forum.FieldStatus, field.TypeEnum, value)
@@ -280,25 +350,29 @@ func (fu *ForumUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := fu.mutation.UpdatedAt(); ok {
 		_spec.SetField(forum.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if fu.mutation.UserCleared() {
+	if fu.mutation.LikedUsersCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   forum.UserTable,
-			Columns: []string{forum.UserColumn},
+			Table:   forum.LikedUsersTable,
+			Columns: forum.LikedUsersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
 			},
 		}
+		createE := &UserForumSubscriptionCreate{config: fu.config, mutation: newUserForumSubscriptionMutation(fu.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := fu.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := fu.mutation.RemovedLikedUsersIDs(); len(nodes) > 0 && !fu.mutation.LikedUsersCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   forum.UserTable,
-			Columns: []string{forum.UserColumn},
+			Table:   forum.LikedUsersTable,
+			Columns: forum.LikedUsersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
@@ -307,6 +381,87 @@ func (fu *ForumUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		createE := &UserForumSubscriptionCreate{config: fu.config, mutation: newUserForumSubscriptionMutation(fu.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := fu.mutation.LikedUsersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   forum.LikedUsersTable,
+			Columns: forum.LikedUsersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		createE := &UserForumSubscriptionCreate{config: fu.config, mutation: newUserForumSubscriptionMutation(fu.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if fu.mutation.SubscribedUsersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   forum.SubscribedUsersTable,
+			Columns: forum.SubscribedUsersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		createE := &UserForumLikeCreate{config: fu.config, mutation: newUserForumLikeMutation(fu.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := fu.mutation.RemovedSubscribedUsersIDs(); len(nodes) > 0 && !fu.mutation.SubscribedUsersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   forum.SubscribedUsersTable,
+			Columns: forum.SubscribedUsersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		createE := &UserForumLikeCreate{config: fu.config, mutation: newUserForumLikeMutation(fu.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := fu.mutation.SubscribedUsersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   forum.SubscribedUsersTable,
+			Columns: forum.SubscribedUsersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		createE := &UserForumLikeCreate{config: fu.config, mutation: newUserForumLikeMutation(fu.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if fu.mutation.TopicsCleared() {
@@ -354,51 +509,6 @@ func (fu *ForumUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if fu.mutation.ForumLikesCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   forum.ForumLikesTable,
-			Columns: []string{forum.ForumLikesColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(forumlike.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := fu.mutation.RemovedForumLikesIDs(); len(nodes) > 0 && !fu.mutation.ForumLikesCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   forum.ForumLikesTable,
-			Columns: []string{forum.ForumLikesColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(forumlike.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := fu.mutation.ForumLikesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   forum.ForumLikesTable,
-			Columns: []string{forum.ForumLikesColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(forumlike.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
 	if n, err = sqlgraph.UpdateNodes(ctx, fu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{forum.Label}
@@ -419,30 +529,37 @@ type ForumUpdateOne struct {
 	mutation *ForumMutation
 }
 
-// SetUserID sets the "user_id" field.
-func (fuo *ForumUpdateOne) SetUserID(i int) *ForumUpdateOne {
-	fuo.mutation.SetUserID(i)
+// SetUserId sets the "userId" field.
+func (fuo *ForumUpdateOne) SetUserId(i int) *ForumUpdateOne {
+	fuo.mutation.ResetUserId()
+	fuo.mutation.SetUserId(i)
 	return fuo
 }
 
-// SetNillableUserID sets the "user_id" field if the given value is not nil.
-func (fuo *ForumUpdateOne) SetNillableUserID(i *int) *ForumUpdateOne {
+// SetNillableUserId sets the "userId" field if the given value is not nil.
+func (fuo *ForumUpdateOne) SetNillableUserId(i *int) *ForumUpdateOne {
 	if i != nil {
-		fuo.SetUserID(*i)
+		fuo.SetUserId(*i)
 	}
 	return fuo
 }
 
-// SetName sets the "name" field.
-func (fuo *ForumUpdateOne) SetName(s string) *ForumUpdateOne {
-	fuo.mutation.SetName(s)
+// AddUserId adds i to the "userId" field.
+func (fuo *ForumUpdateOne) AddUserId(i int) *ForumUpdateOne {
+	fuo.mutation.AddUserId(i)
 	return fuo
 }
 
-// SetNillableName sets the "name" field if the given value is not nil.
-func (fuo *ForumUpdateOne) SetNillableName(s *string) *ForumUpdateOne {
+// SetTitle sets the "title" field.
+func (fuo *ForumUpdateOne) SetTitle(s string) *ForumUpdateOne {
+	fuo.mutation.SetTitle(s)
+	return fuo
+}
+
+// SetNillableTitle sets the "title" field if the given value is not nil.
+func (fuo *ForumUpdateOne) SetNillableTitle(s *string) *ForumUpdateOne {
 	if s != nil {
-		fuo.SetName(*s)
+		fuo.SetTitle(*s)
 	}
 	return fuo
 }
@@ -467,6 +584,26 @@ func (fuo *ForumUpdateOne) ClearDescription() *ForumUpdateOne {
 	return fuo
 }
 
+// SetThumbnailUrl sets the "thumbnailUrl" field.
+func (fuo *ForumUpdateOne) SetThumbnailUrl(s string) *ForumUpdateOne {
+	fuo.mutation.SetThumbnailUrl(s)
+	return fuo
+}
+
+// SetNillableThumbnailUrl sets the "thumbnailUrl" field if the given value is not nil.
+func (fuo *ForumUpdateOne) SetNillableThumbnailUrl(s *string) *ForumUpdateOne {
+	if s != nil {
+		fuo.SetThumbnailUrl(*s)
+	}
+	return fuo
+}
+
+// ClearThumbnailUrl clears the value of the "thumbnailUrl" field.
+func (fuo *ForumUpdateOne) ClearThumbnailUrl() *ForumUpdateOne {
+	fuo.mutation.ClearThumbnailUrl()
+	return fuo
+}
+
 // SetStatus sets the "status" field.
 func (fuo *ForumUpdateOne) SetStatus(f forum.Status) *ForumUpdateOne {
 	fuo.mutation.SetStatus(f)
@@ -481,13 +618,13 @@ func (fuo *ForumUpdateOne) SetNillableStatus(f *forum.Status) *ForumUpdateOne {
 	return fuo
 }
 
-// SetCreatedAt sets the "created_at" field.
+// SetCreatedAt sets the "createdAt" field.
 func (fuo *ForumUpdateOne) SetCreatedAt(t time.Time) *ForumUpdateOne {
 	fuo.mutation.SetCreatedAt(t)
 	return fuo
 }
 
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
 func (fuo *ForumUpdateOne) SetNillableCreatedAt(t *time.Time) *ForumUpdateOne {
 	if t != nil {
 		fuo.SetCreatedAt(*t)
@@ -495,15 +632,40 @@ func (fuo *ForumUpdateOne) SetNillableCreatedAt(t *time.Time) *ForumUpdateOne {
 	return fuo
 }
 
-// SetUpdatedAt sets the "updated_at" field.
+// SetUpdatedAt sets the "updatedAt" field.
 func (fuo *ForumUpdateOne) SetUpdatedAt(t time.Time) *ForumUpdateOne {
 	fuo.mutation.SetUpdatedAt(t)
 	return fuo
 }
 
-// SetUser sets the "user" edge to the User entity.
-func (fuo *ForumUpdateOne) SetUser(u *User) *ForumUpdateOne {
-	return fuo.SetUserID(u.ID)
+// AddLikedUserIDs adds the "liked_users" edge to the User entity by IDs.
+func (fuo *ForumUpdateOne) AddLikedUserIDs(ids ...int) *ForumUpdateOne {
+	fuo.mutation.AddLikedUserIDs(ids...)
+	return fuo
+}
+
+// AddLikedUsers adds the "liked_users" edges to the User entity.
+func (fuo *ForumUpdateOne) AddLikedUsers(u ...*User) *ForumUpdateOne {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return fuo.AddLikedUserIDs(ids...)
+}
+
+// AddSubscribedUserIDs adds the "subscribed_users" edge to the User entity by IDs.
+func (fuo *ForumUpdateOne) AddSubscribedUserIDs(ids ...int) *ForumUpdateOne {
+	fuo.mutation.AddSubscribedUserIDs(ids...)
+	return fuo
+}
+
+// AddSubscribedUsers adds the "subscribed_users" edges to the User entity.
+func (fuo *ForumUpdateOne) AddSubscribedUsers(u ...*User) *ForumUpdateOne {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return fuo.AddSubscribedUserIDs(ids...)
 }
 
 // AddTopicIDs adds the "topics" edge to the Topic entity by IDs.
@@ -521,30 +683,51 @@ func (fuo *ForumUpdateOne) AddTopics(t ...*Topic) *ForumUpdateOne {
 	return fuo.AddTopicIDs(ids...)
 }
 
-// AddForumLikeIDs adds the "forum_likes" edge to the ForumLike entity by IDs.
-func (fuo *ForumUpdateOne) AddForumLikeIDs(ids ...int) *ForumUpdateOne {
-	fuo.mutation.AddForumLikeIDs(ids...)
-	return fuo
-}
-
-// AddForumLikes adds the "forum_likes" edges to the ForumLike entity.
-func (fuo *ForumUpdateOne) AddForumLikes(f ...*ForumLike) *ForumUpdateOne {
-	ids := make([]int, len(f))
-	for i := range f {
-		ids[i] = f[i].ID
-	}
-	return fuo.AddForumLikeIDs(ids...)
-}
-
 // Mutation returns the ForumMutation object of the builder.
 func (fuo *ForumUpdateOne) Mutation() *ForumMutation {
 	return fuo.mutation
 }
 
-// ClearUser clears the "user" edge to the User entity.
-func (fuo *ForumUpdateOne) ClearUser() *ForumUpdateOne {
-	fuo.mutation.ClearUser()
+// ClearLikedUsers clears all "liked_users" edges to the User entity.
+func (fuo *ForumUpdateOne) ClearLikedUsers() *ForumUpdateOne {
+	fuo.mutation.ClearLikedUsers()
 	return fuo
+}
+
+// RemoveLikedUserIDs removes the "liked_users" edge to User entities by IDs.
+func (fuo *ForumUpdateOne) RemoveLikedUserIDs(ids ...int) *ForumUpdateOne {
+	fuo.mutation.RemoveLikedUserIDs(ids...)
+	return fuo
+}
+
+// RemoveLikedUsers removes "liked_users" edges to User entities.
+func (fuo *ForumUpdateOne) RemoveLikedUsers(u ...*User) *ForumUpdateOne {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return fuo.RemoveLikedUserIDs(ids...)
+}
+
+// ClearSubscribedUsers clears all "subscribed_users" edges to the User entity.
+func (fuo *ForumUpdateOne) ClearSubscribedUsers() *ForumUpdateOne {
+	fuo.mutation.ClearSubscribedUsers()
+	return fuo
+}
+
+// RemoveSubscribedUserIDs removes the "subscribed_users" edge to User entities by IDs.
+func (fuo *ForumUpdateOne) RemoveSubscribedUserIDs(ids ...int) *ForumUpdateOne {
+	fuo.mutation.RemoveSubscribedUserIDs(ids...)
+	return fuo
+}
+
+// RemoveSubscribedUsers removes "subscribed_users" edges to User entities.
+func (fuo *ForumUpdateOne) RemoveSubscribedUsers(u ...*User) *ForumUpdateOne {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return fuo.RemoveSubscribedUserIDs(ids...)
 }
 
 // ClearTopics clears all "topics" edges to the Topic entity.
@@ -566,27 +749,6 @@ func (fuo *ForumUpdateOne) RemoveTopics(t ...*Topic) *ForumUpdateOne {
 		ids[i] = t[i].ID
 	}
 	return fuo.RemoveTopicIDs(ids...)
-}
-
-// ClearForumLikes clears all "forum_likes" edges to the ForumLike entity.
-func (fuo *ForumUpdateOne) ClearForumLikes() *ForumUpdateOne {
-	fuo.mutation.ClearForumLikes()
-	return fuo
-}
-
-// RemoveForumLikeIDs removes the "forum_likes" edge to ForumLike entities by IDs.
-func (fuo *ForumUpdateOne) RemoveForumLikeIDs(ids ...int) *ForumUpdateOne {
-	fuo.mutation.RemoveForumLikeIDs(ids...)
-	return fuo
-}
-
-// RemoveForumLikes removes "forum_likes" edges to ForumLike entities.
-func (fuo *ForumUpdateOne) RemoveForumLikes(f ...*ForumLike) *ForumUpdateOne {
-	ids := make([]int, len(f))
-	for i := range f {
-		ids[i] = f[i].ID
-	}
-	return fuo.RemoveForumLikeIDs(ids...)
 }
 
 // Where appends a list predicates to the ForumUpdate builder.
@@ -640,13 +802,20 @@ func (fuo *ForumUpdateOne) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (fuo *ForumUpdateOne) check() error {
+	if v, ok := fuo.mutation.Title(); ok {
+		if err := forum.TitleValidator(v); err != nil {
+			return &ValidationError{Name: "title", err: fmt.Errorf(`ent: validator failed for field "Forum.title": %w`, err)}
+		}
+	}
+	if v, ok := fuo.mutation.Description(); ok {
+		if err := forum.DescriptionValidator(v); err != nil {
+			return &ValidationError{Name: "description", err: fmt.Errorf(`ent: validator failed for field "Forum.description": %w`, err)}
+		}
+	}
 	if v, ok := fuo.mutation.Status(); ok {
 		if err := forum.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Forum.status": %w`, err)}
 		}
-	}
-	if _, ok := fuo.mutation.UserID(); fuo.mutation.UserCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "Forum.user"`)
 	}
 	return nil
 }
@@ -680,14 +849,26 @@ func (fuo *ForumUpdateOne) sqlSave(ctx context.Context) (_node *Forum, err error
 			}
 		}
 	}
-	if value, ok := fuo.mutation.Name(); ok {
-		_spec.SetField(forum.FieldName, field.TypeString, value)
+	if value, ok := fuo.mutation.UserId(); ok {
+		_spec.SetField(forum.FieldUserId, field.TypeInt, value)
+	}
+	if value, ok := fuo.mutation.AddedUserId(); ok {
+		_spec.AddField(forum.FieldUserId, field.TypeInt, value)
+	}
+	if value, ok := fuo.mutation.Title(); ok {
+		_spec.SetField(forum.FieldTitle, field.TypeString, value)
 	}
 	if value, ok := fuo.mutation.Description(); ok {
 		_spec.SetField(forum.FieldDescription, field.TypeString, value)
 	}
 	if fuo.mutation.DescriptionCleared() {
 		_spec.ClearField(forum.FieldDescription, field.TypeString)
+	}
+	if value, ok := fuo.mutation.ThumbnailUrl(); ok {
+		_spec.SetField(forum.FieldThumbnailUrl, field.TypeString, value)
+	}
+	if fuo.mutation.ThumbnailUrlCleared() {
+		_spec.ClearField(forum.FieldThumbnailUrl, field.TypeString)
 	}
 	if value, ok := fuo.mutation.Status(); ok {
 		_spec.SetField(forum.FieldStatus, field.TypeEnum, value)
@@ -698,25 +879,29 @@ func (fuo *ForumUpdateOne) sqlSave(ctx context.Context) (_node *Forum, err error
 	if value, ok := fuo.mutation.UpdatedAt(); ok {
 		_spec.SetField(forum.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if fuo.mutation.UserCleared() {
+	if fuo.mutation.LikedUsersCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   forum.UserTable,
-			Columns: []string{forum.UserColumn},
+			Table:   forum.LikedUsersTable,
+			Columns: forum.LikedUsersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
 			},
 		}
+		createE := &UserForumSubscriptionCreate{config: fuo.config, mutation: newUserForumSubscriptionMutation(fuo.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := fuo.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := fuo.mutation.RemovedLikedUsersIDs(); len(nodes) > 0 && !fuo.mutation.LikedUsersCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   forum.UserTable,
-			Columns: []string{forum.UserColumn},
+			Table:   forum.LikedUsersTable,
+			Columns: forum.LikedUsersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
@@ -725,6 +910,87 @@ func (fuo *ForumUpdateOne) sqlSave(ctx context.Context) (_node *Forum, err error
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		createE := &UserForumSubscriptionCreate{config: fuo.config, mutation: newUserForumSubscriptionMutation(fuo.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := fuo.mutation.LikedUsersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   forum.LikedUsersTable,
+			Columns: forum.LikedUsersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		createE := &UserForumSubscriptionCreate{config: fuo.config, mutation: newUserForumSubscriptionMutation(fuo.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if fuo.mutation.SubscribedUsersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   forum.SubscribedUsersTable,
+			Columns: forum.SubscribedUsersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		createE := &UserForumLikeCreate{config: fuo.config, mutation: newUserForumLikeMutation(fuo.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := fuo.mutation.RemovedSubscribedUsersIDs(); len(nodes) > 0 && !fuo.mutation.SubscribedUsersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   forum.SubscribedUsersTable,
+			Columns: forum.SubscribedUsersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		createE := &UserForumLikeCreate{config: fuo.config, mutation: newUserForumLikeMutation(fuo.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := fuo.mutation.SubscribedUsersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   forum.SubscribedUsersTable,
+			Columns: forum.SubscribedUsersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		createE := &UserForumLikeCreate{config: fuo.config, mutation: newUserForumLikeMutation(fuo.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if fuo.mutation.TopicsCleared() {
@@ -765,51 +1031,6 @@ func (fuo *ForumUpdateOne) sqlSave(ctx context.Context) (_node *Forum, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(topic.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if fuo.mutation.ForumLikesCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   forum.ForumLikesTable,
-			Columns: []string{forum.ForumLikesColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(forumlike.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := fuo.mutation.RemovedForumLikesIDs(); len(nodes) > 0 && !fuo.mutation.ForumLikesCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   forum.ForumLikesTable,
-			Columns: []string{forum.ForumLikesColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(forumlike.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := fuo.mutation.ForumLikesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   forum.ForumLikesTable,
-			Columns: []string{forum.ForumLikesColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(forumlike.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

@@ -15,21 +15,21 @@ const (
 	Label = "user"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldUsername holds the string denoting the username field in the database.
-	FieldUsername = "username"
+	// FieldUserName holds the string denoting the username field in the database.
+	FieldUserName = "user_name"
 	// FieldEmail holds the string denoting the email field in the database.
 	FieldEmail = "email"
 	// FieldPassword holds the string denoting the password field in the database.
 	FieldPassword = "password"
-	// FieldDisplayName holds the string denoting the display_name field in the database.
+	// FieldDisplayName holds the string denoting the displayname field in the database.
 	FieldDisplayName = "display_name"
-	// FieldAvatar holds the string denoting the avatar field in the database.
-	FieldAvatar = "avatar"
+	// FieldAvatarUrl holds the string denoting the avatarurl field in the database.
+	FieldAvatarUrl = "avatar_url"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
-	// FieldCreatedAt holds the string denoting the created_at field in the database.
+	// FieldCreatedAt holds the string denoting the createdat field in the database.
 	FieldCreatedAt = "created_at"
-	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
+	// FieldUpdatedAt holds the string denoting the updatedat field in the database.
 	FieldUpdatedAt = "updated_at"
 	// EdgeForums holds the string denoting the forums edge name in mutations.
 	EdgeForums = "forums"
@@ -37,16 +37,30 @@ const (
 	EdgeTopics = "topics"
 	// EdgeComments holds the string denoting the comments edge name in mutations.
 	EdgeComments = "comments"
-	// EdgeUserTopicNotifications holds the string denoting the user_topic_notifications edge name in mutations.
-	EdgeUserTopicNotifications = "user_topic_notifications"
-	// EdgeUserCommentNotifications holds the string denoting the user_comment_notifications edge name in mutations.
-	EdgeUserCommentNotifications = "user_comment_notifications"
-	// EdgeForumLikes holds the string denoting the forum_likes edge name in mutations.
-	EdgeForumLikes = "forum_likes"
-	// EdgeTopicLikes holds the string denoting the topic_likes edge name in mutations.
-	EdgeTopicLikes = "topic_likes"
-	// EdgeCommentLikes holds the string denoting the comment_likes edge name in mutations.
-	EdgeCommentLikes = "comment_likes"
+	// EdgeLikedForums holds the string denoting the liked_forums edge name in mutations.
+	EdgeLikedForums = "liked_forums"
+	// EdgeLikedTopics holds the string denoting the liked_topics edge name in mutations.
+	EdgeLikedTopics = "liked_topics"
+	// EdgeLikedComments holds the string denoting the liked_comments edge name in mutations.
+	EdgeLikedComments = "liked_comments"
+	// EdgeSubscribedForums holds the string denoting the subscribed_forums edge name in mutations.
+	EdgeSubscribedForums = "subscribed_forums"
+	// EdgeSubscribedTopics holds the string denoting the subscribed_topics edge name in mutations.
+	EdgeSubscribedTopics = "subscribed_topics"
+	// EdgeSubscribedComments holds the string denoting the subscribed_comments edge name in mutations.
+	EdgeSubscribedComments = "subscribed_comments"
+	// EdgeUserForumLike holds the string denoting the user_forum_like edge name in mutations.
+	EdgeUserForumLike = "user_forum_like"
+	// EdgeUserTopicLike holds the string denoting the user_topic_like edge name in mutations.
+	EdgeUserTopicLike = "user_topic_like"
+	// EdgeUserCommentLike holds the string denoting the user_comment_like edge name in mutations.
+	EdgeUserCommentLike = "user_comment_like"
+	// EdgeUserForumSubscription holds the string denoting the user_forum_subscription edge name in mutations.
+	EdgeUserForumSubscription = "user_forum_subscription"
+	// EdgeUserTopicSubscription holds the string denoting the user_topic_subscription edge name in mutations.
+	EdgeUserTopicSubscription = "user_topic_subscription"
+	// EdgeUserCommentSubscription holds the string denoting the user_comment_subscription edge name in mutations.
+	EdgeUserCommentSubscription = "user_comment_subscription"
 	// Table holds the table name of the user in the database.
 	Table = "users"
 	// ForumsTable is the table that holds the forums relation/edge.
@@ -55,7 +69,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "forum" package.
 	ForumsInverseTable = "forums"
 	// ForumsColumn is the table column denoting the forums relation/edge.
-	ForumsColumn = "user_id"
+	ForumsColumn = "user_forums"
 	// TopicsTable is the table that holds the topics relation/edge.
 	TopicsTable = "topics"
 	// TopicsInverseTable is the table name for the Topic entity.
@@ -70,55 +84,113 @@ const (
 	CommentsInverseTable = "comments"
 	// CommentsColumn is the table column denoting the comments relation/edge.
 	CommentsColumn = "user_id"
-	// UserTopicNotificationsTable is the table that holds the user_topic_notifications relation/edge.
-	UserTopicNotificationsTable = "user_topic_notifications"
-	// UserTopicNotificationsInverseTable is the table name for the UserTopicNotification entity.
-	// It exists in this package in order to avoid circular dependency with the "usertopicnotification" package.
-	UserTopicNotificationsInverseTable = "user_topic_notifications"
-	// UserTopicNotificationsColumn is the table column denoting the user_topic_notifications relation/edge.
-	UserTopicNotificationsColumn = "user_id"
-	// UserCommentNotificationsTable is the table that holds the user_comment_notifications relation/edge.
-	UserCommentNotificationsTable = "user_comment_notifications"
-	// UserCommentNotificationsInverseTable is the table name for the UserCommentNotification entity.
-	// It exists in this package in order to avoid circular dependency with the "usercommentnotification" package.
-	UserCommentNotificationsInverseTable = "user_comment_notifications"
-	// UserCommentNotificationsColumn is the table column denoting the user_comment_notifications relation/edge.
-	UserCommentNotificationsColumn = "user_id"
-	// ForumLikesTable is the table that holds the forum_likes relation/edge.
-	ForumLikesTable = "forum_likes"
-	// ForumLikesInverseTable is the table name for the ForumLike entity.
-	// It exists in this package in order to avoid circular dependency with the "forumlike" package.
-	ForumLikesInverseTable = "forum_likes"
-	// ForumLikesColumn is the table column denoting the forum_likes relation/edge.
-	ForumLikesColumn = "user_id"
-	// TopicLikesTable is the table that holds the topic_likes relation/edge.
-	TopicLikesTable = "topic_likes"
-	// TopicLikesInverseTable is the table name for the TopicLike entity.
-	// It exists in this package in order to avoid circular dependency with the "topiclike" package.
-	TopicLikesInverseTable = "topic_likes"
-	// TopicLikesColumn is the table column denoting the topic_likes relation/edge.
-	TopicLikesColumn = "user_id"
-	// CommentLikesTable is the table that holds the comment_likes relation/edge.
-	CommentLikesTable = "comment_likes"
-	// CommentLikesInverseTable is the table name for the CommentLike entity.
-	// It exists in this package in order to avoid circular dependency with the "commentlike" package.
-	CommentLikesInverseTable = "comment_likes"
-	// CommentLikesColumn is the table column denoting the comment_likes relation/edge.
-	CommentLikesColumn = "user_id"
+	// LikedForumsTable is the table that holds the liked_forums relation/edge. The primary key declared below.
+	LikedForumsTable = "user_forum_likes"
+	// LikedForumsInverseTable is the table name for the Forum entity.
+	// It exists in this package in order to avoid circular dependency with the "forum" package.
+	LikedForumsInverseTable = "forums"
+	// LikedTopicsTable is the table that holds the liked_topics relation/edge. The primary key declared below.
+	LikedTopicsTable = "user_topic_likes"
+	// LikedTopicsInverseTable is the table name for the Topic entity.
+	// It exists in this package in order to avoid circular dependency with the "topic" package.
+	LikedTopicsInverseTable = "topics"
+	// LikedCommentsTable is the table that holds the liked_comments relation/edge. The primary key declared below.
+	LikedCommentsTable = "user_comment_likes"
+	// LikedCommentsInverseTable is the table name for the Comment entity.
+	// It exists in this package in order to avoid circular dependency with the "comment" package.
+	LikedCommentsInverseTable = "comments"
+	// SubscribedForumsTable is the table that holds the subscribed_forums relation/edge. The primary key declared below.
+	SubscribedForumsTable = "user_forum_subscriptions"
+	// SubscribedForumsInverseTable is the table name for the Forum entity.
+	// It exists in this package in order to avoid circular dependency with the "forum" package.
+	SubscribedForumsInverseTable = "forums"
+	// SubscribedTopicsTable is the table that holds the subscribed_topics relation/edge. The primary key declared below.
+	SubscribedTopicsTable = "user_topic_subscriptions"
+	// SubscribedTopicsInverseTable is the table name for the Topic entity.
+	// It exists in this package in order to avoid circular dependency with the "topic" package.
+	SubscribedTopicsInverseTable = "topics"
+	// SubscribedCommentsTable is the table that holds the subscribed_comments relation/edge. The primary key declared below.
+	SubscribedCommentsTable = "user_comment_subscriptions"
+	// SubscribedCommentsInverseTable is the table name for the Comment entity.
+	// It exists in this package in order to avoid circular dependency with the "comment" package.
+	SubscribedCommentsInverseTable = "comments"
+	// UserForumLikeTable is the table that holds the user_forum_like relation/edge.
+	UserForumLikeTable = "user_forum_likes"
+	// UserForumLikeInverseTable is the table name for the UserForumLike entity.
+	// It exists in this package in order to avoid circular dependency with the "userforumlike" package.
+	UserForumLikeInverseTable = "user_forum_likes"
+	// UserForumLikeColumn is the table column denoting the user_forum_like relation/edge.
+	UserForumLikeColumn = "user_id"
+	// UserTopicLikeTable is the table that holds the user_topic_like relation/edge.
+	UserTopicLikeTable = "user_topic_likes"
+	// UserTopicLikeInverseTable is the table name for the UserTopicLike entity.
+	// It exists in this package in order to avoid circular dependency with the "usertopiclike" package.
+	UserTopicLikeInverseTable = "user_topic_likes"
+	// UserTopicLikeColumn is the table column denoting the user_topic_like relation/edge.
+	UserTopicLikeColumn = "user_id"
+	// UserCommentLikeTable is the table that holds the user_comment_like relation/edge.
+	UserCommentLikeTable = "user_comment_likes"
+	// UserCommentLikeInverseTable is the table name for the UserCommentLike entity.
+	// It exists in this package in order to avoid circular dependency with the "usercommentlike" package.
+	UserCommentLikeInverseTable = "user_comment_likes"
+	// UserCommentLikeColumn is the table column denoting the user_comment_like relation/edge.
+	UserCommentLikeColumn = "user_id"
+	// UserForumSubscriptionTable is the table that holds the user_forum_subscription relation/edge.
+	UserForumSubscriptionTable = "user_forum_subscriptions"
+	// UserForumSubscriptionInverseTable is the table name for the UserForumSubscription entity.
+	// It exists in this package in order to avoid circular dependency with the "userforumsubscription" package.
+	UserForumSubscriptionInverseTable = "user_forum_subscriptions"
+	// UserForumSubscriptionColumn is the table column denoting the user_forum_subscription relation/edge.
+	UserForumSubscriptionColumn = "user_id"
+	// UserTopicSubscriptionTable is the table that holds the user_topic_subscription relation/edge.
+	UserTopicSubscriptionTable = "user_topic_subscriptions"
+	// UserTopicSubscriptionInverseTable is the table name for the UserTopicSubscription entity.
+	// It exists in this package in order to avoid circular dependency with the "usertopicsubscription" package.
+	UserTopicSubscriptionInverseTable = "user_topic_subscriptions"
+	// UserTopicSubscriptionColumn is the table column denoting the user_topic_subscription relation/edge.
+	UserTopicSubscriptionColumn = "user_id"
+	// UserCommentSubscriptionTable is the table that holds the user_comment_subscription relation/edge.
+	UserCommentSubscriptionTable = "user_comment_subscriptions"
+	// UserCommentSubscriptionInverseTable is the table name for the UserCommentSubscription entity.
+	// It exists in this package in order to avoid circular dependency with the "usercommentsubscription" package.
+	UserCommentSubscriptionInverseTable = "user_comment_subscriptions"
+	// UserCommentSubscriptionColumn is the table column denoting the user_comment_subscription relation/edge.
+	UserCommentSubscriptionColumn = "user_id"
 )
 
 // Columns holds all SQL columns for user fields.
 var Columns = []string{
 	FieldID,
-	FieldUsername,
+	FieldUserName,
 	FieldEmail,
 	FieldPassword,
 	FieldDisplayName,
-	FieldAvatar,
+	FieldAvatarUrl,
 	FieldStatus,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
+
+var (
+	// LikedForumsPrimaryKey and LikedForumsColumn2 are the table columns denoting the
+	// primary key for the liked_forums relation (M2M).
+	LikedForumsPrimaryKey = []string{"userId", "forumId"}
+	// LikedTopicsPrimaryKey and LikedTopicsColumn2 are the table columns denoting the
+	// primary key for the liked_topics relation (M2M).
+	LikedTopicsPrimaryKey = []string{"userId", "topicId"}
+	// LikedCommentsPrimaryKey and LikedCommentsColumn2 are the table columns denoting the
+	// primary key for the liked_comments relation (M2M).
+	LikedCommentsPrimaryKey = []string{"userId", "commentId"}
+	// SubscribedForumsPrimaryKey and SubscribedForumsColumn2 are the table columns denoting the
+	// primary key for the subscribed_forums relation (M2M).
+	SubscribedForumsPrimaryKey = []string{"userId", "forumId"}
+	// SubscribedTopicsPrimaryKey and SubscribedTopicsColumn2 are the table columns denoting the
+	// primary key for the subscribed_topics relation (M2M).
+	SubscribedTopicsPrimaryKey = []string{"userId", "topicId"}
+	// SubscribedCommentsPrimaryKey and SubscribedCommentsColumn2 are the table columns denoting the
+	// primary key for the subscribed_comments relation (M2M).
+	SubscribedCommentsPrimaryKey = []string{"userId", "commentId"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -131,11 +203,17 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
+	// UserNameValidator is a validator for the "userName" field. It is called by the builders before save.
+	UserNameValidator func(string) error
+	// EmailValidator is a validator for the "email" field. It is called by the builders before save.
+	EmailValidator func(string) error
+	// DisplayNameValidator is a validator for the "displayName" field. It is called by the builders before save.
+	DisplayNameValidator func(string) error
+	// DefaultCreatedAt holds the default value on creation for the "createdAt" field.
 	DefaultCreatedAt func() time.Time
-	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
+	// DefaultUpdatedAt holds the default value on creation for the "updatedAt" field.
 	DefaultUpdatedAt func() time.Time
-	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
+	// UpdateDefaultUpdatedAt holds the default value on update for the "updatedAt" field.
 	UpdateDefaultUpdatedAt func() time.Time
 )
 
@@ -175,9 +253,9 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// ByUsername orders the results by the username field.
-func ByUsername(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUsername, opts...).ToFunc()
+// ByUserName orders the results by the userName field.
+func ByUserName(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUserName, opts...).ToFunc()
 }
 
 // ByEmail orders the results by the email field.
@@ -190,14 +268,14 @@ func ByPassword(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldPassword, opts...).ToFunc()
 }
 
-// ByDisplayName orders the results by the display_name field.
+// ByDisplayName orders the results by the displayName field.
 func ByDisplayName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDisplayName, opts...).ToFunc()
 }
 
-// ByAvatar orders the results by the avatar field.
-func ByAvatar(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldAvatar, opts...).ToFunc()
+// ByAvatarUrl orders the results by the avatarUrl field.
+func ByAvatarUrl(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAvatarUrl, opts...).ToFunc()
 }
 
 // ByStatus orders the results by the status field.
@@ -205,12 +283,12 @@ func ByStatus(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStatus, opts...).ToFunc()
 }
 
-// ByCreatedAt orders the results by the created_at field.
+// ByCreatedAt orders the results by the createdAt field.
 func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
 }
 
-// ByUpdatedAt orders the results by the updated_at field.
+// ByUpdatedAt orders the results by the updatedAt field.
 func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
 }
@@ -257,73 +335,171 @@ func ByComments(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
-// ByUserTopicNotificationsCount orders the results by user_topic_notifications count.
-func ByUserTopicNotificationsCount(opts ...sql.OrderTermOption) OrderOption {
+// ByLikedForumsCount orders the results by liked_forums count.
+func ByLikedForumsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newUserTopicNotificationsStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newLikedForumsStep(), opts...)
 	}
 }
 
-// ByUserTopicNotifications orders the results by user_topic_notifications terms.
-func ByUserTopicNotifications(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByLikedForums orders the results by liked_forums terms.
+func ByLikedForums(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newUserTopicNotificationsStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newLikedForumsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
-// ByUserCommentNotificationsCount orders the results by user_comment_notifications count.
-func ByUserCommentNotificationsCount(opts ...sql.OrderTermOption) OrderOption {
+// ByLikedTopicsCount orders the results by liked_topics count.
+func ByLikedTopicsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newUserCommentNotificationsStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newLikedTopicsStep(), opts...)
 	}
 }
 
-// ByUserCommentNotifications orders the results by user_comment_notifications terms.
-func ByUserCommentNotifications(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByLikedTopics orders the results by liked_topics terms.
+func ByLikedTopics(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newUserCommentNotificationsStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newLikedTopicsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
-// ByForumLikesCount orders the results by forum_likes count.
-func ByForumLikesCount(opts ...sql.OrderTermOption) OrderOption {
+// ByLikedCommentsCount orders the results by liked_comments count.
+func ByLikedCommentsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newForumLikesStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newLikedCommentsStep(), opts...)
 	}
 }
 
-// ByForumLikes orders the results by forum_likes terms.
-func ByForumLikes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByLikedComments orders the results by liked_comments terms.
+func ByLikedComments(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newForumLikesStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newLikedCommentsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
-// ByTopicLikesCount orders the results by topic_likes count.
-func ByTopicLikesCount(opts ...sql.OrderTermOption) OrderOption {
+// BySubscribedForumsCount orders the results by subscribed_forums count.
+func BySubscribedForumsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newTopicLikesStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newSubscribedForumsStep(), opts...)
 	}
 }
 
-// ByTopicLikes orders the results by topic_likes terms.
-func ByTopicLikes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// BySubscribedForums orders the results by subscribed_forums terms.
+func BySubscribedForums(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newTopicLikesStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newSubscribedForumsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
-// ByCommentLikesCount orders the results by comment_likes count.
-func ByCommentLikesCount(opts ...sql.OrderTermOption) OrderOption {
+// BySubscribedTopicsCount orders the results by subscribed_topics count.
+func BySubscribedTopicsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newCommentLikesStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newSubscribedTopicsStep(), opts...)
 	}
 }
 
-// ByCommentLikes orders the results by comment_likes terms.
-func ByCommentLikes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// BySubscribedTopics orders the results by subscribed_topics terms.
+func BySubscribedTopics(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newCommentLikesStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newSubscribedTopicsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// BySubscribedCommentsCount orders the results by subscribed_comments count.
+func BySubscribedCommentsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newSubscribedCommentsStep(), opts...)
+	}
+}
+
+// BySubscribedComments orders the results by subscribed_comments terms.
+func BySubscribedComments(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSubscribedCommentsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByUserForumLikeCount orders the results by user_forum_like count.
+func ByUserForumLikeCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newUserForumLikeStep(), opts...)
+	}
+}
+
+// ByUserForumLike orders the results by user_forum_like terms.
+func ByUserForumLike(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newUserForumLikeStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByUserTopicLikeCount orders the results by user_topic_like count.
+func ByUserTopicLikeCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newUserTopicLikeStep(), opts...)
+	}
+}
+
+// ByUserTopicLike orders the results by user_topic_like terms.
+func ByUserTopicLike(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newUserTopicLikeStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByUserCommentLikeCount orders the results by user_comment_like count.
+func ByUserCommentLikeCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newUserCommentLikeStep(), opts...)
+	}
+}
+
+// ByUserCommentLike orders the results by user_comment_like terms.
+func ByUserCommentLike(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newUserCommentLikeStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByUserForumSubscriptionCount orders the results by user_forum_subscription count.
+func ByUserForumSubscriptionCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newUserForumSubscriptionStep(), opts...)
+	}
+}
+
+// ByUserForumSubscription orders the results by user_forum_subscription terms.
+func ByUserForumSubscription(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newUserForumSubscriptionStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByUserTopicSubscriptionCount orders the results by user_topic_subscription count.
+func ByUserTopicSubscriptionCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newUserTopicSubscriptionStep(), opts...)
+	}
+}
+
+// ByUserTopicSubscription orders the results by user_topic_subscription terms.
+func ByUserTopicSubscription(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newUserTopicSubscriptionStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByUserCommentSubscriptionCount orders the results by user_comment_subscription count.
+func ByUserCommentSubscriptionCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newUserCommentSubscriptionStep(), opts...)
+	}
+}
+
+// ByUserCommentSubscription orders the results by user_comment_subscription terms.
+func ByUserCommentSubscription(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newUserCommentSubscriptionStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 func newForumsStep() *sqlgraph.Step {
@@ -347,38 +523,87 @@ func newCommentsStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.O2M, false, CommentsTable, CommentsColumn),
 	)
 }
-func newUserTopicNotificationsStep() *sqlgraph.Step {
+func newLikedForumsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(UserTopicNotificationsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, UserTopicNotificationsTable, UserTopicNotificationsColumn),
+		sqlgraph.To(LikedForumsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, LikedForumsTable, LikedForumsPrimaryKey...),
 	)
 }
-func newUserCommentNotificationsStep() *sqlgraph.Step {
+func newLikedTopicsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(UserCommentNotificationsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, UserCommentNotificationsTable, UserCommentNotificationsColumn),
+		sqlgraph.To(LikedTopicsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, LikedTopicsTable, LikedTopicsPrimaryKey...),
 	)
 }
-func newForumLikesStep() *sqlgraph.Step {
+func newLikedCommentsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ForumLikesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, ForumLikesTable, ForumLikesColumn),
+		sqlgraph.To(LikedCommentsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, LikedCommentsTable, LikedCommentsPrimaryKey...),
 	)
 }
-func newTopicLikesStep() *sqlgraph.Step {
+func newSubscribedForumsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(TopicLikesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, TopicLikesTable, TopicLikesColumn),
+		sqlgraph.To(SubscribedForumsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, SubscribedForumsTable, SubscribedForumsPrimaryKey...),
 	)
 }
-func newCommentLikesStep() *sqlgraph.Step {
+func newSubscribedTopicsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(CommentLikesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, CommentLikesTable, CommentLikesColumn),
+		sqlgraph.To(SubscribedTopicsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, SubscribedTopicsTable, SubscribedTopicsPrimaryKey...),
+	)
+}
+func newSubscribedCommentsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SubscribedCommentsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, SubscribedCommentsTable, SubscribedCommentsPrimaryKey...),
+	)
+}
+func newUserForumLikeStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(UserForumLikeInverseTable, UserForumLikeColumn),
+		sqlgraph.Edge(sqlgraph.O2M, true, UserForumLikeTable, UserForumLikeColumn),
+	)
+}
+func newUserTopicLikeStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(UserTopicLikeInverseTable, UserTopicLikeColumn),
+		sqlgraph.Edge(sqlgraph.O2M, true, UserTopicLikeTable, UserTopicLikeColumn),
+	)
+}
+func newUserCommentLikeStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(UserCommentLikeInverseTable, UserCommentLikeColumn),
+		sqlgraph.Edge(sqlgraph.O2M, true, UserCommentLikeTable, UserCommentLikeColumn),
+	)
+}
+func newUserForumSubscriptionStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(UserForumSubscriptionInverseTable, UserForumSubscriptionColumn),
+		sqlgraph.Edge(sqlgraph.O2M, true, UserForumSubscriptionTable, UserForumSubscriptionColumn),
+	)
+}
+func newUserTopicSubscriptionStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(UserTopicSubscriptionInverseTable, UserTopicSubscriptionColumn),
+		sqlgraph.Edge(sqlgraph.O2M, true, UserTopicSubscriptionTable, UserTopicSubscriptionColumn),
+	)
+}
+func newUserCommentSubscriptionStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(UserCommentSubscriptionInverseTable, UserCommentSubscriptionColumn),
+		sqlgraph.Edge(sqlgraph.O2M, true, UserCommentSubscriptionTable, UserCommentSubscriptionColumn),
 	)
 }

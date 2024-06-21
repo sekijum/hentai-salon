@@ -4,7 +4,6 @@ package commentattachment
 
 import (
 	"fmt"
-	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -15,14 +14,14 @@ const (
 	Label = "comment_attachment"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldCommentID holds the string denoting the comment_id field in the database.
-	FieldCommentID = "comment_id"
-	// FieldPath holds the string denoting the path field in the database.
-	FieldPath = "path"
+	// FieldCommentId holds the string denoting the commentid field in the database.
+	FieldCommentId = "comment_id"
+	// FieldURL holds the string denoting the url field in the database.
+	FieldURL = "url"
+	// FieldOrder holds the string denoting the order field in the database.
+	FieldOrder = "order"
 	// FieldType holds the string denoting the type field in the database.
 	FieldType = "type"
-	// FieldCreatedAt holds the string denoting the created_at field in the database.
-	FieldCreatedAt = "created_at"
 	// EdgeComment holds the string denoting the comment edge name in mutations.
 	EdgeComment = "comment"
 	// Table holds the table name of the commentattachment in the database.
@@ -39,10 +38,10 @@ const (
 // Columns holds all SQL columns for commentattachment fields.
 var Columns = []string{
 	FieldID,
-	FieldCommentID,
-	FieldPath,
+	FieldCommentId,
+	FieldURL,
+	FieldOrder,
 	FieldType,
-	FieldCreatedAt,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -56,8 +55,8 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
-	DefaultCreatedAt func() time.Time
+	// DefaultOrder holds the default value on creation for the "order" field.
+	DefaultOrder int
 )
 
 // Type defines the type for the "type" enum field.
@@ -91,24 +90,24 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// ByCommentID orders the results by the comment_id field.
-func ByCommentID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldCommentID, opts...).ToFunc()
+// ByCommentId orders the results by the commentId field.
+func ByCommentId(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCommentId, opts...).ToFunc()
 }
 
-// ByPath orders the results by the path field.
-func ByPath(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldPath, opts...).ToFunc()
+// ByURL orders the results by the url field.
+func ByURL(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldURL, opts...).ToFunc()
+}
+
+// ByOrder orders the results by the order field.
+func ByOrder(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldOrder, opts...).ToFunc()
 }
 
 // ByType orders the results by the type field.
 func ByType(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldType, opts...).ToFunc()
-}
-
-// ByCreatedAt orders the results by the created_at field.
-func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
 }
 
 // ByCommentField orders the results by comment field.

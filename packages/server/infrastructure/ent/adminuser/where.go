@@ -54,6 +54,11 @@ func IDLTE(id int) predicate.AdminUser {
 	return predicate.AdminUser(sql.FieldLTE(FieldID, id))
 }
 
+// UserName applies equality check predicate on the "userName" field. It's identical to UserNameEQ.
+func UserName(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldEQ(FieldUserName, v))
+}
+
 // Email applies equality check predicate on the "email" field. It's identical to EmailEQ.
 func Email(v string) predicate.AdminUser {
 	return predicate.AdminUser(sql.FieldEQ(FieldEmail, v))
@@ -64,9 +69,79 @@ func Password(v string) predicate.AdminUser {
 	return predicate.AdminUser(sql.FieldEQ(FieldPassword, v))
 }
 
-// CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
+// CreatedAt applies equality check predicate on the "createdAt" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.AdminUser {
 	return predicate.AdminUser(sql.FieldEQ(FieldCreatedAt, v))
+}
+
+// UpdatedAt applies equality check predicate on the "updatedAt" field. It's identical to UpdatedAtEQ.
+func UpdatedAt(v time.Time) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldEQ(FieldUpdatedAt, v))
+}
+
+// UserNameEQ applies the EQ predicate on the "userName" field.
+func UserNameEQ(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldEQ(FieldUserName, v))
+}
+
+// UserNameNEQ applies the NEQ predicate on the "userName" field.
+func UserNameNEQ(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldNEQ(FieldUserName, v))
+}
+
+// UserNameIn applies the In predicate on the "userName" field.
+func UserNameIn(vs ...string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldIn(FieldUserName, vs...))
+}
+
+// UserNameNotIn applies the NotIn predicate on the "userName" field.
+func UserNameNotIn(vs ...string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldNotIn(FieldUserName, vs...))
+}
+
+// UserNameGT applies the GT predicate on the "userName" field.
+func UserNameGT(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldGT(FieldUserName, v))
+}
+
+// UserNameGTE applies the GTE predicate on the "userName" field.
+func UserNameGTE(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldGTE(FieldUserName, v))
+}
+
+// UserNameLT applies the LT predicate on the "userName" field.
+func UserNameLT(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldLT(FieldUserName, v))
+}
+
+// UserNameLTE applies the LTE predicate on the "userName" field.
+func UserNameLTE(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldLTE(FieldUserName, v))
+}
+
+// UserNameContains applies the Contains predicate on the "userName" field.
+func UserNameContains(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldContains(FieldUserName, v))
+}
+
+// UserNameHasPrefix applies the HasPrefix predicate on the "userName" field.
+func UserNameHasPrefix(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldHasPrefix(FieldUserName, v))
+}
+
+// UserNameHasSuffix applies the HasSuffix predicate on the "userName" field.
+func UserNameHasSuffix(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldHasSuffix(FieldUserName, v))
+}
+
+// UserNameEqualFold applies the EqualFold predicate on the "userName" field.
+func UserNameEqualFold(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldEqualFold(FieldUserName, v))
+}
+
+// UserNameContainsFold applies the ContainsFold predicate on the "userName" field.
+func UserNameContainsFold(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldContainsFold(FieldUserName, v))
 }
 
 // EmailEQ applies the EQ predicate on the "email" field.
@@ -199,44 +274,84 @@ func PasswordContainsFold(v string) predicate.AdminUser {
 	return predicate.AdminUser(sql.FieldContainsFold(FieldPassword, v))
 }
 
-// CreatedAtEQ applies the EQ predicate on the "created_at" field.
+// CreatedAtEQ applies the EQ predicate on the "createdAt" field.
 func CreatedAtEQ(v time.Time) predicate.AdminUser {
 	return predicate.AdminUser(sql.FieldEQ(FieldCreatedAt, v))
 }
 
-// CreatedAtNEQ applies the NEQ predicate on the "created_at" field.
+// CreatedAtNEQ applies the NEQ predicate on the "createdAt" field.
 func CreatedAtNEQ(v time.Time) predicate.AdminUser {
 	return predicate.AdminUser(sql.FieldNEQ(FieldCreatedAt, v))
 }
 
-// CreatedAtIn applies the In predicate on the "created_at" field.
+// CreatedAtIn applies the In predicate on the "createdAt" field.
 func CreatedAtIn(vs ...time.Time) predicate.AdminUser {
 	return predicate.AdminUser(sql.FieldIn(FieldCreatedAt, vs...))
 }
 
-// CreatedAtNotIn applies the NotIn predicate on the "created_at" field.
+// CreatedAtNotIn applies the NotIn predicate on the "createdAt" field.
 func CreatedAtNotIn(vs ...time.Time) predicate.AdminUser {
 	return predicate.AdminUser(sql.FieldNotIn(FieldCreatedAt, vs...))
 }
 
-// CreatedAtGT applies the GT predicate on the "created_at" field.
+// CreatedAtGT applies the GT predicate on the "createdAt" field.
 func CreatedAtGT(v time.Time) predicate.AdminUser {
 	return predicate.AdminUser(sql.FieldGT(FieldCreatedAt, v))
 }
 
-// CreatedAtGTE applies the GTE predicate on the "created_at" field.
+// CreatedAtGTE applies the GTE predicate on the "createdAt" field.
 func CreatedAtGTE(v time.Time) predicate.AdminUser {
 	return predicate.AdminUser(sql.FieldGTE(FieldCreatedAt, v))
 }
 
-// CreatedAtLT applies the LT predicate on the "created_at" field.
+// CreatedAtLT applies the LT predicate on the "createdAt" field.
 func CreatedAtLT(v time.Time) predicate.AdminUser {
 	return predicate.AdminUser(sql.FieldLT(FieldCreatedAt, v))
 }
 
-// CreatedAtLTE applies the LTE predicate on the "created_at" field.
+// CreatedAtLTE applies the LTE predicate on the "createdAt" field.
 func CreatedAtLTE(v time.Time) predicate.AdminUser {
 	return predicate.AdminUser(sql.FieldLTE(FieldCreatedAt, v))
+}
+
+// UpdatedAtEQ applies the EQ predicate on the "updatedAt" field.
+func UpdatedAtEQ(v time.Time) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldEQ(FieldUpdatedAt, v))
+}
+
+// UpdatedAtNEQ applies the NEQ predicate on the "updatedAt" field.
+func UpdatedAtNEQ(v time.Time) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldNEQ(FieldUpdatedAt, v))
+}
+
+// UpdatedAtIn applies the In predicate on the "updatedAt" field.
+func UpdatedAtIn(vs ...time.Time) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldIn(FieldUpdatedAt, vs...))
+}
+
+// UpdatedAtNotIn applies the NotIn predicate on the "updatedAt" field.
+func UpdatedAtNotIn(vs ...time.Time) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldNotIn(FieldUpdatedAt, vs...))
+}
+
+// UpdatedAtGT applies the GT predicate on the "updatedAt" field.
+func UpdatedAtGT(v time.Time) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldGT(FieldUpdatedAt, v))
+}
+
+// UpdatedAtGTE applies the GTE predicate on the "updatedAt" field.
+func UpdatedAtGTE(v time.Time) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldGTE(FieldUpdatedAt, v))
+}
+
+// UpdatedAtLT applies the LT predicate on the "updatedAt" field.
+func UpdatedAtLT(v time.Time) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldLT(FieldUpdatedAt, v))
+}
+
+// UpdatedAtLTE applies the LTE predicate on the "updatedAt" field.
+func UpdatedAtLTE(v time.Time) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldLTE(FieldUpdatedAt, v))
 }
 
 // And groups predicates with the AND operator between them.

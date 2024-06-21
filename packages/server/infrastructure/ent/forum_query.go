@@ -8,10 +8,11 @@ import (
 	"fmt"
 	"math"
 	"server/infrastructure/ent/forum"
-	"server/infrastructure/ent/forumlike"
 	"server/infrastructure/ent/predicate"
 	"server/infrastructure/ent/topic"
 	"server/infrastructure/ent/user"
+	"server/infrastructure/ent/userforumlike"
+	"server/infrastructure/ent/userforumsubscription"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -21,13 +22,16 @@ import (
 // ForumQuery is the builder for querying Forum entities.
 type ForumQuery struct {
 	config
-	ctx            *QueryContext
-	order          []forum.OrderOption
-	inters         []Interceptor
-	predicates     []predicate.Forum
-	withUser       *UserQuery
-	withTopics     *TopicQuery
-	withForumLikes *ForumLikeQuery
+	ctx                       *QueryContext
+	order                     []forum.OrderOption
+	inters                    []Interceptor
+	predicates                []predicate.Forum
+	withLikedUsers            *UserQuery
+	withSubscribedUsers       *UserQuery
+	withTopics                *TopicQuery
+	withUserForumLike         *UserForumSubscriptionQuery
+	withUserForumSubscription *UserForumLikeQuery
+	withFKs                   bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -64,8 +68,8 @@ func (fq *ForumQuery) Order(o ...forum.OrderOption) *ForumQuery {
 	return fq
 }
 
-// QueryUser chains the current query on the "user" edge.
-func (fq *ForumQuery) QueryUser() *UserQuery {
+// QueryLikedUsers chains the current query on the "liked_users" edge.
+func (fq *ForumQuery) QueryLikedUsers() *UserQuery {
 	query := (&UserClient{config: fq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := fq.prepareQuery(ctx); err != nil {
@@ -78,7 +82,29 @@ func (fq *ForumQuery) QueryUser() *UserQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(forum.Table, forum.FieldID, selector),
 			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, forum.UserTable, forum.UserColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, forum.LikedUsersTable, forum.LikedUsersPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(fq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QuerySubscribedUsers chains the current query on the "subscribed_users" edge.
+func (fq *ForumQuery) QuerySubscribedUsers() *UserQuery {
+	query := (&UserClient{config: fq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := fq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := fq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(forum.Table, forum.FieldID, selector),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, forum.SubscribedUsersTable, forum.SubscribedUsersPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(fq.driver.Dialect(), step)
 		return fromU, nil
@@ -108,9 +134,9 @@ func (fq *ForumQuery) QueryTopics() *TopicQuery {
 	return query
 }
 
-// QueryForumLikes chains the current query on the "forum_likes" edge.
-func (fq *ForumQuery) QueryForumLikes() *ForumLikeQuery {
-	query := (&ForumLikeClient{config: fq.config}).Query()
+// QueryUserForumLike chains the current query on the "user_forum_like" edge.
+func (fq *ForumQuery) QueryUserForumLike() *UserForumSubscriptionQuery {
+	query := (&UserForumSubscriptionClient{config: fq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := fq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -121,8 +147,30 @@ func (fq *ForumQuery) QueryForumLikes() *ForumLikeQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(forum.Table, forum.FieldID, selector),
-			sqlgraph.To(forumlike.Table, forumlike.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, forum.ForumLikesTable, forum.ForumLikesColumn),
+			sqlgraph.To(userforumsubscription.Table, userforumsubscription.ForumColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, forum.UserForumLikeTable, forum.UserForumLikeColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(fq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryUserForumSubscription chains the current query on the "user_forum_subscription" edge.
+func (fq *ForumQuery) QueryUserForumSubscription() *UserForumLikeQuery {
+	query := (&UserForumLikeClient{config: fq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := fq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := fq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(forum.Table, forum.FieldID, selector),
+			sqlgraph.To(userforumlike.Table, userforumlike.ForumColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, forum.UserForumSubscriptionTable, forum.UserForumSubscriptionColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(fq.driver.Dialect(), step)
 		return fromU, nil
@@ -317,28 +365,41 @@ func (fq *ForumQuery) Clone() *ForumQuery {
 		return nil
 	}
 	return &ForumQuery{
-		config:         fq.config,
-		ctx:            fq.ctx.Clone(),
-		order:          append([]forum.OrderOption{}, fq.order...),
-		inters:         append([]Interceptor{}, fq.inters...),
-		predicates:     append([]predicate.Forum{}, fq.predicates...),
-		withUser:       fq.withUser.Clone(),
-		withTopics:     fq.withTopics.Clone(),
-		withForumLikes: fq.withForumLikes.Clone(),
+		config:                    fq.config,
+		ctx:                       fq.ctx.Clone(),
+		order:                     append([]forum.OrderOption{}, fq.order...),
+		inters:                    append([]Interceptor{}, fq.inters...),
+		predicates:                append([]predicate.Forum{}, fq.predicates...),
+		withLikedUsers:            fq.withLikedUsers.Clone(),
+		withSubscribedUsers:       fq.withSubscribedUsers.Clone(),
+		withTopics:                fq.withTopics.Clone(),
+		withUserForumLike:         fq.withUserForumLike.Clone(),
+		withUserForumSubscription: fq.withUserForumSubscription.Clone(),
 		// clone intermediate query.
 		sql:  fq.sql.Clone(),
 		path: fq.path,
 	}
 }
 
-// WithUser tells the query-builder to eager-load the nodes that are connected to
-// the "user" edge. The optional arguments are used to configure the query builder of the edge.
-func (fq *ForumQuery) WithUser(opts ...func(*UserQuery)) *ForumQuery {
+// WithLikedUsers tells the query-builder to eager-load the nodes that are connected to
+// the "liked_users" edge. The optional arguments are used to configure the query builder of the edge.
+func (fq *ForumQuery) WithLikedUsers(opts ...func(*UserQuery)) *ForumQuery {
 	query := (&UserClient{config: fq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	fq.withUser = query
+	fq.withLikedUsers = query
+	return fq
+}
+
+// WithSubscribedUsers tells the query-builder to eager-load the nodes that are connected to
+// the "subscribed_users" edge. The optional arguments are used to configure the query builder of the edge.
+func (fq *ForumQuery) WithSubscribedUsers(opts ...func(*UserQuery)) *ForumQuery {
+	query := (&UserClient{config: fq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	fq.withSubscribedUsers = query
 	return fq
 }
 
@@ -353,14 +414,25 @@ func (fq *ForumQuery) WithTopics(opts ...func(*TopicQuery)) *ForumQuery {
 	return fq
 }
 
-// WithForumLikes tells the query-builder to eager-load the nodes that are connected to
-// the "forum_likes" edge. The optional arguments are used to configure the query builder of the edge.
-func (fq *ForumQuery) WithForumLikes(opts ...func(*ForumLikeQuery)) *ForumQuery {
-	query := (&ForumLikeClient{config: fq.config}).Query()
+// WithUserForumLike tells the query-builder to eager-load the nodes that are connected to
+// the "user_forum_like" edge. The optional arguments are used to configure the query builder of the edge.
+func (fq *ForumQuery) WithUserForumLike(opts ...func(*UserForumSubscriptionQuery)) *ForumQuery {
+	query := (&UserForumSubscriptionClient{config: fq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	fq.withForumLikes = query
+	fq.withUserForumLike = query
+	return fq
+}
+
+// WithUserForumSubscription tells the query-builder to eager-load the nodes that are connected to
+// the "user_forum_subscription" edge. The optional arguments are used to configure the query builder of the edge.
+func (fq *ForumQuery) WithUserForumSubscription(opts ...func(*UserForumLikeQuery)) *ForumQuery {
+	query := (&UserForumLikeClient{config: fq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	fq.withUserForumSubscription = query
 	return fq
 }
 
@@ -370,12 +442,12 @@ func (fq *ForumQuery) WithForumLikes(opts ...func(*ForumLikeQuery)) *ForumQuery 
 // Example:
 //
 //	var v []struct {
-//		UserID int `json:"user_id,omitempty"`
+//		UserId int `json:"userId,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Forum.Query().
-//		GroupBy(forum.FieldUserID).
+//		GroupBy(forum.FieldUserId).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (fq *ForumQuery) GroupBy(field string, fields ...string) *ForumGroupBy {
@@ -393,11 +465,11 @@ func (fq *ForumQuery) GroupBy(field string, fields ...string) *ForumGroupBy {
 // Example:
 //
 //	var v []struct {
-//		UserID int `json:"user_id,omitempty"`
+//		UserId int `json:"userId,omitempty"`
 //	}
 //
 //	client.Forum.Query().
-//		Select(forum.FieldUserID).
+//		Select(forum.FieldUserId).
 //		Scan(ctx, &v)
 func (fq *ForumQuery) Select(fields ...string) *ForumSelect {
 	fq.ctx.Fields = append(fq.ctx.Fields, fields...)
@@ -441,13 +513,19 @@ func (fq *ForumQuery) prepareQuery(ctx context.Context) error {
 func (fq *ForumQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Forum, error) {
 	var (
 		nodes       = []*Forum{}
+		withFKs     = fq.withFKs
 		_spec       = fq.querySpec()
-		loadedTypes = [3]bool{
-			fq.withUser != nil,
+		loadedTypes = [5]bool{
+			fq.withLikedUsers != nil,
+			fq.withSubscribedUsers != nil,
 			fq.withTopics != nil,
-			fq.withForumLikes != nil,
+			fq.withUserForumLike != nil,
+			fq.withUserForumSubscription != nil,
 		}
 	)
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, forum.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Forum).scanValues(nil, columns)
 	}
@@ -466,9 +544,17 @@ func (fq *ForumQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Forum,
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := fq.withUser; query != nil {
-		if err := fq.loadUser(ctx, query, nodes, nil,
-			func(n *Forum, e *User) { n.Edges.User = e }); err != nil {
+	if query := fq.withLikedUsers; query != nil {
+		if err := fq.loadLikedUsers(ctx, query, nodes,
+			func(n *Forum) { n.Edges.LikedUsers = []*User{} },
+			func(n *Forum, e *User) { n.Edges.LikedUsers = append(n.Edges.LikedUsers, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := fq.withSubscribedUsers; query != nil {
+		if err := fq.loadSubscribedUsers(ctx, query, nodes,
+			func(n *Forum) { n.Edges.SubscribedUsers = []*User{} },
+			func(n *Forum, e *User) { n.Edges.SubscribedUsers = append(n.Edges.SubscribedUsers, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -479,41 +565,143 @@ func (fq *ForumQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Forum,
 			return nil, err
 		}
 	}
-	if query := fq.withForumLikes; query != nil {
-		if err := fq.loadForumLikes(ctx, query, nodes,
-			func(n *Forum) { n.Edges.ForumLikes = []*ForumLike{} },
-			func(n *Forum, e *ForumLike) { n.Edges.ForumLikes = append(n.Edges.ForumLikes, e) }); err != nil {
+	if query := fq.withUserForumLike; query != nil {
+		if err := fq.loadUserForumLike(ctx, query, nodes,
+			func(n *Forum) { n.Edges.UserForumLike = []*UserForumSubscription{} },
+			func(n *Forum, e *UserForumSubscription) { n.Edges.UserForumLike = append(n.Edges.UserForumLike, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := fq.withUserForumSubscription; query != nil {
+		if err := fq.loadUserForumSubscription(ctx, query, nodes,
+			func(n *Forum) { n.Edges.UserForumSubscription = []*UserForumLike{} },
+			func(n *Forum, e *UserForumLike) {
+				n.Edges.UserForumSubscription = append(n.Edges.UserForumSubscription, e)
+			}); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (fq *ForumQuery) loadUser(ctx context.Context, query *UserQuery, nodes []*Forum, init func(*Forum), assign func(*Forum, *User)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*Forum)
-	for i := range nodes {
-		fk := nodes[i].UserID
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
+func (fq *ForumQuery) loadLikedUsers(ctx context.Context, query *UserQuery, nodes []*Forum, init func(*Forum), assign func(*Forum, *User)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*Forum)
+	nids := make(map[int]map[*Forum]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
 		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
-	if len(ids) == 0 {
-		return nil
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(forum.LikedUsersTable)
+		s.Join(joinT).On(s.C(user.FieldID), joinT.C(forum.LikedUsersPrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(forum.LikedUsersPrimaryKey[1]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(forum.LikedUsersPrimaryKey[1]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
 	}
-	query.Where(user.IDIn(ids...))
-	neighbors, err := query.All(ctx)
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Forum]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*User](ctx, query, qr, query.inters)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
+		nodes, ok := nids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "user_id" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected "liked_users" node returned %v`, n.ID)
 		}
-		for i := range nodes {
-			assign(nodes[i], n)
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
+}
+func (fq *ForumQuery) loadSubscribedUsers(ctx context.Context, query *UserQuery, nodes []*Forum, init func(*Forum), assign func(*Forum, *User)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*Forum)
+	nids := make(map[int]map[*Forum]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(forum.SubscribedUsersTable)
+		s.Join(joinT).On(s.C(user.FieldID), joinT.C(forum.SubscribedUsersPrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(forum.SubscribedUsersPrimaryKey[1]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(forum.SubscribedUsersPrimaryKey[1]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Forum]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*User](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "subscribed_users" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
 		}
 	}
 	return nil
@@ -529,7 +717,7 @@ func (fq *ForumQuery) loadTopics(ctx context.Context, query *TopicQuery, nodes [
 		}
 	}
 	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(topic.FieldForumID)
+		query.ctx.AppendFieldOnce(topic.FieldForumId)
 	}
 	query.Where(predicate.Topic(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(forum.TopicsColumn), fks...))
@@ -539,16 +727,16 @@ func (fq *ForumQuery) loadTopics(ctx context.Context, query *TopicQuery, nodes [
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.ForumID
+		fk := n.ForumId
 		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "forum_id" returned %v for node %v`, fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "forumId" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}
 	return nil
 }
-func (fq *ForumQuery) loadForumLikes(ctx context.Context, query *ForumLikeQuery, nodes []*Forum, init func(*Forum), assign func(*Forum, *ForumLike)) error {
+func (fq *ForumQuery) loadUserForumLike(ctx context.Context, query *UserForumSubscriptionQuery, nodes []*Forum, init func(*Forum), assign func(*Forum, *UserForumSubscription)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*Forum)
 	for i := range nodes {
@@ -559,20 +747,50 @@ func (fq *ForumQuery) loadForumLikes(ctx context.Context, query *ForumLikeQuery,
 		}
 	}
 	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(forumlike.FieldForumID)
+		query.ctx.AppendFieldOnce(userforumsubscription.FieldForumId)
 	}
-	query.Where(predicate.ForumLike(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(forum.ForumLikesColumn), fks...))
+	query.Where(predicate.UserForumSubscription(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(forum.UserForumLikeColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.ForumID
+		fk := n.ForumId
 		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "forum_id" returned %v for node %v`, fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "forumId" returned %v for node %v`, fk, n)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (fq *ForumQuery) loadUserForumSubscription(ctx context.Context, query *UserForumLikeQuery, nodes []*Forum, init func(*Forum), assign func(*Forum, *UserForumLike)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Forum)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(userforumlike.FieldForumId)
+	}
+	query.Where(predicate.UserForumLike(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(forum.UserForumSubscriptionColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.ForumId
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "forumId" returned %v for node %v`, fk, n)
 		}
 		assign(node, n)
 	}
@@ -603,9 +821,6 @@ func (fq *ForumQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != forum.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
-		}
-		if fq.withUser != nil {
-			_spec.Node.AddColumnOnce(forum.FieldUserID)
 		}
 	}
 	if ps := fq.predicates; len(ps) > 0 {

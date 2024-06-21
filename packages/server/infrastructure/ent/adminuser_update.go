@@ -28,6 +28,20 @@ func (auu *AdminUserUpdate) Where(ps ...predicate.AdminUser) *AdminUserUpdate {
 	return auu
 }
 
+// SetUserName sets the "userName" field.
+func (auu *AdminUserUpdate) SetUserName(s string) *AdminUserUpdate {
+	auu.mutation.SetUserName(s)
+	return auu
+}
+
+// SetNillableUserName sets the "userName" field if the given value is not nil.
+func (auu *AdminUserUpdate) SetNillableUserName(s *string) *AdminUserUpdate {
+	if s != nil {
+		auu.SetUserName(*s)
+	}
+	return auu
+}
+
 // SetEmail sets the "email" field.
 func (auu *AdminUserUpdate) SetEmail(s string) *AdminUserUpdate {
 	auu.mutation.SetEmail(s)
@@ -56,17 +70,23 @@ func (auu *AdminUserUpdate) SetNillablePassword(s *string) *AdminUserUpdate {
 	return auu
 }
 
-// SetCreatedAt sets the "created_at" field.
+// SetCreatedAt sets the "createdAt" field.
 func (auu *AdminUserUpdate) SetCreatedAt(t time.Time) *AdminUserUpdate {
 	auu.mutation.SetCreatedAt(t)
 	return auu
 }
 
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
 func (auu *AdminUserUpdate) SetNillableCreatedAt(t *time.Time) *AdminUserUpdate {
 	if t != nil {
 		auu.SetCreatedAt(*t)
 	}
+	return auu
+}
+
+// SetUpdatedAt sets the "updatedAt" field.
+func (auu *AdminUserUpdate) SetUpdatedAt(t time.Time) *AdminUserUpdate {
+	auu.mutation.SetUpdatedAt(t)
 	return auu
 }
 
@@ -77,6 +97,7 @@ func (auu *AdminUserUpdate) Mutation() *AdminUserMutation {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (auu *AdminUserUpdate) Save(ctx context.Context) (int, error) {
+	auu.defaults()
 	return withHooks(ctx, auu.sqlSave, auu.mutation, auu.hooks)
 }
 
@@ -102,7 +123,33 @@ func (auu *AdminUserUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (auu *AdminUserUpdate) defaults() {
+	if _, ok := auu.mutation.UpdatedAt(); !ok {
+		v := adminuser.UpdateDefaultUpdatedAt()
+		auu.mutation.SetUpdatedAt(v)
+	}
+}
+
+// check runs all checks and user-defined validators on the builder.
+func (auu *AdminUserUpdate) check() error {
+	if v, ok := auu.mutation.UserName(); ok {
+		if err := adminuser.UserNameValidator(v); err != nil {
+			return &ValidationError{Name: "userName", err: fmt.Errorf(`ent: validator failed for field "AdminUser.userName": %w`, err)}
+		}
+	}
+	if v, ok := auu.mutation.Email(); ok {
+		if err := adminuser.EmailValidator(v); err != nil {
+			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "AdminUser.email": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (auu *AdminUserUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := auu.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(adminuser.Table, adminuser.Columns, sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeInt))
 	if ps := auu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -110,6 +157,9 @@ func (auu *AdminUserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := auu.mutation.UserName(); ok {
+		_spec.SetField(adminuser.FieldUserName, field.TypeString, value)
 	}
 	if value, ok := auu.mutation.Email(); ok {
 		_spec.SetField(adminuser.FieldEmail, field.TypeString, value)
@@ -119,6 +169,9 @@ func (auu *AdminUserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := auu.mutation.CreatedAt(); ok {
 		_spec.SetField(adminuser.FieldCreatedAt, field.TypeTime, value)
+	}
+	if value, ok := auu.mutation.UpdatedAt(); ok {
+		_spec.SetField(adminuser.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, auu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -138,6 +191,20 @@ type AdminUserUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *AdminUserMutation
+}
+
+// SetUserName sets the "userName" field.
+func (auuo *AdminUserUpdateOne) SetUserName(s string) *AdminUserUpdateOne {
+	auuo.mutation.SetUserName(s)
+	return auuo
+}
+
+// SetNillableUserName sets the "userName" field if the given value is not nil.
+func (auuo *AdminUserUpdateOne) SetNillableUserName(s *string) *AdminUserUpdateOne {
+	if s != nil {
+		auuo.SetUserName(*s)
+	}
+	return auuo
 }
 
 // SetEmail sets the "email" field.
@@ -168,17 +235,23 @@ func (auuo *AdminUserUpdateOne) SetNillablePassword(s *string) *AdminUserUpdateO
 	return auuo
 }
 
-// SetCreatedAt sets the "created_at" field.
+// SetCreatedAt sets the "createdAt" field.
 func (auuo *AdminUserUpdateOne) SetCreatedAt(t time.Time) *AdminUserUpdateOne {
 	auuo.mutation.SetCreatedAt(t)
 	return auuo
 }
 
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
 func (auuo *AdminUserUpdateOne) SetNillableCreatedAt(t *time.Time) *AdminUserUpdateOne {
 	if t != nil {
 		auuo.SetCreatedAt(*t)
 	}
+	return auuo
+}
+
+// SetUpdatedAt sets the "updatedAt" field.
+func (auuo *AdminUserUpdateOne) SetUpdatedAt(t time.Time) *AdminUserUpdateOne {
+	auuo.mutation.SetUpdatedAt(t)
 	return auuo
 }
 
@@ -202,6 +275,7 @@ func (auuo *AdminUserUpdateOne) Select(field string, fields ...string) *AdminUse
 
 // Save executes the query and returns the updated AdminUser entity.
 func (auuo *AdminUserUpdateOne) Save(ctx context.Context) (*AdminUser, error) {
+	auuo.defaults()
 	return withHooks(ctx, auuo.sqlSave, auuo.mutation, auuo.hooks)
 }
 
@@ -227,7 +301,33 @@ func (auuo *AdminUserUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (auuo *AdminUserUpdateOne) defaults() {
+	if _, ok := auuo.mutation.UpdatedAt(); !ok {
+		v := adminuser.UpdateDefaultUpdatedAt()
+		auuo.mutation.SetUpdatedAt(v)
+	}
+}
+
+// check runs all checks and user-defined validators on the builder.
+func (auuo *AdminUserUpdateOne) check() error {
+	if v, ok := auuo.mutation.UserName(); ok {
+		if err := adminuser.UserNameValidator(v); err != nil {
+			return &ValidationError{Name: "userName", err: fmt.Errorf(`ent: validator failed for field "AdminUser.userName": %w`, err)}
+		}
+	}
+	if v, ok := auuo.mutation.Email(); ok {
+		if err := adminuser.EmailValidator(v); err != nil {
+			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "AdminUser.email": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (auuo *AdminUserUpdateOne) sqlSave(ctx context.Context) (_node *AdminUser, err error) {
+	if err := auuo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(adminuser.Table, adminuser.Columns, sqlgraph.NewFieldSpec(adminuser.FieldID, field.TypeInt))
 	id, ok := auuo.mutation.ID()
 	if !ok {
@@ -253,6 +353,9 @@ func (auuo *AdminUserUpdateOne) sqlSave(ctx context.Context) (_node *AdminUser, 
 			}
 		}
 	}
+	if value, ok := auuo.mutation.UserName(); ok {
+		_spec.SetField(adminuser.FieldUserName, field.TypeString, value)
+	}
 	if value, ok := auuo.mutation.Email(); ok {
 		_spec.SetField(adminuser.FieldEmail, field.TypeString, value)
 	}
@@ -261,6 +364,9 @@ func (auuo *AdminUserUpdateOne) sqlSave(ctx context.Context) (_node *AdminUser, 
 	}
 	if value, ok := auuo.mutation.CreatedAt(); ok {
 		_spec.SetField(adminuser.FieldCreatedAt, field.TypeTime, value)
+	}
+	if value, ok := auuo.mutation.UpdatedAt(); ok {
+		_spec.SetField(adminuser.FieldUpdatedAt, field.TypeTime, value)
 	}
 	_node = &AdminUser{config: auuo.config}
 	_spec.Assign = _node.assignValues

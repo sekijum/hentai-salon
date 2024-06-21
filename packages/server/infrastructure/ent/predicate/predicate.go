@@ -15,26 +15,35 @@ type Comment func(*sql.Selector)
 // CommentAttachment is the predicate function for commentattachment builders.
 type CommentAttachment func(*sql.Selector)
 
-// CommentLike is the predicate function for commentlike builders.
-type CommentLike func(*sql.Selector)
-
 // Forum is the predicate function for forum builders.
 type Forum func(*sql.Selector)
-
-// ForumLike is the predicate function for forumlike builders.
-type ForumLike func(*sql.Selector)
 
 // Topic is the predicate function for topic builders.
 type Topic func(*sql.Selector)
 
-// TopicLike is the predicate function for topiclike builders.
-type TopicLike func(*sql.Selector)
+// TopicTag is the predicate function for topictag builders.
+type TopicTag func(*sql.Selector)
+
+// TopicTagging is the predicate function for topictagging builders.
+type TopicTagging func(*sql.Selector)
 
 // User is the predicate function for user builders.
 type User func(*sql.Selector)
 
-// UserCommentNotification is the predicate function for usercommentnotification builders.
-type UserCommentNotification func(*sql.Selector)
+// UserCommentLike is the predicate function for usercommentlike builders.
+type UserCommentLike func(*sql.Selector)
 
-// UserTopicNotification is the predicate function for usertopicnotification builders.
-type UserTopicNotification func(*sql.Selector)
+// UserCommentSubscription is the predicate function for usercommentsubscription builders.
+type UserCommentSubscription func(*sql.Selector)
+
+// UserForumLike is the predicate function for userforumlike builders.
+type UserForumLike func(*sql.Selector)
+
+// UserForumSubscription is the predicate function for userforumsubscription builders.
+type UserForumSubscription func(*sql.Selector)
+
+// UserTopicLike is the predicate function for usertopiclike builders.
+type UserTopicLike func(*sql.Selector)
+
+// UserTopicSubscription is the predicate function for usertopicsubscription builders.
+type UserTopicSubscription func(*sql.Selector)

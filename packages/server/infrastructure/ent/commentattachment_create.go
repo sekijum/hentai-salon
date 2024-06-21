@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"server/infrastructure/ent/comment"
 	"server/infrastructure/ent/commentattachment"
-	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -21,15 +20,29 @@ type CommentAttachmentCreate struct {
 	hooks    []Hook
 }
 
-// SetCommentID sets the "comment_id" field.
-func (cac *CommentAttachmentCreate) SetCommentID(i int) *CommentAttachmentCreate {
-	cac.mutation.SetCommentID(i)
+// SetCommentId sets the "commentId" field.
+func (cac *CommentAttachmentCreate) SetCommentId(i int) *CommentAttachmentCreate {
+	cac.mutation.SetCommentId(i)
 	return cac
 }
 
-// SetPath sets the "path" field.
-func (cac *CommentAttachmentCreate) SetPath(s string) *CommentAttachmentCreate {
-	cac.mutation.SetPath(s)
+// SetURL sets the "url" field.
+func (cac *CommentAttachmentCreate) SetURL(s string) *CommentAttachmentCreate {
+	cac.mutation.SetURL(s)
+	return cac
+}
+
+// SetOrder sets the "order" field.
+func (cac *CommentAttachmentCreate) SetOrder(i int) *CommentAttachmentCreate {
+	cac.mutation.SetOrder(i)
+	return cac
+}
+
+// SetNillableOrder sets the "order" field if the given value is not nil.
+func (cac *CommentAttachmentCreate) SetNillableOrder(i *int) *CommentAttachmentCreate {
+	if i != nil {
+		cac.SetOrder(*i)
+	}
 	return cac
 }
 
@@ -39,23 +52,15 @@ func (cac *CommentAttachmentCreate) SetType(c commentattachment.Type) *CommentAt
 	return cac
 }
 
-// SetCreatedAt sets the "created_at" field.
-func (cac *CommentAttachmentCreate) SetCreatedAt(t time.Time) *CommentAttachmentCreate {
-	cac.mutation.SetCreatedAt(t)
-	return cac
-}
-
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (cac *CommentAttachmentCreate) SetNillableCreatedAt(t *time.Time) *CommentAttachmentCreate {
-	if t != nil {
-		cac.SetCreatedAt(*t)
-	}
-	return cac
-}
-
 // SetID sets the "id" field.
 func (cac *CommentAttachmentCreate) SetID(i int) *CommentAttachmentCreate {
 	cac.mutation.SetID(i)
+	return cac
+}
+
+// SetCommentID sets the "comment" edge to the Comment entity by ID.
+func (cac *CommentAttachmentCreate) SetCommentID(id int) *CommentAttachmentCreate {
+	cac.mutation.SetCommentID(id)
 	return cac
 }
 
@@ -99,19 +104,22 @@ func (cac *CommentAttachmentCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (cac *CommentAttachmentCreate) defaults() {
-	if _, ok := cac.mutation.CreatedAt(); !ok {
-		v := commentattachment.DefaultCreatedAt()
-		cac.mutation.SetCreatedAt(v)
+	if _, ok := cac.mutation.Order(); !ok {
+		v := commentattachment.DefaultOrder
+		cac.mutation.SetOrder(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (cac *CommentAttachmentCreate) check() error {
-	if _, ok := cac.mutation.CommentID(); !ok {
-		return &ValidationError{Name: "comment_id", err: errors.New(`ent: missing required field "CommentAttachment.comment_id"`)}
+	if _, ok := cac.mutation.CommentId(); !ok {
+		return &ValidationError{Name: "commentId", err: errors.New(`ent: missing required field "CommentAttachment.commentId"`)}
 	}
-	if _, ok := cac.mutation.Path(); !ok {
-		return &ValidationError{Name: "path", err: errors.New(`ent: missing required field "CommentAttachment.path"`)}
+	if _, ok := cac.mutation.URL(); !ok {
+		return &ValidationError{Name: "url", err: errors.New(`ent: missing required field "CommentAttachment.url"`)}
+	}
+	if _, ok := cac.mutation.Order(); !ok {
+		return &ValidationError{Name: "order", err: errors.New(`ent: missing required field "CommentAttachment.order"`)}
 	}
 	if _, ok := cac.mutation.GetType(); !ok {
 		return &ValidationError{Name: "type", err: errors.New(`ent: missing required field "CommentAttachment.type"`)}
@@ -120,9 +128,6 @@ func (cac *CommentAttachmentCreate) check() error {
 		if err := commentattachment.TypeValidator(v); err != nil {
 			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "CommentAttachment.type": %w`, err)}
 		}
-	}
-	if _, ok := cac.mutation.CreatedAt(); !ok {
-		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "CommentAttachment.created_at"`)}
 	}
 	if _, ok := cac.mutation.CommentID(); !ok {
 		return &ValidationError{Name: "comment", err: errors.New(`ent: missing required edge "CommentAttachment.comment"`)}
@@ -159,17 +164,17 @@ func (cac *CommentAttachmentCreate) createSpec() (*CommentAttachment, *sqlgraph.
 		_node.ID = id
 		_spec.ID.Value = id
 	}
-	if value, ok := cac.mutation.Path(); ok {
-		_spec.SetField(commentattachment.FieldPath, field.TypeString, value)
-		_node.Path = value
+	if value, ok := cac.mutation.URL(); ok {
+		_spec.SetField(commentattachment.FieldURL, field.TypeString, value)
+		_node.URL = value
+	}
+	if value, ok := cac.mutation.Order(); ok {
+		_spec.SetField(commentattachment.FieldOrder, field.TypeInt, value)
+		_node.Order = value
 	}
 	if value, ok := cac.mutation.GetType(); ok {
 		_spec.SetField(commentattachment.FieldType, field.TypeEnum, value)
 		_node.Type = value
-	}
-	if value, ok := cac.mutation.CreatedAt(); ok {
-		_spec.SetField(commentattachment.FieldCreatedAt, field.TypeTime, value)
-		_node.CreatedAt = value
 	}
 	if nodes := cac.mutation.CommentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -185,7 +190,7 @@ func (cac *CommentAttachmentCreate) createSpec() (*CommentAttachment, *sqlgraph.
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.CommentID = nodes[0]
+		_node.CommentId = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

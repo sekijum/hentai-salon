@@ -55,14 +55,14 @@ func IDLTE(id int) predicate.Forum {
 	return predicate.Forum(sql.FieldLTE(FieldID, id))
 }
 
-// UserID applies equality check predicate on the "user_id" field. It's identical to UserIDEQ.
-func UserID(v int) predicate.Forum {
-	return predicate.Forum(sql.FieldEQ(FieldUserID, v))
+// UserId applies equality check predicate on the "userId" field. It's identical to UserIdEQ.
+func UserId(v int) predicate.Forum {
+	return predicate.Forum(sql.FieldEQ(FieldUserId, v))
 }
 
-// Name applies equality check predicate on the "name" field. It's identical to NameEQ.
-func Name(v string) predicate.Forum {
-	return predicate.Forum(sql.FieldEQ(FieldName, v))
+// Title applies equality check predicate on the "title" field. It's identical to TitleEQ.
+func Title(v string) predicate.Forum {
+	return predicate.Forum(sql.FieldEQ(FieldTitle, v))
 }
 
 // Description applies equality check predicate on the "description" field. It's identical to DescriptionEQ.
@@ -70,99 +70,124 @@ func Description(v string) predicate.Forum {
 	return predicate.Forum(sql.FieldEQ(FieldDescription, v))
 }
 
-// CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
+// ThumbnailUrl applies equality check predicate on the "thumbnailUrl" field. It's identical to ThumbnailUrlEQ.
+func ThumbnailUrl(v string) predicate.Forum {
+	return predicate.Forum(sql.FieldEQ(FieldThumbnailUrl, v))
+}
+
+// CreatedAt applies equality check predicate on the "createdAt" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.Forum {
 	return predicate.Forum(sql.FieldEQ(FieldCreatedAt, v))
 }
 
-// UpdatedAt applies equality check predicate on the "updated_at" field. It's identical to UpdatedAtEQ.
+// UpdatedAt applies equality check predicate on the "updatedAt" field. It's identical to UpdatedAtEQ.
 func UpdatedAt(v time.Time) predicate.Forum {
 	return predicate.Forum(sql.FieldEQ(FieldUpdatedAt, v))
 }
 
-// UserIDEQ applies the EQ predicate on the "user_id" field.
-func UserIDEQ(v int) predicate.Forum {
-	return predicate.Forum(sql.FieldEQ(FieldUserID, v))
+// UserIdEQ applies the EQ predicate on the "userId" field.
+func UserIdEQ(v int) predicate.Forum {
+	return predicate.Forum(sql.FieldEQ(FieldUserId, v))
 }
 
-// UserIDNEQ applies the NEQ predicate on the "user_id" field.
-func UserIDNEQ(v int) predicate.Forum {
-	return predicate.Forum(sql.FieldNEQ(FieldUserID, v))
+// UserIdNEQ applies the NEQ predicate on the "userId" field.
+func UserIdNEQ(v int) predicate.Forum {
+	return predicate.Forum(sql.FieldNEQ(FieldUserId, v))
 }
 
-// UserIDIn applies the In predicate on the "user_id" field.
-func UserIDIn(vs ...int) predicate.Forum {
-	return predicate.Forum(sql.FieldIn(FieldUserID, vs...))
+// UserIdIn applies the In predicate on the "userId" field.
+func UserIdIn(vs ...int) predicate.Forum {
+	return predicate.Forum(sql.FieldIn(FieldUserId, vs...))
 }
 
-// UserIDNotIn applies the NotIn predicate on the "user_id" field.
-func UserIDNotIn(vs ...int) predicate.Forum {
-	return predicate.Forum(sql.FieldNotIn(FieldUserID, vs...))
+// UserIdNotIn applies the NotIn predicate on the "userId" field.
+func UserIdNotIn(vs ...int) predicate.Forum {
+	return predicate.Forum(sql.FieldNotIn(FieldUserId, vs...))
 }
 
-// NameEQ applies the EQ predicate on the "name" field.
-func NameEQ(v string) predicate.Forum {
-	return predicate.Forum(sql.FieldEQ(FieldName, v))
+// UserIdGT applies the GT predicate on the "userId" field.
+func UserIdGT(v int) predicate.Forum {
+	return predicate.Forum(sql.FieldGT(FieldUserId, v))
 }
 
-// NameNEQ applies the NEQ predicate on the "name" field.
-func NameNEQ(v string) predicate.Forum {
-	return predicate.Forum(sql.FieldNEQ(FieldName, v))
+// UserIdGTE applies the GTE predicate on the "userId" field.
+func UserIdGTE(v int) predicate.Forum {
+	return predicate.Forum(sql.FieldGTE(FieldUserId, v))
 }
 
-// NameIn applies the In predicate on the "name" field.
-func NameIn(vs ...string) predicate.Forum {
-	return predicate.Forum(sql.FieldIn(FieldName, vs...))
+// UserIdLT applies the LT predicate on the "userId" field.
+func UserIdLT(v int) predicate.Forum {
+	return predicate.Forum(sql.FieldLT(FieldUserId, v))
 }
 
-// NameNotIn applies the NotIn predicate on the "name" field.
-func NameNotIn(vs ...string) predicate.Forum {
-	return predicate.Forum(sql.FieldNotIn(FieldName, vs...))
+// UserIdLTE applies the LTE predicate on the "userId" field.
+func UserIdLTE(v int) predicate.Forum {
+	return predicate.Forum(sql.FieldLTE(FieldUserId, v))
 }
 
-// NameGT applies the GT predicate on the "name" field.
-func NameGT(v string) predicate.Forum {
-	return predicate.Forum(sql.FieldGT(FieldName, v))
+// TitleEQ applies the EQ predicate on the "title" field.
+func TitleEQ(v string) predicate.Forum {
+	return predicate.Forum(sql.FieldEQ(FieldTitle, v))
 }
 
-// NameGTE applies the GTE predicate on the "name" field.
-func NameGTE(v string) predicate.Forum {
-	return predicate.Forum(sql.FieldGTE(FieldName, v))
+// TitleNEQ applies the NEQ predicate on the "title" field.
+func TitleNEQ(v string) predicate.Forum {
+	return predicate.Forum(sql.FieldNEQ(FieldTitle, v))
 }
 
-// NameLT applies the LT predicate on the "name" field.
-func NameLT(v string) predicate.Forum {
-	return predicate.Forum(sql.FieldLT(FieldName, v))
+// TitleIn applies the In predicate on the "title" field.
+func TitleIn(vs ...string) predicate.Forum {
+	return predicate.Forum(sql.FieldIn(FieldTitle, vs...))
 }
 
-// NameLTE applies the LTE predicate on the "name" field.
-func NameLTE(v string) predicate.Forum {
-	return predicate.Forum(sql.FieldLTE(FieldName, v))
+// TitleNotIn applies the NotIn predicate on the "title" field.
+func TitleNotIn(vs ...string) predicate.Forum {
+	return predicate.Forum(sql.FieldNotIn(FieldTitle, vs...))
 }
 
-// NameContains applies the Contains predicate on the "name" field.
-func NameContains(v string) predicate.Forum {
-	return predicate.Forum(sql.FieldContains(FieldName, v))
+// TitleGT applies the GT predicate on the "title" field.
+func TitleGT(v string) predicate.Forum {
+	return predicate.Forum(sql.FieldGT(FieldTitle, v))
 }
 
-// NameHasPrefix applies the HasPrefix predicate on the "name" field.
-func NameHasPrefix(v string) predicate.Forum {
-	return predicate.Forum(sql.FieldHasPrefix(FieldName, v))
+// TitleGTE applies the GTE predicate on the "title" field.
+func TitleGTE(v string) predicate.Forum {
+	return predicate.Forum(sql.FieldGTE(FieldTitle, v))
 }
 
-// NameHasSuffix applies the HasSuffix predicate on the "name" field.
-func NameHasSuffix(v string) predicate.Forum {
-	return predicate.Forum(sql.FieldHasSuffix(FieldName, v))
+// TitleLT applies the LT predicate on the "title" field.
+func TitleLT(v string) predicate.Forum {
+	return predicate.Forum(sql.FieldLT(FieldTitle, v))
 }
 
-// NameEqualFold applies the EqualFold predicate on the "name" field.
-func NameEqualFold(v string) predicate.Forum {
-	return predicate.Forum(sql.FieldEqualFold(FieldName, v))
+// TitleLTE applies the LTE predicate on the "title" field.
+func TitleLTE(v string) predicate.Forum {
+	return predicate.Forum(sql.FieldLTE(FieldTitle, v))
 }
 
-// NameContainsFold applies the ContainsFold predicate on the "name" field.
-func NameContainsFold(v string) predicate.Forum {
-	return predicate.Forum(sql.FieldContainsFold(FieldName, v))
+// TitleContains applies the Contains predicate on the "title" field.
+func TitleContains(v string) predicate.Forum {
+	return predicate.Forum(sql.FieldContains(FieldTitle, v))
+}
+
+// TitleHasPrefix applies the HasPrefix predicate on the "title" field.
+func TitleHasPrefix(v string) predicate.Forum {
+	return predicate.Forum(sql.FieldHasPrefix(FieldTitle, v))
+}
+
+// TitleHasSuffix applies the HasSuffix predicate on the "title" field.
+func TitleHasSuffix(v string) predicate.Forum {
+	return predicate.Forum(sql.FieldHasSuffix(FieldTitle, v))
+}
+
+// TitleEqualFold applies the EqualFold predicate on the "title" field.
+func TitleEqualFold(v string) predicate.Forum {
+	return predicate.Forum(sql.FieldEqualFold(FieldTitle, v))
+}
+
+// TitleContainsFold applies the ContainsFold predicate on the "title" field.
+func TitleContainsFold(v string) predicate.Forum {
+	return predicate.Forum(sql.FieldContainsFold(FieldTitle, v))
 }
 
 // DescriptionEQ applies the EQ predicate on the "description" field.
@@ -240,6 +265,81 @@ func DescriptionContainsFold(v string) predicate.Forum {
 	return predicate.Forum(sql.FieldContainsFold(FieldDescription, v))
 }
 
+// ThumbnailUrlEQ applies the EQ predicate on the "thumbnailUrl" field.
+func ThumbnailUrlEQ(v string) predicate.Forum {
+	return predicate.Forum(sql.FieldEQ(FieldThumbnailUrl, v))
+}
+
+// ThumbnailUrlNEQ applies the NEQ predicate on the "thumbnailUrl" field.
+func ThumbnailUrlNEQ(v string) predicate.Forum {
+	return predicate.Forum(sql.FieldNEQ(FieldThumbnailUrl, v))
+}
+
+// ThumbnailUrlIn applies the In predicate on the "thumbnailUrl" field.
+func ThumbnailUrlIn(vs ...string) predicate.Forum {
+	return predicate.Forum(sql.FieldIn(FieldThumbnailUrl, vs...))
+}
+
+// ThumbnailUrlNotIn applies the NotIn predicate on the "thumbnailUrl" field.
+func ThumbnailUrlNotIn(vs ...string) predicate.Forum {
+	return predicate.Forum(sql.FieldNotIn(FieldThumbnailUrl, vs...))
+}
+
+// ThumbnailUrlGT applies the GT predicate on the "thumbnailUrl" field.
+func ThumbnailUrlGT(v string) predicate.Forum {
+	return predicate.Forum(sql.FieldGT(FieldThumbnailUrl, v))
+}
+
+// ThumbnailUrlGTE applies the GTE predicate on the "thumbnailUrl" field.
+func ThumbnailUrlGTE(v string) predicate.Forum {
+	return predicate.Forum(sql.FieldGTE(FieldThumbnailUrl, v))
+}
+
+// ThumbnailUrlLT applies the LT predicate on the "thumbnailUrl" field.
+func ThumbnailUrlLT(v string) predicate.Forum {
+	return predicate.Forum(sql.FieldLT(FieldThumbnailUrl, v))
+}
+
+// ThumbnailUrlLTE applies the LTE predicate on the "thumbnailUrl" field.
+func ThumbnailUrlLTE(v string) predicate.Forum {
+	return predicate.Forum(sql.FieldLTE(FieldThumbnailUrl, v))
+}
+
+// ThumbnailUrlContains applies the Contains predicate on the "thumbnailUrl" field.
+func ThumbnailUrlContains(v string) predicate.Forum {
+	return predicate.Forum(sql.FieldContains(FieldThumbnailUrl, v))
+}
+
+// ThumbnailUrlHasPrefix applies the HasPrefix predicate on the "thumbnailUrl" field.
+func ThumbnailUrlHasPrefix(v string) predicate.Forum {
+	return predicate.Forum(sql.FieldHasPrefix(FieldThumbnailUrl, v))
+}
+
+// ThumbnailUrlHasSuffix applies the HasSuffix predicate on the "thumbnailUrl" field.
+func ThumbnailUrlHasSuffix(v string) predicate.Forum {
+	return predicate.Forum(sql.FieldHasSuffix(FieldThumbnailUrl, v))
+}
+
+// ThumbnailUrlIsNil applies the IsNil predicate on the "thumbnailUrl" field.
+func ThumbnailUrlIsNil() predicate.Forum {
+	return predicate.Forum(sql.FieldIsNull(FieldThumbnailUrl))
+}
+
+// ThumbnailUrlNotNil applies the NotNil predicate on the "thumbnailUrl" field.
+func ThumbnailUrlNotNil() predicate.Forum {
+	return predicate.Forum(sql.FieldNotNull(FieldThumbnailUrl))
+}
+
+// ThumbnailUrlEqualFold applies the EqualFold predicate on the "thumbnailUrl" field.
+func ThumbnailUrlEqualFold(v string) predicate.Forum {
+	return predicate.Forum(sql.FieldEqualFold(FieldThumbnailUrl, v))
+}
+
+// ThumbnailUrlContainsFold applies the ContainsFold predicate on the "thumbnailUrl" field.
+func ThumbnailUrlContainsFold(v string) predicate.Forum {
+	return predicate.Forum(sql.FieldContainsFold(FieldThumbnailUrl, v))
+}
+
 // StatusEQ applies the EQ predicate on the "status" field.
 func StatusEQ(v Status) predicate.Forum {
 	return predicate.Forum(sql.FieldEQ(FieldStatus, v))
@@ -260,101 +360,124 @@ func StatusNotIn(vs ...Status) predicate.Forum {
 	return predicate.Forum(sql.FieldNotIn(FieldStatus, vs...))
 }
 
-// CreatedAtEQ applies the EQ predicate on the "created_at" field.
+// CreatedAtEQ applies the EQ predicate on the "createdAt" field.
 func CreatedAtEQ(v time.Time) predicate.Forum {
 	return predicate.Forum(sql.FieldEQ(FieldCreatedAt, v))
 }
 
-// CreatedAtNEQ applies the NEQ predicate on the "created_at" field.
+// CreatedAtNEQ applies the NEQ predicate on the "createdAt" field.
 func CreatedAtNEQ(v time.Time) predicate.Forum {
 	return predicate.Forum(sql.FieldNEQ(FieldCreatedAt, v))
 }
 
-// CreatedAtIn applies the In predicate on the "created_at" field.
+// CreatedAtIn applies the In predicate on the "createdAt" field.
 func CreatedAtIn(vs ...time.Time) predicate.Forum {
 	return predicate.Forum(sql.FieldIn(FieldCreatedAt, vs...))
 }
 
-// CreatedAtNotIn applies the NotIn predicate on the "created_at" field.
+// CreatedAtNotIn applies the NotIn predicate on the "createdAt" field.
 func CreatedAtNotIn(vs ...time.Time) predicate.Forum {
 	return predicate.Forum(sql.FieldNotIn(FieldCreatedAt, vs...))
 }
 
-// CreatedAtGT applies the GT predicate on the "created_at" field.
+// CreatedAtGT applies the GT predicate on the "createdAt" field.
 func CreatedAtGT(v time.Time) predicate.Forum {
 	return predicate.Forum(sql.FieldGT(FieldCreatedAt, v))
 }
 
-// CreatedAtGTE applies the GTE predicate on the "created_at" field.
+// CreatedAtGTE applies the GTE predicate on the "createdAt" field.
 func CreatedAtGTE(v time.Time) predicate.Forum {
 	return predicate.Forum(sql.FieldGTE(FieldCreatedAt, v))
 }
 
-// CreatedAtLT applies the LT predicate on the "created_at" field.
+// CreatedAtLT applies the LT predicate on the "createdAt" field.
 func CreatedAtLT(v time.Time) predicate.Forum {
 	return predicate.Forum(sql.FieldLT(FieldCreatedAt, v))
 }
 
-// CreatedAtLTE applies the LTE predicate on the "created_at" field.
+// CreatedAtLTE applies the LTE predicate on the "createdAt" field.
 func CreatedAtLTE(v time.Time) predicate.Forum {
 	return predicate.Forum(sql.FieldLTE(FieldCreatedAt, v))
 }
 
-// UpdatedAtEQ applies the EQ predicate on the "updated_at" field.
+// UpdatedAtEQ applies the EQ predicate on the "updatedAt" field.
 func UpdatedAtEQ(v time.Time) predicate.Forum {
 	return predicate.Forum(sql.FieldEQ(FieldUpdatedAt, v))
 }
 
-// UpdatedAtNEQ applies the NEQ predicate on the "updated_at" field.
+// UpdatedAtNEQ applies the NEQ predicate on the "updatedAt" field.
 func UpdatedAtNEQ(v time.Time) predicate.Forum {
 	return predicate.Forum(sql.FieldNEQ(FieldUpdatedAt, v))
 }
 
-// UpdatedAtIn applies the In predicate on the "updated_at" field.
+// UpdatedAtIn applies the In predicate on the "updatedAt" field.
 func UpdatedAtIn(vs ...time.Time) predicate.Forum {
 	return predicate.Forum(sql.FieldIn(FieldUpdatedAt, vs...))
 }
 
-// UpdatedAtNotIn applies the NotIn predicate on the "updated_at" field.
+// UpdatedAtNotIn applies the NotIn predicate on the "updatedAt" field.
 func UpdatedAtNotIn(vs ...time.Time) predicate.Forum {
 	return predicate.Forum(sql.FieldNotIn(FieldUpdatedAt, vs...))
 }
 
-// UpdatedAtGT applies the GT predicate on the "updated_at" field.
+// UpdatedAtGT applies the GT predicate on the "updatedAt" field.
 func UpdatedAtGT(v time.Time) predicate.Forum {
 	return predicate.Forum(sql.FieldGT(FieldUpdatedAt, v))
 }
 
-// UpdatedAtGTE applies the GTE predicate on the "updated_at" field.
+// UpdatedAtGTE applies the GTE predicate on the "updatedAt" field.
 func UpdatedAtGTE(v time.Time) predicate.Forum {
 	return predicate.Forum(sql.FieldGTE(FieldUpdatedAt, v))
 }
 
-// UpdatedAtLT applies the LT predicate on the "updated_at" field.
+// UpdatedAtLT applies the LT predicate on the "updatedAt" field.
 func UpdatedAtLT(v time.Time) predicate.Forum {
 	return predicate.Forum(sql.FieldLT(FieldUpdatedAt, v))
 }
 
-// UpdatedAtLTE applies the LTE predicate on the "updated_at" field.
+// UpdatedAtLTE applies the LTE predicate on the "updatedAt" field.
 func UpdatedAtLTE(v time.Time) predicate.Forum {
 	return predicate.Forum(sql.FieldLTE(FieldUpdatedAt, v))
 }
 
-// HasUser applies the HasEdge predicate on the "user" edge.
-func HasUser() predicate.Forum {
+// HasLikedUsers applies the HasEdge predicate on the "liked_users" edge.
+func HasLikedUsers() predicate.Forum {
 	return predicate.Forum(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, UserTable, UserColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, LikedUsersTable, LikedUsersPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasUserWith applies the HasEdge predicate on the "user" edge with a given conditions (other predicates).
-func HasUserWith(preds ...predicate.User) predicate.Forum {
+// HasLikedUsersWith applies the HasEdge predicate on the "liked_users" edge with a given conditions (other predicates).
+func HasLikedUsersWith(preds ...predicate.User) predicate.Forum {
 	return predicate.Forum(func(s *sql.Selector) {
-		step := newUserStep()
+		step := newLikedUsersStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasSubscribedUsers applies the HasEdge predicate on the "subscribed_users" edge.
+func HasSubscribedUsers() predicate.Forum {
+	return predicate.Forum(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, SubscribedUsersTable, SubscribedUsersPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasSubscribedUsersWith applies the HasEdge predicate on the "subscribed_users" edge with a given conditions (other predicates).
+func HasSubscribedUsersWith(preds ...predicate.User) predicate.Forum {
+	return predicate.Forum(func(s *sql.Selector) {
+		step := newSubscribedUsersStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -386,21 +509,44 @@ func HasTopicsWith(preds ...predicate.Topic) predicate.Forum {
 	})
 }
 
-// HasForumLikes applies the HasEdge predicate on the "forum_likes" edge.
-func HasForumLikes() predicate.Forum {
+// HasUserForumLike applies the HasEdge predicate on the "user_forum_like" edge.
+func HasUserForumLike() predicate.Forum {
 	return predicate.Forum(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, ForumLikesTable, ForumLikesColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, UserForumLikeTable, UserForumLikeColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasForumLikesWith applies the HasEdge predicate on the "forum_likes" edge with a given conditions (other predicates).
-func HasForumLikesWith(preds ...predicate.ForumLike) predicate.Forum {
+// HasUserForumLikeWith applies the HasEdge predicate on the "user_forum_like" edge with a given conditions (other predicates).
+func HasUserForumLikeWith(preds ...predicate.UserForumSubscription) predicate.Forum {
 	return predicate.Forum(func(s *sql.Selector) {
-		step := newForumLikesStep()
+		step := newUserForumLikeStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasUserForumSubscription applies the HasEdge predicate on the "user_forum_subscription" edge.
+func HasUserForumSubscription() predicate.Forum {
+	return predicate.Forum(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, UserForumSubscriptionTable, UserForumSubscriptionColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasUserForumSubscriptionWith applies the HasEdge predicate on the "user_forum_subscription" edge with a given conditions (other predicates).
+func HasUserForumSubscriptionWith(preds ...predicate.UserForumLike) predicate.Forum {
+	return predicate.Forum(func(s *sql.Selector) {
+		step := newUserForumSubscriptionStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

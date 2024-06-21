@@ -297,12 +297,12 @@ func (caq *CommentAttachmentQuery) WithComment(opts ...func(*CommentQuery)) *Com
 // Example:
 //
 //	var v []struct {
-//		CommentID int `json:"comment_id,omitempty"`
+//		CommentId int `json:"commentId,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.CommentAttachment.Query().
-//		GroupBy(commentattachment.FieldCommentID).
+//		GroupBy(commentattachment.FieldCommentId).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (caq *CommentAttachmentQuery) GroupBy(field string, fields ...string) *CommentAttachmentGroupBy {
@@ -320,11 +320,11 @@ func (caq *CommentAttachmentQuery) GroupBy(field string, fields ...string) *Comm
 // Example:
 //
 //	var v []struct {
-//		CommentID int `json:"comment_id,omitempty"`
+//		CommentId int `json:"commentId,omitempty"`
 //	}
 //
 //	client.CommentAttachment.Query().
-//		Select(commentattachment.FieldCommentID).
+//		Select(commentattachment.FieldCommentId).
 //		Scan(ctx, &v)
 func (caq *CommentAttachmentQuery) Select(fields ...string) *CommentAttachmentSelect {
 	caq.ctx.Fields = append(caq.ctx.Fields, fields...)
@@ -404,7 +404,7 @@ func (caq *CommentAttachmentQuery) loadComment(ctx context.Context, query *Comme
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*CommentAttachment)
 	for i := range nodes {
-		fk := nodes[i].CommentID
+		fk := nodes[i].CommentId
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -421,7 +421,7 @@ func (caq *CommentAttachmentQuery) loadComment(ctx context.Context, query *Comme
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "comment_id" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "commentId" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -456,7 +456,7 @@ func (caq *CommentAttachmentQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 		if caq.withComment != nil {
-			_spec.Node.AddColumnOnce(commentattachment.FieldCommentID)
+			_spec.Node.AddColumnOnce(commentattachment.FieldCommentId)
 		}
 	}
 	if ps := caq.predicates; len(ps) > 0 {

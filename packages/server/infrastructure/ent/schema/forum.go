@@ -7,29 +7,27 @@ import (
     "time"
 )
 
-// Forum holds the schema definition for the Forum entity.
 type Forum struct {
     ent.Schema
 }
 
-// Fields of the Forum.
 func (Forum) Fields() []ent.Field {
     return []ent.Field{
-        field.Int("id").Unique().Immutable().StorageKey("id"),
-        field.Int("user_id"),
-        field.String("name"),
-        field.String("description").Optional(),
-        field.Enum("status").Values("Public", "Private", "Archived", "Disapproved").Default("Public"),
-        field.Time("created_at").Default(time.Now),
-        field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),
+        field.Int("id").Unique().Immutable(),
+        field.Int("userId").StorageKey("user_id"),
+        field.String("title").MaxLen(50),
+        field.String("description").Optional().MaxLen(255),
+        field.String("thumbnailUrl").Optional().StorageKey("thumbnail_url"),
+        field.Enum("status").Values("Public", "Private", "Archived").Default("Public"),
+        field.Time("createdAt").Default(time.Now).StorageKey("created_at"),
+        field.Time("updatedAt").Default(time.Now).UpdateDefault(time.Now).StorageKey("updated_at"),
     }
 }
 
-// Edges of the Forum.
 func (Forum) Edges() []ent.Edge {
     return []ent.Edge{
-        edge.From("user", User.Type).Ref("forums").Unique().Field("user_id").Required(),
+        edge.From("liked_users", User.Type).Ref("subscribed_forums").Through("user_forum_like", UserForumSubscription.Type),
+        edge.From("subscribed_users", User.Type).Ref("liked_forums").Through("user_forum_subscription", UserForumLike.Type),
         edge.To("topics", Topic.Type),
-        edge.To("forum_likes", ForumLike.Type),
     }
 }

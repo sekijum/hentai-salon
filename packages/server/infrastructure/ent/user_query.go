@@ -8,15 +8,16 @@ import (
 	"fmt"
 	"math"
 	"server/infrastructure/ent/comment"
-	"server/infrastructure/ent/commentlike"
 	"server/infrastructure/ent/forum"
-	"server/infrastructure/ent/forumlike"
 	"server/infrastructure/ent/predicate"
 	"server/infrastructure/ent/topic"
-	"server/infrastructure/ent/topiclike"
 	"server/infrastructure/ent/user"
-	"server/infrastructure/ent/usercommentnotification"
-	"server/infrastructure/ent/usertopicnotification"
+	"server/infrastructure/ent/usercommentlike"
+	"server/infrastructure/ent/usercommentsubscription"
+	"server/infrastructure/ent/userforumlike"
+	"server/infrastructure/ent/userforumsubscription"
+	"server/infrastructure/ent/usertopiclike"
+	"server/infrastructure/ent/usertopicsubscription"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -26,18 +27,25 @@ import (
 // UserQuery is the builder for querying User entities.
 type UserQuery struct {
 	config
-	ctx                          *QueryContext
-	order                        []user.OrderOption
-	inters                       []Interceptor
-	predicates                   []predicate.User
-	withForums                   *ForumQuery
-	withTopics                   *TopicQuery
-	withComments                 *CommentQuery
-	withUserTopicNotifications   *UserTopicNotificationQuery
-	withUserCommentNotifications *UserCommentNotificationQuery
-	withForumLikes               *ForumLikeQuery
-	withTopicLikes               *TopicLikeQuery
-	withCommentLikes             *CommentLikeQuery
+	ctx                         *QueryContext
+	order                       []user.OrderOption
+	inters                      []Interceptor
+	predicates                  []predicate.User
+	withForums                  *ForumQuery
+	withTopics                  *TopicQuery
+	withComments                *CommentQuery
+	withLikedForums             *ForumQuery
+	withLikedTopics             *TopicQuery
+	withLikedComments           *CommentQuery
+	withSubscribedForums        *ForumQuery
+	withSubscribedTopics        *TopicQuery
+	withSubscribedComments      *CommentQuery
+	withUserForumLike           *UserForumLikeQuery
+	withUserTopicLike           *UserTopicLikeQuery
+	withUserCommentLike         *UserCommentLikeQuery
+	withUserForumSubscription   *UserForumSubscriptionQuery
+	withUserTopicSubscription   *UserTopicSubscriptionQuery
+	withUserCommentSubscription *UserCommentSubscriptionQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -140,9 +148,9 @@ func (uq *UserQuery) QueryComments() *CommentQuery {
 	return query
 }
 
-// QueryUserTopicNotifications chains the current query on the "user_topic_notifications" edge.
-func (uq *UserQuery) QueryUserTopicNotifications() *UserTopicNotificationQuery {
-	query := (&UserTopicNotificationClient{config: uq.config}).Query()
+// QueryLikedForums chains the current query on the "liked_forums" edge.
+func (uq *UserQuery) QueryLikedForums() *ForumQuery {
+	query := (&ForumClient{config: uq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := uq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -153,8 +161,8 @@ func (uq *UserQuery) QueryUserTopicNotifications() *UserTopicNotificationQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, selector),
-			sqlgraph.To(usertopicnotification.Table, usertopicnotification.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, user.UserTopicNotificationsTable, user.UserTopicNotificationsColumn),
+			sqlgraph.To(forum.Table, forum.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, user.LikedForumsTable, user.LikedForumsPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
 		return fromU, nil
@@ -162,9 +170,9 @@ func (uq *UserQuery) QueryUserTopicNotifications() *UserTopicNotificationQuery {
 	return query
 }
 
-// QueryUserCommentNotifications chains the current query on the "user_comment_notifications" edge.
-func (uq *UserQuery) QueryUserCommentNotifications() *UserCommentNotificationQuery {
-	query := (&UserCommentNotificationClient{config: uq.config}).Query()
+// QueryLikedTopics chains the current query on the "liked_topics" edge.
+func (uq *UserQuery) QueryLikedTopics() *TopicQuery {
+	query := (&TopicClient{config: uq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := uq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -175,8 +183,8 @@ func (uq *UserQuery) QueryUserCommentNotifications() *UserCommentNotificationQue
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, selector),
-			sqlgraph.To(usercommentnotification.Table, usercommentnotification.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, user.UserCommentNotificationsTable, user.UserCommentNotificationsColumn),
+			sqlgraph.To(topic.Table, topic.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, user.LikedTopicsTable, user.LikedTopicsPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
 		return fromU, nil
@@ -184,9 +192,9 @@ func (uq *UserQuery) QueryUserCommentNotifications() *UserCommentNotificationQue
 	return query
 }
 
-// QueryForumLikes chains the current query on the "forum_likes" edge.
-func (uq *UserQuery) QueryForumLikes() *ForumLikeQuery {
-	query := (&ForumLikeClient{config: uq.config}).Query()
+// QueryLikedComments chains the current query on the "liked_comments" edge.
+func (uq *UserQuery) QueryLikedComments() *CommentQuery {
+	query := (&CommentClient{config: uq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := uq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -197,8 +205,8 @@ func (uq *UserQuery) QueryForumLikes() *ForumLikeQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, selector),
-			sqlgraph.To(forumlike.Table, forumlike.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, user.ForumLikesTable, user.ForumLikesColumn),
+			sqlgraph.To(comment.Table, comment.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, user.LikedCommentsTable, user.LikedCommentsPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
 		return fromU, nil
@@ -206,9 +214,9 @@ func (uq *UserQuery) QueryForumLikes() *ForumLikeQuery {
 	return query
 }
 
-// QueryTopicLikes chains the current query on the "topic_likes" edge.
-func (uq *UserQuery) QueryTopicLikes() *TopicLikeQuery {
-	query := (&TopicLikeClient{config: uq.config}).Query()
+// QuerySubscribedForums chains the current query on the "subscribed_forums" edge.
+func (uq *UserQuery) QuerySubscribedForums() *ForumQuery {
+	query := (&ForumClient{config: uq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := uq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -219,8 +227,8 @@ func (uq *UserQuery) QueryTopicLikes() *TopicLikeQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, selector),
-			sqlgraph.To(topiclike.Table, topiclike.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, user.TopicLikesTable, user.TopicLikesColumn),
+			sqlgraph.To(forum.Table, forum.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, user.SubscribedForumsTable, user.SubscribedForumsPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
 		return fromU, nil
@@ -228,9 +236,9 @@ func (uq *UserQuery) QueryTopicLikes() *TopicLikeQuery {
 	return query
 }
 
-// QueryCommentLikes chains the current query on the "comment_likes" edge.
-func (uq *UserQuery) QueryCommentLikes() *CommentLikeQuery {
-	query := (&CommentLikeClient{config: uq.config}).Query()
+// QuerySubscribedTopics chains the current query on the "subscribed_topics" edge.
+func (uq *UserQuery) QuerySubscribedTopics() *TopicQuery {
+	query := (&TopicClient{config: uq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := uq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -241,8 +249,162 @@ func (uq *UserQuery) QueryCommentLikes() *CommentLikeQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, selector),
-			sqlgraph.To(commentlike.Table, commentlike.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, user.CommentLikesTable, user.CommentLikesColumn),
+			sqlgraph.To(topic.Table, topic.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, user.SubscribedTopicsTable, user.SubscribedTopicsPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QuerySubscribedComments chains the current query on the "subscribed_comments" edge.
+func (uq *UserQuery) QuerySubscribedComments() *CommentQuery {
+	query := (&CommentClient{config: uq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := uq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := uq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(comment.Table, comment.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, user.SubscribedCommentsTable, user.SubscribedCommentsPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryUserForumLike chains the current query on the "user_forum_like" edge.
+func (uq *UserQuery) QueryUserForumLike() *UserForumLikeQuery {
+	query := (&UserForumLikeClient{config: uq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := uq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := uq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(userforumlike.Table, userforumlike.UserColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, user.UserForumLikeTable, user.UserForumLikeColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryUserTopicLike chains the current query on the "user_topic_like" edge.
+func (uq *UserQuery) QueryUserTopicLike() *UserTopicLikeQuery {
+	query := (&UserTopicLikeClient{config: uq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := uq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := uq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(usertopiclike.Table, usertopiclike.UserColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, user.UserTopicLikeTable, user.UserTopicLikeColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryUserCommentLike chains the current query on the "user_comment_like" edge.
+func (uq *UserQuery) QueryUserCommentLike() *UserCommentLikeQuery {
+	query := (&UserCommentLikeClient{config: uq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := uq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := uq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(usercommentlike.Table, usercommentlike.UserColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, user.UserCommentLikeTable, user.UserCommentLikeColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryUserForumSubscription chains the current query on the "user_forum_subscription" edge.
+func (uq *UserQuery) QueryUserForumSubscription() *UserForumSubscriptionQuery {
+	query := (&UserForumSubscriptionClient{config: uq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := uq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := uq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(userforumsubscription.Table, userforumsubscription.UserColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, user.UserForumSubscriptionTable, user.UserForumSubscriptionColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryUserTopicSubscription chains the current query on the "user_topic_subscription" edge.
+func (uq *UserQuery) QueryUserTopicSubscription() *UserTopicSubscriptionQuery {
+	query := (&UserTopicSubscriptionClient{config: uq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := uq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := uq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(usertopicsubscription.Table, usertopicsubscription.UserColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, user.UserTopicSubscriptionTable, user.UserTopicSubscriptionColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryUserCommentSubscription chains the current query on the "user_comment_subscription" edge.
+func (uq *UserQuery) QueryUserCommentSubscription() *UserCommentSubscriptionQuery {
+	query := (&UserCommentSubscriptionClient{config: uq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := uq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := uq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(usercommentsubscription.Table, usercommentsubscription.UserColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, user.UserCommentSubscriptionTable, user.UserCommentSubscriptionColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
 		return fromU, nil
@@ -437,19 +599,26 @@ func (uq *UserQuery) Clone() *UserQuery {
 		return nil
 	}
 	return &UserQuery{
-		config:                       uq.config,
-		ctx:                          uq.ctx.Clone(),
-		order:                        append([]user.OrderOption{}, uq.order...),
-		inters:                       append([]Interceptor{}, uq.inters...),
-		predicates:                   append([]predicate.User{}, uq.predicates...),
-		withForums:                   uq.withForums.Clone(),
-		withTopics:                   uq.withTopics.Clone(),
-		withComments:                 uq.withComments.Clone(),
-		withUserTopicNotifications:   uq.withUserTopicNotifications.Clone(),
-		withUserCommentNotifications: uq.withUserCommentNotifications.Clone(),
-		withForumLikes:               uq.withForumLikes.Clone(),
-		withTopicLikes:               uq.withTopicLikes.Clone(),
-		withCommentLikes:             uq.withCommentLikes.Clone(),
+		config:                      uq.config,
+		ctx:                         uq.ctx.Clone(),
+		order:                       append([]user.OrderOption{}, uq.order...),
+		inters:                      append([]Interceptor{}, uq.inters...),
+		predicates:                  append([]predicate.User{}, uq.predicates...),
+		withForums:                  uq.withForums.Clone(),
+		withTopics:                  uq.withTopics.Clone(),
+		withComments:                uq.withComments.Clone(),
+		withLikedForums:             uq.withLikedForums.Clone(),
+		withLikedTopics:             uq.withLikedTopics.Clone(),
+		withLikedComments:           uq.withLikedComments.Clone(),
+		withSubscribedForums:        uq.withSubscribedForums.Clone(),
+		withSubscribedTopics:        uq.withSubscribedTopics.Clone(),
+		withSubscribedComments:      uq.withSubscribedComments.Clone(),
+		withUserForumLike:           uq.withUserForumLike.Clone(),
+		withUserTopicLike:           uq.withUserTopicLike.Clone(),
+		withUserCommentLike:         uq.withUserCommentLike.Clone(),
+		withUserForumSubscription:   uq.withUserForumSubscription.Clone(),
+		withUserTopicSubscription:   uq.withUserTopicSubscription.Clone(),
+		withUserCommentSubscription: uq.withUserCommentSubscription.Clone(),
 		// clone intermediate query.
 		sql:  uq.sql.Clone(),
 		path: uq.path,
@@ -489,58 +658,135 @@ func (uq *UserQuery) WithComments(opts ...func(*CommentQuery)) *UserQuery {
 	return uq
 }
 
-// WithUserTopicNotifications tells the query-builder to eager-load the nodes that are connected to
-// the "user_topic_notifications" edge. The optional arguments are used to configure the query builder of the edge.
-func (uq *UserQuery) WithUserTopicNotifications(opts ...func(*UserTopicNotificationQuery)) *UserQuery {
-	query := (&UserTopicNotificationClient{config: uq.config}).Query()
+// WithLikedForums tells the query-builder to eager-load the nodes that are connected to
+// the "liked_forums" edge. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithLikedForums(opts ...func(*ForumQuery)) *UserQuery {
+	query := (&ForumClient{config: uq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	uq.withUserTopicNotifications = query
+	uq.withLikedForums = query
 	return uq
 }
 
-// WithUserCommentNotifications tells the query-builder to eager-load the nodes that are connected to
-// the "user_comment_notifications" edge. The optional arguments are used to configure the query builder of the edge.
-func (uq *UserQuery) WithUserCommentNotifications(opts ...func(*UserCommentNotificationQuery)) *UserQuery {
-	query := (&UserCommentNotificationClient{config: uq.config}).Query()
+// WithLikedTopics tells the query-builder to eager-load the nodes that are connected to
+// the "liked_topics" edge. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithLikedTopics(opts ...func(*TopicQuery)) *UserQuery {
+	query := (&TopicClient{config: uq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	uq.withUserCommentNotifications = query
+	uq.withLikedTopics = query
 	return uq
 }
 
-// WithForumLikes tells the query-builder to eager-load the nodes that are connected to
-// the "forum_likes" edge. The optional arguments are used to configure the query builder of the edge.
-func (uq *UserQuery) WithForumLikes(opts ...func(*ForumLikeQuery)) *UserQuery {
-	query := (&ForumLikeClient{config: uq.config}).Query()
+// WithLikedComments tells the query-builder to eager-load the nodes that are connected to
+// the "liked_comments" edge. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithLikedComments(opts ...func(*CommentQuery)) *UserQuery {
+	query := (&CommentClient{config: uq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	uq.withForumLikes = query
+	uq.withLikedComments = query
 	return uq
 }
 
-// WithTopicLikes tells the query-builder to eager-load the nodes that are connected to
-// the "topic_likes" edge. The optional arguments are used to configure the query builder of the edge.
-func (uq *UserQuery) WithTopicLikes(opts ...func(*TopicLikeQuery)) *UserQuery {
-	query := (&TopicLikeClient{config: uq.config}).Query()
+// WithSubscribedForums tells the query-builder to eager-load the nodes that are connected to
+// the "subscribed_forums" edge. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithSubscribedForums(opts ...func(*ForumQuery)) *UserQuery {
+	query := (&ForumClient{config: uq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	uq.withTopicLikes = query
+	uq.withSubscribedForums = query
 	return uq
 }
 
-// WithCommentLikes tells the query-builder to eager-load the nodes that are connected to
-// the "comment_likes" edge. The optional arguments are used to configure the query builder of the edge.
-func (uq *UserQuery) WithCommentLikes(opts ...func(*CommentLikeQuery)) *UserQuery {
-	query := (&CommentLikeClient{config: uq.config}).Query()
+// WithSubscribedTopics tells the query-builder to eager-load the nodes that are connected to
+// the "subscribed_topics" edge. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithSubscribedTopics(opts ...func(*TopicQuery)) *UserQuery {
+	query := (&TopicClient{config: uq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	uq.withCommentLikes = query
+	uq.withSubscribedTopics = query
+	return uq
+}
+
+// WithSubscribedComments tells the query-builder to eager-load the nodes that are connected to
+// the "subscribed_comments" edge. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithSubscribedComments(opts ...func(*CommentQuery)) *UserQuery {
+	query := (&CommentClient{config: uq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	uq.withSubscribedComments = query
+	return uq
+}
+
+// WithUserForumLike tells the query-builder to eager-load the nodes that are connected to
+// the "user_forum_like" edge. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithUserForumLike(opts ...func(*UserForumLikeQuery)) *UserQuery {
+	query := (&UserForumLikeClient{config: uq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	uq.withUserForumLike = query
+	return uq
+}
+
+// WithUserTopicLike tells the query-builder to eager-load the nodes that are connected to
+// the "user_topic_like" edge. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithUserTopicLike(opts ...func(*UserTopicLikeQuery)) *UserQuery {
+	query := (&UserTopicLikeClient{config: uq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	uq.withUserTopicLike = query
+	return uq
+}
+
+// WithUserCommentLike tells the query-builder to eager-load the nodes that are connected to
+// the "user_comment_like" edge. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithUserCommentLike(opts ...func(*UserCommentLikeQuery)) *UserQuery {
+	query := (&UserCommentLikeClient{config: uq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	uq.withUserCommentLike = query
+	return uq
+}
+
+// WithUserForumSubscription tells the query-builder to eager-load the nodes that are connected to
+// the "user_forum_subscription" edge. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithUserForumSubscription(opts ...func(*UserForumSubscriptionQuery)) *UserQuery {
+	query := (&UserForumSubscriptionClient{config: uq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	uq.withUserForumSubscription = query
+	return uq
+}
+
+// WithUserTopicSubscription tells the query-builder to eager-load the nodes that are connected to
+// the "user_topic_subscription" edge. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithUserTopicSubscription(opts ...func(*UserTopicSubscriptionQuery)) *UserQuery {
+	query := (&UserTopicSubscriptionClient{config: uq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	uq.withUserTopicSubscription = query
+	return uq
+}
+
+// WithUserCommentSubscription tells the query-builder to eager-load the nodes that are connected to
+// the "user_comment_subscription" edge. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithUserCommentSubscription(opts ...func(*UserCommentSubscriptionQuery)) *UserQuery {
+	query := (&UserCommentSubscriptionClient{config: uq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	uq.withUserCommentSubscription = query
 	return uq
 }
 
@@ -550,12 +796,12 @@ func (uq *UserQuery) WithCommentLikes(opts ...func(*CommentLikeQuery)) *UserQuer
 // Example:
 //
 //	var v []struct {
-//		Username string `json:"username,omitempty"`
+//		UserName string `json:"userName,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.User.Query().
-//		GroupBy(user.FieldUsername).
+//		GroupBy(user.FieldUserName).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (uq *UserQuery) GroupBy(field string, fields ...string) *UserGroupBy {
@@ -573,11 +819,11 @@ func (uq *UserQuery) GroupBy(field string, fields ...string) *UserGroupBy {
 // Example:
 //
 //	var v []struct {
-//		Username string `json:"username,omitempty"`
+//		UserName string `json:"userName,omitempty"`
 //	}
 //
 //	client.User.Query().
-//		Select(user.FieldUsername).
+//		Select(user.FieldUserName).
 //		Scan(ctx, &v)
 func (uq *UserQuery) Select(fields ...string) *UserSelect {
 	uq.ctx.Fields = append(uq.ctx.Fields, fields...)
@@ -622,15 +868,22 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 	var (
 		nodes       = []*User{}
 		_spec       = uq.querySpec()
-		loadedTypes = [8]bool{
+		loadedTypes = [15]bool{
 			uq.withForums != nil,
 			uq.withTopics != nil,
 			uq.withComments != nil,
-			uq.withUserTopicNotifications != nil,
-			uq.withUserCommentNotifications != nil,
-			uq.withForumLikes != nil,
-			uq.withTopicLikes != nil,
-			uq.withCommentLikes != nil,
+			uq.withLikedForums != nil,
+			uq.withLikedTopics != nil,
+			uq.withLikedComments != nil,
+			uq.withSubscribedForums != nil,
+			uq.withSubscribedTopics != nil,
+			uq.withSubscribedComments != nil,
+			uq.withUserForumLike != nil,
+			uq.withUserTopicLike != nil,
+			uq.withUserCommentLike != nil,
+			uq.withUserForumSubscription != nil,
+			uq.withUserTopicSubscription != nil,
+			uq.withUserCommentSubscription != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -672,42 +925,93 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 			return nil, err
 		}
 	}
-	if query := uq.withUserTopicNotifications; query != nil {
-		if err := uq.loadUserTopicNotifications(ctx, query, nodes,
-			func(n *User) { n.Edges.UserTopicNotifications = []*UserTopicNotification{} },
-			func(n *User, e *UserTopicNotification) {
-				n.Edges.UserTopicNotifications = append(n.Edges.UserTopicNotifications, e)
+	if query := uq.withLikedForums; query != nil {
+		if err := uq.loadLikedForums(ctx, query, nodes,
+			func(n *User) { n.Edges.LikedForums = []*Forum{} },
+			func(n *User, e *Forum) { n.Edges.LikedForums = append(n.Edges.LikedForums, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := uq.withLikedTopics; query != nil {
+		if err := uq.loadLikedTopics(ctx, query, nodes,
+			func(n *User) { n.Edges.LikedTopics = []*Topic{} },
+			func(n *User, e *Topic) { n.Edges.LikedTopics = append(n.Edges.LikedTopics, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := uq.withLikedComments; query != nil {
+		if err := uq.loadLikedComments(ctx, query, nodes,
+			func(n *User) { n.Edges.LikedComments = []*Comment{} },
+			func(n *User, e *Comment) { n.Edges.LikedComments = append(n.Edges.LikedComments, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := uq.withSubscribedForums; query != nil {
+		if err := uq.loadSubscribedForums(ctx, query, nodes,
+			func(n *User) { n.Edges.SubscribedForums = []*Forum{} },
+			func(n *User, e *Forum) { n.Edges.SubscribedForums = append(n.Edges.SubscribedForums, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := uq.withSubscribedTopics; query != nil {
+		if err := uq.loadSubscribedTopics(ctx, query, nodes,
+			func(n *User) { n.Edges.SubscribedTopics = []*Topic{} },
+			func(n *User, e *Topic) { n.Edges.SubscribedTopics = append(n.Edges.SubscribedTopics, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := uq.withSubscribedComments; query != nil {
+		if err := uq.loadSubscribedComments(ctx, query, nodes,
+			func(n *User) { n.Edges.SubscribedComments = []*Comment{} },
+			func(n *User, e *Comment) { n.Edges.SubscribedComments = append(n.Edges.SubscribedComments, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := uq.withUserForumLike; query != nil {
+		if err := uq.loadUserForumLike(ctx, query, nodes,
+			func(n *User) { n.Edges.UserForumLike = []*UserForumLike{} },
+			func(n *User, e *UserForumLike) { n.Edges.UserForumLike = append(n.Edges.UserForumLike, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := uq.withUserTopicLike; query != nil {
+		if err := uq.loadUserTopicLike(ctx, query, nodes,
+			func(n *User) { n.Edges.UserTopicLike = []*UserTopicLike{} },
+			func(n *User, e *UserTopicLike) { n.Edges.UserTopicLike = append(n.Edges.UserTopicLike, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := uq.withUserCommentLike; query != nil {
+		if err := uq.loadUserCommentLike(ctx, query, nodes,
+			func(n *User) { n.Edges.UserCommentLike = []*UserCommentLike{} },
+			func(n *User, e *UserCommentLike) { n.Edges.UserCommentLike = append(n.Edges.UserCommentLike, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := uq.withUserForumSubscription; query != nil {
+		if err := uq.loadUserForumSubscription(ctx, query, nodes,
+			func(n *User) { n.Edges.UserForumSubscription = []*UserForumSubscription{} },
+			func(n *User, e *UserForumSubscription) {
+				n.Edges.UserForumSubscription = append(n.Edges.UserForumSubscription, e)
 			}); err != nil {
 			return nil, err
 		}
 	}
-	if query := uq.withUserCommentNotifications; query != nil {
-		if err := uq.loadUserCommentNotifications(ctx, query, nodes,
-			func(n *User) { n.Edges.UserCommentNotifications = []*UserCommentNotification{} },
-			func(n *User, e *UserCommentNotification) {
-				n.Edges.UserCommentNotifications = append(n.Edges.UserCommentNotifications, e)
+	if query := uq.withUserTopicSubscription; query != nil {
+		if err := uq.loadUserTopicSubscription(ctx, query, nodes,
+			func(n *User) { n.Edges.UserTopicSubscription = []*UserTopicSubscription{} },
+			func(n *User, e *UserTopicSubscription) {
+				n.Edges.UserTopicSubscription = append(n.Edges.UserTopicSubscription, e)
 			}); err != nil {
 			return nil, err
 		}
 	}
-	if query := uq.withForumLikes; query != nil {
-		if err := uq.loadForumLikes(ctx, query, nodes,
-			func(n *User) { n.Edges.ForumLikes = []*ForumLike{} },
-			func(n *User, e *ForumLike) { n.Edges.ForumLikes = append(n.Edges.ForumLikes, e) }); err != nil {
-			return nil, err
-		}
-	}
-	if query := uq.withTopicLikes; query != nil {
-		if err := uq.loadTopicLikes(ctx, query, nodes,
-			func(n *User) { n.Edges.TopicLikes = []*TopicLike{} },
-			func(n *User, e *TopicLike) { n.Edges.TopicLikes = append(n.Edges.TopicLikes, e) }); err != nil {
-			return nil, err
-		}
-	}
-	if query := uq.withCommentLikes; query != nil {
-		if err := uq.loadCommentLikes(ctx, query, nodes,
-			func(n *User) { n.Edges.CommentLikes = []*CommentLike{} },
-			func(n *User, e *CommentLike) { n.Edges.CommentLikes = append(n.Edges.CommentLikes, e) }); err != nil {
+	if query := uq.withUserCommentSubscription; query != nil {
+		if err := uq.loadUserCommentSubscription(ctx, query, nodes,
+			func(n *User) { n.Edges.UserCommentSubscription = []*UserCommentSubscription{} },
+			func(n *User, e *UserCommentSubscription) {
+				n.Edges.UserCommentSubscription = append(n.Edges.UserCommentSubscription, e)
+			}); err != nil {
 			return nil, err
 		}
 	}
@@ -724,9 +1028,7 @@ func (uq *UserQuery) loadForums(ctx context.Context, query *ForumQuery, nodes []
 			init(nodes[i])
 		}
 	}
-	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(forum.FieldUserID)
-	}
+	query.withFKs = true
 	query.Where(predicate.Forum(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(user.ForumsColumn), fks...))
 	}))
@@ -735,10 +1037,13 @@ func (uq *UserQuery) loadForums(ctx context.Context, query *ForumQuery, nodes []
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.UserID
-		node, ok := nodeids[fk]
+		fk := n.user_forums
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "user_forums" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "user_id" returned %v for node %v`, fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "user_forums" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -755,7 +1060,7 @@ func (uq *UserQuery) loadTopics(ctx context.Context, query *TopicQuery, nodes []
 		}
 	}
 	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(topic.FieldUserID)
+		query.ctx.AppendFieldOnce(topic.FieldUserId)
 	}
 	query.Where(predicate.Topic(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(user.TopicsColumn), fks...))
@@ -765,10 +1070,10 @@ func (uq *UserQuery) loadTopics(ctx context.Context, query *TopicQuery, nodes []
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.UserID
+		fk := n.UserId
 		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "user_id" returned %v for node %v`, fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "userId" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -785,7 +1090,7 @@ func (uq *UserQuery) loadComments(ctx context.Context, query *CommentQuery, node
 		}
 	}
 	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(comment.FieldUserID)
+		query.ctx.AppendFieldOnce(comment.FieldUserId)
 	}
 	query.Where(predicate.Comment(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(user.CommentsColumn), fks...))
@@ -795,16 +1100,382 @@ func (uq *UserQuery) loadComments(ctx context.Context, query *CommentQuery, node
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.UserID
+		fk := n.UserId
 		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "user_id" returned %v for node %v`, fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "userId" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}
 	return nil
 }
-func (uq *UserQuery) loadUserTopicNotifications(ctx context.Context, query *UserTopicNotificationQuery, nodes []*User, init func(*User), assign func(*User, *UserTopicNotification)) error {
+func (uq *UserQuery) loadLikedForums(ctx context.Context, query *ForumQuery, nodes []*User, init func(*User), assign func(*User, *Forum)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*User)
+	nids := make(map[int]map[*User]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(user.LikedForumsTable)
+		s.Join(joinT).On(s.C(forum.FieldID), joinT.C(user.LikedForumsPrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(user.LikedForumsPrimaryKey[0]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(user.LikedForumsPrimaryKey[0]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*User]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*Forum](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "liked_forums" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
+}
+func (uq *UserQuery) loadLikedTopics(ctx context.Context, query *TopicQuery, nodes []*User, init func(*User), assign func(*User, *Topic)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*User)
+	nids := make(map[int]map[*User]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(user.LikedTopicsTable)
+		s.Join(joinT).On(s.C(topic.FieldID), joinT.C(user.LikedTopicsPrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(user.LikedTopicsPrimaryKey[0]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(user.LikedTopicsPrimaryKey[0]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*User]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*Topic](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "liked_topics" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
+}
+func (uq *UserQuery) loadLikedComments(ctx context.Context, query *CommentQuery, nodes []*User, init func(*User), assign func(*User, *Comment)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*User)
+	nids := make(map[int]map[*User]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(user.LikedCommentsTable)
+		s.Join(joinT).On(s.C(comment.FieldID), joinT.C(user.LikedCommentsPrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(user.LikedCommentsPrimaryKey[0]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(user.LikedCommentsPrimaryKey[0]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*User]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*Comment](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "liked_comments" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
+}
+func (uq *UserQuery) loadSubscribedForums(ctx context.Context, query *ForumQuery, nodes []*User, init func(*User), assign func(*User, *Forum)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*User)
+	nids := make(map[int]map[*User]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(user.SubscribedForumsTable)
+		s.Join(joinT).On(s.C(forum.FieldID), joinT.C(user.SubscribedForumsPrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(user.SubscribedForumsPrimaryKey[0]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(user.SubscribedForumsPrimaryKey[0]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*User]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*Forum](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "subscribed_forums" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
+}
+func (uq *UserQuery) loadSubscribedTopics(ctx context.Context, query *TopicQuery, nodes []*User, init func(*User), assign func(*User, *Topic)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*User)
+	nids := make(map[int]map[*User]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(user.SubscribedTopicsTable)
+		s.Join(joinT).On(s.C(topic.FieldID), joinT.C(user.SubscribedTopicsPrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(user.SubscribedTopicsPrimaryKey[0]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(user.SubscribedTopicsPrimaryKey[0]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*User]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*Topic](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "subscribed_topics" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
+}
+func (uq *UserQuery) loadSubscribedComments(ctx context.Context, query *CommentQuery, nodes []*User, init func(*User), assign func(*User, *Comment)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*User)
+	nids := make(map[int]map[*User]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(user.SubscribedCommentsTable)
+		s.Join(joinT).On(s.C(comment.FieldID), joinT.C(user.SubscribedCommentsPrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(user.SubscribedCommentsPrimaryKey[0]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(user.SubscribedCommentsPrimaryKey[0]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*User]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*Comment](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "subscribed_comments" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
+}
+func (uq *UserQuery) loadUserForumLike(ctx context.Context, query *UserForumLikeQuery, nodes []*User, init func(*User), assign func(*User, *UserForumLike)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*User)
 	for i := range nodes {
@@ -815,26 +1486,26 @@ func (uq *UserQuery) loadUserTopicNotifications(ctx context.Context, query *User
 		}
 	}
 	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(usertopicnotification.FieldUserID)
+		query.ctx.AppendFieldOnce(userforumlike.FieldUserId)
 	}
-	query.Where(predicate.UserTopicNotification(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(user.UserTopicNotificationsColumn), fks...))
+	query.Where(predicate.UserForumLike(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(user.UserForumLikeColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.UserID
+		fk := n.UserId
 		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "user_id" returned %v for node %v`, fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "userId" returned %v for node %v`, fk, n)
 		}
 		assign(node, n)
 	}
 	return nil
 }
-func (uq *UserQuery) loadUserCommentNotifications(ctx context.Context, query *UserCommentNotificationQuery, nodes []*User, init func(*User), assign func(*User, *UserCommentNotification)) error {
+func (uq *UserQuery) loadUserTopicLike(ctx context.Context, query *UserTopicLikeQuery, nodes []*User, init func(*User), assign func(*User, *UserTopicLike)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*User)
 	for i := range nodes {
@@ -845,26 +1516,26 @@ func (uq *UserQuery) loadUserCommentNotifications(ctx context.Context, query *Us
 		}
 	}
 	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(usercommentnotification.FieldUserID)
+		query.ctx.AppendFieldOnce(usertopiclike.FieldUserId)
 	}
-	query.Where(predicate.UserCommentNotification(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(user.UserCommentNotificationsColumn), fks...))
+	query.Where(predicate.UserTopicLike(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(user.UserTopicLikeColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.UserID
+		fk := n.UserId
 		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "user_id" returned %v for node %v`, fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "userId" returned %v for node %v`, fk, n)
 		}
 		assign(node, n)
 	}
 	return nil
 }
-func (uq *UserQuery) loadForumLikes(ctx context.Context, query *ForumLikeQuery, nodes []*User, init func(*User), assign func(*User, *ForumLike)) error {
+func (uq *UserQuery) loadUserCommentLike(ctx context.Context, query *UserCommentLikeQuery, nodes []*User, init func(*User), assign func(*User, *UserCommentLike)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*User)
 	for i := range nodes {
@@ -875,26 +1546,26 @@ func (uq *UserQuery) loadForumLikes(ctx context.Context, query *ForumLikeQuery, 
 		}
 	}
 	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(forumlike.FieldUserID)
+		query.ctx.AppendFieldOnce(usercommentlike.FieldUserId)
 	}
-	query.Where(predicate.ForumLike(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(user.ForumLikesColumn), fks...))
+	query.Where(predicate.UserCommentLike(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(user.UserCommentLikeColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.UserID
+		fk := n.UserId
 		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "user_id" returned %v for node %v`, fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "userId" returned %v for node %v`, fk, n)
 		}
 		assign(node, n)
 	}
 	return nil
 }
-func (uq *UserQuery) loadTopicLikes(ctx context.Context, query *TopicLikeQuery, nodes []*User, init func(*User), assign func(*User, *TopicLike)) error {
+func (uq *UserQuery) loadUserForumSubscription(ctx context.Context, query *UserForumSubscriptionQuery, nodes []*User, init func(*User), assign func(*User, *UserForumSubscription)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*User)
 	for i := range nodes {
@@ -905,26 +1576,26 @@ func (uq *UserQuery) loadTopicLikes(ctx context.Context, query *TopicLikeQuery, 
 		}
 	}
 	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(topiclike.FieldUserID)
+		query.ctx.AppendFieldOnce(userforumsubscription.FieldUserId)
 	}
-	query.Where(predicate.TopicLike(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(user.TopicLikesColumn), fks...))
+	query.Where(predicate.UserForumSubscription(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(user.UserForumSubscriptionColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.UserID
+		fk := n.UserId
 		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "user_id" returned %v for node %v`, fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "userId" returned %v for node %v`, fk, n)
 		}
 		assign(node, n)
 	}
 	return nil
 }
-func (uq *UserQuery) loadCommentLikes(ctx context.Context, query *CommentLikeQuery, nodes []*User, init func(*User), assign func(*User, *CommentLike)) error {
+func (uq *UserQuery) loadUserTopicSubscription(ctx context.Context, query *UserTopicSubscriptionQuery, nodes []*User, init func(*User), assign func(*User, *UserTopicSubscription)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*User)
 	for i := range nodes {
@@ -935,20 +1606,50 @@ func (uq *UserQuery) loadCommentLikes(ctx context.Context, query *CommentLikeQue
 		}
 	}
 	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(commentlike.FieldUserID)
+		query.ctx.AppendFieldOnce(usertopicsubscription.FieldUserId)
 	}
-	query.Where(predicate.CommentLike(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(user.CommentLikesColumn), fks...))
+	query.Where(predicate.UserTopicSubscription(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(user.UserTopicSubscriptionColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.UserID
+		fk := n.UserId
 		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "user_id" returned %v for node %v`, fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "userId" returned %v for node %v`, fk, n)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (uq *UserQuery) loadUserCommentSubscription(ctx context.Context, query *UserCommentSubscriptionQuery, nodes []*User, init func(*User), assign func(*User, *UserCommentSubscription)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*User)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(usercommentsubscription.FieldUserId)
+	}
+	query.Where(predicate.UserCommentSubscription(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(user.UserCommentSubscriptionColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.UserId
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "userId" returned %v for node %v`, fk, n)
 		}
 		assign(node, n)
 	}
