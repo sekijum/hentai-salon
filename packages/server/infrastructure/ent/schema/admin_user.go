@@ -13,7 +13,7 @@ type AdminUser struct {
 func (AdminUser) Fields() []ent.Field {
     return []ent.Field{
         field.Int("id").Unique().Immutable(),
-        field.String("userName").Unique().StorageKey("user_name").MaxLen(20),
+        field.String("name").Unique().StorageKey("name").MaxLen(20),
         field.String("email").Unique().MaxLen(254),
         field.String("password"),
         field.Time("createdAt").Default(time.Now).StorageKey("created_at"),

@@ -14,32 +14,32 @@ type Tx struct {
 	config
 	// AdminUser is the client for interacting with the AdminUser builders.
 	AdminUser *AdminUserClient
+	// Board is the client for interacting with the Board builders.
+	Board *BoardClient
 	// Comment is the client for interacting with the Comment builders.
 	Comment *CommentClient
 	// CommentAttachment is the client for interacting with the CommentAttachment builders.
 	CommentAttachment *CommentAttachmentClient
-	// Forum is the client for interacting with the Forum builders.
-	Forum *ForumClient
-	// Topic is the client for interacting with the Topic builders.
-	Topic *TopicClient
-	// TopicTag is the client for interacting with the TopicTag builders.
-	TopicTag *TopicTagClient
-	// TopicTagging is the client for interacting with the TopicTagging builders.
-	TopicTagging *TopicTaggingClient
+	// Thread is the client for interacting with the Thread builders.
+	Thread *ThreadClient
+	// ThreadTag is the client for interacting with the ThreadTag builders.
+	ThreadTag *ThreadTagClient
+	// ThreadTagging is the client for interacting with the ThreadTagging builders.
+	ThreadTagging *ThreadTaggingClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
+	// UserBoardLike is the client for interacting with the UserBoardLike builders.
+	UserBoardLike *UserBoardLikeClient
+	// UserBoardSubscription is the client for interacting with the UserBoardSubscription builders.
+	UserBoardSubscription *UserBoardSubscriptionClient
 	// UserCommentLike is the client for interacting with the UserCommentLike builders.
 	UserCommentLike *UserCommentLikeClient
 	// UserCommentSubscription is the client for interacting with the UserCommentSubscription builders.
 	UserCommentSubscription *UserCommentSubscriptionClient
-	// UserForumLike is the client for interacting with the UserForumLike builders.
-	UserForumLike *UserForumLikeClient
-	// UserForumSubscription is the client for interacting with the UserForumSubscription builders.
-	UserForumSubscription *UserForumSubscriptionClient
-	// UserTopicLike is the client for interacting with the UserTopicLike builders.
-	UserTopicLike *UserTopicLikeClient
-	// UserTopicSubscription is the client for interacting with the UserTopicSubscription builders.
-	UserTopicSubscription *UserTopicSubscriptionClient
+	// UserThreadLike is the client for interacting with the UserThreadLike builders.
+	UserThreadLike *UserThreadLikeClient
+	// UserThreadSubscription is the client for interacting with the UserThreadSubscription builders.
+	UserThreadSubscription *UserThreadSubscriptionClient
 
 	// lazily loaded.
 	client     *Client
@@ -172,19 +172,19 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.AdminUser = NewAdminUserClient(tx.config)
+	tx.Board = NewBoardClient(tx.config)
 	tx.Comment = NewCommentClient(tx.config)
 	tx.CommentAttachment = NewCommentAttachmentClient(tx.config)
-	tx.Forum = NewForumClient(tx.config)
-	tx.Topic = NewTopicClient(tx.config)
-	tx.TopicTag = NewTopicTagClient(tx.config)
-	tx.TopicTagging = NewTopicTaggingClient(tx.config)
+	tx.Thread = NewThreadClient(tx.config)
+	tx.ThreadTag = NewThreadTagClient(tx.config)
+	tx.ThreadTagging = NewThreadTaggingClient(tx.config)
 	tx.User = NewUserClient(tx.config)
+	tx.UserBoardLike = NewUserBoardLikeClient(tx.config)
+	tx.UserBoardSubscription = NewUserBoardSubscriptionClient(tx.config)
 	tx.UserCommentLike = NewUserCommentLikeClient(tx.config)
 	tx.UserCommentSubscription = NewUserCommentSubscriptionClient(tx.config)
-	tx.UserForumLike = NewUserForumLikeClient(tx.config)
-	tx.UserForumSubscription = NewUserForumSubscriptionClient(tx.config)
-	tx.UserTopicLike = NewUserTopicLikeClient(tx.config)
-	tx.UserTopicSubscription = NewUserTopicSubscriptionClient(tx.config)
+	tx.UserThreadLike = NewUserThreadLikeClient(tx.config)
+	tx.UserThreadSubscription = NewUserThreadSubscriptionClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

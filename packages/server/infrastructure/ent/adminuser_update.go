@@ -28,16 +28,16 @@ func (auu *AdminUserUpdate) Where(ps ...predicate.AdminUser) *AdminUserUpdate {
 	return auu
 }
 
-// SetUserName sets the "userName" field.
-func (auu *AdminUserUpdate) SetUserName(s string) *AdminUserUpdate {
-	auu.mutation.SetUserName(s)
+// SetName sets the "name" field.
+func (auu *AdminUserUpdate) SetName(s string) *AdminUserUpdate {
+	auu.mutation.SetName(s)
 	return auu
 }
 
-// SetNillableUserName sets the "userName" field if the given value is not nil.
-func (auu *AdminUserUpdate) SetNillableUserName(s *string) *AdminUserUpdate {
+// SetNillableName sets the "name" field if the given value is not nil.
+func (auu *AdminUserUpdate) SetNillableName(s *string) *AdminUserUpdate {
 	if s != nil {
-		auu.SetUserName(*s)
+		auu.SetName(*s)
 	}
 	return auu
 }
@@ -133,9 +133,9 @@ func (auu *AdminUserUpdate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (auu *AdminUserUpdate) check() error {
-	if v, ok := auu.mutation.UserName(); ok {
-		if err := adminuser.UserNameValidator(v); err != nil {
-			return &ValidationError{Name: "userName", err: fmt.Errorf(`ent: validator failed for field "AdminUser.userName": %w`, err)}
+	if v, ok := auu.mutation.Name(); ok {
+		if err := adminuser.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "AdminUser.name": %w`, err)}
 		}
 	}
 	if v, ok := auu.mutation.Email(); ok {
@@ -158,8 +158,8 @@ func (auu *AdminUserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := auu.mutation.UserName(); ok {
-		_spec.SetField(adminuser.FieldUserName, field.TypeString, value)
+	if value, ok := auu.mutation.Name(); ok {
+		_spec.SetField(adminuser.FieldName, field.TypeString, value)
 	}
 	if value, ok := auu.mutation.Email(); ok {
 		_spec.SetField(adminuser.FieldEmail, field.TypeString, value)
@@ -193,16 +193,16 @@ type AdminUserUpdateOne struct {
 	mutation *AdminUserMutation
 }
 
-// SetUserName sets the "userName" field.
-func (auuo *AdminUserUpdateOne) SetUserName(s string) *AdminUserUpdateOne {
-	auuo.mutation.SetUserName(s)
+// SetName sets the "name" field.
+func (auuo *AdminUserUpdateOne) SetName(s string) *AdminUserUpdateOne {
+	auuo.mutation.SetName(s)
 	return auuo
 }
 
-// SetNillableUserName sets the "userName" field if the given value is not nil.
-func (auuo *AdminUserUpdateOne) SetNillableUserName(s *string) *AdminUserUpdateOne {
+// SetNillableName sets the "name" field if the given value is not nil.
+func (auuo *AdminUserUpdateOne) SetNillableName(s *string) *AdminUserUpdateOne {
 	if s != nil {
-		auuo.SetUserName(*s)
+		auuo.SetName(*s)
 	}
 	return auuo
 }
@@ -311,9 +311,9 @@ func (auuo *AdminUserUpdateOne) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (auuo *AdminUserUpdateOne) check() error {
-	if v, ok := auuo.mutation.UserName(); ok {
-		if err := adminuser.UserNameValidator(v); err != nil {
-			return &ValidationError{Name: "userName", err: fmt.Errorf(`ent: validator failed for field "AdminUser.userName": %w`, err)}
+	if v, ok := auuo.mutation.Name(); ok {
+		if err := adminuser.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "AdminUser.name": %w`, err)}
 		}
 	}
 	if v, ok := auuo.mutation.Email(); ok {
@@ -353,8 +353,8 @@ func (auuo *AdminUserUpdateOne) sqlSave(ctx context.Context) (_node *AdminUser, 
 			}
 		}
 	}
-	if value, ok := auuo.mutation.UserName(); ok {
-		_spec.SetField(adminuser.FieldUserName, field.TypeString, value)
+	if value, ok := auuo.mutation.Name(); ok {
+		_spec.SetField(adminuser.FieldName, field.TypeString, value)
 	}
 	if value, ok := auuo.mutation.Email(); ok {
 		_spec.SetField(adminuser.FieldEmail, field.TypeString, value)

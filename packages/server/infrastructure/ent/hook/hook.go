@@ -20,6 +20,18 @@ func (f AdminUserFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, e
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AdminUserMutation", m)
 }
 
+// The BoardFunc type is an adapter to allow the use of ordinary
+// function as Board mutator.
+type BoardFunc func(context.Context, *ent.BoardMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f BoardFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.BoardMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.BoardMutation", m)
+}
+
 // The CommentFunc type is an adapter to allow the use of ordinary
 // function as Comment mutator.
 type CommentFunc func(context.Context, *ent.CommentMutation) (ent.Value, error)
@@ -44,52 +56,40 @@ func (f CommentAttachmentFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CommentAttachmentMutation", m)
 }
 
-// The ForumFunc type is an adapter to allow the use of ordinary
-// function as Forum mutator.
-type ForumFunc func(context.Context, *ent.ForumMutation) (ent.Value, error)
+// The ThreadFunc type is an adapter to allow the use of ordinary
+// function as Thread mutator.
+type ThreadFunc func(context.Context, *ent.ThreadMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
-func (f ForumFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.ForumMutation); ok {
+func (f ThreadFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ThreadMutation); ok {
 		return f(ctx, mv)
 	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ForumMutation", m)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ThreadMutation", m)
 }
 
-// The TopicFunc type is an adapter to allow the use of ordinary
-// function as Topic mutator.
-type TopicFunc func(context.Context, *ent.TopicMutation) (ent.Value, error)
+// The ThreadTagFunc type is an adapter to allow the use of ordinary
+// function as ThreadTag mutator.
+type ThreadTagFunc func(context.Context, *ent.ThreadTagMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
-func (f TopicFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.TopicMutation); ok {
+func (f ThreadTagFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ThreadTagMutation); ok {
 		return f(ctx, mv)
 	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TopicMutation", m)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ThreadTagMutation", m)
 }
 
-// The TopicTagFunc type is an adapter to allow the use of ordinary
-// function as TopicTag mutator.
-type TopicTagFunc func(context.Context, *ent.TopicTagMutation) (ent.Value, error)
+// The ThreadTaggingFunc type is an adapter to allow the use of ordinary
+// function as ThreadTagging mutator.
+type ThreadTaggingFunc func(context.Context, *ent.ThreadTaggingMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
-func (f TopicTagFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.TopicTagMutation); ok {
+func (f ThreadTaggingFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ThreadTaggingMutation); ok {
 		return f(ctx, mv)
 	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TopicTagMutation", m)
-}
-
-// The TopicTaggingFunc type is an adapter to allow the use of ordinary
-// function as TopicTagging mutator.
-type TopicTaggingFunc func(context.Context, *ent.TopicTaggingMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f TopicTaggingFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.TopicTaggingMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TopicTaggingMutation", m)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ThreadTaggingMutation", m)
 }
 
 // The UserFunc type is an adapter to allow the use of ordinary
@@ -102,6 +102,30 @@ func (f UserFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error)
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UserMutation", m)
+}
+
+// The UserBoardLikeFunc type is an adapter to allow the use of ordinary
+// function as UserBoardLike mutator.
+type UserBoardLikeFunc func(context.Context, *ent.UserBoardLikeMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f UserBoardLikeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.UserBoardLikeMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UserBoardLikeMutation", m)
+}
+
+// The UserBoardSubscriptionFunc type is an adapter to allow the use of ordinary
+// function as UserBoardSubscription mutator.
+type UserBoardSubscriptionFunc func(context.Context, *ent.UserBoardSubscriptionMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f UserBoardSubscriptionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.UserBoardSubscriptionMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UserBoardSubscriptionMutation", m)
 }
 
 // The UserCommentLikeFunc type is an adapter to allow the use of ordinary
@@ -128,52 +152,28 @@ func (f UserCommentSubscriptionFunc) Mutate(ctx context.Context, m ent.Mutation)
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UserCommentSubscriptionMutation", m)
 }
 
-// The UserForumLikeFunc type is an adapter to allow the use of ordinary
-// function as UserForumLike mutator.
-type UserForumLikeFunc func(context.Context, *ent.UserForumLikeMutation) (ent.Value, error)
+// The UserThreadLikeFunc type is an adapter to allow the use of ordinary
+// function as UserThreadLike mutator.
+type UserThreadLikeFunc func(context.Context, *ent.UserThreadLikeMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
-func (f UserForumLikeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.UserForumLikeMutation); ok {
+func (f UserThreadLikeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.UserThreadLikeMutation); ok {
 		return f(ctx, mv)
 	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UserForumLikeMutation", m)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UserThreadLikeMutation", m)
 }
 
-// The UserForumSubscriptionFunc type is an adapter to allow the use of ordinary
-// function as UserForumSubscription mutator.
-type UserForumSubscriptionFunc func(context.Context, *ent.UserForumSubscriptionMutation) (ent.Value, error)
+// The UserThreadSubscriptionFunc type is an adapter to allow the use of ordinary
+// function as UserThreadSubscription mutator.
+type UserThreadSubscriptionFunc func(context.Context, *ent.UserThreadSubscriptionMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
-func (f UserForumSubscriptionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.UserForumSubscriptionMutation); ok {
+func (f UserThreadSubscriptionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.UserThreadSubscriptionMutation); ok {
 		return f(ctx, mv)
 	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UserForumSubscriptionMutation", m)
-}
-
-// The UserTopicLikeFunc type is an adapter to allow the use of ordinary
-// function as UserTopicLike mutator.
-type UserTopicLikeFunc func(context.Context, *ent.UserTopicLikeMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f UserTopicLikeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.UserTopicLikeMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UserTopicLikeMutation", m)
-}
-
-// The UserTopicSubscriptionFunc type is an adapter to allow the use of ordinary
-// function as UserTopicSubscription mutator.
-type UserTopicSubscriptionFunc func(context.Context, *ent.UserTopicSubscriptionMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f UserTopicSubscriptionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.UserTopicSubscriptionMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UserTopicSubscriptionMutation", m)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UserThreadSubscriptionMutation", m)
 }
 
 // Condition is a hook condition function.

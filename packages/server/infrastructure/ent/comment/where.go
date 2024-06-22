@@ -55,14 +55,14 @@ func IDLTE(id int) predicate.Comment {
 	return predicate.Comment(sql.FieldLTE(FieldID, id))
 }
 
-// TopicId applies equality check predicate on the "topicId" field. It's identical to TopicIdEQ.
-func TopicId(v int) predicate.Comment {
-	return predicate.Comment(sql.FieldEQ(FieldTopicId, v))
+// ThreadId applies equality check predicate on the "threadId" field. It's identical to ThreadIdEQ.
+func ThreadId(v int) predicate.Comment {
+	return predicate.Comment(sql.FieldEQ(FieldThreadId, v))
 }
 
-// ParentId applies equality check predicate on the "parentId" field. It's identical to ParentIdEQ.
-func ParentId(v int) predicate.Comment {
-	return predicate.Comment(sql.FieldEQ(FieldParentId, v))
+// ParentCommentId applies equality check predicate on the "parentCommentId" field. It's identical to ParentCommentIdEQ.
+func ParentCommentId(v int) predicate.Comment {
+	return predicate.Comment(sql.FieldEQ(FieldParentCommentId, v))
 }
 
 // UserId applies equality check predicate on the "userId" field. It's identical to UserIdEQ.
@@ -80,6 +80,11 @@ func Message(v string) predicate.Comment {
 	return predicate.Comment(sql.FieldEQ(FieldMessage, v))
 }
 
+// IPAddress applies equality check predicate on the "ip_address" field. It's identical to IPAddressEQ.
+func IPAddress(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldEQ(FieldIPAddress, v))
+}
+
 // CreatedAt applies equality check predicate on the "createdAt" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.Comment {
 	return predicate.Comment(sql.FieldEQ(FieldCreatedAt, v))
@@ -90,54 +95,54 @@ func UpdatedAt(v time.Time) predicate.Comment {
 	return predicate.Comment(sql.FieldEQ(FieldUpdatedAt, v))
 }
 
-// TopicIdEQ applies the EQ predicate on the "topicId" field.
-func TopicIdEQ(v int) predicate.Comment {
-	return predicate.Comment(sql.FieldEQ(FieldTopicId, v))
+// ThreadIdEQ applies the EQ predicate on the "threadId" field.
+func ThreadIdEQ(v int) predicate.Comment {
+	return predicate.Comment(sql.FieldEQ(FieldThreadId, v))
 }
 
-// TopicIdNEQ applies the NEQ predicate on the "topicId" field.
-func TopicIdNEQ(v int) predicate.Comment {
-	return predicate.Comment(sql.FieldNEQ(FieldTopicId, v))
+// ThreadIdNEQ applies the NEQ predicate on the "threadId" field.
+func ThreadIdNEQ(v int) predicate.Comment {
+	return predicate.Comment(sql.FieldNEQ(FieldThreadId, v))
 }
 
-// TopicIdIn applies the In predicate on the "topicId" field.
-func TopicIdIn(vs ...int) predicate.Comment {
-	return predicate.Comment(sql.FieldIn(FieldTopicId, vs...))
+// ThreadIdIn applies the In predicate on the "threadId" field.
+func ThreadIdIn(vs ...int) predicate.Comment {
+	return predicate.Comment(sql.FieldIn(FieldThreadId, vs...))
 }
 
-// TopicIdNotIn applies the NotIn predicate on the "topicId" field.
-func TopicIdNotIn(vs ...int) predicate.Comment {
-	return predicate.Comment(sql.FieldNotIn(FieldTopicId, vs...))
+// ThreadIdNotIn applies the NotIn predicate on the "threadId" field.
+func ThreadIdNotIn(vs ...int) predicate.Comment {
+	return predicate.Comment(sql.FieldNotIn(FieldThreadId, vs...))
 }
 
-// ParentIdEQ applies the EQ predicate on the "parentId" field.
-func ParentIdEQ(v int) predicate.Comment {
-	return predicate.Comment(sql.FieldEQ(FieldParentId, v))
+// ParentCommentIdEQ applies the EQ predicate on the "parentCommentId" field.
+func ParentCommentIdEQ(v int) predicate.Comment {
+	return predicate.Comment(sql.FieldEQ(FieldParentCommentId, v))
 }
 
-// ParentIdNEQ applies the NEQ predicate on the "parentId" field.
-func ParentIdNEQ(v int) predicate.Comment {
-	return predicate.Comment(sql.FieldNEQ(FieldParentId, v))
+// ParentCommentIdNEQ applies the NEQ predicate on the "parentCommentId" field.
+func ParentCommentIdNEQ(v int) predicate.Comment {
+	return predicate.Comment(sql.FieldNEQ(FieldParentCommentId, v))
 }
 
-// ParentIdIn applies the In predicate on the "parentId" field.
-func ParentIdIn(vs ...int) predicate.Comment {
-	return predicate.Comment(sql.FieldIn(FieldParentId, vs...))
+// ParentCommentIdIn applies the In predicate on the "parentCommentId" field.
+func ParentCommentIdIn(vs ...int) predicate.Comment {
+	return predicate.Comment(sql.FieldIn(FieldParentCommentId, vs...))
 }
 
-// ParentIdNotIn applies the NotIn predicate on the "parentId" field.
-func ParentIdNotIn(vs ...int) predicate.Comment {
-	return predicate.Comment(sql.FieldNotIn(FieldParentId, vs...))
+// ParentCommentIdNotIn applies the NotIn predicate on the "parentCommentId" field.
+func ParentCommentIdNotIn(vs ...int) predicate.Comment {
+	return predicate.Comment(sql.FieldNotIn(FieldParentCommentId, vs...))
 }
 
-// ParentIdIsNil applies the IsNil predicate on the "parentId" field.
-func ParentIdIsNil() predicate.Comment {
-	return predicate.Comment(sql.FieldIsNull(FieldParentId))
+// ParentCommentIdIsNil applies the IsNil predicate on the "parentCommentId" field.
+func ParentCommentIdIsNil() predicate.Comment {
+	return predicate.Comment(sql.FieldIsNull(FieldParentCommentId))
 }
 
-// ParentIdNotNil applies the NotNil predicate on the "parentId" field.
-func ParentIdNotNil() predicate.Comment {
-	return predicate.Comment(sql.FieldNotNull(FieldParentId))
+// ParentCommentIdNotNil applies the NotNil predicate on the "parentCommentId" field.
+func ParentCommentIdNotNil() predicate.Comment {
+	return predicate.Comment(sql.FieldNotNull(FieldParentCommentId))
 }
 
 // UserIdEQ applies the EQ predicate on the "userId" field.
@@ -310,6 +315,71 @@ func MessageContainsFold(v string) predicate.Comment {
 	return predicate.Comment(sql.FieldContainsFold(FieldMessage, v))
 }
 
+// IPAddressEQ applies the EQ predicate on the "ip_address" field.
+func IPAddressEQ(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldEQ(FieldIPAddress, v))
+}
+
+// IPAddressNEQ applies the NEQ predicate on the "ip_address" field.
+func IPAddressNEQ(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldNEQ(FieldIPAddress, v))
+}
+
+// IPAddressIn applies the In predicate on the "ip_address" field.
+func IPAddressIn(vs ...string) predicate.Comment {
+	return predicate.Comment(sql.FieldIn(FieldIPAddress, vs...))
+}
+
+// IPAddressNotIn applies the NotIn predicate on the "ip_address" field.
+func IPAddressNotIn(vs ...string) predicate.Comment {
+	return predicate.Comment(sql.FieldNotIn(FieldIPAddress, vs...))
+}
+
+// IPAddressGT applies the GT predicate on the "ip_address" field.
+func IPAddressGT(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldGT(FieldIPAddress, v))
+}
+
+// IPAddressGTE applies the GTE predicate on the "ip_address" field.
+func IPAddressGTE(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldGTE(FieldIPAddress, v))
+}
+
+// IPAddressLT applies the LT predicate on the "ip_address" field.
+func IPAddressLT(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldLT(FieldIPAddress, v))
+}
+
+// IPAddressLTE applies the LTE predicate on the "ip_address" field.
+func IPAddressLTE(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldLTE(FieldIPAddress, v))
+}
+
+// IPAddressContains applies the Contains predicate on the "ip_address" field.
+func IPAddressContains(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldContains(FieldIPAddress, v))
+}
+
+// IPAddressHasPrefix applies the HasPrefix predicate on the "ip_address" field.
+func IPAddressHasPrefix(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldHasPrefix(FieldIPAddress, v))
+}
+
+// IPAddressHasSuffix applies the HasSuffix predicate on the "ip_address" field.
+func IPAddressHasSuffix(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldHasSuffix(FieldIPAddress, v))
+}
+
+// IPAddressEqualFold applies the EqualFold predicate on the "ip_address" field.
+func IPAddressEqualFold(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldEqualFold(FieldIPAddress, v))
+}
+
+// IPAddressContainsFold applies the ContainsFold predicate on the "ip_address" field.
+func IPAddressContainsFold(v string) predicate.Comment {
+	return predicate.Comment(sql.FieldContainsFold(FieldIPAddress, v))
+}
+
 // StatusEQ applies the EQ predicate on the "status" field.
 func StatusEQ(v Status) predicate.Comment {
 	return predicate.Comment(sql.FieldEQ(FieldStatus, v))
@@ -410,21 +480,21 @@ func UpdatedAtLTE(v time.Time) predicate.Comment {
 	return predicate.Comment(sql.FieldLTE(FieldUpdatedAt, v))
 }
 
-// HasTopic applies the HasEdge predicate on the "topic" edge.
-func HasTopic() predicate.Comment {
+// HasThread applies the HasEdge predicate on the "thread" edge.
+func HasThread() predicate.Comment {
 	return predicate.Comment(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, TopicTable, TopicColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, ThreadTable, ThreadColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasTopicWith applies the HasEdge predicate on the "topic" edge with a given conditions (other predicates).
-func HasTopicWith(preds ...predicate.Topic) predicate.Comment {
+// HasThreadWith applies the HasEdge predicate on the "thread" edge with a given conditions (other predicates).
+func HasThreadWith(preds ...predicate.Thread) predicate.Comment {
 	return predicate.Comment(func(s *sql.Selector) {
-		step := newTopicStep()
+		step := newThreadStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -456,21 +526,21 @@ func HasAuthorWith(preds ...predicate.User) predicate.Comment {
 	})
 }
 
-// HasParent applies the HasEdge predicate on the "parent" edge.
-func HasParent() predicate.Comment {
+// HasParentComment applies the HasEdge predicate on the "parent_comment" edge.
+func HasParentComment() predicate.Comment {
 	return predicate.Comment(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, ParentTable, ParentColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, ParentCommentTable, ParentCommentColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasParentWith applies the HasEdge predicate on the "parent" edge with a given conditions (other predicates).
-func HasParentWith(preds ...predicate.Comment) predicate.Comment {
+// HasParentCommentWith applies the HasEdge predicate on the "parent_comment" edge with a given conditions (other predicates).
+func HasParentCommentWith(preds ...predicate.Comment) predicate.Comment {
 	return predicate.Comment(func(s *sql.Selector) {
-		step := newParentStep()
+		step := newParentCommentStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

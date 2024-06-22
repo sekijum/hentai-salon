@@ -54,9 +54,9 @@ func IDLTE(id int) predicate.AdminUser {
 	return predicate.AdminUser(sql.FieldLTE(FieldID, id))
 }
 
-// UserName applies equality check predicate on the "userName" field. It's identical to UserNameEQ.
-func UserName(v string) predicate.AdminUser {
-	return predicate.AdminUser(sql.FieldEQ(FieldUserName, v))
+// Name applies equality check predicate on the "name" field. It's identical to NameEQ.
+func Name(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldEQ(FieldName, v))
 }
 
 // Email applies equality check predicate on the "email" field. It's identical to EmailEQ.
@@ -79,69 +79,69 @@ func UpdatedAt(v time.Time) predicate.AdminUser {
 	return predicate.AdminUser(sql.FieldEQ(FieldUpdatedAt, v))
 }
 
-// UserNameEQ applies the EQ predicate on the "userName" field.
-func UserNameEQ(v string) predicate.AdminUser {
-	return predicate.AdminUser(sql.FieldEQ(FieldUserName, v))
+// NameEQ applies the EQ predicate on the "name" field.
+func NameEQ(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldEQ(FieldName, v))
 }
 
-// UserNameNEQ applies the NEQ predicate on the "userName" field.
-func UserNameNEQ(v string) predicate.AdminUser {
-	return predicate.AdminUser(sql.FieldNEQ(FieldUserName, v))
+// NameNEQ applies the NEQ predicate on the "name" field.
+func NameNEQ(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldNEQ(FieldName, v))
 }
 
-// UserNameIn applies the In predicate on the "userName" field.
-func UserNameIn(vs ...string) predicate.AdminUser {
-	return predicate.AdminUser(sql.FieldIn(FieldUserName, vs...))
+// NameIn applies the In predicate on the "name" field.
+func NameIn(vs ...string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldIn(FieldName, vs...))
 }
 
-// UserNameNotIn applies the NotIn predicate on the "userName" field.
-func UserNameNotIn(vs ...string) predicate.AdminUser {
-	return predicate.AdminUser(sql.FieldNotIn(FieldUserName, vs...))
+// NameNotIn applies the NotIn predicate on the "name" field.
+func NameNotIn(vs ...string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldNotIn(FieldName, vs...))
 }
 
-// UserNameGT applies the GT predicate on the "userName" field.
-func UserNameGT(v string) predicate.AdminUser {
-	return predicate.AdminUser(sql.FieldGT(FieldUserName, v))
+// NameGT applies the GT predicate on the "name" field.
+func NameGT(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldGT(FieldName, v))
 }
 
-// UserNameGTE applies the GTE predicate on the "userName" field.
-func UserNameGTE(v string) predicate.AdminUser {
-	return predicate.AdminUser(sql.FieldGTE(FieldUserName, v))
+// NameGTE applies the GTE predicate on the "name" field.
+func NameGTE(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldGTE(FieldName, v))
 }
 
-// UserNameLT applies the LT predicate on the "userName" field.
-func UserNameLT(v string) predicate.AdminUser {
-	return predicate.AdminUser(sql.FieldLT(FieldUserName, v))
+// NameLT applies the LT predicate on the "name" field.
+func NameLT(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldLT(FieldName, v))
 }
 
-// UserNameLTE applies the LTE predicate on the "userName" field.
-func UserNameLTE(v string) predicate.AdminUser {
-	return predicate.AdminUser(sql.FieldLTE(FieldUserName, v))
+// NameLTE applies the LTE predicate on the "name" field.
+func NameLTE(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldLTE(FieldName, v))
 }
 
-// UserNameContains applies the Contains predicate on the "userName" field.
-func UserNameContains(v string) predicate.AdminUser {
-	return predicate.AdminUser(sql.FieldContains(FieldUserName, v))
+// NameContains applies the Contains predicate on the "name" field.
+func NameContains(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldContains(FieldName, v))
 }
 
-// UserNameHasPrefix applies the HasPrefix predicate on the "userName" field.
-func UserNameHasPrefix(v string) predicate.AdminUser {
-	return predicate.AdminUser(sql.FieldHasPrefix(FieldUserName, v))
+// NameHasPrefix applies the HasPrefix predicate on the "name" field.
+func NameHasPrefix(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldHasPrefix(FieldName, v))
 }
 
-// UserNameHasSuffix applies the HasSuffix predicate on the "userName" field.
-func UserNameHasSuffix(v string) predicate.AdminUser {
-	return predicate.AdminUser(sql.FieldHasSuffix(FieldUserName, v))
+// NameHasSuffix applies the HasSuffix predicate on the "name" field.
+func NameHasSuffix(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldHasSuffix(FieldName, v))
 }
 
-// UserNameEqualFold applies the EqualFold predicate on the "userName" field.
-func UserNameEqualFold(v string) predicate.AdminUser {
-	return predicate.AdminUser(sql.FieldEqualFold(FieldUserName, v))
+// NameEqualFold applies the EqualFold predicate on the "name" field.
+func NameEqualFold(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldEqualFold(FieldName, v))
 }
 
-// UserNameContainsFold applies the ContainsFold predicate on the "userName" field.
-func UserNameContainsFold(v string) predicate.AdminUser {
-	return predicate.AdminUser(sql.FieldContainsFold(FieldUserName, v))
+// NameContainsFold applies the ContainsFold predicate on the "name" field.
+func NameContainsFold(v string) predicate.AdminUser {
+	return predicate.AdminUser(sql.FieldContainsFold(FieldName, v))
 }
 
 // EmailEQ applies the EQ predicate on the "email" field.

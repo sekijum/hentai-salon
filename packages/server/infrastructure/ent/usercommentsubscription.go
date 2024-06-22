@@ -21,8 +21,10 @@ type UserCommentSubscription struct {
 	UserId int `json:"userId,omitempty"`
 	// CommentId holds the value of the "commentId" field.
 	CommentId int `json:"commentId,omitempty"`
-	// 通知を受け取るかどうかのカラムを追加
+	// メール通知を受け取るかどうかのフラグ
 	IsNotified bool `json:"isNotified,omitempty"`
+	// 通知画面で確認したかどうかのフラグ
+	IsChecked bool `json:"isChecked,omitempty"`
 	// SubscribedAt holds the value of the "subscribedAt" field.
 	SubscribedAt time.Time `json:"subscribedAt,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -69,7 +71,7 @@ func (*UserCommentSubscription) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case usercommentsubscription.FieldIsNotified:
+		case usercommentsubscription.FieldIsNotified, usercommentsubscription.FieldIsChecked:
 			values[i] = new(sql.NullBool)
 		case usercommentsubscription.FieldUserId, usercommentsubscription.FieldCommentId:
 			values[i] = new(sql.NullInt64)
@@ -107,6 +109,12 @@ func (ucs *UserCommentSubscription) assignValues(columns []string, values []any)
 				return fmt.Errorf("unexpected type %T for field isNotified", values[i])
 			} else if value.Valid {
 				ucs.IsNotified = value.Bool
+			}
+		case usercommentsubscription.FieldIsChecked:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field isChecked", values[i])
+			} else if value.Valid {
+				ucs.IsChecked = value.Bool
 			}
 		case usercommentsubscription.FieldSubscribedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -167,6 +175,9 @@ func (ucs *UserCommentSubscription) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("isNotified=")
 	builder.WriteString(fmt.Sprintf("%v", ucs.IsNotified))
+	builder.WriteString(", ")
+	builder.WriteString("isChecked=")
+	builder.WriteString(fmt.Sprintf("%v", ucs.IsChecked))
 	builder.WriteString(", ")
 	builder.WriteString("subscribedAt=")
 	builder.WriteString(ucs.SubscribedAt.Format(time.ANSIC))

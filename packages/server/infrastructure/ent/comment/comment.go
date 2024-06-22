@@ -15,28 +15,30 @@ const (
 	Label = "comment"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldTopicId holds the string denoting the topicid field in the database.
-	FieldTopicId = "topic_id"
-	// FieldParentId holds the string denoting the parentid field in the database.
-	FieldParentId = "parent_id"
+	// FieldThreadId holds the string denoting the threadid field in the database.
+	FieldThreadId = "thread_id"
+	// FieldParentCommentId holds the string denoting the parentcommentid field in the database.
+	FieldParentCommentId = "parent_comment_id"
 	// FieldUserId holds the string denoting the userid field in the database.
 	FieldUserId = "user_id"
 	// FieldGuestName holds the string denoting the guestname field in the database.
 	FieldGuestName = "guest_name"
 	// FieldMessage holds the string denoting the message field in the database.
 	FieldMessage = "message"
+	// FieldIPAddress holds the string denoting the ip_address field in the database.
+	FieldIPAddress = "ip_address"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
 	// FieldCreatedAt holds the string denoting the createdat field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updatedat field in the database.
 	FieldUpdatedAt = "updated_at"
-	// EdgeTopic holds the string denoting the topic edge name in mutations.
-	EdgeTopic = "topic"
+	// EdgeThread holds the string denoting the thread edge name in mutations.
+	EdgeThread = "thread"
 	// EdgeAuthor holds the string denoting the author edge name in mutations.
 	EdgeAuthor = "author"
-	// EdgeParent holds the string denoting the parent edge name in mutations.
-	EdgeParent = "parent"
+	// EdgeParentComment holds the string denoting the parent_comment edge name in mutations.
+	EdgeParentComment = "parent_comment"
 	// EdgeReplies holds the string denoting the replies edge name in mutations.
 	EdgeReplies = "replies"
 	// EdgeCommentAttachments holds the string denoting the comment_attachments edge name in mutations.
@@ -51,13 +53,13 @@ const (
 	EdgeUserCommentSubscription = "user_comment_subscription"
 	// Table holds the table name of the comment in the database.
 	Table = "comments"
-	// TopicTable is the table that holds the topic relation/edge.
-	TopicTable = "comments"
-	// TopicInverseTable is the table name for the Topic entity.
-	// It exists in this package in order to avoid circular dependency with the "topic" package.
-	TopicInverseTable = "topics"
-	// TopicColumn is the table column denoting the topic relation/edge.
-	TopicColumn = "topic_id"
+	// ThreadTable is the table that holds the thread relation/edge.
+	ThreadTable = "comments"
+	// ThreadInverseTable is the table name for the Thread entity.
+	// It exists in this package in order to avoid circular dependency with the "thread" package.
+	ThreadInverseTable = "threads"
+	// ThreadColumn is the table column denoting the thread relation/edge.
+	ThreadColumn = "thread_id"
 	// AuthorTable is the table that holds the author relation/edge.
 	AuthorTable = "comments"
 	// AuthorInverseTable is the table name for the User entity.
@@ -65,14 +67,14 @@ const (
 	AuthorInverseTable = "users"
 	// AuthorColumn is the table column denoting the author relation/edge.
 	AuthorColumn = "user_id"
-	// ParentTable is the table that holds the parent relation/edge.
-	ParentTable = "comments"
-	// ParentColumn is the table column denoting the parent relation/edge.
-	ParentColumn = "parent_id"
+	// ParentCommentTable is the table that holds the parent_comment relation/edge.
+	ParentCommentTable = "comments"
+	// ParentCommentColumn is the table column denoting the parent_comment relation/edge.
+	ParentCommentColumn = "parent_comment_id"
 	// RepliesTable is the table that holds the replies relation/edge.
 	RepliesTable = "comments"
 	// RepliesColumn is the table column denoting the replies relation/edge.
-	RepliesColumn = "parent_id"
+	RepliesColumn = "parent_comment_id"
 	// CommentAttachmentsTable is the table that holds the comment_attachments relation/edge.
 	CommentAttachmentsTable = "comment_attachments"
 	// CommentAttachmentsInverseTable is the table name for the CommentAttachment entity.
@@ -109,11 +111,12 @@ const (
 // Columns holds all SQL columns for comment fields.
 var Columns = []string{
 	FieldID,
-	FieldTopicId,
-	FieldParentId,
+	FieldThreadId,
+	FieldParentCommentId,
 	FieldUserId,
 	FieldGuestName,
 	FieldMessage,
+	FieldIPAddress,
 	FieldStatus,
 	FieldCreatedAt,
 	FieldUpdatedAt,
@@ -141,6 +144,8 @@ func ValidColumn(column string) bool {
 var (
 	// GuestNameValidator is a validator for the "guestName" field. It is called by the builders before save.
 	GuestNameValidator func(string) error
+	// IPAddressValidator is a validator for the "ip_address" field. It is called by the builders before save.
+	IPAddressValidator func(string) error
 	// DefaultCreatedAt holds the default value on creation for the "createdAt" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updatedAt" field.
@@ -157,8 +162,8 @@ const DefaultStatus = StatusVisible
 
 // Status values.
 const (
-	StatusVisible     Status = "Visible"
-	StatusDisapproved Status = "Disapproved"
+	StatusVisible Status = "Visible"
+	StatusDeleted Status = "Deleted"
 )
 
 func (s Status) String() string {
@@ -168,7 +173,7 @@ func (s Status) String() string {
 // StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
 func StatusValidator(s Status) error {
 	switch s {
-	case StatusVisible, StatusDisapproved:
+	case StatusVisible, StatusDeleted:
 		return nil
 	default:
 		return fmt.Errorf("comment: invalid enum value for status field: %q", s)
@@ -183,14 +188,14 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// ByTopicId orders the results by the topicId field.
-func ByTopicId(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldTopicId, opts...).ToFunc()
+// ByThreadId orders the results by the threadId field.
+func ByThreadId(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldThreadId, opts...).ToFunc()
 }
 
-// ByParentId orders the results by the parentId field.
-func ByParentId(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldParentId, opts...).ToFunc()
+// ByParentCommentId orders the results by the parentCommentId field.
+func ByParentCommentId(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldParentCommentId, opts...).ToFunc()
 }
 
 // ByUserId orders the results by the userId field.
@@ -208,6 +213,11 @@ func ByMessage(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldMessage, opts...).ToFunc()
 }
 
+// ByIPAddress orders the results by the ip_address field.
+func ByIPAddress(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldIPAddress, opts...).ToFunc()
+}
+
 // ByStatus orders the results by the status field.
 func ByStatus(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStatus, opts...).ToFunc()
@@ -223,10 +233,10 @@ func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
 }
 
-// ByTopicField orders the results by topic field.
-func ByTopicField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByThreadField orders the results by thread field.
+func ByThreadField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newTopicStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborTerms(s, newThreadStep(), sql.OrderByField(field, opts...))
 	}
 }
 
@@ -237,10 +247,10 @@ func ByAuthorField(field string, opts ...sql.OrderTermOption) OrderOption {
 	}
 }
 
-// ByParentField orders the results by parent field.
-func ByParentField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByParentCommentField orders the results by parent_comment field.
+func ByParentCommentField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newParentStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborTerms(s, newParentCommentStep(), sql.OrderByField(field, opts...))
 	}
 }
 
@@ -327,11 +337,11 @@ func ByUserCommentSubscription(term sql.OrderTerm, terms ...sql.OrderTerm) Order
 		sqlgraph.OrderByNeighborTerms(s, newUserCommentSubscriptionStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
-func newTopicStep() *sqlgraph.Step {
+func newThreadStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(TopicInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, TopicTable, TopicColumn),
+		sqlgraph.To(ThreadInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, ThreadTable, ThreadColumn),
 	)
 }
 func newAuthorStep() *sqlgraph.Step {
@@ -341,11 +351,11 @@ func newAuthorStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2O, true, AuthorTable, AuthorColumn),
 	)
 }
-func newParentStep() *sqlgraph.Step {
+func newParentCommentStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(Table, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, ParentTable, ParentColumn),
+		sqlgraph.Edge(sqlgraph.M2O, true, ParentCommentTable, ParentCommentColumn),
 	)
 }
 func newRepliesStep() *sqlgraph.Step {

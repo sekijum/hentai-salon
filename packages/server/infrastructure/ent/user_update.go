@@ -6,10 +6,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"server/infrastructure/ent/board"
 	"server/infrastructure/ent/comment"
-	"server/infrastructure/ent/forum"
 	"server/infrastructure/ent/predicate"
-	"server/infrastructure/ent/topic"
+	"server/infrastructure/ent/thread"
 	"server/infrastructure/ent/user"
 	"time"
 
@@ -31,16 +31,16 @@ func (uu *UserUpdate) Where(ps ...predicate.User) *UserUpdate {
 	return uu
 }
 
-// SetUserName sets the "userName" field.
-func (uu *UserUpdate) SetUserName(s string) *UserUpdate {
-	uu.mutation.SetUserName(s)
+// SetName sets the "name" field.
+func (uu *UserUpdate) SetName(s string) *UserUpdate {
+	uu.mutation.SetName(s)
 	return uu
 }
 
-// SetNillableUserName sets the "userName" field if the given value is not nil.
-func (uu *UserUpdate) SetNillableUserName(s *string) *UserUpdate {
+// SetNillableName sets the "name" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableName(s *string) *UserUpdate {
 	if s != nil {
-		uu.SetUserName(*s)
+		uu.SetName(*s)
 	}
 	return uu
 }
@@ -147,34 +147,34 @@ func (uu *UserUpdate) SetUpdatedAt(t time.Time) *UserUpdate {
 	return uu
 }
 
-// AddForumIDs adds the "forums" edge to the Forum entity by IDs.
-func (uu *UserUpdate) AddForumIDs(ids ...int) *UserUpdate {
-	uu.mutation.AddForumIDs(ids...)
+// AddBoardIDs adds the "boards" edge to the Board entity by IDs.
+func (uu *UserUpdate) AddBoardIDs(ids ...int) *UserUpdate {
+	uu.mutation.AddBoardIDs(ids...)
 	return uu
 }
 
-// AddForums adds the "forums" edges to the Forum entity.
-func (uu *UserUpdate) AddForums(f ...*Forum) *UserUpdate {
-	ids := make([]int, len(f))
-	for i := range f {
-		ids[i] = f[i].ID
+// AddBoards adds the "boards" edges to the Board entity.
+func (uu *UserUpdate) AddBoards(b ...*Board) *UserUpdate {
+	ids := make([]int, len(b))
+	for i := range b {
+		ids[i] = b[i].ID
 	}
-	return uu.AddForumIDs(ids...)
+	return uu.AddBoardIDs(ids...)
 }
 
-// AddTopicIDs adds the "topics" edge to the Topic entity by IDs.
-func (uu *UserUpdate) AddTopicIDs(ids ...int) *UserUpdate {
-	uu.mutation.AddTopicIDs(ids...)
+// AddThreadIDs adds the "threads" edge to the Thread entity by IDs.
+func (uu *UserUpdate) AddThreadIDs(ids ...int) *UserUpdate {
+	uu.mutation.AddThreadIDs(ids...)
 	return uu
 }
 
-// AddTopics adds the "topics" edges to the Topic entity.
-func (uu *UserUpdate) AddTopics(t ...*Topic) *UserUpdate {
+// AddThreads adds the "threads" edges to the Thread entity.
+func (uu *UserUpdate) AddThreads(t ...*Thread) *UserUpdate {
 	ids := make([]int, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
 	}
-	return uu.AddTopicIDs(ids...)
+	return uu.AddThreadIDs(ids...)
 }
 
 // AddCommentIDs adds the "comments" edge to the Comment entity by IDs.
@@ -192,34 +192,34 @@ func (uu *UserUpdate) AddComments(c ...*Comment) *UserUpdate {
 	return uu.AddCommentIDs(ids...)
 }
 
-// AddLikedForumIDs adds the "liked_forums" edge to the Forum entity by IDs.
-func (uu *UserUpdate) AddLikedForumIDs(ids ...int) *UserUpdate {
-	uu.mutation.AddLikedForumIDs(ids...)
+// AddLikedBoardIDs adds the "liked_boards" edge to the Board entity by IDs.
+func (uu *UserUpdate) AddLikedBoardIDs(ids ...int) *UserUpdate {
+	uu.mutation.AddLikedBoardIDs(ids...)
 	return uu
 }
 
-// AddLikedForums adds the "liked_forums" edges to the Forum entity.
-func (uu *UserUpdate) AddLikedForums(f ...*Forum) *UserUpdate {
-	ids := make([]int, len(f))
-	for i := range f {
-		ids[i] = f[i].ID
+// AddLikedBoards adds the "liked_boards" edges to the Board entity.
+func (uu *UserUpdate) AddLikedBoards(b ...*Board) *UserUpdate {
+	ids := make([]int, len(b))
+	for i := range b {
+		ids[i] = b[i].ID
 	}
-	return uu.AddLikedForumIDs(ids...)
+	return uu.AddLikedBoardIDs(ids...)
 }
 
-// AddLikedTopicIDs adds the "liked_topics" edge to the Topic entity by IDs.
-func (uu *UserUpdate) AddLikedTopicIDs(ids ...int) *UserUpdate {
-	uu.mutation.AddLikedTopicIDs(ids...)
+// AddLikedThreadIDs adds the "liked_threads" edge to the Thread entity by IDs.
+func (uu *UserUpdate) AddLikedThreadIDs(ids ...int) *UserUpdate {
+	uu.mutation.AddLikedThreadIDs(ids...)
 	return uu
 }
 
-// AddLikedTopics adds the "liked_topics" edges to the Topic entity.
-func (uu *UserUpdate) AddLikedTopics(t ...*Topic) *UserUpdate {
+// AddLikedThreads adds the "liked_threads" edges to the Thread entity.
+func (uu *UserUpdate) AddLikedThreads(t ...*Thread) *UserUpdate {
 	ids := make([]int, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
 	}
-	return uu.AddLikedTopicIDs(ids...)
+	return uu.AddLikedThreadIDs(ids...)
 }
 
 // AddLikedCommentIDs adds the "liked_comments" edge to the Comment entity by IDs.
@@ -237,34 +237,34 @@ func (uu *UserUpdate) AddLikedComments(c ...*Comment) *UserUpdate {
 	return uu.AddLikedCommentIDs(ids...)
 }
 
-// AddSubscribedForumIDs adds the "subscribed_forums" edge to the Forum entity by IDs.
-func (uu *UserUpdate) AddSubscribedForumIDs(ids ...int) *UserUpdate {
-	uu.mutation.AddSubscribedForumIDs(ids...)
+// AddSubscribedBoardIDs adds the "subscribed_boards" edge to the Board entity by IDs.
+func (uu *UserUpdate) AddSubscribedBoardIDs(ids ...int) *UserUpdate {
+	uu.mutation.AddSubscribedBoardIDs(ids...)
 	return uu
 }
 
-// AddSubscribedForums adds the "subscribed_forums" edges to the Forum entity.
-func (uu *UserUpdate) AddSubscribedForums(f ...*Forum) *UserUpdate {
-	ids := make([]int, len(f))
-	for i := range f {
-		ids[i] = f[i].ID
+// AddSubscribedBoards adds the "subscribed_boards" edges to the Board entity.
+func (uu *UserUpdate) AddSubscribedBoards(b ...*Board) *UserUpdate {
+	ids := make([]int, len(b))
+	for i := range b {
+		ids[i] = b[i].ID
 	}
-	return uu.AddSubscribedForumIDs(ids...)
+	return uu.AddSubscribedBoardIDs(ids...)
 }
 
-// AddSubscribedTopicIDs adds the "subscribed_topics" edge to the Topic entity by IDs.
-func (uu *UserUpdate) AddSubscribedTopicIDs(ids ...int) *UserUpdate {
-	uu.mutation.AddSubscribedTopicIDs(ids...)
+// AddSubscribedThreadIDs adds the "subscribed_threads" edge to the Thread entity by IDs.
+func (uu *UserUpdate) AddSubscribedThreadIDs(ids ...int) *UserUpdate {
+	uu.mutation.AddSubscribedThreadIDs(ids...)
 	return uu
 }
 
-// AddSubscribedTopics adds the "subscribed_topics" edges to the Topic entity.
-func (uu *UserUpdate) AddSubscribedTopics(t ...*Topic) *UserUpdate {
+// AddSubscribedThreads adds the "subscribed_threads" edges to the Thread entity.
+func (uu *UserUpdate) AddSubscribedThreads(t ...*Thread) *UserUpdate {
 	ids := make([]int, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
 	}
-	return uu.AddSubscribedTopicIDs(ids...)
+	return uu.AddSubscribedThreadIDs(ids...)
 }
 
 // AddSubscribedCommentIDs adds the "subscribed_comments" edge to the Comment entity by IDs.
@@ -287,46 +287,46 @@ func (uu *UserUpdate) Mutation() *UserMutation {
 	return uu.mutation
 }
 
-// ClearForums clears all "forums" edges to the Forum entity.
-func (uu *UserUpdate) ClearForums() *UserUpdate {
-	uu.mutation.ClearForums()
+// ClearBoards clears all "boards" edges to the Board entity.
+func (uu *UserUpdate) ClearBoards() *UserUpdate {
+	uu.mutation.ClearBoards()
 	return uu
 }
 
-// RemoveForumIDs removes the "forums" edge to Forum entities by IDs.
-func (uu *UserUpdate) RemoveForumIDs(ids ...int) *UserUpdate {
-	uu.mutation.RemoveForumIDs(ids...)
+// RemoveBoardIDs removes the "boards" edge to Board entities by IDs.
+func (uu *UserUpdate) RemoveBoardIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveBoardIDs(ids...)
 	return uu
 }
 
-// RemoveForums removes "forums" edges to Forum entities.
-func (uu *UserUpdate) RemoveForums(f ...*Forum) *UserUpdate {
-	ids := make([]int, len(f))
-	for i := range f {
-		ids[i] = f[i].ID
+// RemoveBoards removes "boards" edges to Board entities.
+func (uu *UserUpdate) RemoveBoards(b ...*Board) *UserUpdate {
+	ids := make([]int, len(b))
+	for i := range b {
+		ids[i] = b[i].ID
 	}
-	return uu.RemoveForumIDs(ids...)
+	return uu.RemoveBoardIDs(ids...)
 }
 
-// ClearTopics clears all "topics" edges to the Topic entity.
-func (uu *UserUpdate) ClearTopics() *UserUpdate {
-	uu.mutation.ClearTopics()
+// ClearThreads clears all "threads" edges to the Thread entity.
+func (uu *UserUpdate) ClearThreads() *UserUpdate {
+	uu.mutation.ClearThreads()
 	return uu
 }
 
-// RemoveTopicIDs removes the "topics" edge to Topic entities by IDs.
-func (uu *UserUpdate) RemoveTopicIDs(ids ...int) *UserUpdate {
-	uu.mutation.RemoveTopicIDs(ids...)
+// RemoveThreadIDs removes the "threads" edge to Thread entities by IDs.
+func (uu *UserUpdate) RemoveThreadIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveThreadIDs(ids...)
 	return uu
 }
 
-// RemoveTopics removes "topics" edges to Topic entities.
-func (uu *UserUpdate) RemoveTopics(t ...*Topic) *UserUpdate {
+// RemoveThreads removes "threads" edges to Thread entities.
+func (uu *UserUpdate) RemoveThreads(t ...*Thread) *UserUpdate {
 	ids := make([]int, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
 	}
-	return uu.RemoveTopicIDs(ids...)
+	return uu.RemoveThreadIDs(ids...)
 }
 
 // ClearComments clears all "comments" edges to the Comment entity.
@@ -350,46 +350,46 @@ func (uu *UserUpdate) RemoveComments(c ...*Comment) *UserUpdate {
 	return uu.RemoveCommentIDs(ids...)
 }
 
-// ClearLikedForums clears all "liked_forums" edges to the Forum entity.
-func (uu *UserUpdate) ClearLikedForums() *UserUpdate {
-	uu.mutation.ClearLikedForums()
+// ClearLikedBoards clears all "liked_boards" edges to the Board entity.
+func (uu *UserUpdate) ClearLikedBoards() *UserUpdate {
+	uu.mutation.ClearLikedBoards()
 	return uu
 }
 
-// RemoveLikedForumIDs removes the "liked_forums" edge to Forum entities by IDs.
-func (uu *UserUpdate) RemoveLikedForumIDs(ids ...int) *UserUpdate {
-	uu.mutation.RemoveLikedForumIDs(ids...)
+// RemoveLikedBoardIDs removes the "liked_boards" edge to Board entities by IDs.
+func (uu *UserUpdate) RemoveLikedBoardIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveLikedBoardIDs(ids...)
 	return uu
 }
 
-// RemoveLikedForums removes "liked_forums" edges to Forum entities.
-func (uu *UserUpdate) RemoveLikedForums(f ...*Forum) *UserUpdate {
-	ids := make([]int, len(f))
-	for i := range f {
-		ids[i] = f[i].ID
+// RemoveLikedBoards removes "liked_boards" edges to Board entities.
+func (uu *UserUpdate) RemoveLikedBoards(b ...*Board) *UserUpdate {
+	ids := make([]int, len(b))
+	for i := range b {
+		ids[i] = b[i].ID
 	}
-	return uu.RemoveLikedForumIDs(ids...)
+	return uu.RemoveLikedBoardIDs(ids...)
 }
 
-// ClearLikedTopics clears all "liked_topics" edges to the Topic entity.
-func (uu *UserUpdate) ClearLikedTopics() *UserUpdate {
-	uu.mutation.ClearLikedTopics()
+// ClearLikedThreads clears all "liked_threads" edges to the Thread entity.
+func (uu *UserUpdate) ClearLikedThreads() *UserUpdate {
+	uu.mutation.ClearLikedThreads()
 	return uu
 }
 
-// RemoveLikedTopicIDs removes the "liked_topics" edge to Topic entities by IDs.
-func (uu *UserUpdate) RemoveLikedTopicIDs(ids ...int) *UserUpdate {
-	uu.mutation.RemoveLikedTopicIDs(ids...)
+// RemoveLikedThreadIDs removes the "liked_threads" edge to Thread entities by IDs.
+func (uu *UserUpdate) RemoveLikedThreadIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveLikedThreadIDs(ids...)
 	return uu
 }
 
-// RemoveLikedTopics removes "liked_topics" edges to Topic entities.
-func (uu *UserUpdate) RemoveLikedTopics(t ...*Topic) *UserUpdate {
+// RemoveLikedThreads removes "liked_threads" edges to Thread entities.
+func (uu *UserUpdate) RemoveLikedThreads(t ...*Thread) *UserUpdate {
 	ids := make([]int, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
 	}
-	return uu.RemoveLikedTopicIDs(ids...)
+	return uu.RemoveLikedThreadIDs(ids...)
 }
 
 // ClearLikedComments clears all "liked_comments" edges to the Comment entity.
@@ -413,46 +413,46 @@ func (uu *UserUpdate) RemoveLikedComments(c ...*Comment) *UserUpdate {
 	return uu.RemoveLikedCommentIDs(ids...)
 }
 
-// ClearSubscribedForums clears all "subscribed_forums" edges to the Forum entity.
-func (uu *UserUpdate) ClearSubscribedForums() *UserUpdate {
-	uu.mutation.ClearSubscribedForums()
+// ClearSubscribedBoards clears all "subscribed_boards" edges to the Board entity.
+func (uu *UserUpdate) ClearSubscribedBoards() *UserUpdate {
+	uu.mutation.ClearSubscribedBoards()
 	return uu
 }
 
-// RemoveSubscribedForumIDs removes the "subscribed_forums" edge to Forum entities by IDs.
-func (uu *UserUpdate) RemoveSubscribedForumIDs(ids ...int) *UserUpdate {
-	uu.mutation.RemoveSubscribedForumIDs(ids...)
+// RemoveSubscribedBoardIDs removes the "subscribed_boards" edge to Board entities by IDs.
+func (uu *UserUpdate) RemoveSubscribedBoardIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveSubscribedBoardIDs(ids...)
 	return uu
 }
 
-// RemoveSubscribedForums removes "subscribed_forums" edges to Forum entities.
-func (uu *UserUpdate) RemoveSubscribedForums(f ...*Forum) *UserUpdate {
-	ids := make([]int, len(f))
-	for i := range f {
-		ids[i] = f[i].ID
+// RemoveSubscribedBoards removes "subscribed_boards" edges to Board entities.
+func (uu *UserUpdate) RemoveSubscribedBoards(b ...*Board) *UserUpdate {
+	ids := make([]int, len(b))
+	for i := range b {
+		ids[i] = b[i].ID
 	}
-	return uu.RemoveSubscribedForumIDs(ids...)
+	return uu.RemoveSubscribedBoardIDs(ids...)
 }
 
-// ClearSubscribedTopics clears all "subscribed_topics" edges to the Topic entity.
-func (uu *UserUpdate) ClearSubscribedTopics() *UserUpdate {
-	uu.mutation.ClearSubscribedTopics()
+// ClearSubscribedThreads clears all "subscribed_threads" edges to the Thread entity.
+func (uu *UserUpdate) ClearSubscribedThreads() *UserUpdate {
+	uu.mutation.ClearSubscribedThreads()
 	return uu
 }
 
-// RemoveSubscribedTopicIDs removes the "subscribed_topics" edge to Topic entities by IDs.
-func (uu *UserUpdate) RemoveSubscribedTopicIDs(ids ...int) *UserUpdate {
-	uu.mutation.RemoveSubscribedTopicIDs(ids...)
+// RemoveSubscribedThreadIDs removes the "subscribed_threads" edge to Thread entities by IDs.
+func (uu *UserUpdate) RemoveSubscribedThreadIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveSubscribedThreadIDs(ids...)
 	return uu
 }
 
-// RemoveSubscribedTopics removes "subscribed_topics" edges to Topic entities.
-func (uu *UserUpdate) RemoveSubscribedTopics(t ...*Topic) *UserUpdate {
+// RemoveSubscribedThreads removes "subscribed_threads" edges to Thread entities.
+func (uu *UserUpdate) RemoveSubscribedThreads(t ...*Thread) *UserUpdate {
 	ids := make([]int, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
 	}
-	return uu.RemoveSubscribedTopicIDs(ids...)
+	return uu.RemoveSubscribedThreadIDs(ids...)
 }
 
 // ClearSubscribedComments clears all "subscribed_comments" edges to the Comment entity.
@@ -514,9 +514,9 @@ func (uu *UserUpdate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (uu *UserUpdate) check() error {
-	if v, ok := uu.mutation.UserName(); ok {
-		if err := user.UserNameValidator(v); err != nil {
-			return &ValidationError{Name: "userName", err: fmt.Errorf(`ent: validator failed for field "User.userName": %w`, err)}
+	if v, ok := uu.mutation.Name(); ok {
+		if err := user.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "User.name": %w`, err)}
 		}
 	}
 	if v, ok := uu.mutation.Email(); ok {
@@ -549,8 +549,8 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := uu.mutation.UserName(); ok {
-		_spec.SetField(user.FieldUserName, field.TypeString, value)
+	if value, ok := uu.mutation.Name(); ok {
+		_spec.SetField(user.FieldName, field.TypeString, value)
 	}
 	if value, ok := uu.mutation.Email(); ok {
 		_spec.SetField(user.FieldEmail, field.TypeString, value)
@@ -579,28 +579,28 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := uu.mutation.UpdatedAt(); ok {
 		_spec.SetField(user.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if uu.mutation.ForumsCleared() {
+	if uu.mutation.BoardsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   user.ForumsTable,
-			Columns: []string{user.ForumsColumn},
+			Table:   user.BoardsTable,
+			Columns: []string{user.BoardsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(forum.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(board.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uu.mutation.RemovedForumsIDs(); len(nodes) > 0 && !uu.mutation.ForumsCleared() {
+	if nodes := uu.mutation.RemovedBoardsIDs(); len(nodes) > 0 && !uu.mutation.BoardsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   user.ForumsTable,
-			Columns: []string{user.ForumsColumn},
+			Table:   user.BoardsTable,
+			Columns: []string{user.BoardsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(forum.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(board.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -608,15 +608,15 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uu.mutation.ForumsIDs(); len(nodes) > 0 {
+	if nodes := uu.mutation.BoardsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   user.ForumsTable,
-			Columns: []string{user.ForumsColumn},
+			Table:   user.BoardsTable,
+			Columns: []string{user.BoardsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(forum.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(board.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -624,28 +624,28 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if uu.mutation.TopicsCleared() {
+	if uu.mutation.ThreadsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   user.TopicsTable,
-			Columns: []string{user.TopicsColumn},
+			Table:   user.ThreadsTable,
+			Columns: []string{user.ThreadsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(topic.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(thread.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uu.mutation.RemovedTopicsIDs(); len(nodes) > 0 && !uu.mutation.TopicsCleared() {
+	if nodes := uu.mutation.RemovedThreadsIDs(); len(nodes) > 0 && !uu.mutation.ThreadsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   user.TopicsTable,
-			Columns: []string{user.TopicsColumn},
+			Table:   user.ThreadsTable,
+			Columns: []string{user.ThreadsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(topic.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(thread.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -653,15 +653,15 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uu.mutation.TopicsIDs(); len(nodes) > 0 {
+	if nodes := uu.mutation.ThreadsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   user.TopicsTable,
-			Columns: []string{user.TopicsColumn},
+			Table:   user.ThreadsTable,
+			Columns: []string{user.ThreadsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(topic.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(thread.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -714,115 +714,115 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if uu.mutation.LikedForumsCleared() {
+	if uu.mutation.LikedBoardsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   user.LikedForumsTable,
-			Columns: user.LikedForumsPrimaryKey,
+			Table:   user.LikedBoardsTable,
+			Columns: user.LikedBoardsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(forum.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(board.FieldID, field.TypeInt),
 			},
 		}
-		createE := &UserForumLikeCreate{config: uu.config, mutation: newUserForumLikeMutation(uu.config, OpCreate)}
+		createE := &UserBoardLikeCreate{config: uu.config, mutation: newUserBoardLikeMutation(uu.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uu.mutation.RemovedLikedForumsIDs(); len(nodes) > 0 && !uu.mutation.LikedForumsCleared() {
+	if nodes := uu.mutation.RemovedLikedBoardsIDs(); len(nodes) > 0 && !uu.mutation.LikedBoardsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   user.LikedForumsTable,
-			Columns: user.LikedForumsPrimaryKey,
+			Table:   user.LikedBoardsTable,
+			Columns: user.LikedBoardsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(forum.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(board.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &UserForumLikeCreate{config: uu.config, mutation: newUserForumLikeMutation(uu.config, OpCreate)}
+		createE := &UserBoardLikeCreate{config: uu.config, mutation: newUserBoardLikeMutation(uu.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uu.mutation.LikedForumsIDs(); len(nodes) > 0 {
+	if nodes := uu.mutation.LikedBoardsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   user.LikedForumsTable,
-			Columns: user.LikedForumsPrimaryKey,
+			Table:   user.LikedBoardsTable,
+			Columns: user.LikedBoardsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(forum.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(board.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &UserForumLikeCreate{config: uu.config, mutation: newUserForumLikeMutation(uu.config, OpCreate)}
+		createE := &UserBoardLikeCreate{config: uu.config, mutation: newUserBoardLikeMutation(uu.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if uu.mutation.LikedTopicsCleared() {
+	if uu.mutation.LikedThreadsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   user.LikedTopicsTable,
-			Columns: user.LikedTopicsPrimaryKey,
+			Table:   user.LikedThreadsTable,
+			Columns: user.LikedThreadsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(topic.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(thread.FieldID, field.TypeInt),
 			},
 		}
-		createE := &UserTopicLikeCreate{config: uu.config, mutation: newUserTopicLikeMutation(uu.config, OpCreate)}
+		createE := &UserThreadLikeCreate{config: uu.config, mutation: newUserThreadLikeMutation(uu.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uu.mutation.RemovedLikedTopicsIDs(); len(nodes) > 0 && !uu.mutation.LikedTopicsCleared() {
+	if nodes := uu.mutation.RemovedLikedThreadsIDs(); len(nodes) > 0 && !uu.mutation.LikedThreadsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   user.LikedTopicsTable,
-			Columns: user.LikedTopicsPrimaryKey,
+			Table:   user.LikedThreadsTable,
+			Columns: user.LikedThreadsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(topic.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(thread.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &UserTopicLikeCreate{config: uu.config, mutation: newUserTopicLikeMutation(uu.config, OpCreate)}
+		createE := &UserThreadLikeCreate{config: uu.config, mutation: newUserThreadLikeMutation(uu.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uu.mutation.LikedTopicsIDs(); len(nodes) > 0 {
+	if nodes := uu.mutation.LikedThreadsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   user.LikedTopicsTable,
-			Columns: user.LikedTopicsPrimaryKey,
+			Table:   user.LikedThreadsTable,
+			Columns: user.LikedThreadsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(topic.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(thread.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &UserTopicLikeCreate{config: uu.config, mutation: newUserTopicLikeMutation(uu.config, OpCreate)}
+		createE := &UserThreadLikeCreate{config: uu.config, mutation: newUserThreadLikeMutation(uu.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
@@ -885,115 +885,115 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if uu.mutation.SubscribedForumsCleared() {
+	if uu.mutation.SubscribedBoardsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   user.SubscribedForumsTable,
-			Columns: user.SubscribedForumsPrimaryKey,
+			Table:   user.SubscribedBoardsTable,
+			Columns: user.SubscribedBoardsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(forum.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(board.FieldID, field.TypeInt),
 			},
 		}
-		createE := &UserForumSubscriptionCreate{config: uu.config, mutation: newUserForumSubscriptionMutation(uu.config, OpCreate)}
+		createE := &UserBoardSubscriptionCreate{config: uu.config, mutation: newUserBoardSubscriptionMutation(uu.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uu.mutation.RemovedSubscribedForumsIDs(); len(nodes) > 0 && !uu.mutation.SubscribedForumsCleared() {
+	if nodes := uu.mutation.RemovedSubscribedBoardsIDs(); len(nodes) > 0 && !uu.mutation.SubscribedBoardsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   user.SubscribedForumsTable,
-			Columns: user.SubscribedForumsPrimaryKey,
+			Table:   user.SubscribedBoardsTable,
+			Columns: user.SubscribedBoardsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(forum.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(board.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &UserForumSubscriptionCreate{config: uu.config, mutation: newUserForumSubscriptionMutation(uu.config, OpCreate)}
+		createE := &UserBoardSubscriptionCreate{config: uu.config, mutation: newUserBoardSubscriptionMutation(uu.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uu.mutation.SubscribedForumsIDs(); len(nodes) > 0 {
+	if nodes := uu.mutation.SubscribedBoardsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   user.SubscribedForumsTable,
-			Columns: user.SubscribedForumsPrimaryKey,
+			Table:   user.SubscribedBoardsTable,
+			Columns: user.SubscribedBoardsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(forum.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(board.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &UserForumSubscriptionCreate{config: uu.config, mutation: newUserForumSubscriptionMutation(uu.config, OpCreate)}
+		createE := &UserBoardSubscriptionCreate{config: uu.config, mutation: newUserBoardSubscriptionMutation(uu.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if uu.mutation.SubscribedTopicsCleared() {
+	if uu.mutation.SubscribedThreadsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   user.SubscribedTopicsTable,
-			Columns: user.SubscribedTopicsPrimaryKey,
+			Table:   user.SubscribedThreadsTable,
+			Columns: user.SubscribedThreadsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(topic.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(thread.FieldID, field.TypeInt),
 			},
 		}
-		createE := &UserTopicSubscriptionCreate{config: uu.config, mutation: newUserTopicSubscriptionMutation(uu.config, OpCreate)}
+		createE := &UserThreadSubscriptionCreate{config: uu.config, mutation: newUserThreadSubscriptionMutation(uu.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uu.mutation.RemovedSubscribedTopicsIDs(); len(nodes) > 0 && !uu.mutation.SubscribedTopicsCleared() {
+	if nodes := uu.mutation.RemovedSubscribedThreadsIDs(); len(nodes) > 0 && !uu.mutation.SubscribedThreadsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   user.SubscribedTopicsTable,
-			Columns: user.SubscribedTopicsPrimaryKey,
+			Table:   user.SubscribedThreadsTable,
+			Columns: user.SubscribedThreadsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(topic.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(thread.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &UserTopicSubscriptionCreate{config: uu.config, mutation: newUserTopicSubscriptionMutation(uu.config, OpCreate)}
+		createE := &UserThreadSubscriptionCreate{config: uu.config, mutation: newUserThreadSubscriptionMutation(uu.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uu.mutation.SubscribedTopicsIDs(); len(nodes) > 0 {
+	if nodes := uu.mutation.SubscribedThreadsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   user.SubscribedTopicsTable,
-			Columns: user.SubscribedTopicsPrimaryKey,
+			Table:   user.SubscribedThreadsTable,
+			Columns: user.SubscribedThreadsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(topic.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(thread.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &UserTopicSubscriptionCreate{config: uu.config, mutation: newUserTopicSubscriptionMutation(uu.config, OpCreate)}
+		createE := &UserThreadSubscriptionCreate{config: uu.config, mutation: newUserThreadSubscriptionMutation(uu.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
@@ -1076,16 +1076,16 @@ type UserUpdateOne struct {
 	mutation *UserMutation
 }
 
-// SetUserName sets the "userName" field.
-func (uuo *UserUpdateOne) SetUserName(s string) *UserUpdateOne {
-	uuo.mutation.SetUserName(s)
+// SetName sets the "name" field.
+func (uuo *UserUpdateOne) SetName(s string) *UserUpdateOne {
+	uuo.mutation.SetName(s)
 	return uuo
 }
 
-// SetNillableUserName sets the "userName" field if the given value is not nil.
-func (uuo *UserUpdateOne) SetNillableUserName(s *string) *UserUpdateOne {
+// SetNillableName sets the "name" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableName(s *string) *UserUpdateOne {
 	if s != nil {
-		uuo.SetUserName(*s)
+		uuo.SetName(*s)
 	}
 	return uuo
 }
@@ -1192,34 +1192,34 @@ func (uuo *UserUpdateOne) SetUpdatedAt(t time.Time) *UserUpdateOne {
 	return uuo
 }
 
-// AddForumIDs adds the "forums" edge to the Forum entity by IDs.
-func (uuo *UserUpdateOne) AddForumIDs(ids ...int) *UserUpdateOne {
-	uuo.mutation.AddForumIDs(ids...)
+// AddBoardIDs adds the "boards" edge to the Board entity by IDs.
+func (uuo *UserUpdateOne) AddBoardIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.AddBoardIDs(ids...)
 	return uuo
 }
 
-// AddForums adds the "forums" edges to the Forum entity.
-func (uuo *UserUpdateOne) AddForums(f ...*Forum) *UserUpdateOne {
-	ids := make([]int, len(f))
-	for i := range f {
-		ids[i] = f[i].ID
+// AddBoards adds the "boards" edges to the Board entity.
+func (uuo *UserUpdateOne) AddBoards(b ...*Board) *UserUpdateOne {
+	ids := make([]int, len(b))
+	for i := range b {
+		ids[i] = b[i].ID
 	}
-	return uuo.AddForumIDs(ids...)
+	return uuo.AddBoardIDs(ids...)
 }
 
-// AddTopicIDs adds the "topics" edge to the Topic entity by IDs.
-func (uuo *UserUpdateOne) AddTopicIDs(ids ...int) *UserUpdateOne {
-	uuo.mutation.AddTopicIDs(ids...)
+// AddThreadIDs adds the "threads" edge to the Thread entity by IDs.
+func (uuo *UserUpdateOne) AddThreadIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.AddThreadIDs(ids...)
 	return uuo
 }
 
-// AddTopics adds the "topics" edges to the Topic entity.
-func (uuo *UserUpdateOne) AddTopics(t ...*Topic) *UserUpdateOne {
+// AddThreads adds the "threads" edges to the Thread entity.
+func (uuo *UserUpdateOne) AddThreads(t ...*Thread) *UserUpdateOne {
 	ids := make([]int, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
 	}
-	return uuo.AddTopicIDs(ids...)
+	return uuo.AddThreadIDs(ids...)
 }
 
 // AddCommentIDs adds the "comments" edge to the Comment entity by IDs.
@@ -1237,34 +1237,34 @@ func (uuo *UserUpdateOne) AddComments(c ...*Comment) *UserUpdateOne {
 	return uuo.AddCommentIDs(ids...)
 }
 
-// AddLikedForumIDs adds the "liked_forums" edge to the Forum entity by IDs.
-func (uuo *UserUpdateOne) AddLikedForumIDs(ids ...int) *UserUpdateOne {
-	uuo.mutation.AddLikedForumIDs(ids...)
+// AddLikedBoardIDs adds the "liked_boards" edge to the Board entity by IDs.
+func (uuo *UserUpdateOne) AddLikedBoardIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.AddLikedBoardIDs(ids...)
 	return uuo
 }
 
-// AddLikedForums adds the "liked_forums" edges to the Forum entity.
-func (uuo *UserUpdateOne) AddLikedForums(f ...*Forum) *UserUpdateOne {
-	ids := make([]int, len(f))
-	for i := range f {
-		ids[i] = f[i].ID
+// AddLikedBoards adds the "liked_boards" edges to the Board entity.
+func (uuo *UserUpdateOne) AddLikedBoards(b ...*Board) *UserUpdateOne {
+	ids := make([]int, len(b))
+	for i := range b {
+		ids[i] = b[i].ID
 	}
-	return uuo.AddLikedForumIDs(ids...)
+	return uuo.AddLikedBoardIDs(ids...)
 }
 
-// AddLikedTopicIDs adds the "liked_topics" edge to the Topic entity by IDs.
-func (uuo *UserUpdateOne) AddLikedTopicIDs(ids ...int) *UserUpdateOne {
-	uuo.mutation.AddLikedTopicIDs(ids...)
+// AddLikedThreadIDs adds the "liked_threads" edge to the Thread entity by IDs.
+func (uuo *UserUpdateOne) AddLikedThreadIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.AddLikedThreadIDs(ids...)
 	return uuo
 }
 
-// AddLikedTopics adds the "liked_topics" edges to the Topic entity.
-func (uuo *UserUpdateOne) AddLikedTopics(t ...*Topic) *UserUpdateOne {
+// AddLikedThreads adds the "liked_threads" edges to the Thread entity.
+func (uuo *UserUpdateOne) AddLikedThreads(t ...*Thread) *UserUpdateOne {
 	ids := make([]int, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
 	}
-	return uuo.AddLikedTopicIDs(ids...)
+	return uuo.AddLikedThreadIDs(ids...)
 }
 
 // AddLikedCommentIDs adds the "liked_comments" edge to the Comment entity by IDs.
@@ -1282,34 +1282,34 @@ func (uuo *UserUpdateOne) AddLikedComments(c ...*Comment) *UserUpdateOne {
 	return uuo.AddLikedCommentIDs(ids...)
 }
 
-// AddSubscribedForumIDs adds the "subscribed_forums" edge to the Forum entity by IDs.
-func (uuo *UserUpdateOne) AddSubscribedForumIDs(ids ...int) *UserUpdateOne {
-	uuo.mutation.AddSubscribedForumIDs(ids...)
+// AddSubscribedBoardIDs adds the "subscribed_boards" edge to the Board entity by IDs.
+func (uuo *UserUpdateOne) AddSubscribedBoardIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.AddSubscribedBoardIDs(ids...)
 	return uuo
 }
 
-// AddSubscribedForums adds the "subscribed_forums" edges to the Forum entity.
-func (uuo *UserUpdateOne) AddSubscribedForums(f ...*Forum) *UserUpdateOne {
-	ids := make([]int, len(f))
-	for i := range f {
-		ids[i] = f[i].ID
+// AddSubscribedBoards adds the "subscribed_boards" edges to the Board entity.
+func (uuo *UserUpdateOne) AddSubscribedBoards(b ...*Board) *UserUpdateOne {
+	ids := make([]int, len(b))
+	for i := range b {
+		ids[i] = b[i].ID
 	}
-	return uuo.AddSubscribedForumIDs(ids...)
+	return uuo.AddSubscribedBoardIDs(ids...)
 }
 
-// AddSubscribedTopicIDs adds the "subscribed_topics" edge to the Topic entity by IDs.
-func (uuo *UserUpdateOne) AddSubscribedTopicIDs(ids ...int) *UserUpdateOne {
-	uuo.mutation.AddSubscribedTopicIDs(ids...)
+// AddSubscribedThreadIDs adds the "subscribed_threads" edge to the Thread entity by IDs.
+func (uuo *UserUpdateOne) AddSubscribedThreadIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.AddSubscribedThreadIDs(ids...)
 	return uuo
 }
 
-// AddSubscribedTopics adds the "subscribed_topics" edges to the Topic entity.
-func (uuo *UserUpdateOne) AddSubscribedTopics(t ...*Topic) *UserUpdateOne {
+// AddSubscribedThreads adds the "subscribed_threads" edges to the Thread entity.
+func (uuo *UserUpdateOne) AddSubscribedThreads(t ...*Thread) *UserUpdateOne {
 	ids := make([]int, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
 	}
-	return uuo.AddSubscribedTopicIDs(ids...)
+	return uuo.AddSubscribedThreadIDs(ids...)
 }
 
 // AddSubscribedCommentIDs adds the "subscribed_comments" edge to the Comment entity by IDs.
@@ -1332,46 +1332,46 @@ func (uuo *UserUpdateOne) Mutation() *UserMutation {
 	return uuo.mutation
 }
 
-// ClearForums clears all "forums" edges to the Forum entity.
-func (uuo *UserUpdateOne) ClearForums() *UserUpdateOne {
-	uuo.mutation.ClearForums()
+// ClearBoards clears all "boards" edges to the Board entity.
+func (uuo *UserUpdateOne) ClearBoards() *UserUpdateOne {
+	uuo.mutation.ClearBoards()
 	return uuo
 }
 
-// RemoveForumIDs removes the "forums" edge to Forum entities by IDs.
-func (uuo *UserUpdateOne) RemoveForumIDs(ids ...int) *UserUpdateOne {
-	uuo.mutation.RemoveForumIDs(ids...)
+// RemoveBoardIDs removes the "boards" edge to Board entities by IDs.
+func (uuo *UserUpdateOne) RemoveBoardIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveBoardIDs(ids...)
 	return uuo
 }
 
-// RemoveForums removes "forums" edges to Forum entities.
-func (uuo *UserUpdateOne) RemoveForums(f ...*Forum) *UserUpdateOne {
-	ids := make([]int, len(f))
-	for i := range f {
-		ids[i] = f[i].ID
+// RemoveBoards removes "boards" edges to Board entities.
+func (uuo *UserUpdateOne) RemoveBoards(b ...*Board) *UserUpdateOne {
+	ids := make([]int, len(b))
+	for i := range b {
+		ids[i] = b[i].ID
 	}
-	return uuo.RemoveForumIDs(ids...)
+	return uuo.RemoveBoardIDs(ids...)
 }
 
-// ClearTopics clears all "topics" edges to the Topic entity.
-func (uuo *UserUpdateOne) ClearTopics() *UserUpdateOne {
-	uuo.mutation.ClearTopics()
+// ClearThreads clears all "threads" edges to the Thread entity.
+func (uuo *UserUpdateOne) ClearThreads() *UserUpdateOne {
+	uuo.mutation.ClearThreads()
 	return uuo
 }
 
-// RemoveTopicIDs removes the "topics" edge to Topic entities by IDs.
-func (uuo *UserUpdateOne) RemoveTopicIDs(ids ...int) *UserUpdateOne {
-	uuo.mutation.RemoveTopicIDs(ids...)
+// RemoveThreadIDs removes the "threads" edge to Thread entities by IDs.
+func (uuo *UserUpdateOne) RemoveThreadIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveThreadIDs(ids...)
 	return uuo
 }
 
-// RemoveTopics removes "topics" edges to Topic entities.
-func (uuo *UserUpdateOne) RemoveTopics(t ...*Topic) *UserUpdateOne {
+// RemoveThreads removes "threads" edges to Thread entities.
+func (uuo *UserUpdateOne) RemoveThreads(t ...*Thread) *UserUpdateOne {
 	ids := make([]int, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
 	}
-	return uuo.RemoveTopicIDs(ids...)
+	return uuo.RemoveThreadIDs(ids...)
 }
 
 // ClearComments clears all "comments" edges to the Comment entity.
@@ -1395,46 +1395,46 @@ func (uuo *UserUpdateOne) RemoveComments(c ...*Comment) *UserUpdateOne {
 	return uuo.RemoveCommentIDs(ids...)
 }
 
-// ClearLikedForums clears all "liked_forums" edges to the Forum entity.
-func (uuo *UserUpdateOne) ClearLikedForums() *UserUpdateOne {
-	uuo.mutation.ClearLikedForums()
+// ClearLikedBoards clears all "liked_boards" edges to the Board entity.
+func (uuo *UserUpdateOne) ClearLikedBoards() *UserUpdateOne {
+	uuo.mutation.ClearLikedBoards()
 	return uuo
 }
 
-// RemoveLikedForumIDs removes the "liked_forums" edge to Forum entities by IDs.
-func (uuo *UserUpdateOne) RemoveLikedForumIDs(ids ...int) *UserUpdateOne {
-	uuo.mutation.RemoveLikedForumIDs(ids...)
+// RemoveLikedBoardIDs removes the "liked_boards" edge to Board entities by IDs.
+func (uuo *UserUpdateOne) RemoveLikedBoardIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveLikedBoardIDs(ids...)
 	return uuo
 }
 
-// RemoveLikedForums removes "liked_forums" edges to Forum entities.
-func (uuo *UserUpdateOne) RemoveLikedForums(f ...*Forum) *UserUpdateOne {
-	ids := make([]int, len(f))
-	for i := range f {
-		ids[i] = f[i].ID
+// RemoveLikedBoards removes "liked_boards" edges to Board entities.
+func (uuo *UserUpdateOne) RemoveLikedBoards(b ...*Board) *UserUpdateOne {
+	ids := make([]int, len(b))
+	for i := range b {
+		ids[i] = b[i].ID
 	}
-	return uuo.RemoveLikedForumIDs(ids...)
+	return uuo.RemoveLikedBoardIDs(ids...)
 }
 
-// ClearLikedTopics clears all "liked_topics" edges to the Topic entity.
-func (uuo *UserUpdateOne) ClearLikedTopics() *UserUpdateOne {
-	uuo.mutation.ClearLikedTopics()
+// ClearLikedThreads clears all "liked_threads" edges to the Thread entity.
+func (uuo *UserUpdateOne) ClearLikedThreads() *UserUpdateOne {
+	uuo.mutation.ClearLikedThreads()
 	return uuo
 }
 
-// RemoveLikedTopicIDs removes the "liked_topics" edge to Topic entities by IDs.
-func (uuo *UserUpdateOne) RemoveLikedTopicIDs(ids ...int) *UserUpdateOne {
-	uuo.mutation.RemoveLikedTopicIDs(ids...)
+// RemoveLikedThreadIDs removes the "liked_threads" edge to Thread entities by IDs.
+func (uuo *UserUpdateOne) RemoveLikedThreadIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveLikedThreadIDs(ids...)
 	return uuo
 }
 
-// RemoveLikedTopics removes "liked_topics" edges to Topic entities.
-func (uuo *UserUpdateOne) RemoveLikedTopics(t ...*Topic) *UserUpdateOne {
+// RemoveLikedThreads removes "liked_threads" edges to Thread entities.
+func (uuo *UserUpdateOne) RemoveLikedThreads(t ...*Thread) *UserUpdateOne {
 	ids := make([]int, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
 	}
-	return uuo.RemoveLikedTopicIDs(ids...)
+	return uuo.RemoveLikedThreadIDs(ids...)
 }
 
 // ClearLikedComments clears all "liked_comments" edges to the Comment entity.
@@ -1458,46 +1458,46 @@ func (uuo *UserUpdateOne) RemoveLikedComments(c ...*Comment) *UserUpdateOne {
 	return uuo.RemoveLikedCommentIDs(ids...)
 }
 
-// ClearSubscribedForums clears all "subscribed_forums" edges to the Forum entity.
-func (uuo *UserUpdateOne) ClearSubscribedForums() *UserUpdateOne {
-	uuo.mutation.ClearSubscribedForums()
+// ClearSubscribedBoards clears all "subscribed_boards" edges to the Board entity.
+func (uuo *UserUpdateOne) ClearSubscribedBoards() *UserUpdateOne {
+	uuo.mutation.ClearSubscribedBoards()
 	return uuo
 }
 
-// RemoveSubscribedForumIDs removes the "subscribed_forums" edge to Forum entities by IDs.
-func (uuo *UserUpdateOne) RemoveSubscribedForumIDs(ids ...int) *UserUpdateOne {
-	uuo.mutation.RemoveSubscribedForumIDs(ids...)
+// RemoveSubscribedBoardIDs removes the "subscribed_boards" edge to Board entities by IDs.
+func (uuo *UserUpdateOne) RemoveSubscribedBoardIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveSubscribedBoardIDs(ids...)
 	return uuo
 }
 
-// RemoveSubscribedForums removes "subscribed_forums" edges to Forum entities.
-func (uuo *UserUpdateOne) RemoveSubscribedForums(f ...*Forum) *UserUpdateOne {
-	ids := make([]int, len(f))
-	for i := range f {
-		ids[i] = f[i].ID
+// RemoveSubscribedBoards removes "subscribed_boards" edges to Board entities.
+func (uuo *UserUpdateOne) RemoveSubscribedBoards(b ...*Board) *UserUpdateOne {
+	ids := make([]int, len(b))
+	for i := range b {
+		ids[i] = b[i].ID
 	}
-	return uuo.RemoveSubscribedForumIDs(ids...)
+	return uuo.RemoveSubscribedBoardIDs(ids...)
 }
 
-// ClearSubscribedTopics clears all "subscribed_topics" edges to the Topic entity.
-func (uuo *UserUpdateOne) ClearSubscribedTopics() *UserUpdateOne {
-	uuo.mutation.ClearSubscribedTopics()
+// ClearSubscribedThreads clears all "subscribed_threads" edges to the Thread entity.
+func (uuo *UserUpdateOne) ClearSubscribedThreads() *UserUpdateOne {
+	uuo.mutation.ClearSubscribedThreads()
 	return uuo
 }
 
-// RemoveSubscribedTopicIDs removes the "subscribed_topics" edge to Topic entities by IDs.
-func (uuo *UserUpdateOne) RemoveSubscribedTopicIDs(ids ...int) *UserUpdateOne {
-	uuo.mutation.RemoveSubscribedTopicIDs(ids...)
+// RemoveSubscribedThreadIDs removes the "subscribed_threads" edge to Thread entities by IDs.
+func (uuo *UserUpdateOne) RemoveSubscribedThreadIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveSubscribedThreadIDs(ids...)
 	return uuo
 }
 
-// RemoveSubscribedTopics removes "subscribed_topics" edges to Topic entities.
-func (uuo *UserUpdateOne) RemoveSubscribedTopics(t ...*Topic) *UserUpdateOne {
+// RemoveSubscribedThreads removes "subscribed_threads" edges to Thread entities.
+func (uuo *UserUpdateOne) RemoveSubscribedThreads(t ...*Thread) *UserUpdateOne {
 	ids := make([]int, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
 	}
-	return uuo.RemoveSubscribedTopicIDs(ids...)
+	return uuo.RemoveSubscribedThreadIDs(ids...)
 }
 
 // ClearSubscribedComments clears all "subscribed_comments" edges to the Comment entity.
@@ -1572,9 +1572,9 @@ func (uuo *UserUpdateOne) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (uuo *UserUpdateOne) check() error {
-	if v, ok := uuo.mutation.UserName(); ok {
-		if err := user.UserNameValidator(v); err != nil {
-			return &ValidationError{Name: "userName", err: fmt.Errorf(`ent: validator failed for field "User.userName": %w`, err)}
+	if v, ok := uuo.mutation.Name(); ok {
+		if err := user.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "User.name": %w`, err)}
 		}
 	}
 	if v, ok := uuo.mutation.Email(); ok {
@@ -1624,8 +1624,8 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			}
 		}
 	}
-	if value, ok := uuo.mutation.UserName(); ok {
-		_spec.SetField(user.FieldUserName, field.TypeString, value)
+	if value, ok := uuo.mutation.Name(); ok {
+		_spec.SetField(user.FieldName, field.TypeString, value)
 	}
 	if value, ok := uuo.mutation.Email(); ok {
 		_spec.SetField(user.FieldEmail, field.TypeString, value)
@@ -1654,28 +1654,28 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	if value, ok := uuo.mutation.UpdatedAt(); ok {
 		_spec.SetField(user.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if uuo.mutation.ForumsCleared() {
+	if uuo.mutation.BoardsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   user.ForumsTable,
-			Columns: []string{user.ForumsColumn},
+			Table:   user.BoardsTable,
+			Columns: []string{user.BoardsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(forum.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(board.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uuo.mutation.RemovedForumsIDs(); len(nodes) > 0 && !uuo.mutation.ForumsCleared() {
+	if nodes := uuo.mutation.RemovedBoardsIDs(); len(nodes) > 0 && !uuo.mutation.BoardsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   user.ForumsTable,
-			Columns: []string{user.ForumsColumn},
+			Table:   user.BoardsTable,
+			Columns: []string{user.BoardsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(forum.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(board.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -1683,15 +1683,15 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uuo.mutation.ForumsIDs(); len(nodes) > 0 {
+	if nodes := uuo.mutation.BoardsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   user.ForumsTable,
-			Columns: []string{user.ForumsColumn},
+			Table:   user.BoardsTable,
+			Columns: []string{user.BoardsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(forum.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(board.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -1699,28 +1699,28 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if uuo.mutation.TopicsCleared() {
+	if uuo.mutation.ThreadsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   user.TopicsTable,
-			Columns: []string{user.TopicsColumn},
+			Table:   user.ThreadsTable,
+			Columns: []string{user.ThreadsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(topic.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(thread.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uuo.mutation.RemovedTopicsIDs(); len(nodes) > 0 && !uuo.mutation.TopicsCleared() {
+	if nodes := uuo.mutation.RemovedThreadsIDs(); len(nodes) > 0 && !uuo.mutation.ThreadsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   user.TopicsTable,
-			Columns: []string{user.TopicsColumn},
+			Table:   user.ThreadsTable,
+			Columns: []string{user.ThreadsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(topic.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(thread.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -1728,15 +1728,15 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uuo.mutation.TopicsIDs(); len(nodes) > 0 {
+	if nodes := uuo.mutation.ThreadsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   user.TopicsTable,
-			Columns: []string{user.TopicsColumn},
+			Table:   user.ThreadsTable,
+			Columns: []string{user.ThreadsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(topic.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(thread.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -1789,115 +1789,115 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if uuo.mutation.LikedForumsCleared() {
+	if uuo.mutation.LikedBoardsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   user.LikedForumsTable,
-			Columns: user.LikedForumsPrimaryKey,
+			Table:   user.LikedBoardsTable,
+			Columns: user.LikedBoardsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(forum.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(board.FieldID, field.TypeInt),
 			},
 		}
-		createE := &UserForumLikeCreate{config: uuo.config, mutation: newUserForumLikeMutation(uuo.config, OpCreate)}
+		createE := &UserBoardLikeCreate{config: uuo.config, mutation: newUserBoardLikeMutation(uuo.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uuo.mutation.RemovedLikedForumsIDs(); len(nodes) > 0 && !uuo.mutation.LikedForumsCleared() {
+	if nodes := uuo.mutation.RemovedLikedBoardsIDs(); len(nodes) > 0 && !uuo.mutation.LikedBoardsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   user.LikedForumsTable,
-			Columns: user.LikedForumsPrimaryKey,
+			Table:   user.LikedBoardsTable,
+			Columns: user.LikedBoardsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(forum.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(board.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &UserForumLikeCreate{config: uuo.config, mutation: newUserForumLikeMutation(uuo.config, OpCreate)}
+		createE := &UserBoardLikeCreate{config: uuo.config, mutation: newUserBoardLikeMutation(uuo.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uuo.mutation.LikedForumsIDs(); len(nodes) > 0 {
+	if nodes := uuo.mutation.LikedBoardsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   user.LikedForumsTable,
-			Columns: user.LikedForumsPrimaryKey,
+			Table:   user.LikedBoardsTable,
+			Columns: user.LikedBoardsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(forum.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(board.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &UserForumLikeCreate{config: uuo.config, mutation: newUserForumLikeMutation(uuo.config, OpCreate)}
+		createE := &UserBoardLikeCreate{config: uuo.config, mutation: newUserBoardLikeMutation(uuo.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if uuo.mutation.LikedTopicsCleared() {
+	if uuo.mutation.LikedThreadsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   user.LikedTopicsTable,
-			Columns: user.LikedTopicsPrimaryKey,
+			Table:   user.LikedThreadsTable,
+			Columns: user.LikedThreadsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(topic.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(thread.FieldID, field.TypeInt),
 			},
 		}
-		createE := &UserTopicLikeCreate{config: uuo.config, mutation: newUserTopicLikeMutation(uuo.config, OpCreate)}
+		createE := &UserThreadLikeCreate{config: uuo.config, mutation: newUserThreadLikeMutation(uuo.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uuo.mutation.RemovedLikedTopicsIDs(); len(nodes) > 0 && !uuo.mutation.LikedTopicsCleared() {
+	if nodes := uuo.mutation.RemovedLikedThreadsIDs(); len(nodes) > 0 && !uuo.mutation.LikedThreadsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   user.LikedTopicsTable,
-			Columns: user.LikedTopicsPrimaryKey,
+			Table:   user.LikedThreadsTable,
+			Columns: user.LikedThreadsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(topic.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(thread.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &UserTopicLikeCreate{config: uuo.config, mutation: newUserTopicLikeMutation(uuo.config, OpCreate)}
+		createE := &UserThreadLikeCreate{config: uuo.config, mutation: newUserThreadLikeMutation(uuo.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uuo.mutation.LikedTopicsIDs(); len(nodes) > 0 {
+	if nodes := uuo.mutation.LikedThreadsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   user.LikedTopicsTable,
-			Columns: user.LikedTopicsPrimaryKey,
+			Table:   user.LikedThreadsTable,
+			Columns: user.LikedThreadsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(topic.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(thread.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &UserTopicLikeCreate{config: uuo.config, mutation: newUserTopicLikeMutation(uuo.config, OpCreate)}
+		createE := &UserThreadLikeCreate{config: uuo.config, mutation: newUserThreadLikeMutation(uuo.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
@@ -1960,115 +1960,115 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if uuo.mutation.SubscribedForumsCleared() {
+	if uuo.mutation.SubscribedBoardsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   user.SubscribedForumsTable,
-			Columns: user.SubscribedForumsPrimaryKey,
+			Table:   user.SubscribedBoardsTable,
+			Columns: user.SubscribedBoardsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(forum.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(board.FieldID, field.TypeInt),
 			},
 		}
-		createE := &UserForumSubscriptionCreate{config: uuo.config, mutation: newUserForumSubscriptionMutation(uuo.config, OpCreate)}
+		createE := &UserBoardSubscriptionCreate{config: uuo.config, mutation: newUserBoardSubscriptionMutation(uuo.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uuo.mutation.RemovedSubscribedForumsIDs(); len(nodes) > 0 && !uuo.mutation.SubscribedForumsCleared() {
+	if nodes := uuo.mutation.RemovedSubscribedBoardsIDs(); len(nodes) > 0 && !uuo.mutation.SubscribedBoardsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   user.SubscribedForumsTable,
-			Columns: user.SubscribedForumsPrimaryKey,
+			Table:   user.SubscribedBoardsTable,
+			Columns: user.SubscribedBoardsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(forum.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(board.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &UserForumSubscriptionCreate{config: uuo.config, mutation: newUserForumSubscriptionMutation(uuo.config, OpCreate)}
+		createE := &UserBoardSubscriptionCreate{config: uuo.config, mutation: newUserBoardSubscriptionMutation(uuo.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uuo.mutation.SubscribedForumsIDs(); len(nodes) > 0 {
+	if nodes := uuo.mutation.SubscribedBoardsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   user.SubscribedForumsTable,
-			Columns: user.SubscribedForumsPrimaryKey,
+			Table:   user.SubscribedBoardsTable,
+			Columns: user.SubscribedBoardsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(forum.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(board.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &UserForumSubscriptionCreate{config: uuo.config, mutation: newUserForumSubscriptionMutation(uuo.config, OpCreate)}
+		createE := &UserBoardSubscriptionCreate{config: uuo.config, mutation: newUserBoardSubscriptionMutation(uuo.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if uuo.mutation.SubscribedTopicsCleared() {
+	if uuo.mutation.SubscribedThreadsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   user.SubscribedTopicsTable,
-			Columns: user.SubscribedTopicsPrimaryKey,
+			Table:   user.SubscribedThreadsTable,
+			Columns: user.SubscribedThreadsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(topic.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(thread.FieldID, field.TypeInt),
 			},
 		}
-		createE := &UserTopicSubscriptionCreate{config: uuo.config, mutation: newUserTopicSubscriptionMutation(uuo.config, OpCreate)}
+		createE := &UserThreadSubscriptionCreate{config: uuo.config, mutation: newUserThreadSubscriptionMutation(uuo.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uuo.mutation.RemovedSubscribedTopicsIDs(); len(nodes) > 0 && !uuo.mutation.SubscribedTopicsCleared() {
+	if nodes := uuo.mutation.RemovedSubscribedThreadsIDs(); len(nodes) > 0 && !uuo.mutation.SubscribedThreadsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   user.SubscribedTopicsTable,
-			Columns: user.SubscribedTopicsPrimaryKey,
+			Table:   user.SubscribedThreadsTable,
+			Columns: user.SubscribedThreadsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(topic.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(thread.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &UserTopicSubscriptionCreate{config: uuo.config, mutation: newUserTopicSubscriptionMutation(uuo.config, OpCreate)}
+		createE := &UserThreadSubscriptionCreate{config: uuo.config, mutation: newUserThreadSubscriptionMutation(uuo.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uuo.mutation.SubscribedTopicsIDs(); len(nodes) > 0 {
+	if nodes := uuo.mutation.SubscribedThreadsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   user.SubscribedTopicsTable,
-			Columns: user.SubscribedTopicsPrimaryKey,
+			Table:   user.SubscribedThreadsTable,
+			Columns: user.SubscribedThreadsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(topic.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(thread.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &UserTopicSubscriptionCreate{config: uuo.config, mutation: newUserTopicSubscriptionMutation(uuo.config, OpCreate)}
+		createE := &UserThreadSubscriptionCreate{config: uuo.config, mutation: newUserThreadSubscriptionMutation(uuo.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields

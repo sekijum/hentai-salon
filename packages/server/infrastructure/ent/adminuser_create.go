@@ -20,9 +20,9 @@ type AdminUserCreate struct {
 	hooks    []Hook
 }
 
-// SetUserName sets the "userName" field.
-func (auc *AdminUserCreate) SetUserName(s string) *AdminUserCreate {
-	auc.mutation.SetUserName(s)
+// SetName sets the "name" field.
+func (auc *AdminUserCreate) SetName(s string) *AdminUserCreate {
+	auc.mutation.SetName(s)
 	return auc
 }
 
@@ -119,12 +119,12 @@ func (auc *AdminUserCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (auc *AdminUserCreate) check() error {
-	if _, ok := auc.mutation.UserName(); !ok {
-		return &ValidationError{Name: "userName", err: errors.New(`ent: missing required field "AdminUser.userName"`)}
+	if _, ok := auc.mutation.Name(); !ok {
+		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "AdminUser.name"`)}
 	}
-	if v, ok := auc.mutation.UserName(); ok {
-		if err := adminuser.UserNameValidator(v); err != nil {
-			return &ValidationError{Name: "userName", err: fmt.Errorf(`ent: validator failed for field "AdminUser.userName": %w`, err)}
+	if v, ok := auc.mutation.Name(); ok {
+		if err := adminuser.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "AdminUser.name": %w`, err)}
 		}
 	}
 	if _, ok := auc.mutation.Email(); !ok {
@@ -176,9 +176,9 @@ func (auc *AdminUserCreate) createSpec() (*AdminUser, *sqlgraph.CreateSpec) {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
-	if value, ok := auc.mutation.UserName(); ok {
-		_spec.SetField(adminuser.FieldUserName, field.TypeString, value)
-		_node.UserName = value
+	if value, ok := auc.mutation.Name(); ok {
+		_spec.SetField(adminuser.FieldName, field.TypeString, value)
+		_node.Name = value
 	}
 	if value, ok := auc.mutation.Email(); ok {
 		_spec.SetField(adminuser.FieldEmail, field.TypeString, value)

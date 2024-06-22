@@ -55,9 +55,9 @@ func IDLTE(id int) predicate.User {
 	return predicate.User(sql.FieldLTE(FieldID, id))
 }
 
-// UserName applies equality check predicate on the "userName" field. It's identical to UserNameEQ.
-func UserName(v string) predicate.User {
-	return predicate.User(sql.FieldEQ(FieldUserName, v))
+// Name applies equality check predicate on the "name" field. It's identical to NameEQ.
+func Name(v string) predicate.User {
+	return predicate.User(sql.FieldEQ(FieldName, v))
 }
 
 // Email applies equality check predicate on the "email" field. It's identical to EmailEQ.
@@ -90,69 +90,69 @@ func UpdatedAt(v time.Time) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldUpdatedAt, v))
 }
 
-// UserNameEQ applies the EQ predicate on the "userName" field.
-func UserNameEQ(v string) predicate.User {
-	return predicate.User(sql.FieldEQ(FieldUserName, v))
+// NameEQ applies the EQ predicate on the "name" field.
+func NameEQ(v string) predicate.User {
+	return predicate.User(sql.FieldEQ(FieldName, v))
 }
 
-// UserNameNEQ applies the NEQ predicate on the "userName" field.
-func UserNameNEQ(v string) predicate.User {
-	return predicate.User(sql.FieldNEQ(FieldUserName, v))
+// NameNEQ applies the NEQ predicate on the "name" field.
+func NameNEQ(v string) predicate.User {
+	return predicate.User(sql.FieldNEQ(FieldName, v))
 }
 
-// UserNameIn applies the In predicate on the "userName" field.
-func UserNameIn(vs ...string) predicate.User {
-	return predicate.User(sql.FieldIn(FieldUserName, vs...))
+// NameIn applies the In predicate on the "name" field.
+func NameIn(vs ...string) predicate.User {
+	return predicate.User(sql.FieldIn(FieldName, vs...))
 }
 
-// UserNameNotIn applies the NotIn predicate on the "userName" field.
-func UserNameNotIn(vs ...string) predicate.User {
-	return predicate.User(sql.FieldNotIn(FieldUserName, vs...))
+// NameNotIn applies the NotIn predicate on the "name" field.
+func NameNotIn(vs ...string) predicate.User {
+	return predicate.User(sql.FieldNotIn(FieldName, vs...))
 }
 
-// UserNameGT applies the GT predicate on the "userName" field.
-func UserNameGT(v string) predicate.User {
-	return predicate.User(sql.FieldGT(FieldUserName, v))
+// NameGT applies the GT predicate on the "name" field.
+func NameGT(v string) predicate.User {
+	return predicate.User(sql.FieldGT(FieldName, v))
 }
 
-// UserNameGTE applies the GTE predicate on the "userName" field.
-func UserNameGTE(v string) predicate.User {
-	return predicate.User(sql.FieldGTE(FieldUserName, v))
+// NameGTE applies the GTE predicate on the "name" field.
+func NameGTE(v string) predicate.User {
+	return predicate.User(sql.FieldGTE(FieldName, v))
 }
 
-// UserNameLT applies the LT predicate on the "userName" field.
-func UserNameLT(v string) predicate.User {
-	return predicate.User(sql.FieldLT(FieldUserName, v))
+// NameLT applies the LT predicate on the "name" field.
+func NameLT(v string) predicate.User {
+	return predicate.User(sql.FieldLT(FieldName, v))
 }
 
-// UserNameLTE applies the LTE predicate on the "userName" field.
-func UserNameLTE(v string) predicate.User {
-	return predicate.User(sql.FieldLTE(FieldUserName, v))
+// NameLTE applies the LTE predicate on the "name" field.
+func NameLTE(v string) predicate.User {
+	return predicate.User(sql.FieldLTE(FieldName, v))
 }
 
-// UserNameContains applies the Contains predicate on the "userName" field.
-func UserNameContains(v string) predicate.User {
-	return predicate.User(sql.FieldContains(FieldUserName, v))
+// NameContains applies the Contains predicate on the "name" field.
+func NameContains(v string) predicate.User {
+	return predicate.User(sql.FieldContains(FieldName, v))
 }
 
-// UserNameHasPrefix applies the HasPrefix predicate on the "userName" field.
-func UserNameHasPrefix(v string) predicate.User {
-	return predicate.User(sql.FieldHasPrefix(FieldUserName, v))
+// NameHasPrefix applies the HasPrefix predicate on the "name" field.
+func NameHasPrefix(v string) predicate.User {
+	return predicate.User(sql.FieldHasPrefix(FieldName, v))
 }
 
-// UserNameHasSuffix applies the HasSuffix predicate on the "userName" field.
-func UserNameHasSuffix(v string) predicate.User {
-	return predicate.User(sql.FieldHasSuffix(FieldUserName, v))
+// NameHasSuffix applies the HasSuffix predicate on the "name" field.
+func NameHasSuffix(v string) predicate.User {
+	return predicate.User(sql.FieldHasSuffix(FieldName, v))
 }
 
-// UserNameEqualFold applies the EqualFold predicate on the "userName" field.
-func UserNameEqualFold(v string) predicate.User {
-	return predicate.User(sql.FieldEqualFold(FieldUserName, v))
+// NameEqualFold applies the EqualFold predicate on the "name" field.
+func NameEqualFold(v string) predicate.User {
+	return predicate.User(sql.FieldEqualFold(FieldName, v))
 }
 
-// UserNameContainsFold applies the ContainsFold predicate on the "userName" field.
-func UserNameContainsFold(v string) predicate.User {
-	return predicate.User(sql.FieldContainsFold(FieldUserName, v))
+// NameContainsFold applies the ContainsFold predicate on the "name" field.
+func NameContainsFold(v string) predicate.User {
+	return predicate.User(sql.FieldContainsFold(FieldName, v))
 }
 
 // EmailEQ applies the EQ predicate on the "email" field.
@@ -535,21 +535,21 @@ func UpdatedAtLTE(v time.Time) predicate.User {
 	return predicate.User(sql.FieldLTE(FieldUpdatedAt, v))
 }
 
-// HasForums applies the HasEdge predicate on the "forums" edge.
-func HasForums() predicate.User {
+// HasBoards applies the HasEdge predicate on the "boards" edge.
+func HasBoards() predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, ForumsTable, ForumsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, BoardsTable, BoardsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasForumsWith applies the HasEdge predicate on the "forums" edge with a given conditions (other predicates).
-func HasForumsWith(preds ...predicate.Forum) predicate.User {
+// HasBoardsWith applies the HasEdge predicate on the "boards" edge with a given conditions (other predicates).
+func HasBoardsWith(preds ...predicate.Board) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
-		step := newForumsStep()
+		step := newBoardsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -558,21 +558,21 @@ func HasForumsWith(preds ...predicate.Forum) predicate.User {
 	})
 }
 
-// HasTopics applies the HasEdge predicate on the "topics" edge.
-func HasTopics() predicate.User {
+// HasThreads applies the HasEdge predicate on the "threads" edge.
+func HasThreads() predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, TopicsTable, TopicsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, ThreadsTable, ThreadsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasTopicsWith applies the HasEdge predicate on the "topics" edge with a given conditions (other predicates).
-func HasTopicsWith(preds ...predicate.Topic) predicate.User {
+// HasThreadsWith applies the HasEdge predicate on the "threads" edge with a given conditions (other predicates).
+func HasThreadsWith(preds ...predicate.Thread) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
-		step := newTopicsStep()
+		step := newThreadsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -604,21 +604,21 @@ func HasCommentsWith(preds ...predicate.Comment) predicate.User {
 	})
 }
 
-// HasLikedForums applies the HasEdge predicate on the "liked_forums" edge.
-func HasLikedForums() predicate.User {
+// HasLikedBoards applies the HasEdge predicate on the "liked_boards" edge.
+func HasLikedBoards() predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, LikedForumsTable, LikedForumsPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, false, LikedBoardsTable, LikedBoardsPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasLikedForumsWith applies the HasEdge predicate on the "liked_forums" edge with a given conditions (other predicates).
-func HasLikedForumsWith(preds ...predicate.Forum) predicate.User {
+// HasLikedBoardsWith applies the HasEdge predicate on the "liked_boards" edge with a given conditions (other predicates).
+func HasLikedBoardsWith(preds ...predicate.Board) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
-		step := newLikedForumsStep()
+		step := newLikedBoardsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -627,21 +627,21 @@ func HasLikedForumsWith(preds ...predicate.Forum) predicate.User {
 	})
 }
 
-// HasLikedTopics applies the HasEdge predicate on the "liked_topics" edge.
-func HasLikedTopics() predicate.User {
+// HasLikedThreads applies the HasEdge predicate on the "liked_threads" edge.
+func HasLikedThreads() predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, LikedTopicsTable, LikedTopicsPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, false, LikedThreadsTable, LikedThreadsPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasLikedTopicsWith applies the HasEdge predicate on the "liked_topics" edge with a given conditions (other predicates).
-func HasLikedTopicsWith(preds ...predicate.Topic) predicate.User {
+// HasLikedThreadsWith applies the HasEdge predicate on the "liked_threads" edge with a given conditions (other predicates).
+func HasLikedThreadsWith(preds ...predicate.Thread) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
-		step := newLikedTopicsStep()
+		step := newLikedThreadsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -673,21 +673,21 @@ func HasLikedCommentsWith(preds ...predicate.Comment) predicate.User {
 	})
 }
 
-// HasSubscribedForums applies the HasEdge predicate on the "subscribed_forums" edge.
-func HasSubscribedForums() predicate.User {
+// HasSubscribedBoards applies the HasEdge predicate on the "subscribed_boards" edge.
+func HasSubscribedBoards() predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, SubscribedForumsTable, SubscribedForumsPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, false, SubscribedBoardsTable, SubscribedBoardsPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasSubscribedForumsWith applies the HasEdge predicate on the "subscribed_forums" edge with a given conditions (other predicates).
-func HasSubscribedForumsWith(preds ...predicate.Forum) predicate.User {
+// HasSubscribedBoardsWith applies the HasEdge predicate on the "subscribed_boards" edge with a given conditions (other predicates).
+func HasSubscribedBoardsWith(preds ...predicate.Board) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
-		step := newSubscribedForumsStep()
+		step := newSubscribedBoardsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -696,21 +696,21 @@ func HasSubscribedForumsWith(preds ...predicate.Forum) predicate.User {
 	})
 }
 
-// HasSubscribedTopics applies the HasEdge predicate on the "subscribed_topics" edge.
-func HasSubscribedTopics() predicate.User {
+// HasSubscribedThreads applies the HasEdge predicate on the "subscribed_threads" edge.
+func HasSubscribedThreads() predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, SubscribedTopicsTable, SubscribedTopicsPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, false, SubscribedThreadsTable, SubscribedThreadsPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasSubscribedTopicsWith applies the HasEdge predicate on the "subscribed_topics" edge with a given conditions (other predicates).
-func HasSubscribedTopicsWith(preds ...predicate.Topic) predicate.User {
+// HasSubscribedThreadsWith applies the HasEdge predicate on the "subscribed_threads" edge with a given conditions (other predicates).
+func HasSubscribedThreadsWith(preds ...predicate.Thread) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
-		step := newSubscribedTopicsStep()
+		step := newSubscribedThreadsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -742,21 +742,21 @@ func HasSubscribedCommentsWith(preds ...predicate.Comment) predicate.User {
 	})
 }
 
-// HasUserForumLike applies the HasEdge predicate on the "user_forum_like" edge.
-func HasUserForumLike() predicate.User {
+// HasUserBoardLike applies the HasEdge predicate on the "user_board_like" edge.
+func HasUserBoardLike() predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, UserForumLikeTable, UserForumLikeColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, UserBoardLikeTable, UserBoardLikeColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasUserForumLikeWith applies the HasEdge predicate on the "user_forum_like" edge with a given conditions (other predicates).
-func HasUserForumLikeWith(preds ...predicate.UserForumLike) predicate.User {
+// HasUserBoardLikeWith applies the HasEdge predicate on the "user_board_like" edge with a given conditions (other predicates).
+func HasUserBoardLikeWith(preds ...predicate.UserBoardLike) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
-		step := newUserForumLikeStep()
+		step := newUserBoardLikeStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -765,21 +765,21 @@ func HasUserForumLikeWith(preds ...predicate.UserForumLike) predicate.User {
 	})
 }
 
-// HasUserTopicLike applies the HasEdge predicate on the "user_topic_like" edge.
-func HasUserTopicLike() predicate.User {
+// HasUserThreadLike applies the HasEdge predicate on the "user_thread_like" edge.
+func HasUserThreadLike() predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, UserTopicLikeTable, UserTopicLikeColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, UserThreadLikeTable, UserThreadLikeColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasUserTopicLikeWith applies the HasEdge predicate on the "user_topic_like" edge with a given conditions (other predicates).
-func HasUserTopicLikeWith(preds ...predicate.UserTopicLike) predicate.User {
+// HasUserThreadLikeWith applies the HasEdge predicate on the "user_thread_like" edge with a given conditions (other predicates).
+func HasUserThreadLikeWith(preds ...predicate.UserThreadLike) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
-		step := newUserTopicLikeStep()
+		step := newUserThreadLikeStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -811,21 +811,21 @@ func HasUserCommentLikeWith(preds ...predicate.UserCommentLike) predicate.User {
 	})
 }
 
-// HasUserForumSubscription applies the HasEdge predicate on the "user_forum_subscription" edge.
-func HasUserForumSubscription() predicate.User {
+// HasUserBoardSubscription applies the HasEdge predicate on the "user_board_subscription" edge.
+func HasUserBoardSubscription() predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, UserForumSubscriptionTable, UserForumSubscriptionColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, UserBoardSubscriptionTable, UserBoardSubscriptionColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasUserForumSubscriptionWith applies the HasEdge predicate on the "user_forum_subscription" edge with a given conditions (other predicates).
-func HasUserForumSubscriptionWith(preds ...predicate.UserForumSubscription) predicate.User {
+// HasUserBoardSubscriptionWith applies the HasEdge predicate on the "user_board_subscription" edge with a given conditions (other predicates).
+func HasUserBoardSubscriptionWith(preds ...predicate.UserBoardSubscription) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
-		step := newUserForumSubscriptionStep()
+		step := newUserBoardSubscriptionStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -834,21 +834,21 @@ func HasUserForumSubscriptionWith(preds ...predicate.UserForumSubscription) pred
 	})
 }
 
-// HasUserTopicSubscription applies the HasEdge predicate on the "user_topic_subscription" edge.
-func HasUserTopicSubscription() predicate.User {
+// HasUserThreadSubscription applies the HasEdge predicate on the "user_thread_subscription" edge.
+func HasUserThreadSubscription() predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, UserTopicSubscriptionTable, UserTopicSubscriptionColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, UserThreadSubscriptionTable, UserThreadSubscriptionColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasUserTopicSubscriptionWith applies the HasEdge predicate on the "user_topic_subscription" edge with a given conditions (other predicates).
-func HasUserTopicSubscriptionWith(preds ...predicate.UserTopicSubscription) predicate.User {
+// HasUserThreadSubscriptionWith applies the HasEdge predicate on the "user_thread_subscription" edge with a given conditions (other predicates).
+func HasUserThreadSubscriptionWith(preds ...predicate.UserThreadSubscription) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
-		step := newUserTopicSubscriptionStep()
+		step := newUserThreadSubscriptionStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

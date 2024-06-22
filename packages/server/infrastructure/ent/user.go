@@ -17,8 +17,8 @@ type User struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// UserName holds the value of the "userName" field.
-	UserName string `json:"userName,omitempty"`
+	// Name holds the value of the "name" field.
+	Name string `json:"name,omitempty"`
 	// Email holds the value of the "email" field.
 	Email string `json:"email,omitempty"`
 	// Password holds the value of the "password" field.
@@ -41,34 +41,34 @@ type User struct {
 
 // UserEdges holds the relations/edges for other nodes in the graph.
 type UserEdges struct {
-	// Forums holds the value of the forums edge.
-	Forums []*Forum `json:"forums,omitempty"`
-	// Topics holds the value of the topics edge.
-	Topics []*Topic `json:"topics,omitempty"`
+	// Boards holds the value of the boards edge.
+	Boards []*Board `json:"boards,omitempty"`
+	// Threads holds the value of the threads edge.
+	Threads []*Thread `json:"threads,omitempty"`
 	// Comments holds the value of the comments edge.
 	Comments []*Comment `json:"comments,omitempty"`
-	// LikedForums holds the value of the liked_forums edge.
-	LikedForums []*Forum `json:"liked_forums,omitempty"`
-	// LikedTopics holds the value of the liked_topics edge.
-	LikedTopics []*Topic `json:"liked_topics,omitempty"`
+	// LikedBoards holds the value of the liked_boards edge.
+	LikedBoards []*Board `json:"liked_boards,omitempty"`
+	// LikedThreads holds the value of the liked_threads edge.
+	LikedThreads []*Thread `json:"liked_threads,omitempty"`
 	// LikedComments holds the value of the liked_comments edge.
 	LikedComments []*Comment `json:"liked_comments,omitempty"`
-	// SubscribedForums holds the value of the subscribed_forums edge.
-	SubscribedForums []*Forum `json:"subscribed_forums,omitempty"`
-	// SubscribedTopics holds the value of the subscribed_topics edge.
-	SubscribedTopics []*Topic `json:"subscribed_topics,omitempty"`
+	// SubscribedBoards holds the value of the subscribed_boards edge.
+	SubscribedBoards []*Board `json:"subscribed_boards,omitempty"`
+	// SubscribedThreads holds the value of the subscribed_threads edge.
+	SubscribedThreads []*Thread `json:"subscribed_threads,omitempty"`
 	// SubscribedComments holds the value of the subscribed_comments edge.
 	SubscribedComments []*Comment `json:"subscribed_comments,omitempty"`
-	// UserForumLike holds the value of the user_forum_like edge.
-	UserForumLike []*UserForumLike `json:"user_forum_like,omitempty"`
-	// UserTopicLike holds the value of the user_topic_like edge.
-	UserTopicLike []*UserTopicLike `json:"user_topic_like,omitempty"`
+	// UserBoardLike holds the value of the user_board_like edge.
+	UserBoardLike []*UserBoardLike `json:"user_board_like,omitempty"`
+	// UserThreadLike holds the value of the user_thread_like edge.
+	UserThreadLike []*UserThreadLike `json:"user_thread_like,omitempty"`
 	// UserCommentLike holds the value of the user_comment_like edge.
 	UserCommentLike []*UserCommentLike `json:"user_comment_like,omitempty"`
-	// UserForumSubscription holds the value of the user_forum_subscription edge.
-	UserForumSubscription []*UserForumSubscription `json:"user_forum_subscription,omitempty"`
-	// UserTopicSubscription holds the value of the user_topic_subscription edge.
-	UserTopicSubscription []*UserTopicSubscription `json:"user_topic_subscription,omitempty"`
+	// UserBoardSubscription holds the value of the user_board_subscription edge.
+	UserBoardSubscription []*UserBoardSubscription `json:"user_board_subscription,omitempty"`
+	// UserThreadSubscription holds the value of the user_thread_subscription edge.
+	UserThreadSubscription []*UserThreadSubscription `json:"user_thread_subscription,omitempty"`
 	// UserCommentSubscription holds the value of the user_comment_subscription edge.
 	UserCommentSubscription []*UserCommentSubscription `json:"user_comment_subscription,omitempty"`
 	// loadedTypes holds the information for reporting if a
@@ -76,22 +76,22 @@ type UserEdges struct {
 	loadedTypes [15]bool
 }
 
-// ForumsOrErr returns the Forums value or an error if the edge
+// BoardsOrErr returns the Boards value or an error if the edge
 // was not loaded in eager-loading.
-func (e UserEdges) ForumsOrErr() ([]*Forum, error) {
+func (e UserEdges) BoardsOrErr() ([]*Board, error) {
 	if e.loadedTypes[0] {
-		return e.Forums, nil
+		return e.Boards, nil
 	}
-	return nil, &NotLoadedError{edge: "forums"}
+	return nil, &NotLoadedError{edge: "boards"}
 }
 
-// TopicsOrErr returns the Topics value or an error if the edge
+// ThreadsOrErr returns the Threads value or an error if the edge
 // was not loaded in eager-loading.
-func (e UserEdges) TopicsOrErr() ([]*Topic, error) {
+func (e UserEdges) ThreadsOrErr() ([]*Thread, error) {
 	if e.loadedTypes[1] {
-		return e.Topics, nil
+		return e.Threads, nil
 	}
-	return nil, &NotLoadedError{edge: "topics"}
+	return nil, &NotLoadedError{edge: "threads"}
 }
 
 // CommentsOrErr returns the Comments value or an error if the edge
@@ -103,22 +103,22 @@ func (e UserEdges) CommentsOrErr() ([]*Comment, error) {
 	return nil, &NotLoadedError{edge: "comments"}
 }
 
-// LikedForumsOrErr returns the LikedForums value or an error if the edge
+// LikedBoardsOrErr returns the LikedBoards value or an error if the edge
 // was not loaded in eager-loading.
-func (e UserEdges) LikedForumsOrErr() ([]*Forum, error) {
+func (e UserEdges) LikedBoardsOrErr() ([]*Board, error) {
 	if e.loadedTypes[3] {
-		return e.LikedForums, nil
+		return e.LikedBoards, nil
 	}
-	return nil, &NotLoadedError{edge: "liked_forums"}
+	return nil, &NotLoadedError{edge: "liked_boards"}
 }
 
-// LikedTopicsOrErr returns the LikedTopics value or an error if the edge
+// LikedThreadsOrErr returns the LikedThreads value or an error if the edge
 // was not loaded in eager-loading.
-func (e UserEdges) LikedTopicsOrErr() ([]*Topic, error) {
+func (e UserEdges) LikedThreadsOrErr() ([]*Thread, error) {
 	if e.loadedTypes[4] {
-		return e.LikedTopics, nil
+		return e.LikedThreads, nil
 	}
-	return nil, &NotLoadedError{edge: "liked_topics"}
+	return nil, &NotLoadedError{edge: "liked_threads"}
 }
 
 // LikedCommentsOrErr returns the LikedComments value or an error if the edge
@@ -130,22 +130,22 @@ func (e UserEdges) LikedCommentsOrErr() ([]*Comment, error) {
 	return nil, &NotLoadedError{edge: "liked_comments"}
 }
 
-// SubscribedForumsOrErr returns the SubscribedForums value or an error if the edge
+// SubscribedBoardsOrErr returns the SubscribedBoards value or an error if the edge
 // was not loaded in eager-loading.
-func (e UserEdges) SubscribedForumsOrErr() ([]*Forum, error) {
+func (e UserEdges) SubscribedBoardsOrErr() ([]*Board, error) {
 	if e.loadedTypes[6] {
-		return e.SubscribedForums, nil
+		return e.SubscribedBoards, nil
 	}
-	return nil, &NotLoadedError{edge: "subscribed_forums"}
+	return nil, &NotLoadedError{edge: "subscribed_boards"}
 }
 
-// SubscribedTopicsOrErr returns the SubscribedTopics value or an error if the edge
+// SubscribedThreadsOrErr returns the SubscribedThreads value or an error if the edge
 // was not loaded in eager-loading.
-func (e UserEdges) SubscribedTopicsOrErr() ([]*Topic, error) {
+func (e UserEdges) SubscribedThreadsOrErr() ([]*Thread, error) {
 	if e.loadedTypes[7] {
-		return e.SubscribedTopics, nil
+		return e.SubscribedThreads, nil
 	}
-	return nil, &NotLoadedError{edge: "subscribed_topics"}
+	return nil, &NotLoadedError{edge: "subscribed_threads"}
 }
 
 // SubscribedCommentsOrErr returns the SubscribedComments value or an error if the edge
@@ -157,22 +157,22 @@ func (e UserEdges) SubscribedCommentsOrErr() ([]*Comment, error) {
 	return nil, &NotLoadedError{edge: "subscribed_comments"}
 }
 
-// UserForumLikeOrErr returns the UserForumLike value or an error if the edge
+// UserBoardLikeOrErr returns the UserBoardLike value or an error if the edge
 // was not loaded in eager-loading.
-func (e UserEdges) UserForumLikeOrErr() ([]*UserForumLike, error) {
+func (e UserEdges) UserBoardLikeOrErr() ([]*UserBoardLike, error) {
 	if e.loadedTypes[9] {
-		return e.UserForumLike, nil
+		return e.UserBoardLike, nil
 	}
-	return nil, &NotLoadedError{edge: "user_forum_like"}
+	return nil, &NotLoadedError{edge: "user_board_like"}
 }
 
-// UserTopicLikeOrErr returns the UserTopicLike value or an error if the edge
+// UserThreadLikeOrErr returns the UserThreadLike value or an error if the edge
 // was not loaded in eager-loading.
-func (e UserEdges) UserTopicLikeOrErr() ([]*UserTopicLike, error) {
+func (e UserEdges) UserThreadLikeOrErr() ([]*UserThreadLike, error) {
 	if e.loadedTypes[10] {
-		return e.UserTopicLike, nil
+		return e.UserThreadLike, nil
 	}
-	return nil, &NotLoadedError{edge: "user_topic_like"}
+	return nil, &NotLoadedError{edge: "user_thread_like"}
 }
 
 // UserCommentLikeOrErr returns the UserCommentLike value or an error if the edge
@@ -184,22 +184,22 @@ func (e UserEdges) UserCommentLikeOrErr() ([]*UserCommentLike, error) {
 	return nil, &NotLoadedError{edge: "user_comment_like"}
 }
 
-// UserForumSubscriptionOrErr returns the UserForumSubscription value or an error if the edge
+// UserBoardSubscriptionOrErr returns the UserBoardSubscription value or an error if the edge
 // was not loaded in eager-loading.
-func (e UserEdges) UserForumSubscriptionOrErr() ([]*UserForumSubscription, error) {
+func (e UserEdges) UserBoardSubscriptionOrErr() ([]*UserBoardSubscription, error) {
 	if e.loadedTypes[12] {
-		return e.UserForumSubscription, nil
+		return e.UserBoardSubscription, nil
 	}
-	return nil, &NotLoadedError{edge: "user_forum_subscription"}
+	return nil, &NotLoadedError{edge: "user_board_subscription"}
 }
 
-// UserTopicSubscriptionOrErr returns the UserTopicSubscription value or an error if the edge
+// UserThreadSubscriptionOrErr returns the UserThreadSubscription value or an error if the edge
 // was not loaded in eager-loading.
-func (e UserEdges) UserTopicSubscriptionOrErr() ([]*UserTopicSubscription, error) {
+func (e UserEdges) UserThreadSubscriptionOrErr() ([]*UserThreadSubscription, error) {
 	if e.loadedTypes[13] {
-		return e.UserTopicSubscription, nil
+		return e.UserThreadSubscription, nil
 	}
-	return nil, &NotLoadedError{edge: "user_topic_subscription"}
+	return nil, &NotLoadedError{edge: "user_thread_subscription"}
 }
 
 // UserCommentSubscriptionOrErr returns the UserCommentSubscription value or an error if the edge
@@ -218,7 +218,7 @@ func (*User) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case user.FieldID:
 			values[i] = new(sql.NullInt64)
-		case user.FieldUserName, user.FieldEmail, user.FieldPassword, user.FieldDisplayName, user.FieldAvatarUrl, user.FieldStatus:
+		case user.FieldName, user.FieldEmail, user.FieldPassword, user.FieldDisplayName, user.FieldAvatarUrl, user.FieldStatus:
 			values[i] = new(sql.NullString)
 		case user.FieldCreatedAt, user.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -243,11 +243,11 @@ func (u *User) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			u.ID = int(value.Int64)
-		case user.FieldUserName:
+		case user.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field userName", values[i])
+				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				u.UserName = value.String
+				u.Name = value.String
 			}
 		case user.FieldEmail:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -304,14 +304,14 @@ func (u *User) Value(name string) (ent.Value, error) {
 	return u.selectValues.Get(name)
 }
 
-// QueryForums queries the "forums" edge of the User entity.
-func (u *User) QueryForums() *ForumQuery {
-	return NewUserClient(u.config).QueryForums(u)
+// QueryBoards queries the "boards" edge of the User entity.
+func (u *User) QueryBoards() *BoardQuery {
+	return NewUserClient(u.config).QueryBoards(u)
 }
 
-// QueryTopics queries the "topics" edge of the User entity.
-func (u *User) QueryTopics() *TopicQuery {
-	return NewUserClient(u.config).QueryTopics(u)
+// QueryThreads queries the "threads" edge of the User entity.
+func (u *User) QueryThreads() *ThreadQuery {
+	return NewUserClient(u.config).QueryThreads(u)
 }
 
 // QueryComments queries the "comments" edge of the User entity.
@@ -319,14 +319,14 @@ func (u *User) QueryComments() *CommentQuery {
 	return NewUserClient(u.config).QueryComments(u)
 }
 
-// QueryLikedForums queries the "liked_forums" edge of the User entity.
-func (u *User) QueryLikedForums() *ForumQuery {
-	return NewUserClient(u.config).QueryLikedForums(u)
+// QueryLikedBoards queries the "liked_boards" edge of the User entity.
+func (u *User) QueryLikedBoards() *BoardQuery {
+	return NewUserClient(u.config).QueryLikedBoards(u)
 }
 
-// QueryLikedTopics queries the "liked_topics" edge of the User entity.
-func (u *User) QueryLikedTopics() *TopicQuery {
-	return NewUserClient(u.config).QueryLikedTopics(u)
+// QueryLikedThreads queries the "liked_threads" edge of the User entity.
+func (u *User) QueryLikedThreads() *ThreadQuery {
+	return NewUserClient(u.config).QueryLikedThreads(u)
 }
 
 // QueryLikedComments queries the "liked_comments" edge of the User entity.
@@ -334,14 +334,14 @@ func (u *User) QueryLikedComments() *CommentQuery {
 	return NewUserClient(u.config).QueryLikedComments(u)
 }
 
-// QuerySubscribedForums queries the "subscribed_forums" edge of the User entity.
-func (u *User) QuerySubscribedForums() *ForumQuery {
-	return NewUserClient(u.config).QuerySubscribedForums(u)
+// QuerySubscribedBoards queries the "subscribed_boards" edge of the User entity.
+func (u *User) QuerySubscribedBoards() *BoardQuery {
+	return NewUserClient(u.config).QuerySubscribedBoards(u)
 }
 
-// QuerySubscribedTopics queries the "subscribed_topics" edge of the User entity.
-func (u *User) QuerySubscribedTopics() *TopicQuery {
-	return NewUserClient(u.config).QuerySubscribedTopics(u)
+// QuerySubscribedThreads queries the "subscribed_threads" edge of the User entity.
+func (u *User) QuerySubscribedThreads() *ThreadQuery {
+	return NewUserClient(u.config).QuerySubscribedThreads(u)
 }
 
 // QuerySubscribedComments queries the "subscribed_comments" edge of the User entity.
@@ -349,14 +349,14 @@ func (u *User) QuerySubscribedComments() *CommentQuery {
 	return NewUserClient(u.config).QuerySubscribedComments(u)
 }
 
-// QueryUserForumLike queries the "user_forum_like" edge of the User entity.
-func (u *User) QueryUserForumLike() *UserForumLikeQuery {
-	return NewUserClient(u.config).QueryUserForumLike(u)
+// QueryUserBoardLike queries the "user_board_like" edge of the User entity.
+func (u *User) QueryUserBoardLike() *UserBoardLikeQuery {
+	return NewUserClient(u.config).QueryUserBoardLike(u)
 }
 
-// QueryUserTopicLike queries the "user_topic_like" edge of the User entity.
-func (u *User) QueryUserTopicLike() *UserTopicLikeQuery {
-	return NewUserClient(u.config).QueryUserTopicLike(u)
+// QueryUserThreadLike queries the "user_thread_like" edge of the User entity.
+func (u *User) QueryUserThreadLike() *UserThreadLikeQuery {
+	return NewUserClient(u.config).QueryUserThreadLike(u)
 }
 
 // QueryUserCommentLike queries the "user_comment_like" edge of the User entity.
@@ -364,14 +364,14 @@ func (u *User) QueryUserCommentLike() *UserCommentLikeQuery {
 	return NewUserClient(u.config).QueryUserCommentLike(u)
 }
 
-// QueryUserForumSubscription queries the "user_forum_subscription" edge of the User entity.
-func (u *User) QueryUserForumSubscription() *UserForumSubscriptionQuery {
-	return NewUserClient(u.config).QueryUserForumSubscription(u)
+// QueryUserBoardSubscription queries the "user_board_subscription" edge of the User entity.
+func (u *User) QueryUserBoardSubscription() *UserBoardSubscriptionQuery {
+	return NewUserClient(u.config).QueryUserBoardSubscription(u)
 }
 
-// QueryUserTopicSubscription queries the "user_topic_subscription" edge of the User entity.
-func (u *User) QueryUserTopicSubscription() *UserTopicSubscriptionQuery {
-	return NewUserClient(u.config).QueryUserTopicSubscription(u)
+// QueryUserThreadSubscription queries the "user_thread_subscription" edge of the User entity.
+func (u *User) QueryUserThreadSubscription() *UserThreadSubscriptionQuery {
+	return NewUserClient(u.config).QueryUserThreadSubscription(u)
 }
 
 // QueryUserCommentSubscription queries the "user_comment_subscription" edge of the User entity.
@@ -402,8 +402,8 @@ func (u *User) String() string {
 	var builder strings.Builder
 	builder.WriteString("User(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", u.ID))
-	builder.WriteString("userName=")
-	builder.WriteString(u.UserName)
+	builder.WriteString("name=")
+	builder.WriteString(u.Name)
 	builder.WriteString(", ")
 	builder.WriteString("email=")
 	builder.WriteString(u.Email)

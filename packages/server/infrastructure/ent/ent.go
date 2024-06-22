@@ -8,19 +8,19 @@ import (
 	"fmt"
 	"reflect"
 	"server/infrastructure/ent/adminuser"
+	"server/infrastructure/ent/board"
 	"server/infrastructure/ent/comment"
 	"server/infrastructure/ent/commentattachment"
-	"server/infrastructure/ent/forum"
-	"server/infrastructure/ent/topic"
-	"server/infrastructure/ent/topictag"
-	"server/infrastructure/ent/topictagging"
+	"server/infrastructure/ent/thread"
+	"server/infrastructure/ent/threadtag"
+	"server/infrastructure/ent/threadtagging"
 	"server/infrastructure/ent/user"
+	"server/infrastructure/ent/userboardlike"
+	"server/infrastructure/ent/userboardsubscription"
 	"server/infrastructure/ent/usercommentlike"
 	"server/infrastructure/ent/usercommentsubscription"
-	"server/infrastructure/ent/userforumlike"
-	"server/infrastructure/ent/userforumsubscription"
-	"server/infrastructure/ent/usertopiclike"
-	"server/infrastructure/ent/usertopicsubscription"
+	"server/infrastructure/ent/userthreadlike"
+	"server/infrastructure/ent/userthreadsubscription"
 	"sync"
 
 	"entgo.io/ent"
@@ -87,19 +87,19 @@ func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
 			adminuser.Table:               adminuser.ValidColumn,
+			board.Table:                   board.ValidColumn,
 			comment.Table:                 comment.ValidColumn,
 			commentattachment.Table:       commentattachment.ValidColumn,
-			forum.Table:                   forum.ValidColumn,
-			topic.Table:                   topic.ValidColumn,
-			topictag.Table:                topictag.ValidColumn,
-			topictagging.Table:            topictagging.ValidColumn,
+			thread.Table:                  thread.ValidColumn,
+			threadtag.Table:               threadtag.ValidColumn,
+			threadtagging.Table:           threadtagging.ValidColumn,
 			user.Table:                    user.ValidColumn,
+			userboardlike.Table:           userboardlike.ValidColumn,
+			userboardsubscription.Table:   userboardsubscription.ValidColumn,
 			usercommentlike.Table:         usercommentlike.ValidColumn,
 			usercommentsubscription.Table: usercommentsubscription.ValidColumn,
-			userforumlike.Table:           userforumlike.ValidColumn,
-			userforumsubscription.Table:   userforumsubscription.ValidColumn,
-			usertopiclike.Table:           usertopiclike.ValidColumn,
-			usertopicsubscription.Table:   usertopicsubscription.ValidColumn,
+			userthreadlike.Table:          userthreadlike.ValidColumn,
+			userthreadsubscription.Table:  userthreadsubscription.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

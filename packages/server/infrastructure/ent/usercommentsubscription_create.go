@@ -48,6 +48,20 @@ func (ucsc *UserCommentSubscriptionCreate) SetNillableIsNotified(b *bool) *UserC
 	return ucsc
 }
 
+// SetIsChecked sets the "isChecked" field.
+func (ucsc *UserCommentSubscriptionCreate) SetIsChecked(b bool) *UserCommentSubscriptionCreate {
+	ucsc.mutation.SetIsChecked(b)
+	return ucsc
+}
+
+// SetNillableIsChecked sets the "isChecked" field if the given value is not nil.
+func (ucsc *UserCommentSubscriptionCreate) SetNillableIsChecked(b *bool) *UserCommentSubscriptionCreate {
+	if b != nil {
+		ucsc.SetIsChecked(*b)
+	}
+	return ucsc
+}
+
 // SetSubscribedAt sets the "subscribedAt" field.
 func (ucsc *UserCommentSubscriptionCreate) SetSubscribedAt(t time.Time) *UserCommentSubscriptionCreate {
 	ucsc.mutation.SetSubscribedAt(t)
@@ -123,6 +137,10 @@ func (ucsc *UserCommentSubscriptionCreate) defaults() {
 		v := usercommentsubscription.DefaultIsNotified
 		ucsc.mutation.SetIsNotified(v)
 	}
+	if _, ok := ucsc.mutation.IsChecked(); !ok {
+		v := usercommentsubscription.DefaultIsChecked
+		ucsc.mutation.SetIsChecked(v)
+	}
 	if _, ok := ucsc.mutation.SubscribedAt(); !ok {
 		v := usercommentsubscription.DefaultSubscribedAt()
 		ucsc.mutation.SetSubscribedAt(v)
@@ -139,6 +157,9 @@ func (ucsc *UserCommentSubscriptionCreate) check() error {
 	}
 	if _, ok := ucsc.mutation.IsNotified(); !ok {
 		return &ValidationError{Name: "isNotified", err: errors.New(`ent: missing required field "UserCommentSubscription.isNotified"`)}
+	}
+	if _, ok := ucsc.mutation.IsChecked(); !ok {
+		return &ValidationError{Name: "isChecked", err: errors.New(`ent: missing required field "UserCommentSubscription.isChecked"`)}
 	}
 	if _, ok := ucsc.mutation.SubscribedAt(); !ok {
 		return &ValidationError{Name: "subscribedAt", err: errors.New(`ent: missing required field "UserCommentSubscription.subscribedAt"`)}
@@ -174,6 +195,10 @@ func (ucsc *UserCommentSubscriptionCreate) createSpec() (*UserCommentSubscriptio
 	if value, ok := ucsc.mutation.IsNotified(); ok {
 		_spec.SetField(usercommentsubscription.FieldIsNotified, field.TypeBool, value)
 		_node.IsNotified = value
+	}
+	if value, ok := ucsc.mutation.IsChecked(); ok {
+		_spec.SetField(usercommentsubscription.FieldIsChecked, field.TypeBool, value)
+		_node.IsChecked = value
 	}
 	if value, ok := ucsc.mutation.SubscribedAt(); ok {
 		_spec.SetField(usercommentsubscription.FieldSubscribedAt, field.TypeTime, value)

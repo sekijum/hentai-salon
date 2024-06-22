@@ -34,12 +34,6 @@ func (uclc *UserCommentLikeCreate) SetCommentId(i int) *UserCommentLikeCreate {
 	return uclc
 }
 
-// SetType sets the "type" field.
-func (uclc *UserCommentLikeCreate) SetType(u usercommentlike.Type) *UserCommentLikeCreate {
-	uclc.mutation.SetType(u)
-	return uclc
-}
-
 // SetLikedAt sets the "likedAt" field.
 func (uclc *UserCommentLikeCreate) SetLikedAt(t time.Time) *UserCommentLikeCreate {
 	uclc.mutation.SetLikedAt(t)
@@ -125,14 +119,6 @@ func (uclc *UserCommentLikeCreate) check() error {
 	if _, ok := uclc.mutation.CommentId(); !ok {
 		return &ValidationError{Name: "commentId", err: errors.New(`ent: missing required field "UserCommentLike.commentId"`)}
 	}
-	if _, ok := uclc.mutation.GetType(); !ok {
-		return &ValidationError{Name: "type", err: errors.New(`ent: missing required field "UserCommentLike.type"`)}
-	}
-	if v, ok := uclc.mutation.GetType(); ok {
-		if err := usercommentlike.TypeValidator(v); err != nil {
-			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "UserCommentLike.type": %w`, err)}
-		}
-	}
 	if _, ok := uclc.mutation.LikedAt(); !ok {
 		return &ValidationError{Name: "likedAt", err: errors.New(`ent: missing required field "UserCommentLike.likedAt"`)}
 	}
@@ -164,10 +150,6 @@ func (uclc *UserCommentLikeCreate) createSpec() (*UserCommentLike, *sqlgraph.Cre
 		_node = &UserCommentLike{config: uclc.config}
 		_spec = sqlgraph.NewCreateSpec(usercommentlike.Table, nil)
 	)
-	if value, ok := uclc.mutation.GetType(); ok {
-		_spec.SetField(usercommentlike.FieldType, field.TypeEnum, value)
-		_node.Type = value
-	}
 	if value, ok := uclc.mutation.LikedAt(); ok {
 		_spec.SetField(usercommentlike.FieldLikedAt, field.TypeTime, value)
 		_node.LikedAt = value

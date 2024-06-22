@@ -18,6 +18,8 @@ const (
 	FieldCommentId = "comment_id"
 	// FieldIsNotified holds the string denoting the isnotified field in the database.
 	FieldIsNotified = "is_notified"
+	// FieldIsChecked holds the string denoting the ischecked field in the database.
+	FieldIsChecked = "is_checked"
 	// FieldSubscribedAt holds the string denoting the subscribedat field in the database.
 	FieldSubscribedAt = "subscribed_at"
 	// EdgeUser holds the string denoting the user edge name in mutations.
@@ -51,6 +53,7 @@ var Columns = []string{
 	FieldUserId,
 	FieldCommentId,
 	FieldIsNotified,
+	FieldIsChecked,
 	FieldSubscribedAt,
 }
 
@@ -67,6 +70,8 @@ func ValidColumn(column string) bool {
 var (
 	// DefaultIsNotified holds the default value on creation for the "isNotified" field.
 	DefaultIsNotified bool
+	// DefaultIsChecked holds the default value on creation for the "isChecked" field.
+	DefaultIsChecked bool
 	// DefaultSubscribedAt holds the default value on creation for the "subscribedAt" field.
 	DefaultSubscribedAt func() time.Time
 )
@@ -87,6 +92,11 @@ func ByCommentId(opts ...sql.OrderTermOption) OrderOption {
 // ByIsNotified orders the results by the isNotified field.
 func ByIsNotified(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldIsNotified, opts...).ToFunc()
+}
+
+// ByIsChecked orders the results by the isChecked field.
+func ByIsChecked(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldIsChecked, opts...).ToFunc()
 }
 
 // BySubscribedAt orders the results by the subscribedAt field.

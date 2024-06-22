@@ -72,6 +72,20 @@ func (ucsu *UserCommentSubscriptionUpdate) SetNillableIsNotified(b *bool) *UserC
 	return ucsu
 }
 
+// SetIsChecked sets the "isChecked" field.
+func (ucsu *UserCommentSubscriptionUpdate) SetIsChecked(b bool) *UserCommentSubscriptionUpdate {
+	ucsu.mutation.SetIsChecked(b)
+	return ucsu
+}
+
+// SetNillableIsChecked sets the "isChecked" field if the given value is not nil.
+func (ucsu *UserCommentSubscriptionUpdate) SetNillableIsChecked(b *bool) *UserCommentSubscriptionUpdate {
+	if b != nil {
+		ucsu.SetIsChecked(*b)
+	}
+	return ucsu
+}
+
 // SetSubscribedAt sets the "subscribedAt" field.
 func (ucsu *UserCommentSubscriptionUpdate) SetSubscribedAt(t time.Time) *UserCommentSubscriptionUpdate {
 	ucsu.mutation.SetSubscribedAt(t)
@@ -177,6 +191,9 @@ func (ucsu *UserCommentSubscriptionUpdate) sqlSave(ctx context.Context) (n int, 
 	}
 	if value, ok := ucsu.mutation.IsNotified(); ok {
 		_spec.SetField(usercommentsubscription.FieldIsNotified, field.TypeBool, value)
+	}
+	if value, ok := ucsu.mutation.IsChecked(); ok {
+		_spec.SetField(usercommentsubscription.FieldIsChecked, field.TypeBool, value)
 	}
 	if value, ok := ucsu.mutation.SubscribedAt(); ok {
 		_spec.SetField(usercommentsubscription.FieldSubscribedAt, field.TypeTime, value)
@@ -297,6 +314,20 @@ func (ucsuo *UserCommentSubscriptionUpdateOne) SetIsNotified(b bool) *UserCommen
 func (ucsuo *UserCommentSubscriptionUpdateOne) SetNillableIsNotified(b *bool) *UserCommentSubscriptionUpdateOne {
 	if b != nil {
 		ucsuo.SetIsNotified(*b)
+	}
+	return ucsuo
+}
+
+// SetIsChecked sets the "isChecked" field.
+func (ucsuo *UserCommentSubscriptionUpdateOne) SetIsChecked(b bool) *UserCommentSubscriptionUpdateOne {
+	ucsuo.mutation.SetIsChecked(b)
+	return ucsuo
+}
+
+// SetNillableIsChecked sets the "isChecked" field if the given value is not nil.
+func (ucsuo *UserCommentSubscriptionUpdateOne) SetNillableIsChecked(b *bool) *UserCommentSubscriptionUpdateOne {
+	if b != nil {
+		ucsuo.SetIsChecked(*b)
 	}
 	return ucsuo
 }
@@ -438,6 +469,9 @@ func (ucsuo *UserCommentSubscriptionUpdateOne) sqlSave(ctx context.Context) (_no
 	}
 	if value, ok := ucsuo.mutation.IsNotified(); ok {
 		_spec.SetField(usercommentsubscription.FieldIsNotified, field.TypeBool, value)
+	}
+	if value, ok := ucsuo.mutation.IsChecked(); ok {
+		_spec.SetField(usercommentsubscription.FieldIsChecked, field.TypeBool, value)
 	}
 	if value, ok := ucsuo.mutation.SubscribedAt(); ok {
 		_spec.SetField(usercommentsubscription.FieldSubscribedAt, field.TypeTime, value)

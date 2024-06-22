@@ -3,7 +3,6 @@
 package usercommentlike
 
 import (
-	"fmt"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -17,8 +16,6 @@ const (
 	FieldUserId = "user_id"
 	// FieldCommentId holds the string denoting the commentid field in the database.
 	FieldCommentId = "comment_id"
-	// FieldType holds the string denoting the type field in the database.
-	FieldType = "type"
 	// FieldLikedAt holds the string denoting the likedat field in the database.
 	FieldLikedAt = "liked_at"
 	// EdgeUser holds the string denoting the user edge name in mutations.
@@ -51,7 +48,6 @@ const (
 var Columns = []string{
 	FieldUserId,
 	FieldCommentId,
-	FieldType,
 	FieldLikedAt,
 }
 
@@ -70,29 +66,6 @@ var (
 	DefaultLikedAt func() time.Time
 )
 
-// Type defines the type for the "type" enum field.
-type Type string
-
-// Type values.
-const (
-	TypeLike    Type = "like"
-	TypeDislike Type = "dislike"
-)
-
-func (_type Type) String() string {
-	return string(_type)
-}
-
-// TypeValidator is a validator for the "type" field enum values. It is called by the builders before save.
-func TypeValidator(_type Type) error {
-	switch _type {
-	case TypeLike, TypeDislike:
-		return nil
-	default:
-		return fmt.Errorf("usercommentlike: invalid enum value for type field: %q", _type)
-	}
-}
-
 // OrderOption defines the ordering options for the UserCommentLike queries.
 type OrderOption func(*sql.Selector)
 
@@ -104,11 +77,6 @@ func ByUserId(opts ...sql.OrderTermOption) OrderOption {
 // ByCommentId orders the results by the commentId field.
 func ByCommentId(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCommentId, opts...).ToFunc()
-}
-
-// ByType orders the results by the type field.
-func ByType(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldType, opts...).ToFunc()
 }
 
 // ByLikedAt orders the results by the likedAt field.

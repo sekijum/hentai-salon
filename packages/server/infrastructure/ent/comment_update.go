@@ -9,7 +9,7 @@ import (
 	"server/infrastructure/ent/comment"
 	"server/infrastructure/ent/commentattachment"
 	"server/infrastructure/ent/predicate"
-	"server/infrastructure/ent/topic"
+	"server/infrastructure/ent/thread"
 	"server/infrastructure/ent/user"
 	"time"
 
@@ -31,37 +31,37 @@ func (cu *CommentUpdate) Where(ps ...predicate.Comment) *CommentUpdate {
 	return cu
 }
 
-// SetTopicId sets the "topicId" field.
-func (cu *CommentUpdate) SetTopicId(i int) *CommentUpdate {
-	cu.mutation.SetTopicId(i)
+// SetThreadId sets the "threadId" field.
+func (cu *CommentUpdate) SetThreadId(i int) *CommentUpdate {
+	cu.mutation.SetThreadId(i)
 	return cu
 }
 
-// SetNillableTopicId sets the "topicId" field if the given value is not nil.
-func (cu *CommentUpdate) SetNillableTopicId(i *int) *CommentUpdate {
+// SetNillableThreadId sets the "threadId" field if the given value is not nil.
+func (cu *CommentUpdate) SetNillableThreadId(i *int) *CommentUpdate {
 	if i != nil {
-		cu.SetTopicId(*i)
+		cu.SetThreadId(*i)
 	}
 	return cu
 }
 
-// SetParentId sets the "parentId" field.
-func (cu *CommentUpdate) SetParentId(i int) *CommentUpdate {
-	cu.mutation.SetParentId(i)
+// SetParentCommentId sets the "parentCommentId" field.
+func (cu *CommentUpdate) SetParentCommentId(i int) *CommentUpdate {
+	cu.mutation.SetParentCommentId(i)
 	return cu
 }
 
-// SetNillableParentId sets the "parentId" field if the given value is not nil.
-func (cu *CommentUpdate) SetNillableParentId(i *int) *CommentUpdate {
+// SetNillableParentCommentId sets the "parentCommentId" field if the given value is not nil.
+func (cu *CommentUpdate) SetNillableParentCommentId(i *int) *CommentUpdate {
 	if i != nil {
-		cu.SetParentId(*i)
+		cu.SetParentCommentId(*i)
 	}
 	return cu
 }
 
-// ClearParentId clears the value of the "parentId" field.
-func (cu *CommentUpdate) ClearParentId() *CommentUpdate {
-	cu.mutation.ClearParentId()
+// ClearParentCommentId clears the value of the "parentCommentId" field.
+func (cu *CommentUpdate) ClearParentCommentId() *CommentUpdate {
+	cu.mutation.ClearParentCommentId()
 	return cu
 }
 
@@ -119,6 +119,20 @@ func (cu *CommentUpdate) SetNillableMessage(s *string) *CommentUpdate {
 	return cu
 }
 
+// SetIPAddress sets the "ip_address" field.
+func (cu *CommentUpdate) SetIPAddress(s string) *CommentUpdate {
+	cu.mutation.SetIPAddress(s)
+	return cu
+}
+
+// SetNillableIPAddress sets the "ip_address" field if the given value is not nil.
+func (cu *CommentUpdate) SetNillableIPAddress(s *string) *CommentUpdate {
+	if s != nil {
+		cu.SetIPAddress(*s)
+	}
+	return cu
+}
+
 // SetStatus sets the "status" field.
 func (cu *CommentUpdate) SetStatus(c comment.Status) *CommentUpdate {
 	cu.mutation.SetStatus(c)
@@ -153,15 +167,15 @@ func (cu *CommentUpdate) SetUpdatedAt(t time.Time) *CommentUpdate {
 	return cu
 }
 
-// SetTopicID sets the "topic" edge to the Topic entity by ID.
-func (cu *CommentUpdate) SetTopicID(id int) *CommentUpdate {
-	cu.mutation.SetTopicID(id)
+// SetThreadID sets the "thread" edge to the Thread entity by ID.
+func (cu *CommentUpdate) SetThreadID(id int) *CommentUpdate {
+	cu.mutation.SetThreadID(id)
 	return cu
 }
 
-// SetTopic sets the "topic" edge to the Topic entity.
-func (cu *CommentUpdate) SetTopic(t *Topic) *CommentUpdate {
-	return cu.SetTopicID(t.ID)
+// SetThread sets the "thread" edge to the Thread entity.
+func (cu *CommentUpdate) SetThread(t *Thread) *CommentUpdate {
+	return cu.SetThreadID(t.ID)
 }
 
 // SetAuthorID sets the "author" edge to the User entity by ID.
@@ -183,23 +197,23 @@ func (cu *CommentUpdate) SetAuthor(u *User) *CommentUpdate {
 	return cu.SetAuthorID(u.ID)
 }
 
-// SetParentID sets the "parent" edge to the Comment entity by ID.
-func (cu *CommentUpdate) SetParentID(id int) *CommentUpdate {
-	cu.mutation.SetParentID(id)
+// SetParentCommentID sets the "parent_comment" edge to the Comment entity by ID.
+func (cu *CommentUpdate) SetParentCommentID(id int) *CommentUpdate {
+	cu.mutation.SetParentCommentID(id)
 	return cu
 }
 
-// SetNillableParentID sets the "parent" edge to the Comment entity by ID if the given value is not nil.
-func (cu *CommentUpdate) SetNillableParentID(id *int) *CommentUpdate {
+// SetNillableParentCommentID sets the "parent_comment" edge to the Comment entity by ID if the given value is not nil.
+func (cu *CommentUpdate) SetNillableParentCommentID(id *int) *CommentUpdate {
 	if id != nil {
-		cu = cu.SetParentID(*id)
+		cu = cu.SetParentCommentID(*id)
 	}
 	return cu
 }
 
-// SetParent sets the "parent" edge to the Comment entity.
-func (cu *CommentUpdate) SetParent(c *Comment) *CommentUpdate {
-	return cu.SetParentID(c.ID)
+// SetParentComment sets the "parent_comment" edge to the Comment entity.
+func (cu *CommentUpdate) SetParentComment(c *Comment) *CommentUpdate {
+	return cu.SetParentCommentID(c.ID)
 }
 
 // AddReplyIDs adds the "replies" edge to the Comment entity by IDs.
@@ -267,9 +281,9 @@ func (cu *CommentUpdate) Mutation() *CommentMutation {
 	return cu.mutation
 }
 
-// ClearTopic clears the "topic" edge to the Topic entity.
-func (cu *CommentUpdate) ClearTopic() *CommentUpdate {
-	cu.mutation.ClearTopic()
+// ClearThread clears the "thread" edge to the Thread entity.
+func (cu *CommentUpdate) ClearThread() *CommentUpdate {
+	cu.mutation.ClearThread()
 	return cu
 }
 
@@ -279,9 +293,9 @@ func (cu *CommentUpdate) ClearAuthor() *CommentUpdate {
 	return cu
 }
 
-// ClearParent clears the "parent" edge to the Comment entity.
-func (cu *CommentUpdate) ClearParent() *CommentUpdate {
-	cu.mutation.ClearParent()
+// ClearParentComment clears the "parent_comment" edge to the Comment entity.
+func (cu *CommentUpdate) ClearParentComment() *CommentUpdate {
+	cu.mutation.ClearParentComment()
 	return cu
 }
 
@@ -412,13 +426,18 @@ func (cu *CommentUpdate) check() error {
 			return &ValidationError{Name: "guestName", err: fmt.Errorf(`ent: validator failed for field "Comment.guestName": %w`, err)}
 		}
 	}
+	if v, ok := cu.mutation.IPAddress(); ok {
+		if err := comment.IPAddressValidator(v); err != nil {
+			return &ValidationError{Name: "ip_address", err: fmt.Errorf(`ent: validator failed for field "Comment.ip_address": %w`, err)}
+		}
+	}
 	if v, ok := cu.mutation.Status(); ok {
 		if err := comment.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Comment.status": %w`, err)}
 		}
 	}
-	if _, ok := cu.mutation.TopicID(); cu.mutation.TopicCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "Comment.topic"`)
+	if _, ok := cu.mutation.ThreadID(); cu.mutation.ThreadCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Comment.thread"`)
 	}
 	return nil
 }
@@ -444,6 +463,9 @@ func (cu *CommentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := cu.mutation.Message(); ok {
 		_spec.SetField(comment.FieldMessage, field.TypeString, value)
 	}
+	if value, ok := cu.mutation.IPAddress(); ok {
+		_spec.SetField(comment.FieldIPAddress, field.TypeString, value)
+	}
 	if value, ok := cu.mutation.Status(); ok {
 		_spec.SetField(comment.FieldStatus, field.TypeEnum, value)
 	}
@@ -453,28 +475,28 @@ func (cu *CommentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := cu.mutation.UpdatedAt(); ok {
 		_spec.SetField(comment.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if cu.mutation.TopicCleared() {
+	if cu.mutation.ThreadCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   comment.TopicTable,
-			Columns: []string{comment.TopicColumn},
+			Table:   comment.ThreadTable,
+			Columns: []string{comment.ThreadColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(topic.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(thread.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cu.mutation.TopicIDs(); len(nodes) > 0 {
+	if nodes := cu.mutation.ThreadIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   comment.TopicTable,
-			Columns: []string{comment.TopicColumn},
+			Table:   comment.ThreadTable,
+			Columns: []string{comment.ThreadColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(topic.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(thread.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -511,12 +533,12 @@ func (cu *CommentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if cu.mutation.ParentCleared() {
+	if cu.mutation.ParentCommentCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   comment.ParentTable,
-			Columns: []string{comment.ParentColumn},
+			Table:   comment.ParentCommentTable,
+			Columns: []string{comment.ParentCommentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
@@ -524,12 +546,12 @@ func (cu *CommentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cu.mutation.ParentIDs(); len(nodes) > 0 {
+	if nodes := cu.mutation.ParentCommentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   comment.ParentTable,
-			Columns: []string{comment.ParentColumn},
+			Table:   comment.ParentCommentTable,
+			Columns: []string{comment.ParentCommentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
@@ -764,37 +786,37 @@ type CommentUpdateOne struct {
 	mutation *CommentMutation
 }
 
-// SetTopicId sets the "topicId" field.
-func (cuo *CommentUpdateOne) SetTopicId(i int) *CommentUpdateOne {
-	cuo.mutation.SetTopicId(i)
+// SetThreadId sets the "threadId" field.
+func (cuo *CommentUpdateOne) SetThreadId(i int) *CommentUpdateOne {
+	cuo.mutation.SetThreadId(i)
 	return cuo
 }
 
-// SetNillableTopicId sets the "topicId" field if the given value is not nil.
-func (cuo *CommentUpdateOne) SetNillableTopicId(i *int) *CommentUpdateOne {
+// SetNillableThreadId sets the "threadId" field if the given value is not nil.
+func (cuo *CommentUpdateOne) SetNillableThreadId(i *int) *CommentUpdateOne {
 	if i != nil {
-		cuo.SetTopicId(*i)
+		cuo.SetThreadId(*i)
 	}
 	return cuo
 }
 
-// SetParentId sets the "parentId" field.
-func (cuo *CommentUpdateOne) SetParentId(i int) *CommentUpdateOne {
-	cuo.mutation.SetParentId(i)
+// SetParentCommentId sets the "parentCommentId" field.
+func (cuo *CommentUpdateOne) SetParentCommentId(i int) *CommentUpdateOne {
+	cuo.mutation.SetParentCommentId(i)
 	return cuo
 }
 
-// SetNillableParentId sets the "parentId" field if the given value is not nil.
-func (cuo *CommentUpdateOne) SetNillableParentId(i *int) *CommentUpdateOne {
+// SetNillableParentCommentId sets the "parentCommentId" field if the given value is not nil.
+func (cuo *CommentUpdateOne) SetNillableParentCommentId(i *int) *CommentUpdateOne {
 	if i != nil {
-		cuo.SetParentId(*i)
+		cuo.SetParentCommentId(*i)
 	}
 	return cuo
 }
 
-// ClearParentId clears the value of the "parentId" field.
-func (cuo *CommentUpdateOne) ClearParentId() *CommentUpdateOne {
-	cuo.mutation.ClearParentId()
+// ClearParentCommentId clears the value of the "parentCommentId" field.
+func (cuo *CommentUpdateOne) ClearParentCommentId() *CommentUpdateOne {
+	cuo.mutation.ClearParentCommentId()
 	return cuo
 }
 
@@ -852,6 +874,20 @@ func (cuo *CommentUpdateOne) SetNillableMessage(s *string) *CommentUpdateOne {
 	return cuo
 }
 
+// SetIPAddress sets the "ip_address" field.
+func (cuo *CommentUpdateOne) SetIPAddress(s string) *CommentUpdateOne {
+	cuo.mutation.SetIPAddress(s)
+	return cuo
+}
+
+// SetNillableIPAddress sets the "ip_address" field if the given value is not nil.
+func (cuo *CommentUpdateOne) SetNillableIPAddress(s *string) *CommentUpdateOne {
+	if s != nil {
+		cuo.SetIPAddress(*s)
+	}
+	return cuo
+}
+
 // SetStatus sets the "status" field.
 func (cuo *CommentUpdateOne) SetStatus(c comment.Status) *CommentUpdateOne {
 	cuo.mutation.SetStatus(c)
@@ -886,15 +922,15 @@ func (cuo *CommentUpdateOne) SetUpdatedAt(t time.Time) *CommentUpdateOne {
 	return cuo
 }
 
-// SetTopicID sets the "topic" edge to the Topic entity by ID.
-func (cuo *CommentUpdateOne) SetTopicID(id int) *CommentUpdateOne {
-	cuo.mutation.SetTopicID(id)
+// SetThreadID sets the "thread" edge to the Thread entity by ID.
+func (cuo *CommentUpdateOne) SetThreadID(id int) *CommentUpdateOne {
+	cuo.mutation.SetThreadID(id)
 	return cuo
 }
 
-// SetTopic sets the "topic" edge to the Topic entity.
-func (cuo *CommentUpdateOne) SetTopic(t *Topic) *CommentUpdateOne {
-	return cuo.SetTopicID(t.ID)
+// SetThread sets the "thread" edge to the Thread entity.
+func (cuo *CommentUpdateOne) SetThread(t *Thread) *CommentUpdateOne {
+	return cuo.SetThreadID(t.ID)
 }
 
 // SetAuthorID sets the "author" edge to the User entity by ID.
@@ -916,23 +952,23 @@ func (cuo *CommentUpdateOne) SetAuthor(u *User) *CommentUpdateOne {
 	return cuo.SetAuthorID(u.ID)
 }
 
-// SetParentID sets the "parent" edge to the Comment entity by ID.
-func (cuo *CommentUpdateOne) SetParentID(id int) *CommentUpdateOne {
-	cuo.mutation.SetParentID(id)
+// SetParentCommentID sets the "parent_comment" edge to the Comment entity by ID.
+func (cuo *CommentUpdateOne) SetParentCommentID(id int) *CommentUpdateOne {
+	cuo.mutation.SetParentCommentID(id)
 	return cuo
 }
 
-// SetNillableParentID sets the "parent" edge to the Comment entity by ID if the given value is not nil.
-func (cuo *CommentUpdateOne) SetNillableParentID(id *int) *CommentUpdateOne {
+// SetNillableParentCommentID sets the "parent_comment" edge to the Comment entity by ID if the given value is not nil.
+func (cuo *CommentUpdateOne) SetNillableParentCommentID(id *int) *CommentUpdateOne {
 	if id != nil {
-		cuo = cuo.SetParentID(*id)
+		cuo = cuo.SetParentCommentID(*id)
 	}
 	return cuo
 }
 
-// SetParent sets the "parent" edge to the Comment entity.
-func (cuo *CommentUpdateOne) SetParent(c *Comment) *CommentUpdateOne {
-	return cuo.SetParentID(c.ID)
+// SetParentComment sets the "parent_comment" edge to the Comment entity.
+func (cuo *CommentUpdateOne) SetParentComment(c *Comment) *CommentUpdateOne {
+	return cuo.SetParentCommentID(c.ID)
 }
 
 // AddReplyIDs adds the "replies" edge to the Comment entity by IDs.
@@ -1000,9 +1036,9 @@ func (cuo *CommentUpdateOne) Mutation() *CommentMutation {
 	return cuo.mutation
 }
 
-// ClearTopic clears the "topic" edge to the Topic entity.
-func (cuo *CommentUpdateOne) ClearTopic() *CommentUpdateOne {
-	cuo.mutation.ClearTopic()
+// ClearThread clears the "thread" edge to the Thread entity.
+func (cuo *CommentUpdateOne) ClearThread() *CommentUpdateOne {
+	cuo.mutation.ClearThread()
 	return cuo
 }
 
@@ -1012,9 +1048,9 @@ func (cuo *CommentUpdateOne) ClearAuthor() *CommentUpdateOne {
 	return cuo
 }
 
-// ClearParent clears the "parent" edge to the Comment entity.
-func (cuo *CommentUpdateOne) ClearParent() *CommentUpdateOne {
-	cuo.mutation.ClearParent()
+// ClearParentComment clears the "parent_comment" edge to the Comment entity.
+func (cuo *CommentUpdateOne) ClearParentComment() *CommentUpdateOne {
+	cuo.mutation.ClearParentComment()
 	return cuo
 }
 
@@ -1158,13 +1194,18 @@ func (cuo *CommentUpdateOne) check() error {
 			return &ValidationError{Name: "guestName", err: fmt.Errorf(`ent: validator failed for field "Comment.guestName": %w`, err)}
 		}
 	}
+	if v, ok := cuo.mutation.IPAddress(); ok {
+		if err := comment.IPAddressValidator(v); err != nil {
+			return &ValidationError{Name: "ip_address", err: fmt.Errorf(`ent: validator failed for field "Comment.ip_address": %w`, err)}
+		}
+	}
 	if v, ok := cuo.mutation.Status(); ok {
 		if err := comment.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Comment.status": %w`, err)}
 		}
 	}
-	if _, ok := cuo.mutation.TopicID(); cuo.mutation.TopicCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "Comment.topic"`)
+	if _, ok := cuo.mutation.ThreadID(); cuo.mutation.ThreadCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Comment.thread"`)
 	}
 	return nil
 }
@@ -1207,6 +1248,9 @@ func (cuo *CommentUpdateOne) sqlSave(ctx context.Context) (_node *Comment, err e
 	if value, ok := cuo.mutation.Message(); ok {
 		_spec.SetField(comment.FieldMessage, field.TypeString, value)
 	}
+	if value, ok := cuo.mutation.IPAddress(); ok {
+		_spec.SetField(comment.FieldIPAddress, field.TypeString, value)
+	}
 	if value, ok := cuo.mutation.Status(); ok {
 		_spec.SetField(comment.FieldStatus, field.TypeEnum, value)
 	}
@@ -1216,28 +1260,28 @@ func (cuo *CommentUpdateOne) sqlSave(ctx context.Context) (_node *Comment, err e
 	if value, ok := cuo.mutation.UpdatedAt(); ok {
 		_spec.SetField(comment.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if cuo.mutation.TopicCleared() {
+	if cuo.mutation.ThreadCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   comment.TopicTable,
-			Columns: []string{comment.TopicColumn},
+			Table:   comment.ThreadTable,
+			Columns: []string{comment.ThreadColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(topic.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(thread.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cuo.mutation.TopicIDs(); len(nodes) > 0 {
+	if nodes := cuo.mutation.ThreadIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   comment.TopicTable,
-			Columns: []string{comment.TopicColumn},
+			Table:   comment.ThreadTable,
+			Columns: []string{comment.ThreadColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(topic.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(thread.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -1274,12 +1318,12 @@ func (cuo *CommentUpdateOne) sqlSave(ctx context.Context) (_node *Comment, err e
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if cuo.mutation.ParentCleared() {
+	if cuo.mutation.ParentCommentCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   comment.ParentTable,
-			Columns: []string{comment.ParentColumn},
+			Table:   comment.ParentCommentTable,
+			Columns: []string{comment.ParentCommentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
@@ -1287,12 +1331,12 @@ func (cuo *CommentUpdateOne) sqlSave(ctx context.Context) (_node *Comment, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cuo.mutation.ParentIDs(); len(nodes) > 0 {
+	if nodes := cuo.mutation.ParentCommentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   comment.ParentTable,
-			Columns: []string{comment.ParentColumn},
+			Table:   comment.ParentCommentTable,
+			Columns: []string{comment.ParentCommentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),

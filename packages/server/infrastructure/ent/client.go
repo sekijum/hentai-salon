@@ -12,19 +12,19 @@ import (
 	"server/infrastructure/ent/migrate"
 
 	"server/infrastructure/ent/adminuser"
+	"server/infrastructure/ent/board"
 	"server/infrastructure/ent/comment"
 	"server/infrastructure/ent/commentattachment"
-	"server/infrastructure/ent/forum"
-	"server/infrastructure/ent/topic"
-	"server/infrastructure/ent/topictag"
-	"server/infrastructure/ent/topictagging"
+	"server/infrastructure/ent/thread"
+	"server/infrastructure/ent/threadtag"
+	"server/infrastructure/ent/threadtagging"
 	"server/infrastructure/ent/user"
+	"server/infrastructure/ent/userboardlike"
+	"server/infrastructure/ent/userboardsubscription"
 	"server/infrastructure/ent/usercommentlike"
 	"server/infrastructure/ent/usercommentsubscription"
-	"server/infrastructure/ent/userforumlike"
-	"server/infrastructure/ent/userforumsubscription"
-	"server/infrastructure/ent/usertopiclike"
-	"server/infrastructure/ent/usertopicsubscription"
+	"server/infrastructure/ent/userthreadlike"
+	"server/infrastructure/ent/userthreadsubscription"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
@@ -39,32 +39,32 @@ type Client struct {
 	Schema *migrate.Schema
 	// AdminUser is the client for interacting with the AdminUser builders.
 	AdminUser *AdminUserClient
+	// Board is the client for interacting with the Board builders.
+	Board *BoardClient
 	// Comment is the client for interacting with the Comment builders.
 	Comment *CommentClient
 	// CommentAttachment is the client for interacting with the CommentAttachment builders.
 	CommentAttachment *CommentAttachmentClient
-	// Forum is the client for interacting with the Forum builders.
-	Forum *ForumClient
-	// Topic is the client for interacting with the Topic builders.
-	Topic *TopicClient
-	// TopicTag is the client for interacting with the TopicTag builders.
-	TopicTag *TopicTagClient
-	// TopicTagging is the client for interacting with the TopicTagging builders.
-	TopicTagging *TopicTaggingClient
+	// Thread is the client for interacting with the Thread builders.
+	Thread *ThreadClient
+	// ThreadTag is the client for interacting with the ThreadTag builders.
+	ThreadTag *ThreadTagClient
+	// ThreadTagging is the client for interacting with the ThreadTagging builders.
+	ThreadTagging *ThreadTaggingClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
+	// UserBoardLike is the client for interacting with the UserBoardLike builders.
+	UserBoardLike *UserBoardLikeClient
+	// UserBoardSubscription is the client for interacting with the UserBoardSubscription builders.
+	UserBoardSubscription *UserBoardSubscriptionClient
 	// UserCommentLike is the client for interacting with the UserCommentLike builders.
 	UserCommentLike *UserCommentLikeClient
 	// UserCommentSubscription is the client for interacting with the UserCommentSubscription builders.
 	UserCommentSubscription *UserCommentSubscriptionClient
-	// UserForumLike is the client for interacting with the UserForumLike builders.
-	UserForumLike *UserForumLikeClient
-	// UserForumSubscription is the client for interacting with the UserForumSubscription builders.
-	UserForumSubscription *UserForumSubscriptionClient
-	// UserTopicLike is the client for interacting with the UserTopicLike builders.
-	UserTopicLike *UserTopicLikeClient
-	// UserTopicSubscription is the client for interacting with the UserTopicSubscription builders.
-	UserTopicSubscription *UserTopicSubscriptionClient
+	// UserThreadLike is the client for interacting with the UserThreadLike builders.
+	UserThreadLike *UserThreadLikeClient
+	// UserThreadSubscription is the client for interacting with the UserThreadSubscription builders.
+	UserThreadSubscription *UserThreadSubscriptionClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -77,19 +77,19 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.AdminUser = NewAdminUserClient(c.config)
+	c.Board = NewBoardClient(c.config)
 	c.Comment = NewCommentClient(c.config)
 	c.CommentAttachment = NewCommentAttachmentClient(c.config)
-	c.Forum = NewForumClient(c.config)
-	c.Topic = NewTopicClient(c.config)
-	c.TopicTag = NewTopicTagClient(c.config)
-	c.TopicTagging = NewTopicTaggingClient(c.config)
+	c.Thread = NewThreadClient(c.config)
+	c.ThreadTag = NewThreadTagClient(c.config)
+	c.ThreadTagging = NewThreadTaggingClient(c.config)
 	c.User = NewUserClient(c.config)
+	c.UserBoardLike = NewUserBoardLikeClient(c.config)
+	c.UserBoardSubscription = NewUserBoardSubscriptionClient(c.config)
 	c.UserCommentLike = NewUserCommentLikeClient(c.config)
 	c.UserCommentSubscription = NewUserCommentSubscriptionClient(c.config)
-	c.UserForumLike = NewUserForumLikeClient(c.config)
-	c.UserForumSubscription = NewUserForumSubscriptionClient(c.config)
-	c.UserTopicLike = NewUserTopicLikeClient(c.config)
-	c.UserTopicSubscription = NewUserTopicSubscriptionClient(c.config)
+	c.UserThreadLike = NewUserThreadLikeClient(c.config)
+	c.UserThreadSubscription = NewUserThreadSubscriptionClient(c.config)
 }
 
 type (
@@ -183,19 +183,19 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ctx:                     ctx,
 		config:                  cfg,
 		AdminUser:               NewAdminUserClient(cfg),
+		Board:                   NewBoardClient(cfg),
 		Comment:                 NewCommentClient(cfg),
 		CommentAttachment:       NewCommentAttachmentClient(cfg),
-		Forum:                   NewForumClient(cfg),
-		Topic:                   NewTopicClient(cfg),
-		TopicTag:                NewTopicTagClient(cfg),
-		TopicTagging:            NewTopicTaggingClient(cfg),
+		Thread:                  NewThreadClient(cfg),
+		ThreadTag:               NewThreadTagClient(cfg),
+		ThreadTagging:           NewThreadTaggingClient(cfg),
 		User:                    NewUserClient(cfg),
+		UserBoardLike:           NewUserBoardLikeClient(cfg),
+		UserBoardSubscription:   NewUserBoardSubscriptionClient(cfg),
 		UserCommentLike:         NewUserCommentLikeClient(cfg),
 		UserCommentSubscription: NewUserCommentSubscriptionClient(cfg),
-		UserForumLike:           NewUserForumLikeClient(cfg),
-		UserForumSubscription:   NewUserForumSubscriptionClient(cfg),
-		UserTopicLike:           NewUserTopicLikeClient(cfg),
-		UserTopicSubscription:   NewUserTopicSubscriptionClient(cfg),
+		UserThreadLike:          NewUserThreadLikeClient(cfg),
+		UserThreadSubscription:  NewUserThreadSubscriptionClient(cfg),
 	}, nil
 }
 
@@ -216,19 +216,19 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ctx:                     ctx,
 		config:                  cfg,
 		AdminUser:               NewAdminUserClient(cfg),
+		Board:                   NewBoardClient(cfg),
 		Comment:                 NewCommentClient(cfg),
 		CommentAttachment:       NewCommentAttachmentClient(cfg),
-		Forum:                   NewForumClient(cfg),
-		Topic:                   NewTopicClient(cfg),
-		TopicTag:                NewTopicTagClient(cfg),
-		TopicTagging:            NewTopicTaggingClient(cfg),
+		Thread:                  NewThreadClient(cfg),
+		ThreadTag:               NewThreadTagClient(cfg),
+		ThreadTagging:           NewThreadTaggingClient(cfg),
 		User:                    NewUserClient(cfg),
+		UserBoardLike:           NewUserBoardLikeClient(cfg),
+		UserBoardSubscription:   NewUserBoardSubscriptionClient(cfg),
 		UserCommentLike:         NewUserCommentLikeClient(cfg),
 		UserCommentSubscription: NewUserCommentSubscriptionClient(cfg),
-		UserForumLike:           NewUserForumLikeClient(cfg),
-		UserForumSubscription:   NewUserForumSubscriptionClient(cfg),
-		UserTopicLike:           NewUserTopicLikeClient(cfg),
-		UserTopicSubscription:   NewUserTopicSubscriptionClient(cfg),
+		UserThreadLike:          NewUserThreadLikeClient(cfg),
+		UserThreadSubscription:  NewUserThreadSubscriptionClient(cfg),
 	}, nil
 }
 
@@ -258,10 +258,10 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.AdminUser, c.Comment, c.CommentAttachment, c.Forum, c.Topic, c.TopicTag,
-		c.TopicTagging, c.User, c.UserCommentLike, c.UserCommentSubscription,
-		c.UserForumLike, c.UserForumSubscription, c.UserTopicLike,
-		c.UserTopicSubscription,
+		c.AdminUser, c.Board, c.Comment, c.CommentAttachment, c.Thread, c.ThreadTag,
+		c.ThreadTagging, c.User, c.UserBoardLike, c.UserBoardSubscription,
+		c.UserCommentLike, c.UserCommentSubscription, c.UserThreadLike,
+		c.UserThreadSubscription,
 	} {
 		n.Use(hooks...)
 	}
@@ -271,10 +271,10 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.AdminUser, c.Comment, c.CommentAttachment, c.Forum, c.Topic, c.TopicTag,
-		c.TopicTagging, c.User, c.UserCommentLike, c.UserCommentSubscription,
-		c.UserForumLike, c.UserForumSubscription, c.UserTopicLike,
-		c.UserTopicSubscription,
+		c.AdminUser, c.Board, c.Comment, c.CommentAttachment, c.Thread, c.ThreadTag,
+		c.ThreadTagging, c.User, c.UserBoardLike, c.UserBoardSubscription,
+		c.UserCommentLike, c.UserCommentSubscription, c.UserThreadLike,
+		c.UserThreadSubscription,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -285,32 +285,32 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
 	case *AdminUserMutation:
 		return c.AdminUser.mutate(ctx, m)
+	case *BoardMutation:
+		return c.Board.mutate(ctx, m)
 	case *CommentMutation:
 		return c.Comment.mutate(ctx, m)
 	case *CommentAttachmentMutation:
 		return c.CommentAttachment.mutate(ctx, m)
-	case *ForumMutation:
-		return c.Forum.mutate(ctx, m)
-	case *TopicMutation:
-		return c.Topic.mutate(ctx, m)
-	case *TopicTagMutation:
-		return c.TopicTag.mutate(ctx, m)
-	case *TopicTaggingMutation:
-		return c.TopicTagging.mutate(ctx, m)
+	case *ThreadMutation:
+		return c.Thread.mutate(ctx, m)
+	case *ThreadTagMutation:
+		return c.ThreadTag.mutate(ctx, m)
+	case *ThreadTaggingMutation:
+		return c.ThreadTagging.mutate(ctx, m)
 	case *UserMutation:
 		return c.User.mutate(ctx, m)
+	case *UserBoardLikeMutation:
+		return c.UserBoardLike.mutate(ctx, m)
+	case *UserBoardSubscriptionMutation:
+		return c.UserBoardSubscription.mutate(ctx, m)
 	case *UserCommentLikeMutation:
 		return c.UserCommentLike.mutate(ctx, m)
 	case *UserCommentSubscriptionMutation:
 		return c.UserCommentSubscription.mutate(ctx, m)
-	case *UserForumLikeMutation:
-		return c.UserForumLike.mutate(ctx, m)
-	case *UserForumSubscriptionMutation:
-		return c.UserForumSubscription.mutate(ctx, m)
-	case *UserTopicLikeMutation:
-		return c.UserTopicLike.mutate(ctx, m)
-	case *UserTopicSubscriptionMutation:
-		return c.UserTopicSubscription.mutate(ctx, m)
+	case *UserThreadLikeMutation:
+		return c.UserThreadLike.mutate(ctx, m)
+	case *UserThreadSubscriptionMutation:
+		return c.UserThreadSubscription.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
 	}
@@ -449,6 +449,219 @@ func (c *AdminUserClient) mutate(ctx context.Context, m *AdminUserMutation) (Val
 	}
 }
 
+// BoardClient is a client for the Board schema.
+type BoardClient struct {
+	config
+}
+
+// NewBoardClient returns a client for the Board from the given config.
+func NewBoardClient(c config) *BoardClient {
+	return &BoardClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `board.Hooks(f(g(h())))`.
+func (c *BoardClient) Use(hooks ...Hook) {
+	c.hooks.Board = append(c.hooks.Board, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `board.Intercept(f(g(h())))`.
+func (c *BoardClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Board = append(c.inters.Board, interceptors...)
+}
+
+// Create returns a builder for creating a Board entity.
+func (c *BoardClient) Create() *BoardCreate {
+	mutation := newBoardMutation(c.config, OpCreate)
+	return &BoardCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Board entities.
+func (c *BoardClient) CreateBulk(builders ...*BoardCreate) *BoardCreateBulk {
+	return &BoardCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *BoardClient) MapCreateBulk(slice any, setFunc func(*BoardCreate, int)) *BoardCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &BoardCreateBulk{err: fmt.Errorf("calling to BoardClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*BoardCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &BoardCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Board.
+func (c *BoardClient) Update() *BoardUpdate {
+	mutation := newBoardMutation(c.config, OpUpdate)
+	return &BoardUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *BoardClient) UpdateOne(b *Board) *BoardUpdateOne {
+	mutation := newBoardMutation(c.config, OpUpdateOne, withBoard(b))
+	return &BoardUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *BoardClient) UpdateOneID(id int) *BoardUpdateOne {
+	mutation := newBoardMutation(c.config, OpUpdateOne, withBoardID(id))
+	return &BoardUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Board.
+func (c *BoardClient) Delete() *BoardDelete {
+	mutation := newBoardMutation(c.config, OpDelete)
+	return &BoardDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *BoardClient) DeleteOne(b *Board) *BoardDeleteOne {
+	return c.DeleteOneID(b.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *BoardClient) DeleteOneID(id int) *BoardDeleteOne {
+	builder := c.Delete().Where(board.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &BoardDeleteOne{builder}
+}
+
+// Query returns a query builder for Board.
+func (c *BoardClient) Query() *BoardQuery {
+	return &BoardQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeBoard},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Board entity by its id.
+func (c *BoardClient) Get(ctx context.Context, id int) (*Board, error) {
+	return c.Query().Where(board.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *BoardClient) GetX(ctx context.Context, id int) *Board {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryLikedUsers queries the liked_users edge of a Board.
+func (c *BoardClient) QueryLikedUsers(b *Board) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := b.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(board.Table, board.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, board.LikedUsersTable, board.LikedUsersPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(b.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySubscribedUsers queries the subscribed_users edge of a Board.
+func (c *BoardClient) QuerySubscribedUsers(b *Board) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := b.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(board.Table, board.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, board.SubscribedUsersTable, board.SubscribedUsersPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(b.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryThreads queries the threads edge of a Board.
+func (c *BoardClient) QueryThreads(b *Board) *ThreadQuery {
+	query := (&ThreadClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := b.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(board.Table, board.FieldID, id),
+			sqlgraph.To(thread.Table, thread.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, board.ThreadsTable, board.ThreadsColumn),
+		)
+		fromV = sqlgraph.Neighbors(b.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUserBoardLike queries the user_board_like edge of a Board.
+func (c *BoardClient) QueryUserBoardLike(b *Board) *UserBoardSubscriptionQuery {
+	query := (&UserBoardSubscriptionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := b.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(board.Table, board.FieldID, id),
+			sqlgraph.To(userboardsubscription.Table, userboardsubscription.BoardColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, board.UserBoardLikeTable, board.UserBoardLikeColumn),
+		)
+		fromV = sqlgraph.Neighbors(b.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUserBoardSubscription queries the user_board_subscription edge of a Board.
+func (c *BoardClient) QueryUserBoardSubscription(b *Board) *UserBoardLikeQuery {
+	query := (&UserBoardLikeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := b.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(board.Table, board.FieldID, id),
+			sqlgraph.To(userboardlike.Table, userboardlike.BoardColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, board.UserBoardSubscriptionTable, board.UserBoardSubscriptionColumn),
+		)
+		fromV = sqlgraph.Neighbors(b.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *BoardClient) Hooks() []Hook {
+	return c.hooks.Board
+}
+
+// Interceptors returns the client interceptors.
+func (c *BoardClient) Interceptors() []Interceptor {
+	return c.inters.Board
+}
+
+func (c *BoardClient) mutate(ctx context.Context, m *BoardMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&BoardCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&BoardUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&BoardUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&BoardDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Board mutation op: %q", m.Op())
+	}
+}
+
 // CommentClient is a client for the Comment schema.
 type CommentClient struct {
 	config
@@ -557,15 +770,15 @@ func (c *CommentClient) GetX(ctx context.Context, id int) *Comment {
 	return obj
 }
 
-// QueryTopic queries the topic edge of a Comment.
-func (c *CommentClient) QueryTopic(co *Comment) *TopicQuery {
-	query := (&TopicClient{config: c.config}).Query()
+// QueryThread queries the thread edge of a Comment.
+func (c *CommentClient) QueryThread(co *Comment) *ThreadQuery {
+	query := (&ThreadClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := co.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(comment.Table, comment.FieldID, id),
-			sqlgraph.To(topic.Table, topic.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, comment.TopicTable, comment.TopicColumn),
+			sqlgraph.To(thread.Table, thread.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, comment.ThreadTable, comment.ThreadColumn),
 		)
 		fromV = sqlgraph.Neighbors(co.driver.Dialect(), step)
 		return fromV, nil
@@ -589,15 +802,15 @@ func (c *CommentClient) QueryAuthor(co *Comment) *UserQuery {
 	return query
 }
 
-// QueryParent queries the parent edge of a Comment.
-func (c *CommentClient) QueryParent(co *Comment) *CommentQuery {
+// QueryParentComment queries the parent_comment edge of a Comment.
+func (c *CommentClient) QueryParentComment(co *Comment) *CommentQuery {
 	query := (&CommentClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := co.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(comment.Table, comment.FieldID, id),
 			sqlgraph.To(comment.Table, comment.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, comment.ParentTable, comment.ParentColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, comment.ParentCommentTable, comment.ParentCommentColumn),
 		)
 		fromV = sqlgraph.Neighbors(co.driver.Dialect(), step)
 		return fromV, nil
@@ -875,320 +1088,107 @@ func (c *CommentAttachmentClient) mutate(ctx context.Context, m *CommentAttachme
 	}
 }
 
-// ForumClient is a client for the Forum schema.
-type ForumClient struct {
+// ThreadClient is a client for the Thread schema.
+type ThreadClient struct {
 	config
 }
 
-// NewForumClient returns a client for the Forum from the given config.
-func NewForumClient(c config) *ForumClient {
-	return &ForumClient{config: c}
+// NewThreadClient returns a client for the Thread from the given config.
+func NewThreadClient(c config) *ThreadClient {
+	return &ThreadClient{config: c}
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `forum.Hooks(f(g(h())))`.
-func (c *ForumClient) Use(hooks ...Hook) {
-	c.hooks.Forum = append(c.hooks.Forum, hooks...)
+// A call to `Use(f, g, h)` equals to `thread.Hooks(f(g(h())))`.
+func (c *ThreadClient) Use(hooks ...Hook) {
+	c.hooks.Thread = append(c.hooks.Thread, hooks...)
 }
 
 // Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `forum.Intercept(f(g(h())))`.
-func (c *ForumClient) Intercept(interceptors ...Interceptor) {
-	c.inters.Forum = append(c.inters.Forum, interceptors...)
+// A call to `Intercept(f, g, h)` equals to `thread.Intercept(f(g(h())))`.
+func (c *ThreadClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Thread = append(c.inters.Thread, interceptors...)
 }
 
-// Create returns a builder for creating a Forum entity.
-func (c *ForumClient) Create() *ForumCreate {
-	mutation := newForumMutation(c.config, OpCreate)
-	return &ForumCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Create returns a builder for creating a Thread entity.
+func (c *ThreadClient) Create() *ThreadCreate {
+	mutation := newThreadMutation(c.config, OpCreate)
+	return &ThreadCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// CreateBulk returns a builder for creating a bulk of Forum entities.
-func (c *ForumClient) CreateBulk(builders ...*ForumCreate) *ForumCreateBulk {
-	return &ForumCreateBulk{config: c.config, builders: builders}
+// CreateBulk returns a builder for creating a bulk of Thread entities.
+func (c *ThreadClient) CreateBulk(builders ...*ThreadCreate) *ThreadCreateBulk {
+	return &ThreadCreateBulk{config: c.config, builders: builders}
 }
 
 // MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
 // a builder and applies setFunc on it.
-func (c *ForumClient) MapCreateBulk(slice any, setFunc func(*ForumCreate, int)) *ForumCreateBulk {
+func (c *ThreadClient) MapCreateBulk(slice any, setFunc func(*ThreadCreate, int)) *ThreadCreateBulk {
 	rv := reflect.ValueOf(slice)
 	if rv.Kind() != reflect.Slice {
-		return &ForumCreateBulk{err: fmt.Errorf("calling to ForumClient.MapCreateBulk with wrong type %T, need slice", slice)}
+		return &ThreadCreateBulk{err: fmt.Errorf("calling to ThreadClient.MapCreateBulk with wrong type %T, need slice", slice)}
 	}
-	builders := make([]*ForumCreate, rv.Len())
+	builders := make([]*ThreadCreate, rv.Len())
 	for i := 0; i < rv.Len(); i++ {
 		builders[i] = c.Create()
 		setFunc(builders[i], i)
 	}
-	return &ForumCreateBulk{config: c.config, builders: builders}
+	return &ThreadCreateBulk{config: c.config, builders: builders}
 }
 
-// Update returns an update builder for Forum.
-func (c *ForumClient) Update() *ForumUpdate {
-	mutation := newForumMutation(c.config, OpUpdate)
-	return &ForumUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *ForumClient) UpdateOne(f *Forum) *ForumUpdateOne {
-	mutation := newForumMutation(c.config, OpUpdateOne, withForum(f))
-	return &ForumUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *ForumClient) UpdateOneID(id int) *ForumUpdateOne {
-	mutation := newForumMutation(c.config, OpUpdateOne, withForumID(id))
-	return &ForumUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for Forum.
-func (c *ForumClient) Delete() *ForumDelete {
-	mutation := newForumMutation(c.config, OpDelete)
-	return &ForumDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a builder for deleting the given entity.
-func (c *ForumClient) DeleteOne(f *Forum) *ForumDeleteOne {
-	return c.DeleteOneID(f.ID)
-}
-
-// DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *ForumClient) DeleteOneID(id int) *ForumDeleteOne {
-	builder := c.Delete().Where(forum.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &ForumDeleteOne{builder}
-}
-
-// Query returns a query builder for Forum.
-func (c *ForumClient) Query() *ForumQuery {
-	return &ForumQuery{
-		config: c.config,
-		ctx:    &QueryContext{Type: TypeForum},
-		inters: c.Interceptors(),
-	}
-}
-
-// Get returns a Forum entity by its id.
-func (c *ForumClient) Get(ctx context.Context, id int) (*Forum, error) {
-	return c.Query().Where(forum.ID(id)).Only(ctx)
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *ForumClient) GetX(ctx context.Context, id int) *Forum {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
-}
-
-// QueryLikedUsers queries the liked_users edge of a Forum.
-func (c *ForumClient) QueryLikedUsers(f *Forum) *UserQuery {
-	query := (&UserClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := f.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(forum.Table, forum.FieldID, id),
-			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, forum.LikedUsersTable, forum.LikedUsersPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(f.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QuerySubscribedUsers queries the subscribed_users edge of a Forum.
-func (c *ForumClient) QuerySubscribedUsers(f *Forum) *UserQuery {
-	query := (&UserClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := f.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(forum.Table, forum.FieldID, id),
-			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, forum.SubscribedUsersTable, forum.SubscribedUsersPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(f.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryTopics queries the topics edge of a Forum.
-func (c *ForumClient) QueryTopics(f *Forum) *TopicQuery {
-	query := (&TopicClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := f.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(forum.Table, forum.FieldID, id),
-			sqlgraph.To(topic.Table, topic.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, forum.TopicsTable, forum.TopicsColumn),
-		)
-		fromV = sqlgraph.Neighbors(f.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryUserForumLike queries the user_forum_like edge of a Forum.
-func (c *ForumClient) QueryUserForumLike(f *Forum) *UserForumSubscriptionQuery {
-	query := (&UserForumSubscriptionClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := f.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(forum.Table, forum.FieldID, id),
-			sqlgraph.To(userforumsubscription.Table, userforumsubscription.ForumColumn),
-			sqlgraph.Edge(sqlgraph.O2M, true, forum.UserForumLikeTable, forum.UserForumLikeColumn),
-		)
-		fromV = sqlgraph.Neighbors(f.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryUserForumSubscription queries the user_forum_subscription edge of a Forum.
-func (c *ForumClient) QueryUserForumSubscription(f *Forum) *UserForumLikeQuery {
-	query := (&UserForumLikeClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := f.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(forum.Table, forum.FieldID, id),
-			sqlgraph.To(userforumlike.Table, userforumlike.ForumColumn),
-			sqlgraph.Edge(sqlgraph.O2M, true, forum.UserForumSubscriptionTable, forum.UserForumSubscriptionColumn),
-		)
-		fromV = sqlgraph.Neighbors(f.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// Hooks returns the client hooks.
-func (c *ForumClient) Hooks() []Hook {
-	return c.hooks.Forum
-}
-
-// Interceptors returns the client interceptors.
-func (c *ForumClient) Interceptors() []Interceptor {
-	return c.inters.Forum
-}
-
-func (c *ForumClient) mutate(ctx context.Context, m *ForumMutation) (Value, error) {
-	switch m.Op() {
-	case OpCreate:
-		return (&ForumCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdate:
-		return (&ForumUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdateOne:
-		return (&ForumUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpDelete, OpDeleteOne:
-		return (&ForumDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
-	default:
-		return nil, fmt.Errorf("ent: unknown Forum mutation op: %q", m.Op())
-	}
-}
-
-// TopicClient is a client for the Topic schema.
-type TopicClient struct {
-	config
-}
-
-// NewTopicClient returns a client for the Topic from the given config.
-func NewTopicClient(c config) *TopicClient {
-	return &TopicClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `topic.Hooks(f(g(h())))`.
-func (c *TopicClient) Use(hooks ...Hook) {
-	c.hooks.Topic = append(c.hooks.Topic, hooks...)
-}
-
-// Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `topic.Intercept(f(g(h())))`.
-func (c *TopicClient) Intercept(interceptors ...Interceptor) {
-	c.inters.Topic = append(c.inters.Topic, interceptors...)
-}
-
-// Create returns a builder for creating a Topic entity.
-func (c *TopicClient) Create() *TopicCreate {
-	mutation := newTopicMutation(c.config, OpCreate)
-	return &TopicCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of Topic entities.
-func (c *TopicClient) CreateBulk(builders ...*TopicCreate) *TopicCreateBulk {
-	return &TopicCreateBulk{config: c.config, builders: builders}
-}
-
-// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
-// a builder and applies setFunc on it.
-func (c *TopicClient) MapCreateBulk(slice any, setFunc func(*TopicCreate, int)) *TopicCreateBulk {
-	rv := reflect.ValueOf(slice)
-	if rv.Kind() != reflect.Slice {
-		return &TopicCreateBulk{err: fmt.Errorf("calling to TopicClient.MapCreateBulk with wrong type %T, need slice", slice)}
-	}
-	builders := make([]*TopicCreate, rv.Len())
-	for i := 0; i < rv.Len(); i++ {
-		builders[i] = c.Create()
-		setFunc(builders[i], i)
-	}
-	return &TopicCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for Topic.
-func (c *TopicClient) Update() *TopicUpdate {
-	mutation := newTopicMutation(c.config, OpUpdate)
-	return &TopicUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Update returns an update builder for Thread.
+func (c *ThreadClient) Update() *ThreadUpdate {
+	mutation := newThreadMutation(c.config, OpUpdate)
+	return &ThreadUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *TopicClient) UpdateOne(t *Topic) *TopicUpdateOne {
-	mutation := newTopicMutation(c.config, OpUpdateOne, withTopic(t))
-	return &TopicUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *ThreadClient) UpdateOne(t *Thread) *ThreadUpdateOne {
+	mutation := newThreadMutation(c.config, OpUpdateOne, withThread(t))
+	return &ThreadUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *TopicClient) UpdateOneID(id int) *TopicUpdateOne {
-	mutation := newTopicMutation(c.config, OpUpdateOne, withTopicID(id))
-	return &TopicUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *ThreadClient) UpdateOneID(id int) *ThreadUpdateOne {
+	mutation := newThreadMutation(c.config, OpUpdateOne, withThreadID(id))
+	return &ThreadUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Delete returns a delete builder for Topic.
-func (c *TopicClient) Delete() *TopicDelete {
-	mutation := newTopicMutation(c.config, OpDelete)
-	return &TopicDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Delete returns a delete builder for Thread.
+func (c *ThreadClient) Delete() *ThreadDelete {
+	mutation := newThreadMutation(c.config, OpDelete)
+	return &ThreadDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *TopicClient) DeleteOne(t *Topic) *TopicDeleteOne {
+func (c *ThreadClient) DeleteOne(t *Thread) *ThreadDeleteOne {
 	return c.DeleteOneID(t.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *TopicClient) DeleteOneID(id int) *TopicDeleteOne {
-	builder := c.Delete().Where(topic.ID(id))
+func (c *ThreadClient) DeleteOneID(id int) *ThreadDeleteOne {
+	builder := c.Delete().Where(thread.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
-	return &TopicDeleteOne{builder}
+	return &ThreadDeleteOne{builder}
 }
 
-// Query returns a query builder for Topic.
-func (c *TopicClient) Query() *TopicQuery {
-	return &TopicQuery{
+// Query returns a query builder for Thread.
+func (c *ThreadClient) Query() *ThreadQuery {
+	return &ThreadQuery{
 		config: c.config,
-		ctx:    &QueryContext{Type: TypeTopic},
+		ctx:    &QueryContext{Type: TypeThread},
 		inters: c.Interceptors(),
 	}
 }
 
-// Get returns a Topic entity by its id.
-func (c *TopicClient) Get(ctx context.Context, id int) (*Topic, error) {
-	return c.Query().Where(topic.ID(id)).Only(ctx)
+// Get returns a Thread entity by its id.
+func (c *ThreadClient) Get(ctx context.Context, id int) (*Thread, error) {
+	return c.Query().Where(thread.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *TopicClient) GetX(ctx context.Context, id int) *Topic {
+func (c *ThreadClient) GetX(ctx context.Context, id int) *Thread {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -1196,15 +1196,15 @@ func (c *TopicClient) GetX(ctx context.Context, id int) *Topic {
 	return obj
 }
 
-// QueryForum queries the forum edge of a Topic.
-func (c *TopicClient) QueryForum(t *Topic) *ForumQuery {
-	query := (&ForumClient{config: c.config}).Query()
+// QueryBoard queries the board edge of a Thread.
+func (c *ThreadClient) QueryBoard(t *Thread) *BoardQuery {
+	query := (&BoardClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := t.ID
 		step := sqlgraph.NewStep(
-			sqlgraph.From(topic.Table, topic.FieldID, id),
-			sqlgraph.To(forum.Table, forum.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, topic.ForumTable, topic.ForumColumn),
+			sqlgraph.From(thread.Table, thread.FieldID, id),
+			sqlgraph.To(board.Table, board.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, thread.BoardTable, thread.BoardColumn),
 		)
 		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
 		return fromV, nil
@@ -1212,15 +1212,15 @@ func (c *TopicClient) QueryForum(t *Topic) *ForumQuery {
 	return query
 }
 
-// QueryOwner queries the owner edge of a Topic.
-func (c *TopicClient) QueryOwner(t *Topic) *UserQuery {
+// QueryOwner queries the owner edge of a Thread.
+func (c *ThreadClient) QueryOwner(t *Thread) *UserQuery {
 	query := (&UserClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := t.ID
 		step := sqlgraph.NewStep(
-			sqlgraph.From(topic.Table, topic.FieldID, id),
+			sqlgraph.From(thread.Table, thread.FieldID, id),
 			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, topic.OwnerTable, topic.OwnerColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, thread.OwnerTable, thread.OwnerColumn),
 		)
 		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
 		return fromV, nil
@@ -1228,15 +1228,15 @@ func (c *TopicClient) QueryOwner(t *Topic) *UserQuery {
 	return query
 }
 
-// QueryComments queries the comments edge of a Topic.
-func (c *TopicClient) QueryComments(t *Topic) *CommentQuery {
+// QueryComments queries the comments edge of a Thread.
+func (c *ThreadClient) QueryComments(t *Thread) *CommentQuery {
 	query := (&CommentClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := t.ID
 		step := sqlgraph.NewStep(
-			sqlgraph.From(topic.Table, topic.FieldID, id),
+			sqlgraph.From(thread.Table, thread.FieldID, id),
 			sqlgraph.To(comment.Table, comment.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, topic.CommentsTable, topic.CommentsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, thread.CommentsTable, thread.CommentsColumn),
 		)
 		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
 		return fromV, nil
@@ -1244,15 +1244,15 @@ func (c *TopicClient) QueryComments(t *Topic) *CommentQuery {
 	return query
 }
 
-// QueryTags queries the tags edge of a Topic.
-func (c *TopicClient) QueryTags(t *Topic) *TopicTagQuery {
-	query := (&TopicTagClient{config: c.config}).Query()
+// QueryTags queries the tags edge of a Thread.
+func (c *ThreadClient) QueryTags(t *Thread) *ThreadTagQuery {
+	query := (&ThreadTagClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := t.ID
 		step := sqlgraph.NewStep(
-			sqlgraph.From(topic.Table, topic.FieldID, id),
-			sqlgraph.To(topictag.Table, topictag.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, topic.TagsTable, topic.TagsPrimaryKey...),
+			sqlgraph.From(thread.Table, thread.FieldID, id),
+			sqlgraph.To(threadtag.Table, threadtag.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, thread.TagsTable, thread.TagsPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
 		return fromV, nil
@@ -1260,15 +1260,15 @@ func (c *TopicClient) QueryTags(t *Topic) *TopicTagQuery {
 	return query
 }
 
-// QueryLikedUsers queries the liked_users edge of a Topic.
-func (c *TopicClient) QueryLikedUsers(t *Topic) *UserQuery {
+// QueryLikedUsers queries the liked_users edge of a Thread.
+func (c *ThreadClient) QueryLikedUsers(t *Thread) *UserQuery {
 	query := (&UserClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := t.ID
 		step := sqlgraph.NewStep(
-			sqlgraph.From(topic.Table, topic.FieldID, id),
+			sqlgraph.From(thread.Table, thread.FieldID, id),
 			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, topic.LikedUsersTable, topic.LikedUsersPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, true, thread.LikedUsersTable, thread.LikedUsersPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
 		return fromV, nil
@@ -1276,15 +1276,15 @@ func (c *TopicClient) QueryLikedUsers(t *Topic) *UserQuery {
 	return query
 }
 
-// QuerySubscribedUsers queries the subscribed_users edge of a Topic.
-func (c *TopicClient) QuerySubscribedUsers(t *Topic) *UserQuery {
+// QuerySubscribedUsers queries the subscribed_users edge of a Thread.
+func (c *ThreadClient) QuerySubscribedUsers(t *Thread) *UserQuery {
 	query := (&UserClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := t.ID
 		step := sqlgraph.NewStep(
-			sqlgraph.From(topic.Table, topic.FieldID, id),
+			sqlgraph.From(thread.Table, thread.FieldID, id),
 			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, topic.SubscribedUsersTable, topic.SubscribedUsersPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, true, thread.SubscribedUsersTable, thread.SubscribedUsersPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
 		return fromV, nil
@@ -1292,15 +1292,15 @@ func (c *TopicClient) QuerySubscribedUsers(t *Topic) *UserQuery {
 	return query
 }
 
-// QueryTopicTaggings queries the topic_taggings edge of a Topic.
-func (c *TopicClient) QueryTopicTaggings(t *Topic) *TopicTaggingQuery {
-	query := (&TopicTaggingClient{config: c.config}).Query()
+// QueryThreadTaggings queries the thread_taggings edge of a Thread.
+func (c *ThreadClient) QueryThreadTaggings(t *Thread) *ThreadTaggingQuery {
+	query := (&ThreadTaggingClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := t.ID
 		step := sqlgraph.NewStep(
-			sqlgraph.From(topic.Table, topic.FieldID, id),
-			sqlgraph.To(topictagging.Table, topictagging.TopicColumn),
-			sqlgraph.Edge(sqlgraph.O2M, true, topic.TopicTaggingsTable, topic.TopicTaggingsColumn),
+			sqlgraph.From(thread.Table, thread.FieldID, id),
+			sqlgraph.To(threadtagging.Table, threadtagging.ThreadColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, thread.ThreadTaggingsTable, thread.ThreadTaggingsColumn),
 		)
 		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
 		return fromV, nil
@@ -1308,15 +1308,15 @@ func (c *TopicClient) QueryTopicTaggings(t *Topic) *TopicTaggingQuery {
 	return query
 }
 
-// QueryUserTopicLike queries the user_topic_like edge of a Topic.
-func (c *TopicClient) QueryUserTopicLike(t *Topic) *UserTopicLikeQuery {
-	query := (&UserTopicLikeClient{config: c.config}).Query()
+// QueryUserThreadLike queries the user_thread_like edge of a Thread.
+func (c *ThreadClient) QueryUserThreadLike(t *Thread) *UserThreadLikeQuery {
+	query := (&UserThreadLikeClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := t.ID
 		step := sqlgraph.NewStep(
-			sqlgraph.From(topic.Table, topic.FieldID, id),
-			sqlgraph.To(usertopiclike.Table, usertopiclike.TopicColumn),
-			sqlgraph.Edge(sqlgraph.O2M, true, topic.UserTopicLikeTable, topic.UserTopicLikeColumn),
+			sqlgraph.From(thread.Table, thread.FieldID, id),
+			sqlgraph.To(userthreadlike.Table, userthreadlike.ThreadColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, thread.UserThreadLikeTable, thread.UserThreadLikeColumn),
 		)
 		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
 		return fromV, nil
@@ -1324,15 +1324,15 @@ func (c *TopicClient) QueryUserTopicLike(t *Topic) *UserTopicLikeQuery {
 	return query
 }
 
-// QueryUserTopicSubscription queries the user_topic_subscription edge of a Topic.
-func (c *TopicClient) QueryUserTopicSubscription(t *Topic) *UserTopicSubscriptionQuery {
-	query := (&UserTopicSubscriptionClient{config: c.config}).Query()
+// QueryUserThreadSubscription queries the user_thread_subscription edge of a Thread.
+func (c *ThreadClient) QueryUserThreadSubscription(t *Thread) *UserThreadSubscriptionQuery {
+	query := (&UserThreadSubscriptionClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := t.ID
 		step := sqlgraph.NewStep(
-			sqlgraph.From(topic.Table, topic.FieldID, id),
-			sqlgraph.To(usertopicsubscription.Table, usertopicsubscription.TopicColumn),
-			sqlgraph.Edge(sqlgraph.O2M, true, topic.UserTopicSubscriptionTable, topic.UserTopicSubscriptionColumn),
+			sqlgraph.From(thread.Table, thread.FieldID, id),
+			sqlgraph.To(userthreadsubscription.Table, userthreadsubscription.ThreadColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, thread.UserThreadSubscriptionTable, thread.UserThreadSubscriptionColumn),
 		)
 		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
 		return fromV, nil
@@ -1341,131 +1341,131 @@ func (c *TopicClient) QueryUserTopicSubscription(t *Topic) *UserTopicSubscriptio
 }
 
 // Hooks returns the client hooks.
-func (c *TopicClient) Hooks() []Hook {
-	return c.hooks.Topic
+func (c *ThreadClient) Hooks() []Hook {
+	return c.hooks.Thread
 }
 
 // Interceptors returns the client interceptors.
-func (c *TopicClient) Interceptors() []Interceptor {
-	return c.inters.Topic
+func (c *ThreadClient) Interceptors() []Interceptor {
+	return c.inters.Thread
 }
 
-func (c *TopicClient) mutate(ctx context.Context, m *TopicMutation) (Value, error) {
+func (c *ThreadClient) mutate(ctx context.Context, m *ThreadMutation) (Value, error) {
 	switch m.Op() {
 	case OpCreate:
-		return (&TopicCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&ThreadCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdate:
-		return (&TopicUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&ThreadUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdateOne:
-		return (&TopicUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&ThreadUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpDelete, OpDeleteOne:
-		return (&TopicDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+		return (&ThreadDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
-		return nil, fmt.Errorf("ent: unknown Topic mutation op: %q", m.Op())
+		return nil, fmt.Errorf("ent: unknown Thread mutation op: %q", m.Op())
 	}
 }
 
-// TopicTagClient is a client for the TopicTag schema.
-type TopicTagClient struct {
+// ThreadTagClient is a client for the ThreadTag schema.
+type ThreadTagClient struct {
 	config
 }
 
-// NewTopicTagClient returns a client for the TopicTag from the given config.
-func NewTopicTagClient(c config) *TopicTagClient {
-	return &TopicTagClient{config: c}
+// NewThreadTagClient returns a client for the ThreadTag from the given config.
+func NewThreadTagClient(c config) *ThreadTagClient {
+	return &ThreadTagClient{config: c}
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `topictag.Hooks(f(g(h())))`.
-func (c *TopicTagClient) Use(hooks ...Hook) {
-	c.hooks.TopicTag = append(c.hooks.TopicTag, hooks...)
+// A call to `Use(f, g, h)` equals to `threadtag.Hooks(f(g(h())))`.
+func (c *ThreadTagClient) Use(hooks ...Hook) {
+	c.hooks.ThreadTag = append(c.hooks.ThreadTag, hooks...)
 }
 
 // Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `topictag.Intercept(f(g(h())))`.
-func (c *TopicTagClient) Intercept(interceptors ...Interceptor) {
-	c.inters.TopicTag = append(c.inters.TopicTag, interceptors...)
+// A call to `Intercept(f, g, h)` equals to `threadtag.Intercept(f(g(h())))`.
+func (c *ThreadTagClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ThreadTag = append(c.inters.ThreadTag, interceptors...)
 }
 
-// Create returns a builder for creating a TopicTag entity.
-func (c *TopicTagClient) Create() *TopicTagCreate {
-	mutation := newTopicTagMutation(c.config, OpCreate)
-	return &TopicTagCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Create returns a builder for creating a ThreadTag entity.
+func (c *ThreadTagClient) Create() *ThreadTagCreate {
+	mutation := newThreadTagMutation(c.config, OpCreate)
+	return &ThreadTagCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// CreateBulk returns a builder for creating a bulk of TopicTag entities.
-func (c *TopicTagClient) CreateBulk(builders ...*TopicTagCreate) *TopicTagCreateBulk {
-	return &TopicTagCreateBulk{config: c.config, builders: builders}
+// CreateBulk returns a builder for creating a bulk of ThreadTag entities.
+func (c *ThreadTagClient) CreateBulk(builders ...*ThreadTagCreate) *ThreadTagCreateBulk {
+	return &ThreadTagCreateBulk{config: c.config, builders: builders}
 }
 
 // MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
 // a builder and applies setFunc on it.
-func (c *TopicTagClient) MapCreateBulk(slice any, setFunc func(*TopicTagCreate, int)) *TopicTagCreateBulk {
+func (c *ThreadTagClient) MapCreateBulk(slice any, setFunc func(*ThreadTagCreate, int)) *ThreadTagCreateBulk {
 	rv := reflect.ValueOf(slice)
 	if rv.Kind() != reflect.Slice {
-		return &TopicTagCreateBulk{err: fmt.Errorf("calling to TopicTagClient.MapCreateBulk with wrong type %T, need slice", slice)}
+		return &ThreadTagCreateBulk{err: fmt.Errorf("calling to ThreadTagClient.MapCreateBulk with wrong type %T, need slice", slice)}
 	}
-	builders := make([]*TopicTagCreate, rv.Len())
+	builders := make([]*ThreadTagCreate, rv.Len())
 	for i := 0; i < rv.Len(); i++ {
 		builders[i] = c.Create()
 		setFunc(builders[i], i)
 	}
-	return &TopicTagCreateBulk{config: c.config, builders: builders}
+	return &ThreadTagCreateBulk{config: c.config, builders: builders}
 }
 
-// Update returns an update builder for TopicTag.
-func (c *TopicTagClient) Update() *TopicTagUpdate {
-	mutation := newTopicTagMutation(c.config, OpUpdate)
-	return &TopicTagUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Update returns an update builder for ThreadTag.
+func (c *ThreadTagClient) Update() *ThreadTagUpdate {
+	mutation := newThreadTagMutation(c.config, OpUpdate)
+	return &ThreadTagUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *TopicTagClient) UpdateOne(tt *TopicTag) *TopicTagUpdateOne {
-	mutation := newTopicTagMutation(c.config, OpUpdateOne, withTopicTag(tt))
-	return &TopicTagUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *ThreadTagClient) UpdateOne(tt *ThreadTag) *ThreadTagUpdateOne {
+	mutation := newThreadTagMutation(c.config, OpUpdateOne, withThreadTag(tt))
+	return &ThreadTagUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *TopicTagClient) UpdateOneID(id int) *TopicTagUpdateOne {
-	mutation := newTopicTagMutation(c.config, OpUpdateOne, withTopicTagID(id))
-	return &TopicTagUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *ThreadTagClient) UpdateOneID(id int) *ThreadTagUpdateOne {
+	mutation := newThreadTagMutation(c.config, OpUpdateOne, withThreadTagID(id))
+	return &ThreadTagUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Delete returns a delete builder for TopicTag.
-func (c *TopicTagClient) Delete() *TopicTagDelete {
-	mutation := newTopicTagMutation(c.config, OpDelete)
-	return &TopicTagDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Delete returns a delete builder for ThreadTag.
+func (c *ThreadTagClient) Delete() *ThreadTagDelete {
+	mutation := newThreadTagMutation(c.config, OpDelete)
+	return &ThreadTagDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *TopicTagClient) DeleteOne(tt *TopicTag) *TopicTagDeleteOne {
+func (c *ThreadTagClient) DeleteOne(tt *ThreadTag) *ThreadTagDeleteOne {
 	return c.DeleteOneID(tt.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *TopicTagClient) DeleteOneID(id int) *TopicTagDeleteOne {
-	builder := c.Delete().Where(topictag.ID(id))
+func (c *ThreadTagClient) DeleteOneID(id int) *ThreadTagDeleteOne {
+	builder := c.Delete().Where(threadtag.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
-	return &TopicTagDeleteOne{builder}
+	return &ThreadTagDeleteOne{builder}
 }
 
-// Query returns a query builder for TopicTag.
-func (c *TopicTagClient) Query() *TopicTagQuery {
-	return &TopicTagQuery{
+// Query returns a query builder for ThreadTag.
+func (c *ThreadTagClient) Query() *ThreadTagQuery {
+	return &ThreadTagQuery{
 		config: c.config,
-		ctx:    &QueryContext{Type: TypeTopicTag},
+		ctx:    &QueryContext{Type: TypeThreadTag},
 		inters: c.Interceptors(),
 	}
 }
 
-// Get returns a TopicTag entity by its id.
-func (c *TopicTagClient) Get(ctx context.Context, id int) (*TopicTag, error) {
-	return c.Query().Where(topictag.ID(id)).Only(ctx)
+// Get returns a ThreadTag entity by its id.
+func (c *ThreadTagClient) Get(ctx context.Context, id int) (*ThreadTag, error) {
+	return c.Query().Where(threadtag.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *TopicTagClient) GetX(ctx context.Context, id int) *TopicTag {
+func (c *ThreadTagClient) GetX(ctx context.Context, id int) *ThreadTag {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -1473,15 +1473,15 @@ func (c *TopicTagClient) GetX(ctx context.Context, id int) *TopicTag {
 	return obj
 }
 
-// QueryTopics queries the topics edge of a TopicTag.
-func (c *TopicTagClient) QueryTopics(tt *TopicTag) *TopicQuery {
-	query := (&TopicClient{config: c.config}).Query()
+// QueryThreads queries the threads edge of a ThreadTag.
+func (c *ThreadTagClient) QueryThreads(tt *ThreadTag) *ThreadQuery {
+	query := (&ThreadClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := tt.ID
 		step := sqlgraph.NewStep(
-			sqlgraph.From(topictag.Table, topictag.FieldID, id),
-			sqlgraph.To(topic.Table, topic.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, topictag.TopicsTable, topictag.TopicsPrimaryKey...),
+			sqlgraph.From(threadtag.Table, threadtag.FieldID, id),
+			sqlgraph.To(thread.Table, thread.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, threadtag.ThreadsTable, threadtag.ThreadsPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(tt.driver.Dialect(), step)
 		return fromV, nil
@@ -1489,15 +1489,15 @@ func (c *TopicTagClient) QueryTopics(tt *TopicTag) *TopicQuery {
 	return query
 }
 
-// QueryTopicTaggings queries the topic_taggings edge of a TopicTag.
-func (c *TopicTagClient) QueryTopicTaggings(tt *TopicTag) *TopicTaggingQuery {
-	query := (&TopicTaggingClient{config: c.config}).Query()
+// QueryThreadTaggings queries the thread_taggings edge of a ThreadTag.
+func (c *ThreadTagClient) QueryThreadTaggings(tt *ThreadTag) *ThreadTaggingQuery {
+	query := (&ThreadTaggingClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := tt.ID
 		step := sqlgraph.NewStep(
-			sqlgraph.From(topictag.Table, topictag.FieldID, id),
-			sqlgraph.To(topictagging.Table, topictagging.TagColumn),
-			sqlgraph.Edge(sqlgraph.O2M, true, topictag.TopicTaggingsTable, topictag.TopicTaggingsColumn),
+			sqlgraph.From(threadtag.Table, threadtag.FieldID, id),
+			sqlgraph.To(threadtagging.Table, threadtagging.TagColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, threadtag.ThreadTaggingsTable, threadtag.ThreadTaggingsColumn),
 		)
 		fromV = sqlgraph.Neighbors(tt.driver.Dialect(), step)
 		return fromV, nil
@@ -1506,143 +1506,143 @@ func (c *TopicTagClient) QueryTopicTaggings(tt *TopicTag) *TopicTaggingQuery {
 }
 
 // Hooks returns the client hooks.
-func (c *TopicTagClient) Hooks() []Hook {
-	return c.hooks.TopicTag
+func (c *ThreadTagClient) Hooks() []Hook {
+	return c.hooks.ThreadTag
 }
 
 // Interceptors returns the client interceptors.
-func (c *TopicTagClient) Interceptors() []Interceptor {
-	return c.inters.TopicTag
+func (c *ThreadTagClient) Interceptors() []Interceptor {
+	return c.inters.ThreadTag
 }
 
-func (c *TopicTagClient) mutate(ctx context.Context, m *TopicTagMutation) (Value, error) {
+func (c *ThreadTagClient) mutate(ctx context.Context, m *ThreadTagMutation) (Value, error) {
 	switch m.Op() {
 	case OpCreate:
-		return (&TopicTagCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&ThreadTagCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdate:
-		return (&TopicTagUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&ThreadTagUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdateOne:
-		return (&TopicTagUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&ThreadTagUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpDelete, OpDeleteOne:
-		return (&TopicTagDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+		return (&ThreadTagDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
-		return nil, fmt.Errorf("ent: unknown TopicTag mutation op: %q", m.Op())
+		return nil, fmt.Errorf("ent: unknown ThreadTag mutation op: %q", m.Op())
 	}
 }
 
-// TopicTaggingClient is a client for the TopicTagging schema.
-type TopicTaggingClient struct {
+// ThreadTaggingClient is a client for the ThreadTagging schema.
+type ThreadTaggingClient struct {
 	config
 }
 
-// NewTopicTaggingClient returns a client for the TopicTagging from the given config.
-func NewTopicTaggingClient(c config) *TopicTaggingClient {
-	return &TopicTaggingClient{config: c}
+// NewThreadTaggingClient returns a client for the ThreadTagging from the given config.
+func NewThreadTaggingClient(c config) *ThreadTaggingClient {
+	return &ThreadTaggingClient{config: c}
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `topictagging.Hooks(f(g(h())))`.
-func (c *TopicTaggingClient) Use(hooks ...Hook) {
-	c.hooks.TopicTagging = append(c.hooks.TopicTagging, hooks...)
+// A call to `Use(f, g, h)` equals to `threadtagging.Hooks(f(g(h())))`.
+func (c *ThreadTaggingClient) Use(hooks ...Hook) {
+	c.hooks.ThreadTagging = append(c.hooks.ThreadTagging, hooks...)
 }
 
 // Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `topictagging.Intercept(f(g(h())))`.
-func (c *TopicTaggingClient) Intercept(interceptors ...Interceptor) {
-	c.inters.TopicTagging = append(c.inters.TopicTagging, interceptors...)
+// A call to `Intercept(f, g, h)` equals to `threadtagging.Intercept(f(g(h())))`.
+func (c *ThreadTaggingClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ThreadTagging = append(c.inters.ThreadTagging, interceptors...)
 }
 
-// Create returns a builder for creating a TopicTagging entity.
-func (c *TopicTaggingClient) Create() *TopicTaggingCreate {
-	mutation := newTopicTaggingMutation(c.config, OpCreate)
-	return &TopicTaggingCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Create returns a builder for creating a ThreadTagging entity.
+func (c *ThreadTaggingClient) Create() *ThreadTaggingCreate {
+	mutation := newThreadTaggingMutation(c.config, OpCreate)
+	return &ThreadTaggingCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// CreateBulk returns a builder for creating a bulk of TopicTagging entities.
-func (c *TopicTaggingClient) CreateBulk(builders ...*TopicTaggingCreate) *TopicTaggingCreateBulk {
-	return &TopicTaggingCreateBulk{config: c.config, builders: builders}
+// CreateBulk returns a builder for creating a bulk of ThreadTagging entities.
+func (c *ThreadTaggingClient) CreateBulk(builders ...*ThreadTaggingCreate) *ThreadTaggingCreateBulk {
+	return &ThreadTaggingCreateBulk{config: c.config, builders: builders}
 }
 
 // MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
 // a builder and applies setFunc on it.
-func (c *TopicTaggingClient) MapCreateBulk(slice any, setFunc func(*TopicTaggingCreate, int)) *TopicTaggingCreateBulk {
+func (c *ThreadTaggingClient) MapCreateBulk(slice any, setFunc func(*ThreadTaggingCreate, int)) *ThreadTaggingCreateBulk {
 	rv := reflect.ValueOf(slice)
 	if rv.Kind() != reflect.Slice {
-		return &TopicTaggingCreateBulk{err: fmt.Errorf("calling to TopicTaggingClient.MapCreateBulk with wrong type %T, need slice", slice)}
+		return &ThreadTaggingCreateBulk{err: fmt.Errorf("calling to ThreadTaggingClient.MapCreateBulk with wrong type %T, need slice", slice)}
 	}
-	builders := make([]*TopicTaggingCreate, rv.Len())
+	builders := make([]*ThreadTaggingCreate, rv.Len())
 	for i := 0; i < rv.Len(); i++ {
 		builders[i] = c.Create()
 		setFunc(builders[i], i)
 	}
-	return &TopicTaggingCreateBulk{config: c.config, builders: builders}
+	return &ThreadTaggingCreateBulk{config: c.config, builders: builders}
 }
 
-// Update returns an update builder for TopicTagging.
-func (c *TopicTaggingClient) Update() *TopicTaggingUpdate {
-	mutation := newTopicTaggingMutation(c.config, OpUpdate)
-	return &TopicTaggingUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Update returns an update builder for ThreadTagging.
+func (c *ThreadTaggingClient) Update() *ThreadTaggingUpdate {
+	mutation := newThreadTaggingMutation(c.config, OpUpdate)
+	return &ThreadTaggingUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *TopicTaggingClient) UpdateOne(tt *TopicTagging) *TopicTaggingUpdateOne {
-	mutation := newTopicTaggingMutation(c.config, OpUpdateOne)
-	mutation.topic = &tt.TopicId
+func (c *ThreadTaggingClient) UpdateOne(tt *ThreadTagging) *ThreadTaggingUpdateOne {
+	mutation := newThreadTaggingMutation(c.config, OpUpdateOne)
+	mutation.thread = &tt.ThreadId
 	mutation.tag = &tt.TagId
-	return &TopicTaggingUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+	return &ThreadTaggingUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Delete returns a delete builder for TopicTagging.
-func (c *TopicTaggingClient) Delete() *TopicTaggingDelete {
-	mutation := newTopicTaggingMutation(c.config, OpDelete)
-	return &TopicTaggingDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Delete returns a delete builder for ThreadTagging.
+func (c *ThreadTaggingClient) Delete() *ThreadTaggingDelete {
+	mutation := newThreadTaggingMutation(c.config, OpDelete)
+	return &ThreadTaggingDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Query returns a query builder for TopicTagging.
-func (c *TopicTaggingClient) Query() *TopicTaggingQuery {
-	return &TopicTaggingQuery{
+// Query returns a query builder for ThreadTagging.
+func (c *ThreadTaggingClient) Query() *ThreadTaggingQuery {
+	return &ThreadTaggingQuery{
 		config: c.config,
-		ctx:    &QueryContext{Type: TypeTopicTagging},
+		ctx:    &QueryContext{Type: TypeThreadTagging},
 		inters: c.Interceptors(),
 	}
 }
 
-// QueryTopic queries the topic edge of a TopicTagging.
-func (c *TopicTaggingClient) QueryTopic(tt *TopicTagging) *TopicQuery {
+// QueryThread queries the thread edge of a ThreadTagging.
+func (c *ThreadTaggingClient) QueryThread(tt *ThreadTagging) *ThreadQuery {
 	return c.Query().
-		Where(topictagging.TopicId(tt.TopicId), topictagging.TagId(tt.TagId)).
-		QueryTopic()
+		Where(threadtagging.ThreadId(tt.ThreadId), threadtagging.TagId(tt.TagId)).
+		QueryThread()
 }
 
-// QueryTag queries the tag edge of a TopicTagging.
-func (c *TopicTaggingClient) QueryTag(tt *TopicTagging) *TopicTagQuery {
+// QueryTag queries the tag edge of a ThreadTagging.
+func (c *ThreadTaggingClient) QueryTag(tt *ThreadTagging) *ThreadTagQuery {
 	return c.Query().
-		Where(topictagging.TopicId(tt.TopicId), topictagging.TagId(tt.TagId)).
+		Where(threadtagging.ThreadId(tt.ThreadId), threadtagging.TagId(tt.TagId)).
 		QueryTag()
 }
 
 // Hooks returns the client hooks.
-func (c *TopicTaggingClient) Hooks() []Hook {
-	return c.hooks.TopicTagging
+func (c *ThreadTaggingClient) Hooks() []Hook {
+	return c.hooks.ThreadTagging
 }
 
 // Interceptors returns the client interceptors.
-func (c *TopicTaggingClient) Interceptors() []Interceptor {
-	return c.inters.TopicTagging
+func (c *ThreadTaggingClient) Interceptors() []Interceptor {
+	return c.inters.ThreadTagging
 }
 
-func (c *TopicTaggingClient) mutate(ctx context.Context, m *TopicTaggingMutation) (Value, error) {
+func (c *ThreadTaggingClient) mutate(ctx context.Context, m *ThreadTaggingMutation) (Value, error) {
 	switch m.Op() {
 	case OpCreate:
-		return (&TopicTaggingCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&ThreadTaggingCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdate:
-		return (&TopicTaggingUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&ThreadTaggingUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdateOne:
-		return (&TopicTaggingUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&ThreadTaggingUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpDelete, OpDeleteOne:
-		return (&TopicTaggingDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+		return (&ThreadTaggingDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
-		return nil, fmt.Errorf("ent: unknown TopicTagging mutation op: %q", m.Op())
+		return nil, fmt.Errorf("ent: unknown ThreadTagging mutation op: %q", m.Op())
 	}
 }
 
@@ -1754,15 +1754,15 @@ func (c *UserClient) GetX(ctx context.Context, id int) *User {
 	return obj
 }
 
-// QueryForums queries the forums edge of a User.
-func (c *UserClient) QueryForums(u *User) *ForumQuery {
-	query := (&ForumClient{config: c.config}).Query()
+// QueryBoards queries the boards edge of a User.
+func (c *UserClient) QueryBoards(u *User) *BoardQuery {
+	query := (&BoardClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := u.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, id),
-			sqlgraph.To(forum.Table, forum.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, user.ForumsTable, user.ForumsColumn),
+			sqlgraph.To(board.Table, board.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.BoardsTable, user.BoardsColumn),
 		)
 		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
 		return fromV, nil
@@ -1770,15 +1770,15 @@ func (c *UserClient) QueryForums(u *User) *ForumQuery {
 	return query
 }
 
-// QueryTopics queries the topics edge of a User.
-func (c *UserClient) QueryTopics(u *User) *TopicQuery {
-	query := (&TopicClient{config: c.config}).Query()
+// QueryThreads queries the threads edge of a User.
+func (c *UserClient) QueryThreads(u *User) *ThreadQuery {
+	query := (&ThreadClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := u.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, id),
-			sqlgraph.To(topic.Table, topic.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, user.TopicsTable, user.TopicsColumn),
+			sqlgraph.To(thread.Table, thread.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.ThreadsTable, user.ThreadsColumn),
 		)
 		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
 		return fromV, nil
@@ -1802,15 +1802,15 @@ func (c *UserClient) QueryComments(u *User) *CommentQuery {
 	return query
 }
 
-// QueryLikedForums queries the liked_forums edge of a User.
-func (c *UserClient) QueryLikedForums(u *User) *ForumQuery {
-	query := (&ForumClient{config: c.config}).Query()
+// QueryLikedBoards queries the liked_boards edge of a User.
+func (c *UserClient) QueryLikedBoards(u *User) *BoardQuery {
+	query := (&BoardClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := u.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, id),
-			sqlgraph.To(forum.Table, forum.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, user.LikedForumsTable, user.LikedForumsPrimaryKey...),
+			sqlgraph.To(board.Table, board.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, user.LikedBoardsTable, user.LikedBoardsPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
 		return fromV, nil
@@ -1818,15 +1818,15 @@ func (c *UserClient) QueryLikedForums(u *User) *ForumQuery {
 	return query
 }
 
-// QueryLikedTopics queries the liked_topics edge of a User.
-func (c *UserClient) QueryLikedTopics(u *User) *TopicQuery {
-	query := (&TopicClient{config: c.config}).Query()
+// QueryLikedThreads queries the liked_threads edge of a User.
+func (c *UserClient) QueryLikedThreads(u *User) *ThreadQuery {
+	query := (&ThreadClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := u.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, id),
-			sqlgraph.To(topic.Table, topic.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, user.LikedTopicsTable, user.LikedTopicsPrimaryKey...),
+			sqlgraph.To(thread.Table, thread.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, user.LikedThreadsTable, user.LikedThreadsPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
 		return fromV, nil
@@ -1850,15 +1850,15 @@ func (c *UserClient) QueryLikedComments(u *User) *CommentQuery {
 	return query
 }
 
-// QuerySubscribedForums queries the subscribed_forums edge of a User.
-func (c *UserClient) QuerySubscribedForums(u *User) *ForumQuery {
-	query := (&ForumClient{config: c.config}).Query()
+// QuerySubscribedBoards queries the subscribed_boards edge of a User.
+func (c *UserClient) QuerySubscribedBoards(u *User) *BoardQuery {
+	query := (&BoardClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := u.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, id),
-			sqlgraph.To(forum.Table, forum.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, user.SubscribedForumsTable, user.SubscribedForumsPrimaryKey...),
+			sqlgraph.To(board.Table, board.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, user.SubscribedBoardsTable, user.SubscribedBoardsPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
 		return fromV, nil
@@ -1866,15 +1866,15 @@ func (c *UserClient) QuerySubscribedForums(u *User) *ForumQuery {
 	return query
 }
 
-// QuerySubscribedTopics queries the subscribed_topics edge of a User.
-func (c *UserClient) QuerySubscribedTopics(u *User) *TopicQuery {
-	query := (&TopicClient{config: c.config}).Query()
+// QuerySubscribedThreads queries the subscribed_threads edge of a User.
+func (c *UserClient) QuerySubscribedThreads(u *User) *ThreadQuery {
+	query := (&ThreadClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := u.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, id),
-			sqlgraph.To(topic.Table, topic.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, user.SubscribedTopicsTable, user.SubscribedTopicsPrimaryKey...),
+			sqlgraph.To(thread.Table, thread.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, user.SubscribedThreadsTable, user.SubscribedThreadsPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
 		return fromV, nil
@@ -1898,15 +1898,15 @@ func (c *UserClient) QuerySubscribedComments(u *User) *CommentQuery {
 	return query
 }
 
-// QueryUserForumLike queries the user_forum_like edge of a User.
-func (c *UserClient) QueryUserForumLike(u *User) *UserForumLikeQuery {
-	query := (&UserForumLikeClient{config: c.config}).Query()
+// QueryUserBoardLike queries the user_board_like edge of a User.
+func (c *UserClient) QueryUserBoardLike(u *User) *UserBoardLikeQuery {
+	query := (&UserBoardLikeClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := u.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, id),
-			sqlgraph.To(userforumlike.Table, userforumlike.UserColumn),
-			sqlgraph.Edge(sqlgraph.O2M, true, user.UserForumLikeTable, user.UserForumLikeColumn),
+			sqlgraph.To(userboardlike.Table, userboardlike.UserColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, user.UserBoardLikeTable, user.UserBoardLikeColumn),
 		)
 		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
 		return fromV, nil
@@ -1914,15 +1914,15 @@ func (c *UserClient) QueryUserForumLike(u *User) *UserForumLikeQuery {
 	return query
 }
 
-// QueryUserTopicLike queries the user_topic_like edge of a User.
-func (c *UserClient) QueryUserTopicLike(u *User) *UserTopicLikeQuery {
-	query := (&UserTopicLikeClient{config: c.config}).Query()
+// QueryUserThreadLike queries the user_thread_like edge of a User.
+func (c *UserClient) QueryUserThreadLike(u *User) *UserThreadLikeQuery {
+	query := (&UserThreadLikeClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := u.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, id),
-			sqlgraph.To(usertopiclike.Table, usertopiclike.UserColumn),
-			sqlgraph.Edge(sqlgraph.O2M, true, user.UserTopicLikeTable, user.UserTopicLikeColumn),
+			sqlgraph.To(userthreadlike.Table, userthreadlike.UserColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, user.UserThreadLikeTable, user.UserThreadLikeColumn),
 		)
 		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
 		return fromV, nil
@@ -1946,15 +1946,15 @@ func (c *UserClient) QueryUserCommentLike(u *User) *UserCommentLikeQuery {
 	return query
 }
 
-// QueryUserForumSubscription queries the user_forum_subscription edge of a User.
-func (c *UserClient) QueryUserForumSubscription(u *User) *UserForumSubscriptionQuery {
-	query := (&UserForumSubscriptionClient{config: c.config}).Query()
+// QueryUserBoardSubscription queries the user_board_subscription edge of a User.
+func (c *UserClient) QueryUserBoardSubscription(u *User) *UserBoardSubscriptionQuery {
+	query := (&UserBoardSubscriptionClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := u.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, id),
-			sqlgraph.To(userforumsubscription.Table, userforumsubscription.UserColumn),
-			sqlgraph.Edge(sqlgraph.O2M, true, user.UserForumSubscriptionTable, user.UserForumSubscriptionColumn),
+			sqlgraph.To(userboardsubscription.Table, userboardsubscription.UserColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, user.UserBoardSubscriptionTable, user.UserBoardSubscriptionColumn),
 		)
 		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
 		return fromV, nil
@@ -1962,15 +1962,15 @@ func (c *UserClient) QueryUserForumSubscription(u *User) *UserForumSubscriptionQ
 	return query
 }
 
-// QueryUserTopicSubscription queries the user_topic_subscription edge of a User.
-func (c *UserClient) QueryUserTopicSubscription(u *User) *UserTopicSubscriptionQuery {
-	query := (&UserTopicSubscriptionClient{config: c.config}).Query()
+// QueryUserThreadSubscription queries the user_thread_subscription edge of a User.
+func (c *UserClient) QueryUserThreadSubscription(u *User) *UserThreadSubscriptionQuery {
+	query := (&UserThreadSubscriptionClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := u.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, id),
-			sqlgraph.To(usertopicsubscription.Table, usertopicsubscription.UserColumn),
-			sqlgraph.Edge(sqlgraph.O2M, true, user.UserTopicSubscriptionTable, user.UserTopicSubscriptionColumn),
+			sqlgraph.To(userthreadsubscription.Table, userthreadsubscription.UserColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, user.UserThreadSubscriptionTable, user.UserThreadSubscriptionColumn),
 		)
 		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
 		return fromV, nil
@@ -2016,6 +2016,238 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 		return (&UserDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown User mutation op: %q", m.Op())
+	}
+}
+
+// UserBoardLikeClient is a client for the UserBoardLike schema.
+type UserBoardLikeClient struct {
+	config
+}
+
+// NewUserBoardLikeClient returns a client for the UserBoardLike from the given config.
+func NewUserBoardLikeClient(c config) *UserBoardLikeClient {
+	return &UserBoardLikeClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `userboardlike.Hooks(f(g(h())))`.
+func (c *UserBoardLikeClient) Use(hooks ...Hook) {
+	c.hooks.UserBoardLike = append(c.hooks.UserBoardLike, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `userboardlike.Intercept(f(g(h())))`.
+func (c *UserBoardLikeClient) Intercept(interceptors ...Interceptor) {
+	c.inters.UserBoardLike = append(c.inters.UserBoardLike, interceptors...)
+}
+
+// Create returns a builder for creating a UserBoardLike entity.
+func (c *UserBoardLikeClient) Create() *UserBoardLikeCreate {
+	mutation := newUserBoardLikeMutation(c.config, OpCreate)
+	return &UserBoardLikeCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of UserBoardLike entities.
+func (c *UserBoardLikeClient) CreateBulk(builders ...*UserBoardLikeCreate) *UserBoardLikeCreateBulk {
+	return &UserBoardLikeCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *UserBoardLikeClient) MapCreateBulk(slice any, setFunc func(*UserBoardLikeCreate, int)) *UserBoardLikeCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &UserBoardLikeCreateBulk{err: fmt.Errorf("calling to UserBoardLikeClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*UserBoardLikeCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &UserBoardLikeCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for UserBoardLike.
+func (c *UserBoardLikeClient) Update() *UserBoardLikeUpdate {
+	mutation := newUserBoardLikeMutation(c.config, OpUpdate)
+	return &UserBoardLikeUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *UserBoardLikeClient) UpdateOne(ubl *UserBoardLike) *UserBoardLikeUpdateOne {
+	mutation := newUserBoardLikeMutation(c.config, OpUpdateOne)
+	mutation.user = &ubl.UserId
+	mutation.board = &ubl.BoardId
+	return &UserBoardLikeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for UserBoardLike.
+func (c *UserBoardLikeClient) Delete() *UserBoardLikeDelete {
+	mutation := newUserBoardLikeMutation(c.config, OpDelete)
+	return &UserBoardLikeDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Query returns a query builder for UserBoardLike.
+func (c *UserBoardLikeClient) Query() *UserBoardLikeQuery {
+	return &UserBoardLikeQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeUserBoardLike},
+		inters: c.Interceptors(),
+	}
+}
+
+// QueryUser queries the user edge of a UserBoardLike.
+func (c *UserBoardLikeClient) QueryUser(ubl *UserBoardLike) *UserQuery {
+	return c.Query().
+		Where(userboardlike.UserId(ubl.UserId), userboardlike.BoardId(ubl.BoardId)).
+		QueryUser()
+}
+
+// QueryBoard queries the board edge of a UserBoardLike.
+func (c *UserBoardLikeClient) QueryBoard(ubl *UserBoardLike) *BoardQuery {
+	return c.Query().
+		Where(userboardlike.UserId(ubl.UserId), userboardlike.BoardId(ubl.BoardId)).
+		QueryBoard()
+}
+
+// Hooks returns the client hooks.
+func (c *UserBoardLikeClient) Hooks() []Hook {
+	return c.hooks.UserBoardLike
+}
+
+// Interceptors returns the client interceptors.
+func (c *UserBoardLikeClient) Interceptors() []Interceptor {
+	return c.inters.UserBoardLike
+}
+
+func (c *UserBoardLikeClient) mutate(ctx context.Context, m *UserBoardLikeMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&UserBoardLikeCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&UserBoardLikeUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&UserBoardLikeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&UserBoardLikeDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown UserBoardLike mutation op: %q", m.Op())
+	}
+}
+
+// UserBoardSubscriptionClient is a client for the UserBoardSubscription schema.
+type UserBoardSubscriptionClient struct {
+	config
+}
+
+// NewUserBoardSubscriptionClient returns a client for the UserBoardSubscription from the given config.
+func NewUserBoardSubscriptionClient(c config) *UserBoardSubscriptionClient {
+	return &UserBoardSubscriptionClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `userboardsubscription.Hooks(f(g(h())))`.
+func (c *UserBoardSubscriptionClient) Use(hooks ...Hook) {
+	c.hooks.UserBoardSubscription = append(c.hooks.UserBoardSubscription, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `userboardsubscription.Intercept(f(g(h())))`.
+func (c *UserBoardSubscriptionClient) Intercept(interceptors ...Interceptor) {
+	c.inters.UserBoardSubscription = append(c.inters.UserBoardSubscription, interceptors...)
+}
+
+// Create returns a builder for creating a UserBoardSubscription entity.
+func (c *UserBoardSubscriptionClient) Create() *UserBoardSubscriptionCreate {
+	mutation := newUserBoardSubscriptionMutation(c.config, OpCreate)
+	return &UserBoardSubscriptionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of UserBoardSubscription entities.
+func (c *UserBoardSubscriptionClient) CreateBulk(builders ...*UserBoardSubscriptionCreate) *UserBoardSubscriptionCreateBulk {
+	return &UserBoardSubscriptionCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *UserBoardSubscriptionClient) MapCreateBulk(slice any, setFunc func(*UserBoardSubscriptionCreate, int)) *UserBoardSubscriptionCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &UserBoardSubscriptionCreateBulk{err: fmt.Errorf("calling to UserBoardSubscriptionClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*UserBoardSubscriptionCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &UserBoardSubscriptionCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for UserBoardSubscription.
+func (c *UserBoardSubscriptionClient) Update() *UserBoardSubscriptionUpdate {
+	mutation := newUserBoardSubscriptionMutation(c.config, OpUpdate)
+	return &UserBoardSubscriptionUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *UserBoardSubscriptionClient) UpdateOne(ubs *UserBoardSubscription) *UserBoardSubscriptionUpdateOne {
+	mutation := newUserBoardSubscriptionMutation(c.config, OpUpdateOne)
+	mutation.user = &ubs.UserId
+	mutation.board = &ubs.BoardId
+	return &UserBoardSubscriptionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for UserBoardSubscription.
+func (c *UserBoardSubscriptionClient) Delete() *UserBoardSubscriptionDelete {
+	mutation := newUserBoardSubscriptionMutation(c.config, OpDelete)
+	return &UserBoardSubscriptionDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Query returns a query builder for UserBoardSubscription.
+func (c *UserBoardSubscriptionClient) Query() *UserBoardSubscriptionQuery {
+	return &UserBoardSubscriptionQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeUserBoardSubscription},
+		inters: c.Interceptors(),
+	}
+}
+
+// QueryUser queries the user edge of a UserBoardSubscription.
+func (c *UserBoardSubscriptionClient) QueryUser(ubs *UserBoardSubscription) *UserQuery {
+	return c.Query().
+		Where(userboardsubscription.UserId(ubs.UserId), userboardsubscription.BoardId(ubs.BoardId)).
+		QueryUser()
+}
+
+// QueryBoard queries the board edge of a UserBoardSubscription.
+func (c *UserBoardSubscriptionClient) QueryBoard(ubs *UserBoardSubscription) *BoardQuery {
+	return c.Query().
+		Where(userboardsubscription.UserId(ubs.UserId), userboardsubscription.BoardId(ubs.BoardId)).
+		QueryBoard()
+}
+
+// Hooks returns the client hooks.
+func (c *UserBoardSubscriptionClient) Hooks() []Hook {
+	return c.hooks.UserBoardSubscription
+}
+
+// Interceptors returns the client interceptors.
+func (c *UserBoardSubscriptionClient) Interceptors() []Interceptor {
+	return c.inters.UserBoardSubscription
+}
+
+func (c *UserBoardSubscriptionClient) mutate(ctx context.Context, m *UserBoardSubscriptionMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&UserBoardSubscriptionCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&UserBoardSubscriptionUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&UserBoardSubscriptionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&UserBoardSubscriptionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown UserBoardSubscription mutation op: %q", m.Op())
 	}
 }
 
@@ -2251,480 +2483,249 @@ func (c *UserCommentSubscriptionClient) mutate(ctx context.Context, m *UserComme
 	}
 }
 
-// UserForumLikeClient is a client for the UserForumLike schema.
-type UserForumLikeClient struct {
+// UserThreadLikeClient is a client for the UserThreadLike schema.
+type UserThreadLikeClient struct {
 	config
 }
 
-// NewUserForumLikeClient returns a client for the UserForumLike from the given config.
-func NewUserForumLikeClient(c config) *UserForumLikeClient {
-	return &UserForumLikeClient{config: c}
+// NewUserThreadLikeClient returns a client for the UserThreadLike from the given config.
+func NewUserThreadLikeClient(c config) *UserThreadLikeClient {
+	return &UserThreadLikeClient{config: c}
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `userforumlike.Hooks(f(g(h())))`.
-func (c *UserForumLikeClient) Use(hooks ...Hook) {
-	c.hooks.UserForumLike = append(c.hooks.UserForumLike, hooks...)
+// A call to `Use(f, g, h)` equals to `userthreadlike.Hooks(f(g(h())))`.
+func (c *UserThreadLikeClient) Use(hooks ...Hook) {
+	c.hooks.UserThreadLike = append(c.hooks.UserThreadLike, hooks...)
 }
 
 // Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `userforumlike.Intercept(f(g(h())))`.
-func (c *UserForumLikeClient) Intercept(interceptors ...Interceptor) {
-	c.inters.UserForumLike = append(c.inters.UserForumLike, interceptors...)
+// A call to `Intercept(f, g, h)` equals to `userthreadlike.Intercept(f(g(h())))`.
+func (c *UserThreadLikeClient) Intercept(interceptors ...Interceptor) {
+	c.inters.UserThreadLike = append(c.inters.UserThreadLike, interceptors...)
 }
 
-// Create returns a builder for creating a UserForumLike entity.
-func (c *UserForumLikeClient) Create() *UserForumLikeCreate {
-	mutation := newUserForumLikeMutation(c.config, OpCreate)
-	return &UserForumLikeCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Create returns a builder for creating a UserThreadLike entity.
+func (c *UserThreadLikeClient) Create() *UserThreadLikeCreate {
+	mutation := newUserThreadLikeMutation(c.config, OpCreate)
+	return &UserThreadLikeCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// CreateBulk returns a builder for creating a bulk of UserForumLike entities.
-func (c *UserForumLikeClient) CreateBulk(builders ...*UserForumLikeCreate) *UserForumLikeCreateBulk {
-	return &UserForumLikeCreateBulk{config: c.config, builders: builders}
+// CreateBulk returns a builder for creating a bulk of UserThreadLike entities.
+func (c *UserThreadLikeClient) CreateBulk(builders ...*UserThreadLikeCreate) *UserThreadLikeCreateBulk {
+	return &UserThreadLikeCreateBulk{config: c.config, builders: builders}
 }
 
 // MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
 // a builder and applies setFunc on it.
-func (c *UserForumLikeClient) MapCreateBulk(slice any, setFunc func(*UserForumLikeCreate, int)) *UserForumLikeCreateBulk {
+func (c *UserThreadLikeClient) MapCreateBulk(slice any, setFunc func(*UserThreadLikeCreate, int)) *UserThreadLikeCreateBulk {
 	rv := reflect.ValueOf(slice)
 	if rv.Kind() != reflect.Slice {
-		return &UserForumLikeCreateBulk{err: fmt.Errorf("calling to UserForumLikeClient.MapCreateBulk with wrong type %T, need slice", slice)}
+		return &UserThreadLikeCreateBulk{err: fmt.Errorf("calling to UserThreadLikeClient.MapCreateBulk with wrong type %T, need slice", slice)}
 	}
-	builders := make([]*UserForumLikeCreate, rv.Len())
+	builders := make([]*UserThreadLikeCreate, rv.Len())
 	for i := 0; i < rv.Len(); i++ {
 		builders[i] = c.Create()
 		setFunc(builders[i], i)
 	}
-	return &UserForumLikeCreateBulk{config: c.config, builders: builders}
+	return &UserThreadLikeCreateBulk{config: c.config, builders: builders}
 }
 
-// Update returns an update builder for UserForumLike.
-func (c *UserForumLikeClient) Update() *UserForumLikeUpdate {
-	mutation := newUserForumLikeMutation(c.config, OpUpdate)
-	return &UserForumLikeUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *UserForumLikeClient) UpdateOne(ufl *UserForumLike) *UserForumLikeUpdateOne {
-	mutation := newUserForumLikeMutation(c.config, OpUpdateOne)
-	mutation.user = &ufl.UserId
-	mutation.forum = &ufl.ForumId
-	return &UserForumLikeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for UserForumLike.
-func (c *UserForumLikeClient) Delete() *UserForumLikeDelete {
-	mutation := newUserForumLikeMutation(c.config, OpDelete)
-	return &UserForumLikeDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Query returns a query builder for UserForumLike.
-func (c *UserForumLikeClient) Query() *UserForumLikeQuery {
-	return &UserForumLikeQuery{
-		config: c.config,
-		ctx:    &QueryContext{Type: TypeUserForumLike},
-		inters: c.Interceptors(),
-	}
-}
-
-// QueryUser queries the user edge of a UserForumLike.
-func (c *UserForumLikeClient) QueryUser(ufl *UserForumLike) *UserQuery {
-	return c.Query().
-		Where(userforumlike.UserId(ufl.UserId), userforumlike.ForumId(ufl.ForumId)).
-		QueryUser()
-}
-
-// QueryForum queries the forum edge of a UserForumLike.
-func (c *UserForumLikeClient) QueryForum(ufl *UserForumLike) *ForumQuery {
-	return c.Query().
-		Where(userforumlike.UserId(ufl.UserId), userforumlike.ForumId(ufl.ForumId)).
-		QueryForum()
-}
-
-// Hooks returns the client hooks.
-func (c *UserForumLikeClient) Hooks() []Hook {
-	return c.hooks.UserForumLike
-}
-
-// Interceptors returns the client interceptors.
-func (c *UserForumLikeClient) Interceptors() []Interceptor {
-	return c.inters.UserForumLike
-}
-
-func (c *UserForumLikeClient) mutate(ctx context.Context, m *UserForumLikeMutation) (Value, error) {
-	switch m.Op() {
-	case OpCreate:
-		return (&UserForumLikeCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdate:
-		return (&UserForumLikeUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdateOne:
-		return (&UserForumLikeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpDelete, OpDeleteOne:
-		return (&UserForumLikeDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
-	default:
-		return nil, fmt.Errorf("ent: unknown UserForumLike mutation op: %q", m.Op())
-	}
-}
-
-// UserForumSubscriptionClient is a client for the UserForumSubscription schema.
-type UserForumSubscriptionClient struct {
-	config
-}
-
-// NewUserForumSubscriptionClient returns a client for the UserForumSubscription from the given config.
-func NewUserForumSubscriptionClient(c config) *UserForumSubscriptionClient {
-	return &UserForumSubscriptionClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `userforumsubscription.Hooks(f(g(h())))`.
-func (c *UserForumSubscriptionClient) Use(hooks ...Hook) {
-	c.hooks.UserForumSubscription = append(c.hooks.UserForumSubscription, hooks...)
-}
-
-// Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `userforumsubscription.Intercept(f(g(h())))`.
-func (c *UserForumSubscriptionClient) Intercept(interceptors ...Interceptor) {
-	c.inters.UserForumSubscription = append(c.inters.UserForumSubscription, interceptors...)
-}
-
-// Create returns a builder for creating a UserForumSubscription entity.
-func (c *UserForumSubscriptionClient) Create() *UserForumSubscriptionCreate {
-	mutation := newUserForumSubscriptionMutation(c.config, OpCreate)
-	return &UserForumSubscriptionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of UserForumSubscription entities.
-func (c *UserForumSubscriptionClient) CreateBulk(builders ...*UserForumSubscriptionCreate) *UserForumSubscriptionCreateBulk {
-	return &UserForumSubscriptionCreateBulk{config: c.config, builders: builders}
-}
-
-// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
-// a builder and applies setFunc on it.
-func (c *UserForumSubscriptionClient) MapCreateBulk(slice any, setFunc func(*UserForumSubscriptionCreate, int)) *UserForumSubscriptionCreateBulk {
-	rv := reflect.ValueOf(slice)
-	if rv.Kind() != reflect.Slice {
-		return &UserForumSubscriptionCreateBulk{err: fmt.Errorf("calling to UserForumSubscriptionClient.MapCreateBulk with wrong type %T, need slice", slice)}
-	}
-	builders := make([]*UserForumSubscriptionCreate, rv.Len())
-	for i := 0; i < rv.Len(); i++ {
-		builders[i] = c.Create()
-		setFunc(builders[i], i)
-	}
-	return &UserForumSubscriptionCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for UserForumSubscription.
-func (c *UserForumSubscriptionClient) Update() *UserForumSubscriptionUpdate {
-	mutation := newUserForumSubscriptionMutation(c.config, OpUpdate)
-	return &UserForumSubscriptionUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Update returns an update builder for UserThreadLike.
+func (c *UserThreadLikeClient) Update() *UserThreadLikeUpdate {
+	mutation := newUserThreadLikeMutation(c.config, OpUpdate)
+	return &UserThreadLikeUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *UserForumSubscriptionClient) UpdateOne(ufs *UserForumSubscription) *UserForumSubscriptionUpdateOne {
-	mutation := newUserForumSubscriptionMutation(c.config, OpUpdateOne)
-	mutation.user = &ufs.UserId
-	mutation.forum = &ufs.ForumId
-	return &UserForumSubscriptionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for UserForumSubscription.
-func (c *UserForumSubscriptionClient) Delete() *UserForumSubscriptionDelete {
-	mutation := newUserForumSubscriptionMutation(c.config, OpDelete)
-	return &UserForumSubscriptionDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Query returns a query builder for UserForumSubscription.
-func (c *UserForumSubscriptionClient) Query() *UserForumSubscriptionQuery {
-	return &UserForumSubscriptionQuery{
-		config: c.config,
-		ctx:    &QueryContext{Type: TypeUserForumSubscription},
-		inters: c.Interceptors(),
-	}
-}
-
-// QueryUser queries the user edge of a UserForumSubscription.
-func (c *UserForumSubscriptionClient) QueryUser(ufs *UserForumSubscription) *UserQuery {
-	return c.Query().
-		Where(userforumsubscription.UserId(ufs.UserId), userforumsubscription.ForumId(ufs.ForumId)).
-		QueryUser()
-}
-
-// QueryForum queries the forum edge of a UserForumSubscription.
-func (c *UserForumSubscriptionClient) QueryForum(ufs *UserForumSubscription) *ForumQuery {
-	return c.Query().
-		Where(userforumsubscription.UserId(ufs.UserId), userforumsubscription.ForumId(ufs.ForumId)).
-		QueryForum()
-}
-
-// Hooks returns the client hooks.
-func (c *UserForumSubscriptionClient) Hooks() []Hook {
-	return c.hooks.UserForumSubscription
-}
-
-// Interceptors returns the client interceptors.
-func (c *UserForumSubscriptionClient) Interceptors() []Interceptor {
-	return c.inters.UserForumSubscription
-}
-
-func (c *UserForumSubscriptionClient) mutate(ctx context.Context, m *UserForumSubscriptionMutation) (Value, error) {
-	switch m.Op() {
-	case OpCreate:
-		return (&UserForumSubscriptionCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdate:
-		return (&UserForumSubscriptionUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdateOne:
-		return (&UserForumSubscriptionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpDelete, OpDeleteOne:
-		return (&UserForumSubscriptionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
-	default:
-		return nil, fmt.Errorf("ent: unknown UserForumSubscription mutation op: %q", m.Op())
-	}
-}
-
-// UserTopicLikeClient is a client for the UserTopicLike schema.
-type UserTopicLikeClient struct {
-	config
-}
-
-// NewUserTopicLikeClient returns a client for the UserTopicLike from the given config.
-func NewUserTopicLikeClient(c config) *UserTopicLikeClient {
-	return &UserTopicLikeClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `usertopiclike.Hooks(f(g(h())))`.
-func (c *UserTopicLikeClient) Use(hooks ...Hook) {
-	c.hooks.UserTopicLike = append(c.hooks.UserTopicLike, hooks...)
-}
-
-// Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `usertopiclike.Intercept(f(g(h())))`.
-func (c *UserTopicLikeClient) Intercept(interceptors ...Interceptor) {
-	c.inters.UserTopicLike = append(c.inters.UserTopicLike, interceptors...)
-}
-
-// Create returns a builder for creating a UserTopicLike entity.
-func (c *UserTopicLikeClient) Create() *UserTopicLikeCreate {
-	mutation := newUserTopicLikeMutation(c.config, OpCreate)
-	return &UserTopicLikeCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of UserTopicLike entities.
-func (c *UserTopicLikeClient) CreateBulk(builders ...*UserTopicLikeCreate) *UserTopicLikeCreateBulk {
-	return &UserTopicLikeCreateBulk{config: c.config, builders: builders}
-}
-
-// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
-// a builder and applies setFunc on it.
-func (c *UserTopicLikeClient) MapCreateBulk(slice any, setFunc func(*UserTopicLikeCreate, int)) *UserTopicLikeCreateBulk {
-	rv := reflect.ValueOf(slice)
-	if rv.Kind() != reflect.Slice {
-		return &UserTopicLikeCreateBulk{err: fmt.Errorf("calling to UserTopicLikeClient.MapCreateBulk with wrong type %T, need slice", slice)}
-	}
-	builders := make([]*UserTopicLikeCreate, rv.Len())
-	for i := 0; i < rv.Len(); i++ {
-		builders[i] = c.Create()
-		setFunc(builders[i], i)
-	}
-	return &UserTopicLikeCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for UserTopicLike.
-func (c *UserTopicLikeClient) Update() *UserTopicLikeUpdate {
-	mutation := newUserTopicLikeMutation(c.config, OpUpdate)
-	return &UserTopicLikeUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *UserTopicLikeClient) UpdateOne(utl *UserTopicLike) *UserTopicLikeUpdateOne {
-	mutation := newUserTopicLikeMutation(c.config, OpUpdateOne)
+func (c *UserThreadLikeClient) UpdateOne(utl *UserThreadLike) *UserThreadLikeUpdateOne {
+	mutation := newUserThreadLikeMutation(c.config, OpUpdateOne)
 	mutation.user = &utl.UserId
-	mutation.topic = &utl.TopicId
-	return &UserTopicLikeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+	mutation.thread = &utl.ThreadId
+	return &UserThreadLikeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Delete returns a delete builder for UserTopicLike.
-func (c *UserTopicLikeClient) Delete() *UserTopicLikeDelete {
-	mutation := newUserTopicLikeMutation(c.config, OpDelete)
-	return &UserTopicLikeDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Delete returns a delete builder for UserThreadLike.
+func (c *UserThreadLikeClient) Delete() *UserThreadLikeDelete {
+	mutation := newUserThreadLikeMutation(c.config, OpDelete)
+	return &UserThreadLikeDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Query returns a query builder for UserTopicLike.
-func (c *UserTopicLikeClient) Query() *UserTopicLikeQuery {
-	return &UserTopicLikeQuery{
+// Query returns a query builder for UserThreadLike.
+func (c *UserThreadLikeClient) Query() *UserThreadLikeQuery {
+	return &UserThreadLikeQuery{
 		config: c.config,
-		ctx:    &QueryContext{Type: TypeUserTopicLike},
+		ctx:    &QueryContext{Type: TypeUserThreadLike},
 		inters: c.Interceptors(),
 	}
 }
 
-// QueryUser queries the user edge of a UserTopicLike.
-func (c *UserTopicLikeClient) QueryUser(utl *UserTopicLike) *UserQuery {
+// QueryUser queries the user edge of a UserThreadLike.
+func (c *UserThreadLikeClient) QueryUser(utl *UserThreadLike) *UserQuery {
 	return c.Query().
-		Where(usertopiclike.UserId(utl.UserId), usertopiclike.TopicId(utl.TopicId)).
+		Where(userthreadlike.UserId(utl.UserId), userthreadlike.ThreadId(utl.ThreadId)).
 		QueryUser()
 }
 
-// QueryTopic queries the topic edge of a UserTopicLike.
-func (c *UserTopicLikeClient) QueryTopic(utl *UserTopicLike) *TopicQuery {
+// QueryThread queries the thread edge of a UserThreadLike.
+func (c *UserThreadLikeClient) QueryThread(utl *UserThreadLike) *ThreadQuery {
 	return c.Query().
-		Where(usertopiclike.UserId(utl.UserId), usertopiclike.TopicId(utl.TopicId)).
-		QueryTopic()
+		Where(userthreadlike.UserId(utl.UserId), userthreadlike.ThreadId(utl.ThreadId)).
+		QueryThread()
 }
 
 // Hooks returns the client hooks.
-func (c *UserTopicLikeClient) Hooks() []Hook {
-	return c.hooks.UserTopicLike
+func (c *UserThreadLikeClient) Hooks() []Hook {
+	return c.hooks.UserThreadLike
 }
 
 // Interceptors returns the client interceptors.
-func (c *UserTopicLikeClient) Interceptors() []Interceptor {
-	return c.inters.UserTopicLike
+func (c *UserThreadLikeClient) Interceptors() []Interceptor {
+	return c.inters.UserThreadLike
 }
 
-func (c *UserTopicLikeClient) mutate(ctx context.Context, m *UserTopicLikeMutation) (Value, error) {
+func (c *UserThreadLikeClient) mutate(ctx context.Context, m *UserThreadLikeMutation) (Value, error) {
 	switch m.Op() {
 	case OpCreate:
-		return (&UserTopicLikeCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&UserThreadLikeCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdate:
-		return (&UserTopicLikeUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&UserThreadLikeUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdateOne:
-		return (&UserTopicLikeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&UserThreadLikeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpDelete, OpDeleteOne:
-		return (&UserTopicLikeDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+		return (&UserThreadLikeDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
-		return nil, fmt.Errorf("ent: unknown UserTopicLike mutation op: %q", m.Op())
+		return nil, fmt.Errorf("ent: unknown UserThreadLike mutation op: %q", m.Op())
 	}
 }
 
-// UserTopicSubscriptionClient is a client for the UserTopicSubscription schema.
-type UserTopicSubscriptionClient struct {
+// UserThreadSubscriptionClient is a client for the UserThreadSubscription schema.
+type UserThreadSubscriptionClient struct {
 	config
 }
 
-// NewUserTopicSubscriptionClient returns a client for the UserTopicSubscription from the given config.
-func NewUserTopicSubscriptionClient(c config) *UserTopicSubscriptionClient {
-	return &UserTopicSubscriptionClient{config: c}
+// NewUserThreadSubscriptionClient returns a client for the UserThreadSubscription from the given config.
+func NewUserThreadSubscriptionClient(c config) *UserThreadSubscriptionClient {
+	return &UserThreadSubscriptionClient{config: c}
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `usertopicsubscription.Hooks(f(g(h())))`.
-func (c *UserTopicSubscriptionClient) Use(hooks ...Hook) {
-	c.hooks.UserTopicSubscription = append(c.hooks.UserTopicSubscription, hooks...)
+// A call to `Use(f, g, h)` equals to `userthreadsubscription.Hooks(f(g(h())))`.
+func (c *UserThreadSubscriptionClient) Use(hooks ...Hook) {
+	c.hooks.UserThreadSubscription = append(c.hooks.UserThreadSubscription, hooks...)
 }
 
 // Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `usertopicsubscription.Intercept(f(g(h())))`.
-func (c *UserTopicSubscriptionClient) Intercept(interceptors ...Interceptor) {
-	c.inters.UserTopicSubscription = append(c.inters.UserTopicSubscription, interceptors...)
+// A call to `Intercept(f, g, h)` equals to `userthreadsubscription.Intercept(f(g(h())))`.
+func (c *UserThreadSubscriptionClient) Intercept(interceptors ...Interceptor) {
+	c.inters.UserThreadSubscription = append(c.inters.UserThreadSubscription, interceptors...)
 }
 
-// Create returns a builder for creating a UserTopicSubscription entity.
-func (c *UserTopicSubscriptionClient) Create() *UserTopicSubscriptionCreate {
-	mutation := newUserTopicSubscriptionMutation(c.config, OpCreate)
-	return &UserTopicSubscriptionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Create returns a builder for creating a UserThreadSubscription entity.
+func (c *UserThreadSubscriptionClient) Create() *UserThreadSubscriptionCreate {
+	mutation := newUserThreadSubscriptionMutation(c.config, OpCreate)
+	return &UserThreadSubscriptionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// CreateBulk returns a builder for creating a bulk of UserTopicSubscription entities.
-func (c *UserTopicSubscriptionClient) CreateBulk(builders ...*UserTopicSubscriptionCreate) *UserTopicSubscriptionCreateBulk {
-	return &UserTopicSubscriptionCreateBulk{config: c.config, builders: builders}
+// CreateBulk returns a builder for creating a bulk of UserThreadSubscription entities.
+func (c *UserThreadSubscriptionClient) CreateBulk(builders ...*UserThreadSubscriptionCreate) *UserThreadSubscriptionCreateBulk {
+	return &UserThreadSubscriptionCreateBulk{config: c.config, builders: builders}
 }
 
 // MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
 // a builder and applies setFunc on it.
-func (c *UserTopicSubscriptionClient) MapCreateBulk(slice any, setFunc func(*UserTopicSubscriptionCreate, int)) *UserTopicSubscriptionCreateBulk {
+func (c *UserThreadSubscriptionClient) MapCreateBulk(slice any, setFunc func(*UserThreadSubscriptionCreate, int)) *UserThreadSubscriptionCreateBulk {
 	rv := reflect.ValueOf(slice)
 	if rv.Kind() != reflect.Slice {
-		return &UserTopicSubscriptionCreateBulk{err: fmt.Errorf("calling to UserTopicSubscriptionClient.MapCreateBulk with wrong type %T, need slice", slice)}
+		return &UserThreadSubscriptionCreateBulk{err: fmt.Errorf("calling to UserThreadSubscriptionClient.MapCreateBulk with wrong type %T, need slice", slice)}
 	}
-	builders := make([]*UserTopicSubscriptionCreate, rv.Len())
+	builders := make([]*UserThreadSubscriptionCreate, rv.Len())
 	for i := 0; i < rv.Len(); i++ {
 		builders[i] = c.Create()
 		setFunc(builders[i], i)
 	}
-	return &UserTopicSubscriptionCreateBulk{config: c.config, builders: builders}
+	return &UserThreadSubscriptionCreateBulk{config: c.config, builders: builders}
 }
 
-// Update returns an update builder for UserTopicSubscription.
-func (c *UserTopicSubscriptionClient) Update() *UserTopicSubscriptionUpdate {
-	mutation := newUserTopicSubscriptionMutation(c.config, OpUpdate)
-	return &UserTopicSubscriptionUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Update returns an update builder for UserThreadSubscription.
+func (c *UserThreadSubscriptionClient) Update() *UserThreadSubscriptionUpdate {
+	mutation := newUserThreadSubscriptionMutation(c.config, OpUpdate)
+	return &UserThreadSubscriptionUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *UserTopicSubscriptionClient) UpdateOne(uts *UserTopicSubscription) *UserTopicSubscriptionUpdateOne {
-	mutation := newUserTopicSubscriptionMutation(c.config, OpUpdateOne)
+func (c *UserThreadSubscriptionClient) UpdateOne(uts *UserThreadSubscription) *UserThreadSubscriptionUpdateOne {
+	mutation := newUserThreadSubscriptionMutation(c.config, OpUpdateOne)
 	mutation.user = &uts.UserId
-	mutation.topic = &uts.TopicId
-	return &UserTopicSubscriptionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+	mutation.thread = &uts.ThreadId
+	return &UserThreadSubscriptionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Delete returns a delete builder for UserTopicSubscription.
-func (c *UserTopicSubscriptionClient) Delete() *UserTopicSubscriptionDelete {
-	mutation := newUserTopicSubscriptionMutation(c.config, OpDelete)
-	return &UserTopicSubscriptionDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Delete returns a delete builder for UserThreadSubscription.
+func (c *UserThreadSubscriptionClient) Delete() *UserThreadSubscriptionDelete {
+	mutation := newUserThreadSubscriptionMutation(c.config, OpDelete)
+	return &UserThreadSubscriptionDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Query returns a query builder for UserTopicSubscription.
-func (c *UserTopicSubscriptionClient) Query() *UserTopicSubscriptionQuery {
-	return &UserTopicSubscriptionQuery{
+// Query returns a query builder for UserThreadSubscription.
+func (c *UserThreadSubscriptionClient) Query() *UserThreadSubscriptionQuery {
+	return &UserThreadSubscriptionQuery{
 		config: c.config,
-		ctx:    &QueryContext{Type: TypeUserTopicSubscription},
+		ctx:    &QueryContext{Type: TypeUserThreadSubscription},
 		inters: c.Interceptors(),
 	}
 }
 
-// QueryUser queries the user edge of a UserTopicSubscription.
-func (c *UserTopicSubscriptionClient) QueryUser(uts *UserTopicSubscription) *UserQuery {
+// QueryUser queries the user edge of a UserThreadSubscription.
+func (c *UserThreadSubscriptionClient) QueryUser(uts *UserThreadSubscription) *UserQuery {
 	return c.Query().
-		Where(usertopicsubscription.UserId(uts.UserId), usertopicsubscription.TopicId(uts.TopicId)).
+		Where(userthreadsubscription.UserId(uts.UserId), userthreadsubscription.ThreadId(uts.ThreadId)).
 		QueryUser()
 }
 
-// QueryTopic queries the topic edge of a UserTopicSubscription.
-func (c *UserTopicSubscriptionClient) QueryTopic(uts *UserTopicSubscription) *TopicQuery {
+// QueryThread queries the thread edge of a UserThreadSubscription.
+func (c *UserThreadSubscriptionClient) QueryThread(uts *UserThreadSubscription) *ThreadQuery {
 	return c.Query().
-		Where(usertopicsubscription.UserId(uts.UserId), usertopicsubscription.TopicId(uts.TopicId)).
-		QueryTopic()
+		Where(userthreadsubscription.UserId(uts.UserId), userthreadsubscription.ThreadId(uts.ThreadId)).
+		QueryThread()
 }
 
 // Hooks returns the client hooks.
-func (c *UserTopicSubscriptionClient) Hooks() []Hook {
-	return c.hooks.UserTopicSubscription
+func (c *UserThreadSubscriptionClient) Hooks() []Hook {
+	return c.hooks.UserThreadSubscription
 }
 
 // Interceptors returns the client interceptors.
-func (c *UserTopicSubscriptionClient) Interceptors() []Interceptor {
-	return c.inters.UserTopicSubscription
+func (c *UserThreadSubscriptionClient) Interceptors() []Interceptor {
+	return c.inters.UserThreadSubscription
 }
 
-func (c *UserTopicSubscriptionClient) mutate(ctx context.Context, m *UserTopicSubscriptionMutation) (Value, error) {
+func (c *UserThreadSubscriptionClient) mutate(ctx context.Context, m *UserThreadSubscriptionMutation) (Value, error) {
 	switch m.Op() {
 	case OpCreate:
-		return (&UserTopicSubscriptionCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&UserThreadSubscriptionCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdate:
-		return (&UserTopicSubscriptionUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&UserThreadSubscriptionUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdateOne:
-		return (&UserTopicSubscriptionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&UserThreadSubscriptionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpDelete, OpDeleteOne:
-		return (&UserTopicSubscriptionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+		return (&UserThreadSubscriptionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
-		return nil, fmt.Errorf("ent: unknown UserTopicSubscription mutation op: %q", m.Op())
+		return nil, fmt.Errorf("ent: unknown UserThreadSubscription mutation op: %q", m.Op())
 	}
 }
 
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		AdminUser, Comment, CommentAttachment, Forum, Topic, TopicTag, TopicTagging,
-		User, UserCommentLike, UserCommentSubscription, UserForumLike,
-		UserForumSubscription, UserTopicLike, UserTopicSubscription []ent.Hook
+		AdminUser, Board, Comment, CommentAttachment, Thread, ThreadTag, ThreadTagging,
+		User, UserBoardLike, UserBoardSubscription, UserCommentLike,
+		UserCommentSubscription, UserThreadLike, UserThreadSubscription []ent.Hook
 	}
 	inters struct {
-		AdminUser, Comment, CommentAttachment, Forum, Topic, TopicTag, TopicTagging,
-		User, UserCommentLike, UserCommentSubscription, UserForumLike,
-		UserForumSubscription, UserTopicLike, UserTopicSubscription []ent.Interceptor
+		AdminUser, Board, Comment, CommentAttachment, Thread, ThreadTag, ThreadTagging,
+		User, UserBoardLike, UserBoardSubscription, UserCommentLike,
+		UserCommentSubscription, UserThreadLike,
+		UserThreadSubscription []ent.Interceptor
 	}
 )

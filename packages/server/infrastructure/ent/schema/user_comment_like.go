@@ -22,7 +22,6 @@ func (UserCommentLike) Fields() []ent.Field {
     return []ent.Field{
         field.Int("userId").StorageKey("user_id"),
         field.Int("commentId").StorageKey("comment_id"),
-        field.Enum("type").Values("like", "dislike"),
         field.Time("likedAt").Default(time.Now).StorageKey("liked_at"),
     }
 }

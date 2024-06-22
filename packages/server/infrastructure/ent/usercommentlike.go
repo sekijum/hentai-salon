@@ -21,8 +21,6 @@ type UserCommentLike struct {
 	UserId int `json:"userId,omitempty"`
 	// CommentId holds the value of the "commentId" field.
 	CommentId int `json:"commentId,omitempty"`
-	// Type holds the value of the "type" field.
-	Type usercommentlike.Type `json:"type,omitempty"`
 	// LikedAt holds the value of the "likedAt" field.
 	LikedAt time.Time `json:"likedAt,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -71,8 +69,6 @@ func (*UserCommentLike) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case usercommentlike.FieldUserId, usercommentlike.FieldCommentId:
 			values[i] = new(sql.NullInt64)
-		case usercommentlike.FieldType:
-			values[i] = new(sql.NullString)
 		case usercommentlike.FieldLikedAt:
 			values[i] = new(sql.NullTime)
 		default:
@@ -101,12 +97,6 @@ func (ucl *UserCommentLike) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field commentId", values[i])
 			} else if value.Valid {
 				ucl.CommentId = int(value.Int64)
-			}
-		case usercommentlike.FieldType:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field type", values[i])
-			} else if value.Valid {
-				ucl.Type = usercommentlike.Type(value.String)
 			}
 		case usercommentlike.FieldLikedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -164,9 +154,6 @@ func (ucl *UserCommentLike) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("commentId=")
 	builder.WriteString(fmt.Sprintf("%v", ucl.CommentId))
-	builder.WriteString(", ")
-	builder.WriteString("type=")
-	builder.WriteString(fmt.Sprintf("%v", ucl.Type))
 	builder.WriteString(", ")
 	builder.WriteString("likedAt=")
 	builder.WriteString(ucl.LikedAt.Format(time.ANSIC))

@@ -4,19 +4,19 @@ package ent
 
 import (
 	"server/infrastructure/ent/adminuser"
+	"server/infrastructure/ent/board"
 	"server/infrastructure/ent/comment"
 	"server/infrastructure/ent/commentattachment"
-	"server/infrastructure/ent/forum"
 	"server/infrastructure/ent/schema"
-	"server/infrastructure/ent/topic"
-	"server/infrastructure/ent/topictag"
+	"server/infrastructure/ent/thread"
+	"server/infrastructure/ent/threadtag"
 	"server/infrastructure/ent/user"
+	"server/infrastructure/ent/userboardlike"
+	"server/infrastructure/ent/userboardsubscription"
 	"server/infrastructure/ent/usercommentlike"
 	"server/infrastructure/ent/usercommentsubscription"
-	"server/infrastructure/ent/userforumlike"
-	"server/infrastructure/ent/userforumsubscription"
-	"server/infrastructure/ent/usertopiclike"
-	"server/infrastructure/ent/usertopicsubscription"
+	"server/infrastructure/ent/userthreadlike"
+	"server/infrastructure/ent/userthreadsubscription"
 	"time"
 )
 
@@ -26,10 +26,10 @@ import (
 func init() {
 	adminuserFields := schema.AdminUser{}.Fields()
 	_ = adminuserFields
-	// adminuserDescUserName is the schema descriptor for userName field.
-	adminuserDescUserName := adminuserFields[1].Descriptor()
-	// adminuser.UserNameValidator is a validator for the "userName" field. It is called by the builders before save.
-	adminuser.UserNameValidator = adminuserDescUserName.Validators[0].(func(string) error)
+	// adminuserDescName is the schema descriptor for name field.
+	adminuserDescName := adminuserFields[1].Descriptor()
+	// adminuser.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	adminuser.NameValidator = adminuserDescName.Validators[0].(func(string) error)
 	// adminuserDescEmail is the schema descriptor for email field.
 	adminuserDescEmail := adminuserFields[2].Descriptor()
 	// adminuser.EmailValidator is a validator for the "email" field. It is called by the builders before save.
@@ -44,18 +44,46 @@ func init() {
 	adminuser.DefaultUpdatedAt = adminuserDescUpdatedAt.Default.(func() time.Time)
 	// adminuser.UpdateDefaultUpdatedAt holds the default value on update for the updatedAt field.
 	adminuser.UpdateDefaultUpdatedAt = adminuserDescUpdatedAt.UpdateDefault.(func() time.Time)
+	boardFields := schema.Board{}.Fields()
+	_ = boardFields
+	// boardDescTitle is the schema descriptor for title field.
+	boardDescTitle := boardFields[2].Descriptor()
+	// board.TitleValidator is a validator for the "title" field. It is called by the builders before save.
+	board.TitleValidator = boardDescTitle.Validators[0].(func(string) error)
+	// boardDescDescription is the schema descriptor for description field.
+	boardDescDescription := boardFields[3].Descriptor()
+	// board.DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
+	board.DescriptionValidator = boardDescDescription.Validators[0].(func(string) error)
+	// boardDescOrder is the schema descriptor for order field.
+	boardDescOrder := boardFields[5].Descriptor()
+	// board.DefaultOrder holds the default value on creation for the order field.
+	board.DefaultOrder = boardDescOrder.Default.(int)
+	// boardDescCreatedAt is the schema descriptor for createdAt field.
+	boardDescCreatedAt := boardFields[7].Descriptor()
+	// board.DefaultCreatedAt holds the default value on creation for the createdAt field.
+	board.DefaultCreatedAt = boardDescCreatedAt.Default.(func() time.Time)
+	// boardDescUpdatedAt is the schema descriptor for updatedAt field.
+	boardDescUpdatedAt := boardFields[8].Descriptor()
+	// board.DefaultUpdatedAt holds the default value on creation for the updatedAt field.
+	board.DefaultUpdatedAt = boardDescUpdatedAt.Default.(func() time.Time)
+	// board.UpdateDefaultUpdatedAt holds the default value on update for the updatedAt field.
+	board.UpdateDefaultUpdatedAt = boardDescUpdatedAt.UpdateDefault.(func() time.Time)
 	commentFields := schema.Comment{}.Fields()
 	_ = commentFields
 	// commentDescGuestName is the schema descriptor for guestName field.
 	commentDescGuestName := commentFields[4].Descriptor()
 	// comment.GuestNameValidator is a validator for the "guestName" field. It is called by the builders before save.
 	comment.GuestNameValidator = commentDescGuestName.Validators[0].(func(string) error)
+	// commentDescIPAddress is the schema descriptor for ip_address field.
+	commentDescIPAddress := commentFields[6].Descriptor()
+	// comment.IPAddressValidator is a validator for the "ip_address" field. It is called by the builders before save.
+	comment.IPAddressValidator = commentDescIPAddress.Validators[0].(func(string) error)
 	// commentDescCreatedAt is the schema descriptor for createdAt field.
-	commentDescCreatedAt := commentFields[7].Descriptor()
+	commentDescCreatedAt := commentFields[8].Descriptor()
 	// comment.DefaultCreatedAt holds the default value on creation for the createdAt field.
 	comment.DefaultCreatedAt = commentDescCreatedAt.Default.(func() time.Time)
 	// commentDescUpdatedAt is the schema descriptor for updatedAt field.
-	commentDescUpdatedAt := commentFields[8].Descriptor()
+	commentDescUpdatedAt := commentFields[9].Descriptor()
 	// comment.DefaultUpdatedAt holds the default value on creation for the updatedAt field.
 	comment.DefaultUpdatedAt = commentDescUpdatedAt.Default.(func() time.Time)
 	// comment.UpdateDefaultUpdatedAt holds the default value on update for the updatedAt field.
@@ -66,70 +94,54 @@ func init() {
 	commentattachmentDescOrder := commentattachmentFields[3].Descriptor()
 	// commentattachment.DefaultOrder holds the default value on creation for the order field.
 	commentattachment.DefaultOrder = commentattachmentDescOrder.Default.(int)
-	forumFields := schema.Forum{}.Fields()
-	_ = forumFields
-	// forumDescTitle is the schema descriptor for title field.
-	forumDescTitle := forumFields[2].Descriptor()
-	// forum.TitleValidator is a validator for the "title" field. It is called by the builders before save.
-	forum.TitleValidator = forumDescTitle.Validators[0].(func(string) error)
-	// forumDescDescription is the schema descriptor for description field.
-	forumDescDescription := forumFields[3].Descriptor()
-	// forum.DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
-	forum.DescriptionValidator = forumDescDescription.Validators[0].(func(string) error)
-	// forumDescCreatedAt is the schema descriptor for createdAt field.
-	forumDescCreatedAt := forumFields[6].Descriptor()
-	// forum.DefaultCreatedAt holds the default value on creation for the createdAt field.
-	forum.DefaultCreatedAt = forumDescCreatedAt.Default.(func() time.Time)
-	// forumDescUpdatedAt is the schema descriptor for updatedAt field.
-	forumDescUpdatedAt := forumFields[7].Descriptor()
-	// forum.DefaultUpdatedAt holds the default value on creation for the updatedAt field.
-	forum.DefaultUpdatedAt = forumDescUpdatedAt.Default.(func() time.Time)
-	// forum.UpdateDefaultUpdatedAt holds the default value on update for the updatedAt field.
-	forum.UpdateDefaultUpdatedAt = forumDescUpdatedAt.UpdateDefault.(func() time.Time)
-	topicFields := schema.Topic{}.Fields()
-	_ = topicFields
-	// topicDescTitle is the schema descriptor for title field.
-	topicDescTitle := topicFields[3].Descriptor()
-	// topic.TitleValidator is a validator for the "title" field. It is called by the builders before save.
-	topic.TitleValidator = topicDescTitle.Validators[0].(func(string) error)
-	// topicDescDescription is the schema descriptor for description field.
-	topicDescDescription := topicFields[4].Descriptor()
-	// topic.DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
-	topic.DescriptionValidator = topicDescDescription.Validators[0].(func(string) error)
-	// topicDescIsAutoGenerated is the schema descriptor for isAutoGenerated field.
-	topicDescIsAutoGenerated := topicFields[6].Descriptor()
-	// topic.DefaultIsAutoGenerated holds the default value on creation for the isAutoGenerated field.
-	topic.DefaultIsAutoGenerated = topicDescIsAutoGenerated.Default.(bool)
-	// topicDescIsNotifyOnComment is the schema descriptor for isNotifyOnComment field.
-	topicDescIsNotifyOnComment := topicFields[7].Descriptor()
-	// topic.DefaultIsNotifyOnComment holds the default value on creation for the isNotifyOnComment field.
-	topic.DefaultIsNotifyOnComment = topicDescIsNotifyOnComment.Default.(bool)
-	// topicDescCreatedAt is the schema descriptor for createdAt field.
-	topicDescCreatedAt := topicFields[9].Descriptor()
-	// topic.DefaultCreatedAt holds the default value on creation for the createdAt field.
-	topic.DefaultCreatedAt = topicDescCreatedAt.Default.(func() time.Time)
-	// topicDescUpdatedAt is the schema descriptor for updatedAt field.
-	topicDescUpdatedAt := topicFields[10].Descriptor()
-	// topic.DefaultUpdatedAt holds the default value on creation for the updatedAt field.
-	topic.DefaultUpdatedAt = topicDescUpdatedAt.Default.(func() time.Time)
-	// topic.UpdateDefaultUpdatedAt holds the default value on update for the updatedAt field.
-	topic.UpdateDefaultUpdatedAt = topicDescUpdatedAt.UpdateDefault.(func() time.Time)
-	topictagFields := schema.TopicTag{}.Fields()
-	_ = topictagFields
-	// topictagDescName is the schema descriptor for name field.
-	topictagDescName := topictagFields[1].Descriptor()
-	// topictag.NameValidator is a validator for the "name" field. It is called by the builders before save.
-	topictag.NameValidator = topictagDescName.Validators[0].(func(string) error)
-	// topictagDescCreatedAt is the schema descriptor for createdAt field.
-	topictagDescCreatedAt := topictagFields[2].Descriptor()
-	// topictag.DefaultCreatedAt holds the default value on creation for the createdAt field.
-	topictag.DefaultCreatedAt = topictagDescCreatedAt.Default.(func() time.Time)
+	threadFields := schema.Thread{}.Fields()
+	_ = threadFields
+	// threadDescTitle is the schema descriptor for title field.
+	threadDescTitle := threadFields[3].Descriptor()
+	// thread.TitleValidator is a validator for the "title" field. It is called by the builders before save.
+	thread.TitleValidator = threadDescTitle.Validators[0].(func(string) error)
+	// threadDescDescription is the schema descriptor for description field.
+	threadDescDescription := threadFields[4].Descriptor()
+	// thread.DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
+	thread.DescriptionValidator = threadDescDescription.Validators[0].(func(string) error)
+	// threadDescIsAutoGenerated is the schema descriptor for isAutoGenerated field.
+	threadDescIsAutoGenerated := threadFields[6].Descriptor()
+	// thread.DefaultIsAutoGenerated holds the default value on creation for the isAutoGenerated field.
+	thread.DefaultIsAutoGenerated = threadDescIsAutoGenerated.Default.(bool)
+	// threadDescIsNotifyOnComment is the schema descriptor for isNotifyOnComment field.
+	threadDescIsNotifyOnComment := threadFields[7].Descriptor()
+	// thread.DefaultIsNotifyOnComment holds the default value on creation for the isNotifyOnComment field.
+	thread.DefaultIsNotifyOnComment = threadDescIsNotifyOnComment.Default.(bool)
+	// threadDescIPAddress is the schema descriptor for ip_address field.
+	threadDescIPAddress := threadFields[8].Descriptor()
+	// thread.IPAddressValidator is a validator for the "ip_address" field. It is called by the builders before save.
+	thread.IPAddressValidator = threadDescIPAddress.Validators[0].(func(string) error)
+	// threadDescCreatedAt is the schema descriptor for createdAt field.
+	threadDescCreatedAt := threadFields[10].Descriptor()
+	// thread.DefaultCreatedAt holds the default value on creation for the createdAt field.
+	thread.DefaultCreatedAt = threadDescCreatedAt.Default.(func() time.Time)
+	// threadDescUpdatedAt is the schema descriptor for updatedAt field.
+	threadDescUpdatedAt := threadFields[11].Descriptor()
+	// thread.DefaultUpdatedAt holds the default value on creation for the updatedAt field.
+	thread.DefaultUpdatedAt = threadDescUpdatedAt.Default.(func() time.Time)
+	// thread.UpdateDefaultUpdatedAt holds the default value on update for the updatedAt field.
+	thread.UpdateDefaultUpdatedAt = threadDescUpdatedAt.UpdateDefault.(func() time.Time)
+	threadtagFields := schema.ThreadTag{}.Fields()
+	_ = threadtagFields
+	// threadtagDescName is the schema descriptor for name field.
+	threadtagDescName := threadtagFields[1].Descriptor()
+	// threadtag.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	threadtag.NameValidator = threadtagDescName.Validators[0].(func(string) error)
+	// threadtagDescCreatedAt is the schema descriptor for createdAt field.
+	threadtagDescCreatedAt := threadtagFields[2].Descriptor()
+	// threadtag.DefaultCreatedAt holds the default value on creation for the createdAt field.
+	threadtag.DefaultCreatedAt = threadtagDescCreatedAt.Default.(func() time.Time)
 	userFields := schema.User{}.Fields()
 	_ = userFields
-	// userDescUserName is the schema descriptor for userName field.
-	userDescUserName := userFields[1].Descriptor()
-	// user.UserNameValidator is a validator for the "userName" field. It is called by the builders before save.
-	user.UserNameValidator = userDescUserName.Validators[0].(func(string) error)
+	// userDescName is the schema descriptor for name field.
+	userDescName := userFields[1].Descriptor()
+	// user.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	user.NameValidator = userDescName.Validators[0].(func(string) error)
 	// userDescEmail is the schema descriptor for email field.
 	userDescEmail := userFields[2].Descriptor()
 	// user.EmailValidator is a validator for the "email" field. It is called by the builders before save.
@@ -148,52 +160,64 @@ func init() {
 	user.DefaultUpdatedAt = userDescUpdatedAt.Default.(func() time.Time)
 	// user.UpdateDefaultUpdatedAt holds the default value on update for the updatedAt field.
 	user.UpdateDefaultUpdatedAt = userDescUpdatedAt.UpdateDefault.(func() time.Time)
+	userboardlikeFields := schema.UserBoardLike{}.Fields()
+	_ = userboardlikeFields
+	// userboardlikeDescLikedAt is the schema descriptor for likedAt field.
+	userboardlikeDescLikedAt := userboardlikeFields[2].Descriptor()
+	// userboardlike.DefaultLikedAt holds the default value on creation for the likedAt field.
+	userboardlike.DefaultLikedAt = userboardlikeDescLikedAt.Default.(func() time.Time)
+	userboardsubscriptionFields := schema.UserBoardSubscription{}.Fields()
+	_ = userboardsubscriptionFields
+	// userboardsubscriptionDescIsNotified is the schema descriptor for isNotified field.
+	userboardsubscriptionDescIsNotified := userboardsubscriptionFields[2].Descriptor()
+	// userboardsubscription.DefaultIsNotified holds the default value on creation for the isNotified field.
+	userboardsubscription.DefaultIsNotified = userboardsubscriptionDescIsNotified.Default.(bool)
+	// userboardsubscriptionDescIsChecked is the schema descriptor for isChecked field.
+	userboardsubscriptionDescIsChecked := userboardsubscriptionFields[3].Descriptor()
+	// userboardsubscription.DefaultIsChecked holds the default value on creation for the isChecked field.
+	userboardsubscription.DefaultIsChecked = userboardsubscriptionDescIsChecked.Default.(bool)
+	// userboardsubscriptionDescSubscribedAt is the schema descriptor for subscribedAt field.
+	userboardsubscriptionDescSubscribedAt := userboardsubscriptionFields[4].Descriptor()
+	// userboardsubscription.DefaultSubscribedAt holds the default value on creation for the subscribedAt field.
+	userboardsubscription.DefaultSubscribedAt = userboardsubscriptionDescSubscribedAt.Default.(func() time.Time)
 	usercommentlikeFields := schema.UserCommentLike{}.Fields()
 	_ = usercommentlikeFields
 	// usercommentlikeDescLikedAt is the schema descriptor for likedAt field.
-	usercommentlikeDescLikedAt := usercommentlikeFields[4].Descriptor()
+	usercommentlikeDescLikedAt := usercommentlikeFields[2].Descriptor()
 	// usercommentlike.DefaultLikedAt holds the default value on creation for the likedAt field.
 	usercommentlike.DefaultLikedAt = usercommentlikeDescLikedAt.Default.(func() time.Time)
 	usercommentsubscriptionFields := schema.UserCommentSubscription{}.Fields()
 	_ = usercommentsubscriptionFields
 	// usercommentsubscriptionDescIsNotified is the schema descriptor for isNotified field.
-	usercommentsubscriptionDescIsNotified := usercommentsubscriptionFields[3].Descriptor()
+	usercommentsubscriptionDescIsNotified := usercommentsubscriptionFields[2].Descriptor()
 	// usercommentsubscription.DefaultIsNotified holds the default value on creation for the isNotified field.
 	usercommentsubscription.DefaultIsNotified = usercommentsubscriptionDescIsNotified.Default.(bool)
+	// usercommentsubscriptionDescIsChecked is the schema descriptor for isChecked field.
+	usercommentsubscriptionDescIsChecked := usercommentsubscriptionFields[3].Descriptor()
+	// usercommentsubscription.DefaultIsChecked holds the default value on creation for the isChecked field.
+	usercommentsubscription.DefaultIsChecked = usercommentsubscriptionDescIsChecked.Default.(bool)
 	// usercommentsubscriptionDescSubscribedAt is the schema descriptor for subscribedAt field.
 	usercommentsubscriptionDescSubscribedAt := usercommentsubscriptionFields[4].Descriptor()
 	// usercommentsubscription.DefaultSubscribedAt holds the default value on creation for the subscribedAt field.
 	usercommentsubscription.DefaultSubscribedAt = usercommentsubscriptionDescSubscribedAt.Default.(func() time.Time)
-	userforumlikeFields := schema.UserForumLike{}.Fields()
-	_ = userforumlikeFields
-	// userforumlikeDescLikedAt is the schema descriptor for likedAt field.
-	userforumlikeDescLikedAt := userforumlikeFields[4].Descriptor()
-	// userforumlike.DefaultLikedAt holds the default value on creation for the likedAt field.
-	userforumlike.DefaultLikedAt = userforumlikeDescLikedAt.Default.(func() time.Time)
-	userforumsubscriptionFields := schema.UserForumSubscription{}.Fields()
-	_ = userforumsubscriptionFields
-	// userforumsubscriptionDescIsNotified is the schema descriptor for isNotified field.
-	userforumsubscriptionDescIsNotified := userforumsubscriptionFields[3].Descriptor()
-	// userforumsubscription.DefaultIsNotified holds the default value on creation for the isNotified field.
-	userforumsubscription.DefaultIsNotified = userforumsubscriptionDescIsNotified.Default.(bool)
-	// userforumsubscriptionDescSubscribedAt is the schema descriptor for subscribedAt field.
-	userforumsubscriptionDescSubscribedAt := userforumsubscriptionFields[4].Descriptor()
-	// userforumsubscription.DefaultSubscribedAt holds the default value on creation for the subscribedAt field.
-	userforumsubscription.DefaultSubscribedAt = userforumsubscriptionDescSubscribedAt.Default.(func() time.Time)
-	usertopiclikeFields := schema.UserTopicLike{}.Fields()
-	_ = usertopiclikeFields
-	// usertopiclikeDescLikedAt is the schema descriptor for likedAt field.
-	usertopiclikeDescLikedAt := usertopiclikeFields[4].Descriptor()
-	// usertopiclike.DefaultLikedAt holds the default value on creation for the likedAt field.
-	usertopiclike.DefaultLikedAt = usertopiclikeDescLikedAt.Default.(func() time.Time)
-	usertopicsubscriptionFields := schema.UserTopicSubscription{}.Fields()
-	_ = usertopicsubscriptionFields
-	// usertopicsubscriptionDescIsNotified is the schema descriptor for isNotified field.
-	usertopicsubscriptionDescIsNotified := usertopicsubscriptionFields[3].Descriptor()
-	// usertopicsubscription.DefaultIsNotified holds the default value on creation for the isNotified field.
-	usertopicsubscription.DefaultIsNotified = usertopicsubscriptionDescIsNotified.Default.(bool)
-	// usertopicsubscriptionDescSubscribedAt is the schema descriptor for subscribedAt field.
-	usertopicsubscriptionDescSubscribedAt := usertopicsubscriptionFields[4].Descriptor()
-	// usertopicsubscription.DefaultSubscribedAt holds the default value on creation for the subscribedAt field.
-	usertopicsubscription.DefaultSubscribedAt = usertopicsubscriptionDescSubscribedAt.Default.(func() time.Time)
+	userthreadlikeFields := schema.UserThreadLike{}.Fields()
+	_ = userthreadlikeFields
+	// userthreadlikeDescLikedAt is the schema descriptor for likedAt field.
+	userthreadlikeDescLikedAt := userthreadlikeFields[2].Descriptor()
+	// userthreadlike.DefaultLikedAt holds the default value on creation for the likedAt field.
+	userthreadlike.DefaultLikedAt = userthreadlikeDescLikedAt.Default.(func() time.Time)
+	userthreadsubscriptionFields := schema.UserThreadSubscription{}.Fields()
+	_ = userthreadsubscriptionFields
+	// userthreadsubscriptionDescIsNotified is the schema descriptor for isNotified field.
+	userthreadsubscriptionDescIsNotified := userthreadsubscriptionFields[2].Descriptor()
+	// userthreadsubscription.DefaultIsNotified holds the default value on creation for the isNotified field.
+	userthreadsubscription.DefaultIsNotified = userthreadsubscriptionDescIsNotified.Default.(bool)
+	// userthreadsubscriptionDescIsChecked is the schema descriptor for isChecked field.
+	userthreadsubscriptionDescIsChecked := userthreadsubscriptionFields[3].Descriptor()
+	// userthreadsubscription.DefaultIsChecked holds the default value on creation for the isChecked field.
+	userthreadsubscription.DefaultIsChecked = userthreadsubscriptionDescIsChecked.Default.(bool)
+	// userthreadsubscriptionDescSubscribedAt is the schema descriptor for subscribedAt field.
+	userthreadsubscriptionDescSubscribedAt := userthreadsubscriptionFields[4].Descriptor()
+	// userthreadsubscription.DefaultSubscribedAt holds the default value on creation for the subscribedAt field.
+	userthreadsubscription.DefaultSubscribedAt = userthreadsubscriptionDescSubscribedAt.Default.(func() time.Time)
 }

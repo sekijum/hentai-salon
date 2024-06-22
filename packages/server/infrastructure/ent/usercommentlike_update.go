@@ -58,20 +58,6 @@ func (uclu *UserCommentLikeUpdate) SetNillableCommentId(i *int) *UserCommentLike
 	return uclu
 }
 
-// SetType sets the "type" field.
-func (uclu *UserCommentLikeUpdate) SetType(u usercommentlike.Type) *UserCommentLikeUpdate {
-	uclu.mutation.SetType(u)
-	return uclu
-}
-
-// SetNillableType sets the "type" field if the given value is not nil.
-func (uclu *UserCommentLikeUpdate) SetNillableType(u *usercommentlike.Type) *UserCommentLikeUpdate {
-	if u != nil {
-		uclu.SetType(*u)
-	}
-	return uclu
-}
-
 // SetLikedAt sets the "likedAt" field.
 func (uclu *UserCommentLikeUpdate) SetLikedAt(t time.Time) *UserCommentLikeUpdate {
 	uclu.mutation.SetLikedAt(t)
@@ -154,11 +140,6 @@ func (uclu *UserCommentLikeUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (uclu *UserCommentLikeUpdate) check() error {
-	if v, ok := uclu.mutation.GetType(); ok {
-		if err := usercommentlike.TypeValidator(v); err != nil {
-			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "UserCommentLike.type": %w`, err)}
-		}
-	}
 	if _, ok := uclu.mutation.UserID(); uclu.mutation.UserCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "UserCommentLike.user"`)
 	}
@@ -179,9 +160,6 @@ func (uclu *UserCommentLikeUpdate) sqlSave(ctx context.Context) (n int, err erro
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := uclu.mutation.GetType(); ok {
-		_spec.SetField(usercommentlike.FieldType, field.TypeEnum, value)
 	}
 	if value, ok := uclu.mutation.LikedAt(); ok {
 		_spec.SetField(usercommentlike.FieldLikedAt, field.TypeTime, value)
@@ -292,20 +270,6 @@ func (ucluo *UserCommentLikeUpdateOne) SetNillableCommentId(i *int) *UserComment
 	return ucluo
 }
 
-// SetType sets the "type" field.
-func (ucluo *UserCommentLikeUpdateOne) SetType(u usercommentlike.Type) *UserCommentLikeUpdateOne {
-	ucluo.mutation.SetType(u)
-	return ucluo
-}
-
-// SetNillableType sets the "type" field if the given value is not nil.
-func (ucluo *UserCommentLikeUpdateOne) SetNillableType(u *usercommentlike.Type) *UserCommentLikeUpdateOne {
-	if u != nil {
-		ucluo.SetType(*u)
-	}
-	return ucluo
-}
-
 // SetLikedAt sets the "likedAt" field.
 func (ucluo *UserCommentLikeUpdateOne) SetLikedAt(t time.Time) *UserCommentLikeUpdateOne {
 	ucluo.mutation.SetLikedAt(t)
@@ -401,11 +365,6 @@ func (ucluo *UserCommentLikeUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (ucluo *UserCommentLikeUpdateOne) check() error {
-	if v, ok := ucluo.mutation.GetType(); ok {
-		if err := usercommentlike.TypeValidator(v); err != nil {
-			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "UserCommentLike.type": %w`, err)}
-		}
-	}
 	if _, ok := ucluo.mutation.UserID(); ucluo.mutation.UserCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "UserCommentLike.user"`)
 	}
@@ -445,9 +404,6 @@ func (ucluo *UserCommentLikeUpdateOne) sqlSave(ctx context.Context) (_node *User
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := ucluo.mutation.GetType(); ok {
-		_spec.SetField(usercommentlike.FieldType, field.TypeEnum, value)
 	}
 	if value, ok := ucluo.mutation.LikedAt(); ok {
 		_spec.SetField(usercommentlike.FieldLikedAt, field.TypeTime, value)

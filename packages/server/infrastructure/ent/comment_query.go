@@ -10,7 +10,7 @@ import (
 	"server/infrastructure/ent/comment"
 	"server/infrastructure/ent/commentattachment"
 	"server/infrastructure/ent/predicate"
-	"server/infrastructure/ent/topic"
+	"server/infrastructure/ent/thread"
 	"server/infrastructure/ent/user"
 	"server/infrastructure/ent/usercommentlike"
 	"server/infrastructure/ent/usercommentsubscription"
@@ -27,9 +27,9 @@ type CommentQuery struct {
 	order                       []comment.OrderOption
 	inters                      []Interceptor
 	predicates                  []predicate.Comment
-	withTopic                   *TopicQuery
+	withThread                  *ThreadQuery
 	withAuthor                  *UserQuery
-	withParent                  *CommentQuery
+	withParentComment           *CommentQuery
 	withReplies                 *CommentQuery
 	withCommentAttachments      *CommentAttachmentQuery
 	withLikedUsers              *UserQuery
@@ -72,9 +72,9 @@ func (cq *CommentQuery) Order(o ...comment.OrderOption) *CommentQuery {
 	return cq
 }
 
-// QueryTopic chains the current query on the "topic" edge.
-func (cq *CommentQuery) QueryTopic() *TopicQuery {
-	query := (&TopicClient{config: cq.config}).Query()
+// QueryThread chains the current query on the "thread" edge.
+func (cq *CommentQuery) QueryThread() *ThreadQuery {
+	query := (&ThreadClient{config: cq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := cq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -85,8 +85,8 @@ func (cq *CommentQuery) QueryTopic() *TopicQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(comment.Table, comment.FieldID, selector),
-			sqlgraph.To(topic.Table, topic.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, comment.TopicTable, comment.TopicColumn),
+			sqlgraph.To(thread.Table, thread.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, comment.ThreadTable, comment.ThreadColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil
@@ -116,8 +116,8 @@ func (cq *CommentQuery) QueryAuthor() *UserQuery {
 	return query
 }
 
-// QueryParent chains the current query on the "parent" edge.
-func (cq *CommentQuery) QueryParent() *CommentQuery {
+// QueryParentComment chains the current query on the "parent_comment" edge.
+func (cq *CommentQuery) QueryParentComment() *CommentQuery {
 	query := (&CommentClient{config: cq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := cq.prepareQuery(ctx); err != nil {
@@ -130,7 +130,7 @@ func (cq *CommentQuery) QueryParent() *CommentQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(comment.Table, comment.FieldID, selector),
 			sqlgraph.To(comment.Table, comment.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, comment.ParentTable, comment.ParentColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, comment.ParentCommentTable, comment.ParentCommentColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil
@@ -462,9 +462,9 @@ func (cq *CommentQuery) Clone() *CommentQuery {
 		order:                       append([]comment.OrderOption{}, cq.order...),
 		inters:                      append([]Interceptor{}, cq.inters...),
 		predicates:                  append([]predicate.Comment{}, cq.predicates...),
-		withTopic:                   cq.withTopic.Clone(),
+		withThread:                  cq.withThread.Clone(),
 		withAuthor:                  cq.withAuthor.Clone(),
-		withParent:                  cq.withParent.Clone(),
+		withParentComment:           cq.withParentComment.Clone(),
 		withReplies:                 cq.withReplies.Clone(),
 		withCommentAttachments:      cq.withCommentAttachments.Clone(),
 		withLikedUsers:              cq.withLikedUsers.Clone(),
@@ -477,14 +477,14 @@ func (cq *CommentQuery) Clone() *CommentQuery {
 	}
 }
 
-// WithTopic tells the query-builder to eager-load the nodes that are connected to
-// the "topic" edge. The optional arguments are used to configure the query builder of the edge.
-func (cq *CommentQuery) WithTopic(opts ...func(*TopicQuery)) *CommentQuery {
-	query := (&TopicClient{config: cq.config}).Query()
+// WithThread tells the query-builder to eager-load the nodes that are connected to
+// the "thread" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *CommentQuery) WithThread(opts ...func(*ThreadQuery)) *CommentQuery {
+	query := (&ThreadClient{config: cq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	cq.withTopic = query
+	cq.withThread = query
 	return cq
 }
 
@@ -499,14 +499,14 @@ func (cq *CommentQuery) WithAuthor(opts ...func(*UserQuery)) *CommentQuery {
 	return cq
 }
 
-// WithParent tells the query-builder to eager-load the nodes that are connected to
-// the "parent" edge. The optional arguments are used to configure the query builder of the edge.
-func (cq *CommentQuery) WithParent(opts ...func(*CommentQuery)) *CommentQuery {
+// WithParentComment tells the query-builder to eager-load the nodes that are connected to
+// the "parent_comment" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *CommentQuery) WithParentComment(opts ...func(*CommentQuery)) *CommentQuery {
 	query := (&CommentClient{config: cq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	cq.withParent = query
+	cq.withParentComment = query
 	return cq
 }
 
@@ -582,12 +582,12 @@ func (cq *CommentQuery) WithUserCommentSubscription(opts ...func(*UserCommentSub
 // Example:
 //
 //	var v []struct {
-//		TopicId int `json:"topicId,omitempty"`
+//		ThreadId int `json:"threadId,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Comment.Query().
-//		GroupBy(comment.FieldTopicId).
+//		GroupBy(comment.FieldThreadId).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (cq *CommentQuery) GroupBy(field string, fields ...string) *CommentGroupBy {
@@ -605,11 +605,11 @@ func (cq *CommentQuery) GroupBy(field string, fields ...string) *CommentGroupBy 
 // Example:
 //
 //	var v []struct {
-//		TopicId int `json:"topicId,omitempty"`
+//		ThreadId int `json:"threadId,omitempty"`
 //	}
 //
 //	client.Comment.Query().
-//		Select(comment.FieldTopicId).
+//		Select(comment.FieldThreadId).
 //		Scan(ctx, &v)
 func (cq *CommentQuery) Select(fields ...string) *CommentSelect {
 	cq.ctx.Fields = append(cq.ctx.Fields, fields...)
@@ -655,9 +655,9 @@ func (cq *CommentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Comm
 		nodes       = []*Comment{}
 		_spec       = cq.querySpec()
 		loadedTypes = [9]bool{
-			cq.withTopic != nil,
+			cq.withThread != nil,
 			cq.withAuthor != nil,
-			cq.withParent != nil,
+			cq.withParentComment != nil,
 			cq.withReplies != nil,
 			cq.withCommentAttachments != nil,
 			cq.withLikedUsers != nil,
@@ -684,9 +684,9 @@ func (cq *CommentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Comm
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := cq.withTopic; query != nil {
-		if err := cq.loadTopic(ctx, query, nodes, nil,
-			func(n *Comment, e *Topic) { n.Edges.Topic = e }); err != nil {
+	if query := cq.withThread; query != nil {
+		if err := cq.loadThread(ctx, query, nodes, nil,
+			func(n *Comment, e *Thread) { n.Edges.Thread = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -696,9 +696,9 @@ func (cq *CommentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Comm
 			return nil, err
 		}
 	}
-	if query := cq.withParent; query != nil {
-		if err := cq.loadParent(ctx, query, nodes, nil,
-			func(n *Comment, e *Comment) { n.Edges.Parent = e }); err != nil {
+	if query := cq.withParentComment; query != nil {
+		if err := cq.loadParentComment(ctx, query, nodes, nil,
+			func(n *Comment, e *Comment) { n.Edges.ParentComment = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -751,11 +751,11 @@ func (cq *CommentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Comm
 	return nodes, nil
 }
 
-func (cq *CommentQuery) loadTopic(ctx context.Context, query *TopicQuery, nodes []*Comment, init func(*Comment), assign func(*Comment, *Topic)) error {
+func (cq *CommentQuery) loadThread(ctx context.Context, query *ThreadQuery, nodes []*Comment, init func(*Comment), assign func(*Comment, *Thread)) error {
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Comment)
 	for i := range nodes {
-		fk := nodes[i].TopicId
+		fk := nodes[i].ThreadId
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -764,7 +764,7 @@ func (cq *CommentQuery) loadTopic(ctx context.Context, query *TopicQuery, nodes 
 	if len(ids) == 0 {
 		return nil
 	}
-	query.Where(topic.IDIn(ids...))
+	query.Where(thread.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
@@ -772,7 +772,7 @@ func (cq *CommentQuery) loadTopic(ctx context.Context, query *TopicQuery, nodes 
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "topicId" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "threadId" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -809,11 +809,11 @@ func (cq *CommentQuery) loadAuthor(ctx context.Context, query *UserQuery, nodes 
 	}
 	return nil
 }
-func (cq *CommentQuery) loadParent(ctx context.Context, query *CommentQuery, nodes []*Comment, init func(*Comment), assign func(*Comment, *Comment)) error {
+func (cq *CommentQuery) loadParentComment(ctx context.Context, query *CommentQuery, nodes []*Comment, init func(*Comment), assign func(*Comment, *Comment)) error {
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Comment)
 	for i := range nodes {
-		fk := nodes[i].ParentId
+		fk := nodes[i].ParentCommentId
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -830,7 +830,7 @@ func (cq *CommentQuery) loadParent(ctx context.Context, query *CommentQuery, nod
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "parentId" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "parentCommentId" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -849,7 +849,7 @@ func (cq *CommentQuery) loadReplies(ctx context.Context, query *CommentQuery, no
 		}
 	}
 	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(comment.FieldParentId)
+		query.ctx.AppendFieldOnce(comment.FieldParentCommentId)
 	}
 	query.Where(predicate.Comment(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(comment.RepliesColumn), fks...))
@@ -859,10 +859,10 @@ func (cq *CommentQuery) loadReplies(ctx context.Context, query *CommentQuery, no
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.ParentId
+		fk := n.ParentCommentId
 		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "parentId" returned %v for node %v`, fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "parentCommentId" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -1106,14 +1106,14 @@ func (cq *CommentQuery) querySpec() *sqlgraph.QuerySpec {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
 		}
-		if cq.withTopic != nil {
-			_spec.Node.AddColumnOnce(comment.FieldTopicId)
+		if cq.withThread != nil {
+			_spec.Node.AddColumnOnce(comment.FieldThreadId)
 		}
 		if cq.withAuthor != nil {
 			_spec.Node.AddColumnOnce(comment.FieldUserId)
 		}
-		if cq.withParent != nil {
-			_spec.Node.AddColumnOnce(comment.FieldParentId)
+		if cq.withParentComment != nil {
+			_spec.Node.AddColumnOnce(comment.FieldParentCommentId)
 		}
 	}
 	if ps := cq.predicates; len(ps) > 0 {

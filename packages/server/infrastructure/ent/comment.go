@@ -5,7 +5,7 @@ package ent
 import (
 	"fmt"
 	"server/infrastructure/ent/comment"
-	"server/infrastructure/ent/topic"
+	"server/infrastructure/ent/thread"
 	"server/infrastructure/ent/user"
 	"strings"
 	"time"
@@ -19,16 +19,18 @@ type Comment struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// TopicId holds the value of the "topicId" field.
-	TopicId int `json:"topicId,omitempty"`
+	// ThreadId holds the value of the "threadId" field.
+	ThreadId int `json:"threadId,omitempty"`
 	// 親コメントID（リプライの場合）
-	ParentId int `json:"parentId,omitempty"`
+	ParentCommentId int `json:"parentCommentId,omitempty"`
 	// ログインユーザーの場合
 	UserId int `json:"userId,omitempty"`
 	// ゲストユーザーの場合
 	GuestName string `json:"guestName,omitempty"`
 	// Message holds the value of the "message" field.
 	Message string `json:"message,omitempty"`
+	// コメント者のIPアドレス
+	IPAddress string `json:"ip_address,omitempty"`
 	// Status holds the value of the "status" field.
 	Status comment.Status `json:"status,omitempty"`
 	// CreatedAt holds the value of the "createdAt" field.
@@ -43,12 +45,12 @@ type Comment struct {
 
 // CommentEdges holds the relations/edges for other nodes in the graph.
 type CommentEdges struct {
-	// Topic holds the value of the topic edge.
-	Topic *Topic `json:"topic,omitempty"`
+	// Thread holds the value of the thread edge.
+	Thread *Thread `json:"thread,omitempty"`
 	// Author holds the value of the author edge.
 	Author *User `json:"author,omitempty"`
-	// Parent holds the value of the parent edge.
-	Parent *Comment `json:"parent,omitempty"`
+	// ParentComment holds the value of the parent_comment edge.
+	ParentComment *Comment `json:"parent_comment,omitempty"`
 	// Replies holds the value of the replies edge.
 	Replies []*Comment `json:"replies,omitempty"`
 	// CommentAttachments holds the value of the comment_attachments edge.
@@ -66,15 +68,15 @@ type CommentEdges struct {
 	loadedTypes [9]bool
 }
 
-// TopicOrErr returns the Topic value or an error if the edge
+// ThreadOrErr returns the Thread value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e CommentEdges) TopicOrErr() (*Topic, error) {
-	if e.Topic != nil {
-		return e.Topic, nil
+func (e CommentEdges) ThreadOrErr() (*Thread, error) {
+	if e.Thread != nil {
+		return e.Thread, nil
 	} else if e.loadedTypes[0] {
-		return nil, &NotFoundError{label: topic.Label}
+		return nil, &NotFoundError{label: thread.Label}
 	}
-	return nil, &NotLoadedError{edge: "topic"}
+	return nil, &NotLoadedError{edge: "thread"}
 }
 
 // AuthorOrErr returns the Author value or an error if the edge
@@ -88,15 +90,15 @@ func (e CommentEdges) AuthorOrErr() (*User, error) {
 	return nil, &NotLoadedError{edge: "author"}
 }
 
-// ParentOrErr returns the Parent value or an error if the edge
+// ParentCommentOrErr returns the ParentComment value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e CommentEdges) ParentOrErr() (*Comment, error) {
-	if e.Parent != nil {
-		return e.Parent, nil
+func (e CommentEdges) ParentCommentOrErr() (*Comment, error) {
+	if e.ParentComment != nil {
+		return e.ParentComment, nil
 	} else if e.loadedTypes[2] {
 		return nil, &NotFoundError{label: comment.Label}
 	}
-	return nil, &NotLoadedError{edge: "parent"}
+	return nil, &NotLoadedError{edge: "parent_comment"}
 }
 
 // RepliesOrErr returns the Replies value or an error if the edge
@@ -158,9 +160,9 @@ func (*Comment) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case comment.FieldID, comment.FieldTopicId, comment.FieldParentId, comment.FieldUserId:
+		case comment.FieldID, comment.FieldThreadId, comment.FieldParentCommentId, comment.FieldUserId:
 			values[i] = new(sql.NullInt64)
-		case comment.FieldGuestName, comment.FieldMessage, comment.FieldStatus:
+		case comment.FieldGuestName, comment.FieldMessage, comment.FieldIPAddress, comment.FieldStatus:
 			values[i] = new(sql.NullString)
 		case comment.FieldCreatedAt, comment.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -185,17 +187,17 @@ func (c *Comment) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			c.ID = int(value.Int64)
-		case comment.FieldTopicId:
+		case comment.FieldThreadId:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field topicId", values[i])
+				return fmt.Errorf("unexpected type %T for field threadId", values[i])
 			} else if value.Valid {
-				c.TopicId = int(value.Int64)
+				c.ThreadId = int(value.Int64)
 			}
-		case comment.FieldParentId:
+		case comment.FieldParentCommentId:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field parentId", values[i])
+				return fmt.Errorf("unexpected type %T for field parentCommentId", values[i])
 			} else if value.Valid {
-				c.ParentId = int(value.Int64)
+				c.ParentCommentId = int(value.Int64)
 			}
 		case comment.FieldUserId:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -214,6 +216,12 @@ func (c *Comment) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field message", values[i])
 			} else if value.Valid {
 				c.Message = value.String
+			}
+		case comment.FieldIPAddress:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field ip_address", values[i])
+			} else if value.Valid {
+				c.IPAddress = value.String
 			}
 		case comment.FieldStatus:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -246,9 +254,9 @@ func (c *Comment) Value(name string) (ent.Value, error) {
 	return c.selectValues.Get(name)
 }
 
-// QueryTopic queries the "topic" edge of the Comment entity.
-func (c *Comment) QueryTopic() *TopicQuery {
-	return NewCommentClient(c.config).QueryTopic(c)
+// QueryThread queries the "thread" edge of the Comment entity.
+func (c *Comment) QueryThread() *ThreadQuery {
+	return NewCommentClient(c.config).QueryThread(c)
 }
 
 // QueryAuthor queries the "author" edge of the Comment entity.
@@ -256,9 +264,9 @@ func (c *Comment) QueryAuthor() *UserQuery {
 	return NewCommentClient(c.config).QueryAuthor(c)
 }
 
-// QueryParent queries the "parent" edge of the Comment entity.
-func (c *Comment) QueryParent() *CommentQuery {
-	return NewCommentClient(c.config).QueryParent(c)
+// QueryParentComment queries the "parent_comment" edge of the Comment entity.
+func (c *Comment) QueryParentComment() *CommentQuery {
+	return NewCommentClient(c.config).QueryParentComment(c)
 }
 
 // QueryReplies queries the "replies" edge of the Comment entity.
@@ -314,11 +322,11 @@ func (c *Comment) String() string {
 	var builder strings.Builder
 	builder.WriteString("Comment(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", c.ID))
-	builder.WriteString("topicId=")
-	builder.WriteString(fmt.Sprintf("%v", c.TopicId))
+	builder.WriteString("threadId=")
+	builder.WriteString(fmt.Sprintf("%v", c.ThreadId))
 	builder.WriteString(", ")
-	builder.WriteString("parentId=")
-	builder.WriteString(fmt.Sprintf("%v", c.ParentId))
+	builder.WriteString("parentCommentId=")
+	builder.WriteString(fmt.Sprintf("%v", c.ParentCommentId))
 	builder.WriteString(", ")
 	builder.WriteString("userId=")
 	builder.WriteString(fmt.Sprintf("%v", c.UserId))
@@ -328,6 +336,9 @@ func (c *Comment) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("message=")
 	builder.WriteString(c.Message)
+	builder.WriteString(", ")
+	builder.WriteString("ip_address=")
+	builder.WriteString(c.IPAddress)
 	builder.WriteString(", ")
 	builder.WriteString("status=")
 	builder.WriteString(fmt.Sprintf("%v", c.Status))

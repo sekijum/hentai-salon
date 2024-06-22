@@ -9,26 +9,32 @@ import (
 // AdminUser is the predicate function for adminuser builders.
 type AdminUser func(*sql.Selector)
 
+// Board is the predicate function for board builders.
+type Board func(*sql.Selector)
+
 // Comment is the predicate function for comment builders.
 type Comment func(*sql.Selector)
 
 // CommentAttachment is the predicate function for commentattachment builders.
 type CommentAttachment func(*sql.Selector)
 
-// Forum is the predicate function for forum builders.
-type Forum func(*sql.Selector)
+// Thread is the predicate function for thread builders.
+type Thread func(*sql.Selector)
 
-// Topic is the predicate function for topic builders.
-type Topic func(*sql.Selector)
+// ThreadTag is the predicate function for threadtag builders.
+type ThreadTag func(*sql.Selector)
 
-// TopicTag is the predicate function for topictag builders.
-type TopicTag func(*sql.Selector)
-
-// TopicTagging is the predicate function for topictagging builders.
-type TopicTagging func(*sql.Selector)
+// ThreadTagging is the predicate function for threadtagging builders.
+type ThreadTagging func(*sql.Selector)
 
 // User is the predicate function for user builders.
 type User func(*sql.Selector)
+
+// UserBoardLike is the predicate function for userboardlike builders.
+type UserBoardLike func(*sql.Selector)
+
+// UserBoardSubscription is the predicate function for userboardsubscription builders.
+type UserBoardSubscription func(*sql.Selector)
 
 // UserCommentLike is the predicate function for usercommentlike builders.
 type UserCommentLike func(*sql.Selector)
@@ -36,14 +42,8 @@ type UserCommentLike func(*sql.Selector)
 // UserCommentSubscription is the predicate function for usercommentsubscription builders.
 type UserCommentSubscription func(*sql.Selector)
 
-// UserForumLike is the predicate function for userforumlike builders.
-type UserForumLike func(*sql.Selector)
+// UserThreadLike is the predicate function for userthreadlike builders.
+type UserThreadLike func(*sql.Selector)
 
-// UserForumSubscription is the predicate function for userforumsubscription builders.
-type UserForumSubscription func(*sql.Selector)
-
-// UserTopicLike is the predicate function for usertopiclike builders.
-type UserTopicLike func(*sql.Selector)
-
-// UserTopicSubscription is the predicate function for usertopicsubscription builders.
-type UserTopicSubscription func(*sql.Selector)
+// UserThreadSubscription is the predicate function for userthreadsubscription builders.
+type UserThreadSubscription func(*sql.Selector)

@@ -25,6 +25,11 @@ func IsNotified(v bool) predicate.UserCommentSubscription {
 	return predicate.UserCommentSubscription(sql.FieldEQ(FieldIsNotified, v))
 }
 
+// IsChecked applies equality check predicate on the "isChecked" field. It's identical to IsCheckedEQ.
+func IsChecked(v bool) predicate.UserCommentSubscription {
+	return predicate.UserCommentSubscription(sql.FieldEQ(FieldIsChecked, v))
+}
+
 // SubscribedAt applies equality check predicate on the "subscribedAt" field. It's identical to SubscribedAtEQ.
 func SubscribedAt(v time.Time) predicate.UserCommentSubscription {
 	return predicate.UserCommentSubscription(sql.FieldEQ(FieldSubscribedAt, v))
@@ -78,6 +83,16 @@ func IsNotifiedEQ(v bool) predicate.UserCommentSubscription {
 // IsNotifiedNEQ applies the NEQ predicate on the "isNotified" field.
 func IsNotifiedNEQ(v bool) predicate.UserCommentSubscription {
 	return predicate.UserCommentSubscription(sql.FieldNEQ(FieldIsNotified, v))
+}
+
+// IsCheckedEQ applies the EQ predicate on the "isChecked" field.
+func IsCheckedEQ(v bool) predicate.UserCommentSubscription {
+	return predicate.UserCommentSubscription(sql.FieldEQ(FieldIsChecked, v))
+}
+
+// IsCheckedNEQ applies the NEQ predicate on the "isChecked" field.
+func IsCheckedNEQ(v bool) predicate.UserCommentSubscription {
+	return predicate.UserCommentSubscription(sql.FieldNEQ(FieldIsChecked, v))
 }
 
 // SubscribedAtEQ applies the EQ predicate on the "subscribedAt" field.

@@ -261,12 +261,12 @@ func (auq *AdminUserQuery) Clone() *AdminUserQuery {
 // Example:
 //
 //	var v []struct {
-//		UserName string `json:"userName,omitempty"`
+//		Name string `json:"name,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.AdminUser.Query().
-//		GroupBy(adminuser.FieldUserName).
+//		GroupBy(adminuser.FieldName).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (auq *AdminUserQuery) GroupBy(field string, fields ...string) *AdminUserGroupBy {
@@ -284,11 +284,11 @@ func (auq *AdminUserQuery) GroupBy(field string, fields ...string) *AdminUserGro
 // Example:
 //
 //	var v []struct {
-//		UserName string `json:"userName,omitempty"`
+//		Name string `json:"name,omitempty"`
 //	}
 //
 //	client.AdminUser.Query().
-//		Select(adminuser.FieldUserName).
+//		Select(adminuser.FieldName).
 //		Scan(ctx, &v)
 func (auq *AdminUserQuery) Select(fields ...string) *AdminUserSelect {
 	auq.ctx.Fields = append(auq.ctx.Fields, fields...)

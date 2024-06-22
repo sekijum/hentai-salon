@@ -65,26 +65,6 @@ func CommentIdNotIn(vs ...int) predicate.UserCommentLike {
 	return predicate.UserCommentLike(sql.FieldNotIn(FieldCommentId, vs...))
 }
 
-// TypeEQ applies the EQ predicate on the "type" field.
-func TypeEQ(v Type) predicate.UserCommentLike {
-	return predicate.UserCommentLike(sql.FieldEQ(FieldType, v))
-}
-
-// TypeNEQ applies the NEQ predicate on the "type" field.
-func TypeNEQ(v Type) predicate.UserCommentLike {
-	return predicate.UserCommentLike(sql.FieldNEQ(FieldType, v))
-}
-
-// TypeIn applies the In predicate on the "type" field.
-func TypeIn(vs ...Type) predicate.UserCommentLike {
-	return predicate.UserCommentLike(sql.FieldIn(FieldType, vs...))
-}
-
-// TypeNotIn applies the NotIn predicate on the "type" field.
-func TypeNotIn(vs ...Type) predicate.UserCommentLike {
-	return predicate.UserCommentLike(sql.FieldNotIn(FieldType, vs...))
-}
-
 // LikedAtEQ applies the EQ predicate on the "likedAt" field.
 func LikedAtEQ(v time.Time) predicate.UserCommentLike {
 	return predicate.UserCommentLike(sql.FieldEQ(FieldLikedAt, v))

@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"server/infrastructure/ent/comment"
 	"server/infrastructure/ent/commentattachment"
-	"server/infrastructure/ent/topic"
+	"server/infrastructure/ent/thread"
 	"server/infrastructure/ent/user"
 	"time"
 
@@ -23,22 +23,22 @@ type CommentCreate struct {
 	hooks    []Hook
 }
 
-// SetTopicId sets the "topicId" field.
-func (cc *CommentCreate) SetTopicId(i int) *CommentCreate {
-	cc.mutation.SetTopicId(i)
+// SetThreadId sets the "threadId" field.
+func (cc *CommentCreate) SetThreadId(i int) *CommentCreate {
+	cc.mutation.SetThreadId(i)
 	return cc
 }
 
-// SetParentId sets the "parentId" field.
-func (cc *CommentCreate) SetParentId(i int) *CommentCreate {
-	cc.mutation.SetParentId(i)
+// SetParentCommentId sets the "parentCommentId" field.
+func (cc *CommentCreate) SetParentCommentId(i int) *CommentCreate {
+	cc.mutation.SetParentCommentId(i)
 	return cc
 }
 
-// SetNillableParentId sets the "parentId" field if the given value is not nil.
-func (cc *CommentCreate) SetNillableParentId(i *int) *CommentCreate {
+// SetNillableParentCommentId sets the "parentCommentId" field if the given value is not nil.
+func (cc *CommentCreate) SetNillableParentCommentId(i *int) *CommentCreate {
 	if i != nil {
-		cc.SetParentId(*i)
+		cc.SetParentCommentId(*i)
 	}
 	return cc
 }
@@ -74,6 +74,12 @@ func (cc *CommentCreate) SetNillableGuestName(s *string) *CommentCreate {
 // SetMessage sets the "message" field.
 func (cc *CommentCreate) SetMessage(s string) *CommentCreate {
 	cc.mutation.SetMessage(s)
+	return cc
+}
+
+// SetIPAddress sets the "ip_address" field.
+func (cc *CommentCreate) SetIPAddress(s string) *CommentCreate {
+	cc.mutation.SetIPAddress(s)
 	return cc
 }
 
@@ -125,15 +131,15 @@ func (cc *CommentCreate) SetID(i int) *CommentCreate {
 	return cc
 }
 
-// SetTopicID sets the "topic" edge to the Topic entity by ID.
-func (cc *CommentCreate) SetTopicID(id int) *CommentCreate {
-	cc.mutation.SetTopicID(id)
+// SetThreadID sets the "thread" edge to the Thread entity by ID.
+func (cc *CommentCreate) SetThreadID(id int) *CommentCreate {
+	cc.mutation.SetThreadID(id)
 	return cc
 }
 
-// SetTopic sets the "topic" edge to the Topic entity.
-func (cc *CommentCreate) SetTopic(t *Topic) *CommentCreate {
-	return cc.SetTopicID(t.ID)
+// SetThread sets the "thread" edge to the Thread entity.
+func (cc *CommentCreate) SetThread(t *Thread) *CommentCreate {
+	return cc.SetThreadID(t.ID)
 }
 
 // SetAuthorID sets the "author" edge to the User entity by ID.
@@ -155,23 +161,23 @@ func (cc *CommentCreate) SetAuthor(u *User) *CommentCreate {
 	return cc.SetAuthorID(u.ID)
 }
 
-// SetParentID sets the "parent" edge to the Comment entity by ID.
-func (cc *CommentCreate) SetParentID(id int) *CommentCreate {
-	cc.mutation.SetParentID(id)
+// SetParentCommentID sets the "parent_comment" edge to the Comment entity by ID.
+func (cc *CommentCreate) SetParentCommentID(id int) *CommentCreate {
+	cc.mutation.SetParentCommentID(id)
 	return cc
 }
 
-// SetNillableParentID sets the "parent" edge to the Comment entity by ID if the given value is not nil.
-func (cc *CommentCreate) SetNillableParentID(id *int) *CommentCreate {
+// SetNillableParentCommentID sets the "parent_comment" edge to the Comment entity by ID if the given value is not nil.
+func (cc *CommentCreate) SetNillableParentCommentID(id *int) *CommentCreate {
 	if id != nil {
-		cc = cc.SetParentID(*id)
+		cc = cc.SetParentCommentID(*id)
 	}
 	return cc
 }
 
-// SetParent sets the "parent" edge to the Comment entity.
-func (cc *CommentCreate) SetParent(c *Comment) *CommentCreate {
-	return cc.SetParentID(c.ID)
+// SetParentComment sets the "parent_comment" edge to the Comment entity.
+func (cc *CommentCreate) SetParentComment(c *Comment) *CommentCreate {
+	return cc.SetParentCommentID(c.ID)
 }
 
 // AddReplyIDs adds the "replies" edge to the Comment entity by IDs.
@@ -285,8 +291,8 @@ func (cc *CommentCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (cc *CommentCreate) check() error {
-	if _, ok := cc.mutation.TopicId(); !ok {
-		return &ValidationError{Name: "topicId", err: errors.New(`ent: missing required field "Comment.topicId"`)}
+	if _, ok := cc.mutation.ThreadId(); !ok {
+		return &ValidationError{Name: "threadId", err: errors.New(`ent: missing required field "Comment.threadId"`)}
 	}
 	if v, ok := cc.mutation.GuestName(); ok {
 		if err := comment.GuestNameValidator(v); err != nil {
@@ -295,6 +301,14 @@ func (cc *CommentCreate) check() error {
 	}
 	if _, ok := cc.mutation.Message(); !ok {
 		return &ValidationError{Name: "message", err: errors.New(`ent: missing required field "Comment.message"`)}
+	}
+	if _, ok := cc.mutation.IPAddress(); !ok {
+		return &ValidationError{Name: "ip_address", err: errors.New(`ent: missing required field "Comment.ip_address"`)}
+	}
+	if v, ok := cc.mutation.IPAddress(); ok {
+		if err := comment.IPAddressValidator(v); err != nil {
+			return &ValidationError{Name: "ip_address", err: fmt.Errorf(`ent: validator failed for field "Comment.ip_address": %w`, err)}
+		}
 	}
 	if _, ok := cc.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Comment.status"`)}
@@ -310,8 +324,8 @@ func (cc *CommentCreate) check() error {
 	if _, ok := cc.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updatedAt", err: errors.New(`ent: missing required field "Comment.updatedAt"`)}
 	}
-	if _, ok := cc.mutation.TopicID(); !ok {
-		return &ValidationError{Name: "topic", err: errors.New(`ent: missing required edge "Comment.topic"`)}
+	if _, ok := cc.mutation.ThreadID(); !ok {
+		return &ValidationError{Name: "thread", err: errors.New(`ent: missing required edge "Comment.thread"`)}
 	}
 	return nil
 }
@@ -353,6 +367,10 @@ func (cc *CommentCreate) createSpec() (*Comment, *sqlgraph.CreateSpec) {
 		_spec.SetField(comment.FieldMessage, field.TypeString, value)
 		_node.Message = value
 	}
+	if value, ok := cc.mutation.IPAddress(); ok {
+		_spec.SetField(comment.FieldIPAddress, field.TypeString, value)
+		_node.IPAddress = value
+	}
 	if value, ok := cc.mutation.Status(); ok {
 		_spec.SetField(comment.FieldStatus, field.TypeEnum, value)
 		_node.Status = value
@@ -365,21 +383,21 @@ func (cc *CommentCreate) createSpec() (*Comment, *sqlgraph.CreateSpec) {
 		_spec.SetField(comment.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
-	if nodes := cc.mutation.TopicIDs(); len(nodes) > 0 {
+	if nodes := cc.mutation.ThreadIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   comment.TopicTable,
-			Columns: []string{comment.TopicColumn},
+			Table:   comment.ThreadTable,
+			Columns: []string{comment.ThreadColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(topic.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(thread.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.TopicId = nodes[0]
+		_node.ThreadId = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := cc.mutation.AuthorIDs(); len(nodes) > 0 {
@@ -399,12 +417,12 @@ func (cc *CommentCreate) createSpec() (*Comment, *sqlgraph.CreateSpec) {
 		_node.UserId = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := cc.mutation.ParentIDs(); len(nodes) > 0 {
+	if nodes := cc.mutation.ParentCommentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   comment.ParentTable,
-			Columns: []string{comment.ParentColumn},
+			Table:   comment.ParentCommentTable,
+			Columns: []string{comment.ParentCommentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
@@ -413,7 +431,7 @@ func (cc *CommentCreate) createSpec() (*Comment, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.ParentId = nodes[0]
+		_node.ParentCommentId = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := cc.mutation.RepliesIDs(); len(nodes) > 0 {
