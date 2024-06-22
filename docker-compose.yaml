@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   server:
-    container_name: fetish_talk-server
+    container_name: hentai-salon-server
     build:
       context: .
       dockerfile: docker/go/Dockerfile
@@ -24,7 +24,7 @@ services:
 
   mysql:
     image: mysql:8.0
-    container_name: fetish_talk-mysql
+    container_name: hentai-salon-mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASS}
       MYSQL_DATABASE: ${DB_NAME}

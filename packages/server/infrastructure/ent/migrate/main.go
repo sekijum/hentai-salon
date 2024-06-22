@@ -33,7 +33,7 @@ func main() {
         log.Fatalln("migration name is required. Use: 'go run -mod=mod ent/migrate/main.go <name>'")
     }
     // Generate migrations using Atlas support for MySQL (note the Ent dialect option passed above).
-    err = migrate.NamedDiff(ctx, "mysql://fetish_talk:password@192.168.10.20/fetish_talk", os.Args[1], opts...)
+    err = migrate.NamedDiff(ctx, "mysql://hentai_salon:password@192.168.10.20/hentai_salon", os.Args[1], opts...)
     if err != nil {
         log.Fatalf("failed generating migration file: %v", err)
     }
