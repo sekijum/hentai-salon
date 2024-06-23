@@ -8,6 +8,7 @@ WORKDIR /server
 
 RUN go install github.com/air-verse/air@v1.52.2
 RUN go install ariga.io/atlas/cmd/atlas@latest
+RUN go install github.com/google/wire/cmd/wire@latest
 
 USER root
 
