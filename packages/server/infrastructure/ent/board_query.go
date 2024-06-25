@@ -28,10 +28,10 @@ type BoardQuery struct {
 	predicates                []predicate.Board
 	withLikedUsers            *UserQuery
 	withSubscribedUsers       *UserQuery
+	withOwner                 *UserQuery
 	withThreads               *ThreadQuery
 	withUserBoardLike         *UserBoardSubscriptionQuery
 	withUserBoardSubscription *UserBoardLikeQuery
-	withFKs                   bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -105,6 +105,28 @@ func (bq *BoardQuery) QuerySubscribedUsers() *UserQuery {
 			sqlgraph.From(board.Table, board.FieldID, selector),
 			sqlgraph.To(user.Table, user.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, true, board.SubscribedUsersTable, board.SubscribedUsersPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(bq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryOwner chains the current query on the "owner" edge.
+func (bq *BoardQuery) QueryOwner() *UserQuery {
+	query := (&UserClient{config: bq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := bq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := bq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(board.Table, board.FieldID, selector),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, board.OwnerTable, board.OwnerColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(bq.driver.Dialect(), step)
 		return fromU, nil
@@ -372,6 +394,7 @@ func (bq *BoardQuery) Clone() *BoardQuery {
 		predicates:                append([]predicate.Board{}, bq.predicates...),
 		withLikedUsers:            bq.withLikedUsers.Clone(),
 		withSubscribedUsers:       bq.withSubscribedUsers.Clone(),
+		withOwner:                 bq.withOwner.Clone(),
 		withThreads:               bq.withThreads.Clone(),
 		withUserBoardLike:         bq.withUserBoardLike.Clone(),
 		withUserBoardSubscription: bq.withUserBoardSubscription.Clone(),
@@ -400,6 +423,17 @@ func (bq *BoardQuery) WithSubscribedUsers(opts ...func(*UserQuery)) *BoardQuery 
 		opt(query)
 	}
 	bq.withSubscribedUsers = query
+	return bq
+}
+
+// WithOwner tells the query-builder to eager-load the nodes that are connected to
+// the "owner" edge. The optional arguments are used to configure the query builder of the edge.
+func (bq *BoardQuery) WithOwner(opts ...func(*UserQuery)) *BoardQuery {
+	query := (&UserClient{config: bq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	bq.withOwner = query
 	return bq
 }
 
@@ -513,19 +547,16 @@ func (bq *BoardQuery) prepareQuery(ctx context.Context) error {
 func (bq *BoardQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Board, error) {
 	var (
 		nodes       = []*Board{}
-		withFKs     = bq.withFKs
 		_spec       = bq.querySpec()
-		loadedTypes = [5]bool{
+		loadedTypes = [6]bool{
 			bq.withLikedUsers != nil,
 			bq.withSubscribedUsers != nil,
+			bq.withOwner != nil,
 			bq.withThreads != nil,
 			bq.withUserBoardLike != nil,
 			bq.withUserBoardSubscription != nil,
 		}
 	)
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, board.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Board).scanValues(nil, columns)
 	}
@@ -555,6 +586,12 @@ func (bq *BoardQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Board,
 		if err := bq.loadSubscribedUsers(ctx, query, nodes,
 			func(n *Board) { n.Edges.SubscribedUsers = []*User{} },
 			func(n *Board, e *User) { n.Edges.SubscribedUsers = append(n.Edges.SubscribedUsers, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := bq.withOwner; query != nil {
+		if err := bq.loadOwner(ctx, query, nodes, nil,
+			func(n *Board, e *User) { n.Edges.Owner = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -706,6 +743,35 @@ func (bq *BoardQuery) loadSubscribedUsers(ctx context.Context, query *UserQuery,
 	}
 	return nil
 }
+func (bq *BoardQuery) loadOwner(ctx context.Context, query *UserQuery, nodes []*Board, init func(*Board), assign func(*Board, *User)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*Board)
+	for i := range nodes {
+		fk := nodes[i].UserId
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(user.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "userId" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
 func (bq *BoardQuery) loadThreads(ctx context.Context, query *ThreadQuery, nodes []*Board, init func(*Board), assign func(*Board, *Thread)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*Board)
@@ -821,6 +887,9 @@ func (bq *BoardQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != board.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if bq.withOwner != nil {
+			_spec.Node.AddColumnOnce(board.FieldUserId)
 		}
 	}
 	if ps := bq.predicates; len(ps) > 0 {

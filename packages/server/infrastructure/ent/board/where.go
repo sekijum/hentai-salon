@@ -75,9 +75,9 @@ func ThumbnailUrl(v string) predicate.Board {
 	return predicate.Board(sql.FieldEQ(FieldThumbnailUrl, v))
 }
 
-// Order applies equality check predicate on the "order" field. It's identical to OrderEQ.
-func Order(v int) predicate.Board {
-	return predicate.Board(sql.FieldEQ(FieldOrder, v))
+// Status applies equality check predicate on the "status" field. It's identical to StatusEQ.
+func Status(v int) predicate.Board {
+	return predicate.Board(sql.FieldEQ(FieldStatus, v))
 }
 
 // CreatedAt applies equality check predicate on the "createdAt" field. It's identical to CreatedAtEQ.
@@ -108,26 +108,6 @@ func UserIdIn(vs ...int) predicate.Board {
 // UserIdNotIn applies the NotIn predicate on the "userId" field.
 func UserIdNotIn(vs ...int) predicate.Board {
 	return predicate.Board(sql.FieldNotIn(FieldUserId, vs...))
-}
-
-// UserIdGT applies the GT predicate on the "userId" field.
-func UserIdGT(v int) predicate.Board {
-	return predicate.Board(sql.FieldGT(FieldUserId, v))
-}
-
-// UserIdGTE applies the GTE predicate on the "userId" field.
-func UserIdGTE(v int) predicate.Board {
-	return predicate.Board(sql.FieldGTE(FieldUserId, v))
-}
-
-// UserIdLT applies the LT predicate on the "userId" field.
-func UserIdLT(v int) predicate.Board {
-	return predicate.Board(sql.FieldLT(FieldUserId, v))
-}
-
-// UserIdLTE applies the LTE predicate on the "userId" field.
-func UserIdLTE(v int) predicate.Board {
-	return predicate.Board(sql.FieldLTE(FieldUserId, v))
 }
 
 // TitleEQ applies the EQ predicate on the "title" field.
@@ -345,64 +325,44 @@ func ThumbnailUrlContainsFold(v string) predicate.Board {
 	return predicate.Board(sql.FieldContainsFold(FieldThumbnailUrl, v))
 }
 
-// OrderEQ applies the EQ predicate on the "order" field.
-func OrderEQ(v int) predicate.Board {
-	return predicate.Board(sql.FieldEQ(FieldOrder, v))
-}
-
-// OrderNEQ applies the NEQ predicate on the "order" field.
-func OrderNEQ(v int) predicate.Board {
-	return predicate.Board(sql.FieldNEQ(FieldOrder, v))
-}
-
-// OrderIn applies the In predicate on the "order" field.
-func OrderIn(vs ...int) predicate.Board {
-	return predicate.Board(sql.FieldIn(FieldOrder, vs...))
-}
-
-// OrderNotIn applies the NotIn predicate on the "order" field.
-func OrderNotIn(vs ...int) predicate.Board {
-	return predicate.Board(sql.FieldNotIn(FieldOrder, vs...))
-}
-
-// OrderGT applies the GT predicate on the "order" field.
-func OrderGT(v int) predicate.Board {
-	return predicate.Board(sql.FieldGT(FieldOrder, v))
-}
-
-// OrderGTE applies the GTE predicate on the "order" field.
-func OrderGTE(v int) predicate.Board {
-	return predicate.Board(sql.FieldGTE(FieldOrder, v))
-}
-
-// OrderLT applies the LT predicate on the "order" field.
-func OrderLT(v int) predicate.Board {
-	return predicate.Board(sql.FieldLT(FieldOrder, v))
-}
-
-// OrderLTE applies the LTE predicate on the "order" field.
-func OrderLTE(v int) predicate.Board {
-	return predicate.Board(sql.FieldLTE(FieldOrder, v))
-}
-
 // StatusEQ applies the EQ predicate on the "status" field.
-func StatusEQ(v Status) predicate.Board {
+func StatusEQ(v int) predicate.Board {
 	return predicate.Board(sql.FieldEQ(FieldStatus, v))
 }
 
 // StatusNEQ applies the NEQ predicate on the "status" field.
-func StatusNEQ(v Status) predicate.Board {
+func StatusNEQ(v int) predicate.Board {
 	return predicate.Board(sql.FieldNEQ(FieldStatus, v))
 }
 
 // StatusIn applies the In predicate on the "status" field.
-func StatusIn(vs ...Status) predicate.Board {
+func StatusIn(vs ...int) predicate.Board {
 	return predicate.Board(sql.FieldIn(FieldStatus, vs...))
 }
 
 // StatusNotIn applies the NotIn predicate on the "status" field.
-func StatusNotIn(vs ...Status) predicate.Board {
+func StatusNotIn(vs ...int) predicate.Board {
 	return predicate.Board(sql.FieldNotIn(FieldStatus, vs...))
+}
+
+// StatusGT applies the GT predicate on the "status" field.
+func StatusGT(v int) predicate.Board {
+	return predicate.Board(sql.FieldGT(FieldStatus, v))
+}
+
+// StatusGTE applies the GTE predicate on the "status" field.
+func StatusGTE(v int) predicate.Board {
+	return predicate.Board(sql.FieldGTE(FieldStatus, v))
+}
+
+// StatusLT applies the LT predicate on the "status" field.
+func StatusLT(v int) predicate.Board {
+	return predicate.Board(sql.FieldLT(FieldStatus, v))
+}
+
+// StatusLTE applies the LTE predicate on the "status" field.
+func StatusLTE(v int) predicate.Board {
+	return predicate.Board(sql.FieldLTE(FieldStatus, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "createdAt" field.
@@ -523,6 +483,29 @@ func HasSubscribedUsers() predicate.Board {
 func HasSubscribedUsersWith(preds ...predicate.User) predicate.Board {
 	return predicate.Board(func(s *sql.Selector) {
 		step := newSubscribedUsersStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasOwner applies the HasEdge predicate on the "owner" edge.
+func HasOwner() predicate.Board {
+	return predicate.Board(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, OwnerTable, OwnerColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasOwnerWith applies the HasEdge predicate on the "owner" edge with a given conditions (other predicates).
+func HasOwnerWith(preds ...predicate.User) predicate.Board {
+	return predicate.Board(func(s *sql.Selector) {
+		step := newOwnerStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

@@ -28,7 +28,7 @@ type User struct {
 	// AvatarUrl holds the value of the "avatarUrl" field.
 	AvatarUrl string `json:"avatarUrl,omitempty"`
 	// Status holds the value of the "status" field.
-	Status user.Status `json:"status,omitempty"`
+	Status int `json:"status,omitempty"`
 	// CreatedAt holds the value of the "createdAt" field.
 	CreatedAt time.Time `json:"createdAt,omitempty"`
 	// UpdatedAt holds the value of the "updatedAt" field.
@@ -216,9 +216,9 @@ func (*User) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case user.FieldID:
+		case user.FieldID, user.FieldStatus:
 			values[i] = new(sql.NullInt64)
-		case user.FieldName, user.FieldEmail, user.FieldPassword, user.FieldDisplayName, user.FieldAvatarUrl, user.FieldStatus:
+		case user.FieldName, user.FieldEmail, user.FieldPassword, user.FieldDisplayName, user.FieldAvatarUrl:
 			values[i] = new(sql.NullString)
 		case user.FieldCreatedAt, user.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -274,10 +274,10 @@ func (u *User) assignValues(columns []string, values []any) error {
 				u.AvatarUrl = value.String
 			}
 		case user.FieldStatus:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field status", values[i])
 			} else if value.Valid {
-				u.Status = user.Status(value.String)
+				u.Status = int(value.Int64)
 			}
 		case user.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {

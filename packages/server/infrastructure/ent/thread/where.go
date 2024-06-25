@@ -95,6 +95,11 @@ func IPAddress(v string) predicate.Thread {
 	return predicate.Thread(sql.FieldEQ(FieldIPAddress, v))
 }
 
+// Status applies equality check predicate on the "status" field. It's identical to StatusEQ.
+func Status(v int) predicate.Thread {
+	return predicate.Thread(sql.FieldEQ(FieldStatus, v))
+}
+
 // CreatedAt applies equality check predicate on the "createdAt" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.Thread {
 	return predicate.Thread(sql.FieldEQ(FieldCreatedAt, v))
@@ -198,16 +203,6 @@ func TitleHasPrefix(v string) predicate.Thread {
 // TitleHasSuffix applies the HasSuffix predicate on the "title" field.
 func TitleHasSuffix(v string) predicate.Thread {
 	return predicate.Thread(sql.FieldHasSuffix(FieldTitle, v))
-}
-
-// TitleIsNil applies the IsNil predicate on the "title" field.
-func TitleIsNil() predicate.Thread {
-	return predicate.Thread(sql.FieldIsNull(FieldTitle))
-}
-
-// TitleNotNil applies the NotNil predicate on the "title" field.
-func TitleNotNil() predicate.Thread {
-	return predicate.Thread(sql.FieldNotNull(FieldTitle))
 }
 
 // TitleEqualFold applies the EqualFold predicate on the "title" field.
@@ -456,23 +451,43 @@ func IPAddressContainsFold(v string) predicate.Thread {
 }
 
 // StatusEQ applies the EQ predicate on the "status" field.
-func StatusEQ(v Status) predicate.Thread {
+func StatusEQ(v int) predicate.Thread {
 	return predicate.Thread(sql.FieldEQ(FieldStatus, v))
 }
 
 // StatusNEQ applies the NEQ predicate on the "status" field.
-func StatusNEQ(v Status) predicate.Thread {
+func StatusNEQ(v int) predicate.Thread {
 	return predicate.Thread(sql.FieldNEQ(FieldStatus, v))
 }
 
 // StatusIn applies the In predicate on the "status" field.
-func StatusIn(vs ...Status) predicate.Thread {
+func StatusIn(vs ...int) predicate.Thread {
 	return predicate.Thread(sql.FieldIn(FieldStatus, vs...))
 }
 
 // StatusNotIn applies the NotIn predicate on the "status" field.
-func StatusNotIn(vs ...Status) predicate.Thread {
+func StatusNotIn(vs ...int) predicate.Thread {
 	return predicate.Thread(sql.FieldNotIn(FieldStatus, vs...))
+}
+
+// StatusGT applies the GT predicate on the "status" field.
+func StatusGT(v int) predicate.Thread {
+	return predicate.Thread(sql.FieldGT(FieldStatus, v))
+}
+
+// StatusGTE applies the GTE predicate on the "status" field.
+func StatusGTE(v int) predicate.Thread {
+	return predicate.Thread(sql.FieldGTE(FieldStatus, v))
+}
+
+// StatusLT applies the LT predicate on the "status" field.
+func StatusLT(v int) predicate.Thread {
+	return predicate.Thread(sql.FieldLT(FieldStatus, v))
+}
+
+// StatusLTE applies the LTE predicate on the "status" field.
+func StatusLTE(v int) predicate.Thread {
+	return predicate.Thread(sql.FieldLTE(FieldStatus, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "createdAt" field.

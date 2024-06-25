@@ -62,30 +62,16 @@ func (bc *BoardCreate) SetNillableThumbnailUrl(s *string) *BoardCreate {
 	return bc
 }
 
-// SetOrder sets the "order" field.
-func (bc *BoardCreate) SetOrder(i int) *BoardCreate {
-	bc.mutation.SetOrder(i)
-	return bc
-}
-
-// SetNillableOrder sets the "order" field if the given value is not nil.
-func (bc *BoardCreate) SetNillableOrder(i *int) *BoardCreate {
-	if i != nil {
-		bc.SetOrder(*i)
-	}
-	return bc
-}
-
 // SetStatus sets the "status" field.
-func (bc *BoardCreate) SetStatus(b board.Status) *BoardCreate {
-	bc.mutation.SetStatus(b)
+func (bc *BoardCreate) SetStatus(i int) *BoardCreate {
+	bc.mutation.SetStatus(i)
 	return bc
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (bc *BoardCreate) SetNillableStatus(b *board.Status) *BoardCreate {
-	if b != nil {
-		bc.SetStatus(*b)
+func (bc *BoardCreate) SetNillableStatus(i *int) *BoardCreate {
+	if i != nil {
+		bc.SetStatus(*i)
 	}
 	return bc
 }
@@ -154,6 +140,17 @@ func (bc *BoardCreate) AddSubscribedUsers(u ...*User) *BoardCreate {
 	return bc.AddSubscribedUserIDs(ids...)
 }
 
+// SetOwnerID sets the "owner" edge to the User entity by ID.
+func (bc *BoardCreate) SetOwnerID(id int) *BoardCreate {
+	bc.mutation.SetOwnerID(id)
+	return bc
+}
+
+// SetOwner sets the "owner" edge to the User entity.
+func (bc *BoardCreate) SetOwner(u *User) *BoardCreate {
+	return bc.SetOwnerID(u.ID)
+}
+
 // AddThreadIDs adds the "threads" edge to the Thread entity by IDs.
 func (bc *BoardCreate) AddThreadIDs(ids ...int) *BoardCreate {
 	bc.mutation.AddThreadIDs(ids...)
@@ -204,10 +201,6 @@ func (bc *BoardCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (bc *BoardCreate) defaults() {
-	if _, ok := bc.mutation.Order(); !ok {
-		v := board.DefaultOrder
-		bc.mutation.SetOrder(v)
-	}
 	if _, ok := bc.mutation.Status(); !ok {
 		v := board.DefaultStatus
 		bc.mutation.SetStatus(v)
@@ -240,22 +233,17 @@ func (bc *BoardCreate) check() error {
 			return &ValidationError{Name: "description", err: fmt.Errorf(`ent: validator failed for field "Board.description": %w`, err)}
 		}
 	}
-	if _, ok := bc.mutation.Order(); !ok {
-		return &ValidationError{Name: "order", err: errors.New(`ent: missing required field "Board.order"`)}
-	}
 	if _, ok := bc.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Board.status"`)}
-	}
-	if v, ok := bc.mutation.Status(); ok {
-		if err := board.StatusValidator(v); err != nil {
-			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Board.status": %w`, err)}
-		}
 	}
 	if _, ok := bc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "createdAt", err: errors.New(`ent: missing required field "Board.createdAt"`)}
 	}
 	if _, ok := bc.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updatedAt", err: errors.New(`ent: missing required field "Board.updatedAt"`)}
+	}
+	if _, ok := bc.mutation.OwnerID(); !ok {
+		return &ValidationError{Name: "owner", err: errors.New(`ent: missing required edge "Board.owner"`)}
 	}
 	return nil
 }
@@ -289,10 +277,6 @@ func (bc *BoardCreate) createSpec() (*Board, *sqlgraph.CreateSpec) {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
-	if value, ok := bc.mutation.UserId(); ok {
-		_spec.SetField(board.FieldUserId, field.TypeInt, value)
-		_node.UserId = value
-	}
 	if value, ok := bc.mutation.Title(); ok {
 		_spec.SetField(board.FieldTitle, field.TypeString, value)
 		_node.Title = value
@@ -305,12 +289,8 @@ func (bc *BoardCreate) createSpec() (*Board, *sqlgraph.CreateSpec) {
 		_spec.SetField(board.FieldThumbnailUrl, field.TypeString, value)
 		_node.ThumbnailUrl = value
 	}
-	if value, ok := bc.mutation.Order(); ok {
-		_spec.SetField(board.FieldOrder, field.TypeInt, value)
-		_node.Order = value
-	}
 	if value, ok := bc.mutation.Status(); ok {
-		_spec.SetField(board.FieldStatus, field.TypeEnum, value)
+		_spec.SetField(board.FieldStatus, field.TypeInt, value)
 		_node.Status = value
 	}
 	if value, ok := bc.mutation.CreatedAt(); ok {
@@ -359,6 +339,23 @@ func (bc *BoardCreate) createSpec() (*Board, *sqlgraph.CreateSpec) {
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := bc.mutation.OwnerIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   board.OwnerTable,
+			Columns: []string{board.OwnerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.UserId = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := bc.mutation.ThreadsIDs(); len(nodes) > 0 {

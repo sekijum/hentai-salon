@@ -26,15 +26,13 @@ var (
 	// BoardsColumns holds the columns for the "boards" table.
 	BoardsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "user_id", Type: field.TypeInt},
 		{Name: "title", Type: field.TypeString, Unique: true, Size: 50},
 		{Name: "description", Type: field.TypeString, Nullable: true, Size: 255},
 		{Name: "thumbnail_url", Type: field.TypeString, Nullable: true},
-		{Name: "order", Type: field.TypeInt, Default: 0},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"Public", "Private", "Archived", "Deleted"}, Default: "Public"},
+		{Name: "status", Type: field.TypeInt, Default: 0},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "user_boards", Type: field.TypeInt, Nullable: true},
+		{Name: "user_id", Type: field.TypeInt},
 	}
 	// BoardsTable holds the schema information for the "boards" table.
 	BoardsTable = &schema.Table{
@@ -44,9 +42,16 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "boards_users_boards",
-				Columns:    []*schema.Column{BoardsColumns[9]},
+				Columns:    []*schema.Column{BoardsColumns[7]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.NoAction,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "board_title",
+				Unique:  true,
+				Columns: []*schema.Column{BoardsColumns[1]},
 			},
 		},
 	}
@@ -56,7 +61,7 @@ var (
 		{Name: "guest_name", Type: field.TypeString, Nullable: true, Size: 20},
 		{Name: "message", Type: field.TypeString, Size: 2147483647},
 		{Name: "ip_address", Type: field.TypeString, Size: 64},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"Visible", "Deleted"}, Default: "Visible"},
+		{Name: "status", Type: field.TypeInt, Default: 0},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "parent_comment_id", Type: field.TypeInt, Nullable: true},
@@ -114,13 +119,13 @@ var (
 	// ThreadsColumns holds the columns for the "threads" table.
 	ThreadsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "title", Type: field.TypeString, Nullable: true, Size: 50},
+		{Name: "title", Type: field.TypeString, Unique: true, Size: 50},
 		{Name: "description", Type: field.TypeString, Nullable: true, Size: 255},
 		{Name: "thumbnail_url", Type: field.TypeString, Nullable: true},
 		{Name: "is_auto_generated", Type: field.TypeBool, Default: false},
 		{Name: "is_notify_on_comment", Type: field.TypeBool, Default: true},
 		{Name: "ip_address", Type: field.TypeString, Size: 64},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"Open", "Archived", "Deleted"}, Default: "Open"},
+		{Name: "status", Type: field.TypeInt, Default: 0},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "board_id", Type: field.TypeInt},
@@ -143,6 +148,13 @@ var (
 				Columns:    []*schema.Column{ThreadsColumns[11]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.NoAction,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "thread_title",
+				Unique:  true,
+				Columns: []*schema.Column{ThreadsColumns[1]},
 			},
 		},
 	}
@@ -198,7 +210,7 @@ var (
 		{Name: "password", Type: field.TypeString},
 		{Name: "display_name", Type: field.TypeString, Nullable: true, Size: 20},
 		{Name: "avatar_url", Type: field.TypeString, Nullable: true},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"Active", "Withdrawn", "Suspended", "Inactive"}, Default: "Active"},
+		{Name: "status", Type: field.TypeInt, Default: 0},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 	}

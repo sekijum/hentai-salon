@@ -3,7 +3,6 @@
 package comment
 
 import (
-	"fmt"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -146,6 +145,8 @@ var (
 	GuestNameValidator func(string) error
 	// IPAddressValidator is a validator for the "ip_address" field. It is called by the builders before save.
 	IPAddressValidator func(string) error
+	// DefaultStatus holds the default value on creation for the "status" field.
+	DefaultStatus int
 	// DefaultCreatedAt holds the default value on creation for the "createdAt" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updatedAt" field.
@@ -153,32 +154,6 @@ var (
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updatedAt" field.
 	UpdateDefaultUpdatedAt func() time.Time
 )
-
-// Status defines the type for the "status" enum field.
-type Status string
-
-// StatusVisible is the default value of the Status enum.
-const DefaultStatus = StatusVisible
-
-// Status values.
-const (
-	StatusVisible Status = "Visible"
-	StatusDeleted Status = "Deleted"
-)
-
-func (s Status) String() string {
-	return string(s)
-}
-
-// StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
-func StatusValidator(s Status) error {
-	switch s {
-	case StatusVisible, StatusDeleted:
-		return nil
-	default:
-		return fmt.Errorf("comment: invalid enum value for status field: %q", s)
-	}
-}
 
 // OrderOption defines the ordering options for the Comment queries.
 type OrderOption func(*sql.Selector)

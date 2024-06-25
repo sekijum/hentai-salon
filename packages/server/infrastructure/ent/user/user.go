@@ -3,7 +3,6 @@
 package user
 
 import (
-	"fmt"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -69,7 +68,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "board" package.
 	BoardsInverseTable = "boards"
 	// BoardsColumn is the table column denoting the boards relation/edge.
-	BoardsColumn = "user_boards"
+	BoardsColumn = "user_id"
 	// ThreadsTable is the table that holds the threads relation/edge.
 	ThreadsTable = "threads"
 	// ThreadsInverseTable is the table name for the Thread entity.
@@ -209,6 +208,8 @@ var (
 	EmailValidator func(string) error
 	// DisplayNameValidator is a validator for the "displayName" field. It is called by the builders before save.
 	DisplayNameValidator func(string) error
+	// DefaultStatus holds the default value on creation for the "status" field.
+	DefaultStatus int
 	// DefaultCreatedAt holds the default value on creation for the "createdAt" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updatedAt" field.
@@ -216,34 +217,6 @@ var (
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updatedAt" field.
 	UpdateDefaultUpdatedAt func() time.Time
 )
-
-// Status defines the type for the "status" enum field.
-type Status string
-
-// StatusActive is the default value of the Status enum.
-const DefaultStatus = StatusActive
-
-// Status values.
-const (
-	StatusActive    Status = "Active"
-	StatusWithdrawn Status = "Withdrawn"
-	StatusSuspended Status = "Suspended"
-	StatusInactive  Status = "Inactive"
-)
-
-func (s Status) String() string {
-	return string(s)
-}
-
-// StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
-func StatusValidator(s Status) error {
-	switch s {
-	case StatusActive, StatusWithdrawn, StatusSuspended, StatusInactive:
-		return nil
-	default:
-		return fmt.Errorf("user: invalid enum value for status field: %q", s)
-	}
-}
 
 // OrderOption defines the ordering options for the User queries.
 type OrderOption func(*sql.Selector)

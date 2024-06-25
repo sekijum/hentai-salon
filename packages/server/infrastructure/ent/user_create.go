@@ -70,15 +70,15 @@ func (uc *UserCreate) SetNillableAvatarUrl(s *string) *UserCreate {
 }
 
 // SetStatus sets the "status" field.
-func (uc *UserCreate) SetStatus(u user.Status) *UserCreate {
-	uc.mutation.SetStatus(u)
+func (uc *UserCreate) SetStatus(i int) *UserCreate {
+	uc.mutation.SetStatus(i)
 	return uc
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (uc *UserCreate) SetNillableStatus(u *user.Status) *UserCreate {
-	if u != nil {
-		uc.SetStatus(*u)
+func (uc *UserCreate) SetNillableStatus(i *int) *UserCreate {
+	if i != nil {
+		uc.SetStatus(*i)
 	}
 	return uc
 }
@@ -330,11 +330,6 @@ func (uc *UserCreate) check() error {
 	if _, ok := uc.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "User.status"`)}
 	}
-	if v, ok := uc.mutation.Status(); ok {
-		if err := user.StatusValidator(v); err != nil {
-			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "User.status": %w`, err)}
-		}
-	}
 	if _, ok := uc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "createdAt", err: errors.New(`ent: missing required field "User.createdAt"`)}
 	}
@@ -394,7 +389,7 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_node.AvatarUrl = value
 	}
 	if value, ok := uc.mutation.Status(); ok {
-		_spec.SetField(user.FieldStatus, field.TypeEnum, value)
+		_spec.SetField(user.FieldStatus, field.TypeInt, value)
 		_node.Status = value
 	}
 	if value, ok := uc.mutation.CreatedAt(); ok {

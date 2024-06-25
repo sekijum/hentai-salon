@@ -589,6 +589,22 @@ func (c *BoardClient) QuerySubscribedUsers(b *Board) *UserQuery {
 	return query
 }
 
+// QueryOwner queries the owner edge of a Board.
+func (c *BoardClient) QueryOwner(b *Board) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := b.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(board.Table, board.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, board.OwnerTable, board.OwnerColumn),
+		)
+		fromV = sqlgraph.Neighbors(b.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryThreads queries the threads edge of a Board.
 func (c *BoardClient) QueryThreads(b *Board) *ThreadQuery {
 	query := (&ThreadClient{config: c.config}).Query()

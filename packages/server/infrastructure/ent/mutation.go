@@ -607,14 +607,11 @@ type BoardMutation struct {
 	op                      Op
 	typ                     string
 	id                      *int
-	userId                  *int
-	adduserId               *int
 	title                   *string
 	description             *string
 	thumbnailUrl            *string
-	_order                  *int
-	add_order               *int
-	status                  *board.Status
+	status                  *int
+	addstatus               *int
 	createdAt               *time.Time
 	updatedAt               *time.Time
 	clearedFields           map[string]struct{}
@@ -624,6 +621,8 @@ type BoardMutation struct {
 	subscribed_users        map[int]struct{}
 	removedsubscribed_users map[int]struct{}
 	clearedsubscribed_users bool
+	owner                   *int
+	clearedowner            bool
 	threads                 map[int]struct{}
 	removedthreads          map[int]struct{}
 	clearedthreads          bool
@@ -738,13 +737,12 @@ func (m *BoardMutation) IDs(ctx context.Context) ([]int, error) {
 
 // SetUserId sets the "userId" field.
 func (m *BoardMutation) SetUserId(i int) {
-	m.userId = &i
-	m.adduserId = nil
+	m.owner = &i
 }
 
 // UserId returns the value of the "userId" field in the mutation.
 func (m *BoardMutation) UserId() (r int, exists bool) {
-	v := m.userId
+	v := m.owner
 	if v == nil {
 		return
 	}
@@ -768,28 +766,9 @@ func (m *BoardMutation) OldUserId(ctx context.Context) (v int, err error) {
 	return oldValue.UserId, nil
 }
 
-// AddUserId adds i to the "userId" field.
-func (m *BoardMutation) AddUserId(i int) {
-	if m.adduserId != nil {
-		*m.adduserId += i
-	} else {
-		m.adduserId = &i
-	}
-}
-
-// AddedUserId returns the value that was added to the "userId" field in this mutation.
-func (m *BoardMutation) AddedUserId() (r int, exists bool) {
-	v := m.adduserId
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
 // ResetUserId resets all changes to the "userId" field.
 func (m *BoardMutation) ResetUserId() {
-	m.userId = nil
-	m.adduserId = nil
+	m.owner = nil
 }
 
 // SetTitle sets the "title" field.
@@ -926,69 +905,14 @@ func (m *BoardMutation) ResetThumbnailUrl() {
 	delete(m.clearedFields, board.FieldThumbnailUrl)
 }
 
-// SetOrder sets the "order" field.
-func (m *BoardMutation) SetOrder(i int) {
-	m._order = &i
-	m.add_order = nil
-}
-
-// Order returns the value of the "order" field in the mutation.
-func (m *BoardMutation) Order() (r int, exists bool) {
-	v := m._order
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldOrder returns the old "order" field's value of the Board entity.
-// If the Board object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *BoardMutation) OldOrder(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldOrder is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldOrder requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldOrder: %w", err)
-	}
-	return oldValue.Order, nil
-}
-
-// AddOrder adds i to the "order" field.
-func (m *BoardMutation) AddOrder(i int) {
-	if m.add_order != nil {
-		*m.add_order += i
-	} else {
-		m.add_order = &i
-	}
-}
-
-// AddedOrder returns the value that was added to the "order" field in this mutation.
-func (m *BoardMutation) AddedOrder() (r int, exists bool) {
-	v := m.add_order
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetOrder resets all changes to the "order" field.
-func (m *BoardMutation) ResetOrder() {
-	m._order = nil
-	m.add_order = nil
-}
-
 // SetStatus sets the "status" field.
-func (m *BoardMutation) SetStatus(b board.Status) {
-	m.status = &b
+func (m *BoardMutation) SetStatus(i int) {
+	m.status = &i
+	m.addstatus = nil
 }
 
 // Status returns the value of the "status" field in the mutation.
-func (m *BoardMutation) Status() (r board.Status, exists bool) {
+func (m *BoardMutation) Status() (r int, exists bool) {
 	v := m.status
 	if v == nil {
 		return
@@ -999,7 +923,7 @@ func (m *BoardMutation) Status() (r board.Status, exists bool) {
 // OldStatus returns the old "status" field's value of the Board entity.
 // If the Board object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *BoardMutation) OldStatus(ctx context.Context) (v board.Status, err error) {
+func (m *BoardMutation) OldStatus(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
 	}
@@ -1013,9 +937,28 @@ func (m *BoardMutation) OldStatus(ctx context.Context) (v board.Status, err erro
 	return oldValue.Status, nil
 }
 
+// AddStatus adds i to the "status" field.
+func (m *BoardMutation) AddStatus(i int) {
+	if m.addstatus != nil {
+		*m.addstatus += i
+	} else {
+		m.addstatus = &i
+	}
+}
+
+// AddedStatus returns the value that was added to the "status" field in this mutation.
+func (m *BoardMutation) AddedStatus() (r int, exists bool) {
+	v := m.addstatus
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
 // ResetStatus resets all changes to the "status" field.
 func (m *BoardMutation) ResetStatus() {
 	m.status = nil
+	m.addstatus = nil
 }
 
 // SetCreatedAt sets the "createdAt" field.
@@ -1198,6 +1141,46 @@ func (m *BoardMutation) ResetSubscribedUsers() {
 	m.removedsubscribed_users = nil
 }
 
+// SetOwnerID sets the "owner" edge to the User entity by id.
+func (m *BoardMutation) SetOwnerID(id int) {
+	m.owner = &id
+}
+
+// ClearOwner clears the "owner" edge to the User entity.
+func (m *BoardMutation) ClearOwner() {
+	m.clearedowner = true
+	m.clearedFields[board.FieldUserId] = struct{}{}
+}
+
+// OwnerCleared reports if the "owner" edge to the User entity was cleared.
+func (m *BoardMutation) OwnerCleared() bool {
+	return m.clearedowner
+}
+
+// OwnerID returns the "owner" edge ID in the mutation.
+func (m *BoardMutation) OwnerID() (id int, exists bool) {
+	if m.owner != nil {
+		return *m.owner, true
+	}
+	return
+}
+
+// OwnerIDs returns the "owner" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// OwnerID instead. It exists only for internal usage by the builders.
+func (m *BoardMutation) OwnerIDs() (ids []int) {
+	if id := m.owner; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetOwner resets all changes to the "owner" edge.
+func (m *BoardMutation) ResetOwner() {
+	m.owner = nil
+	m.clearedowner = false
+}
+
 // AddThreadIDs adds the "threads" edge to the Thread entity by ids.
 func (m *BoardMutation) AddThreadIDs(ids ...int) {
 	if m.threads == nil {
@@ -1286,8 +1269,8 @@ func (m *BoardMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *BoardMutation) Fields() []string {
-	fields := make([]string, 0, 8)
-	if m.userId != nil {
+	fields := make([]string, 0, 7)
+	if m.owner != nil {
 		fields = append(fields, board.FieldUserId)
 	}
 	if m.title != nil {
@@ -1298,9 +1281,6 @@ func (m *BoardMutation) Fields() []string {
 	}
 	if m.thumbnailUrl != nil {
 		fields = append(fields, board.FieldThumbnailUrl)
-	}
-	if m._order != nil {
-		fields = append(fields, board.FieldOrder)
 	}
 	if m.status != nil {
 		fields = append(fields, board.FieldStatus)
@@ -1327,8 +1307,6 @@ func (m *BoardMutation) Field(name string) (ent.Value, bool) {
 		return m.Description()
 	case board.FieldThumbnailUrl:
 		return m.ThumbnailUrl()
-	case board.FieldOrder:
-		return m.Order()
 	case board.FieldStatus:
 		return m.Status()
 	case board.FieldCreatedAt:
@@ -1352,8 +1330,6 @@ func (m *BoardMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldDescription(ctx)
 	case board.FieldThumbnailUrl:
 		return m.OldThumbnailUrl(ctx)
-	case board.FieldOrder:
-		return m.OldOrder(ctx)
 	case board.FieldStatus:
 		return m.OldStatus(ctx)
 	case board.FieldCreatedAt:
@@ -1397,15 +1373,8 @@ func (m *BoardMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetThumbnailUrl(v)
 		return nil
-	case board.FieldOrder:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetOrder(v)
-		return nil
 	case board.FieldStatus:
-		v, ok := value.(board.Status)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -1433,11 +1402,8 @@ func (m *BoardMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *BoardMutation) AddedFields() []string {
 	var fields []string
-	if m.adduserId != nil {
-		fields = append(fields, board.FieldUserId)
-	}
-	if m.add_order != nil {
-		fields = append(fields, board.FieldOrder)
+	if m.addstatus != nil {
+		fields = append(fields, board.FieldStatus)
 	}
 	return fields
 }
@@ -1447,10 +1413,8 @@ func (m *BoardMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *BoardMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case board.FieldUserId:
-		return m.AddedUserId()
-	case board.FieldOrder:
-		return m.AddedOrder()
+	case board.FieldStatus:
+		return m.AddedStatus()
 	}
 	return nil, false
 }
@@ -1460,19 +1424,12 @@ func (m *BoardMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *BoardMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case board.FieldUserId:
+	case board.FieldStatus:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddUserId(v)
-		return nil
-	case board.FieldOrder:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddOrder(v)
+		m.AddStatus(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Board numeric field %s", name)
@@ -1528,9 +1485,6 @@ func (m *BoardMutation) ResetField(name string) error {
 	case board.FieldThumbnailUrl:
 		m.ResetThumbnailUrl()
 		return nil
-	case board.FieldOrder:
-		m.ResetOrder()
-		return nil
 	case board.FieldStatus:
 		m.ResetStatus()
 		return nil
@@ -1546,12 +1500,15 @@ func (m *BoardMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *BoardMutation) AddedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.liked_users != nil {
 		edges = append(edges, board.EdgeLikedUsers)
 	}
 	if m.subscribed_users != nil {
 		edges = append(edges, board.EdgeSubscribedUsers)
+	}
+	if m.owner != nil {
+		edges = append(edges, board.EdgeOwner)
 	}
 	if m.threads != nil {
 		edges = append(edges, board.EdgeThreads)
@@ -1575,6 +1532,10 @@ func (m *BoardMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case board.EdgeOwner:
+		if id := m.owner; id != nil {
+			return []ent.Value{*id}
+		}
 	case board.EdgeThreads:
 		ids := make([]ent.Value, 0, len(m.threads))
 		for id := range m.threads {
@@ -1587,7 +1548,7 @@ func (m *BoardMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *BoardMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.removedliked_users != nil {
 		edges = append(edges, board.EdgeLikedUsers)
 	}
@@ -1628,12 +1589,15 @@ func (m *BoardMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *BoardMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.clearedliked_users {
 		edges = append(edges, board.EdgeLikedUsers)
 	}
 	if m.clearedsubscribed_users {
 		edges = append(edges, board.EdgeSubscribedUsers)
+	}
+	if m.clearedowner {
+		edges = append(edges, board.EdgeOwner)
 	}
 	if m.clearedthreads {
 		edges = append(edges, board.EdgeThreads)
@@ -1649,6 +1613,8 @@ func (m *BoardMutation) EdgeCleared(name string) bool {
 		return m.clearedliked_users
 	case board.EdgeSubscribedUsers:
 		return m.clearedsubscribed_users
+	case board.EdgeOwner:
+		return m.clearedowner
 	case board.EdgeThreads:
 		return m.clearedthreads
 	}
@@ -1659,6 +1625,9 @@ func (m *BoardMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *BoardMutation) ClearEdge(name string) error {
 	switch name {
+	case board.EdgeOwner:
+		m.ClearOwner()
+		return nil
 	}
 	return fmt.Errorf("unknown Board unique edge %s", name)
 }
@@ -1672,6 +1641,9 @@ func (m *BoardMutation) ResetEdge(name string) error {
 		return nil
 	case board.EdgeSubscribedUsers:
 		m.ResetSubscribedUsers()
+		return nil
+	case board.EdgeOwner:
+		m.ResetOwner()
 		return nil
 	case board.EdgeThreads:
 		m.ResetThreads()
@@ -1689,7 +1661,8 @@ type CommentMutation struct {
 	guestName                  *string
 	message                    *string
 	ip_address                 *string
-	status                     *comment.Status
+	status                     *int
+	addstatus                  *int
 	createdAt                  *time.Time
 	updatedAt                  *time.Time
 	clearedFields              map[string]struct{}
@@ -2076,12 +2049,13 @@ func (m *CommentMutation) ResetIPAddress() {
 }
 
 // SetStatus sets the "status" field.
-func (m *CommentMutation) SetStatus(c comment.Status) {
-	m.status = &c
+func (m *CommentMutation) SetStatus(i int) {
+	m.status = &i
+	m.addstatus = nil
 }
 
 // Status returns the value of the "status" field in the mutation.
-func (m *CommentMutation) Status() (r comment.Status, exists bool) {
+func (m *CommentMutation) Status() (r int, exists bool) {
 	v := m.status
 	if v == nil {
 		return
@@ -2092,7 +2066,7 @@ func (m *CommentMutation) Status() (r comment.Status, exists bool) {
 // OldStatus returns the old "status" field's value of the Comment entity.
 // If the Comment object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CommentMutation) OldStatus(ctx context.Context) (v comment.Status, err error) {
+func (m *CommentMutation) OldStatus(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
 	}
@@ -2106,9 +2080,28 @@ func (m *CommentMutation) OldStatus(ctx context.Context) (v comment.Status, err 
 	return oldValue.Status, nil
 }
 
+// AddStatus adds i to the "status" field.
+func (m *CommentMutation) AddStatus(i int) {
+	if m.addstatus != nil {
+		*m.addstatus += i
+	} else {
+		m.addstatus = &i
+	}
+}
+
+// AddedStatus returns the value that was added to the "status" field in this mutation.
+func (m *CommentMutation) AddedStatus() (r int, exists bool) {
+	v := m.addstatus
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
 // ResetStatus resets all changes to the "status" field.
 func (m *CommentMutation) ResetStatus() {
 	m.status = nil
+	m.addstatus = nil
 }
 
 // SetCreatedAt sets the "createdAt" field.
@@ -2686,7 +2679,7 @@ func (m *CommentMutation) SetField(name string, value ent.Value) error {
 		m.SetIPAddress(v)
 		return nil
 	case comment.FieldStatus:
-		v, ok := value.(comment.Status)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -2714,6 +2707,9 @@ func (m *CommentMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *CommentMutation) AddedFields() []string {
 	var fields []string
+	if m.addstatus != nil {
+		fields = append(fields, comment.FieldStatus)
+	}
 	return fields
 }
 
@@ -2722,6 +2718,8 @@ func (m *CommentMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *CommentMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
+	case comment.FieldStatus:
+		return m.AddedStatus()
 	}
 	return nil, false
 }
@@ -2731,6 +2729,13 @@ func (m *CommentMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *CommentMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case comment.FieldStatus:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddStatus(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Comment numeric field %s", name)
 }
@@ -3635,7 +3640,8 @@ type ThreadMutation struct {
 	isAutoGenerated         *bool
 	isNotifyOnComment       *bool
 	ip_address              *string
-	status                  *thread.Status
+	status                  *int
+	addstatus               *int
 	createdAt               *time.Time
 	updatedAt               *time.Time
 	clearedFields           map[string]struct{}
@@ -3867,22 +3873,9 @@ func (m *ThreadMutation) OldTitle(ctx context.Context) (v string, err error) {
 	return oldValue.Title, nil
 }
 
-// ClearTitle clears the value of the "title" field.
-func (m *ThreadMutation) ClearTitle() {
-	m.title = nil
-	m.clearedFields[thread.FieldTitle] = struct{}{}
-}
-
-// TitleCleared returns if the "title" field was cleared in this mutation.
-func (m *ThreadMutation) TitleCleared() bool {
-	_, ok := m.clearedFields[thread.FieldTitle]
-	return ok
-}
-
 // ResetTitle resets all changes to the "title" field.
 func (m *ThreadMutation) ResetTitle() {
 	m.title = nil
-	delete(m.clearedFields, thread.FieldTitle)
 }
 
 // SetDescription sets the "description" field.
@@ -4092,12 +4085,13 @@ func (m *ThreadMutation) ResetIPAddress() {
 }
 
 // SetStatus sets the "status" field.
-func (m *ThreadMutation) SetStatus(t thread.Status) {
-	m.status = &t
+func (m *ThreadMutation) SetStatus(i int) {
+	m.status = &i
+	m.addstatus = nil
 }
 
 // Status returns the value of the "status" field in the mutation.
-func (m *ThreadMutation) Status() (r thread.Status, exists bool) {
+func (m *ThreadMutation) Status() (r int, exists bool) {
 	v := m.status
 	if v == nil {
 		return
@@ -4108,7 +4102,7 @@ func (m *ThreadMutation) Status() (r thread.Status, exists bool) {
 // OldStatus returns the old "status" field's value of the Thread entity.
 // If the Thread object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ThreadMutation) OldStatus(ctx context.Context) (v thread.Status, err error) {
+func (m *ThreadMutation) OldStatus(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
 	}
@@ -4122,9 +4116,28 @@ func (m *ThreadMutation) OldStatus(ctx context.Context) (v thread.Status, err er
 	return oldValue.Status, nil
 }
 
+// AddStatus adds i to the "status" field.
+func (m *ThreadMutation) AddStatus(i int) {
+	if m.addstatus != nil {
+		*m.addstatus += i
+	} else {
+		m.addstatus = &i
+	}
+}
+
+// AddedStatus returns the value that was added to the "status" field in this mutation.
+func (m *ThreadMutation) AddedStatus() (r int, exists bool) {
+	v := m.addstatus
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
 // ResetStatus resets all changes to the "status" field.
 func (m *ThreadMutation) ResetStatus() {
 	m.status = nil
+	m.addstatus = nil
 }
 
 // SetCreatedAt sets the "createdAt" field.
@@ -4690,7 +4703,7 @@ func (m *ThreadMutation) SetField(name string, value ent.Value) error {
 		m.SetIPAddress(v)
 		return nil
 	case thread.FieldStatus:
-		v, ok := value.(thread.Status)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -4718,6 +4731,9 @@ func (m *ThreadMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *ThreadMutation) AddedFields() []string {
 	var fields []string
+	if m.addstatus != nil {
+		fields = append(fields, thread.FieldStatus)
+	}
 	return fields
 }
 
@@ -4726,6 +4742,8 @@ func (m *ThreadMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *ThreadMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
+	case thread.FieldStatus:
+		return m.AddedStatus()
 	}
 	return nil, false
 }
@@ -4735,6 +4753,13 @@ func (m *ThreadMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *ThreadMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case thread.FieldStatus:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddStatus(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Thread numeric field %s", name)
 }
@@ -4743,9 +4768,6 @@ func (m *ThreadMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *ThreadMutation) ClearedFields() []string {
 	var fields []string
-	if m.FieldCleared(thread.FieldTitle) {
-		fields = append(fields, thread.FieldTitle)
-	}
 	if m.FieldCleared(thread.FieldDescription) {
 		fields = append(fields, thread.FieldDescription)
 	}
@@ -4766,9 +4788,6 @@ func (m *ThreadMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *ThreadMutation) ClearField(name string) error {
 	switch name {
-	case thread.FieldTitle:
-		m.ClearTitle()
-		return nil
 	case thread.FieldDescription:
 		m.ClearDescription()
 		return nil
@@ -5916,7 +5935,8 @@ type UserMutation struct {
 	password                   *string
 	displayName                *string
 	avatarUrl                  *string
-	status                     *user.Status
+	status                     *int
+	addstatus                  *int
 	createdAt                  *time.Time
 	updatedAt                  *time.Time
 	clearedFields              map[string]struct{}
@@ -6263,12 +6283,13 @@ func (m *UserMutation) ResetAvatarUrl() {
 }
 
 // SetStatus sets the "status" field.
-func (m *UserMutation) SetStatus(u user.Status) {
-	m.status = &u
+func (m *UserMutation) SetStatus(i int) {
+	m.status = &i
+	m.addstatus = nil
 }
 
 // Status returns the value of the "status" field in the mutation.
-func (m *UserMutation) Status() (r user.Status, exists bool) {
+func (m *UserMutation) Status() (r int, exists bool) {
 	v := m.status
 	if v == nil {
 		return
@@ -6279,7 +6300,7 @@ func (m *UserMutation) Status() (r user.Status, exists bool) {
 // OldStatus returns the old "status" field's value of the User entity.
 // If the User object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UserMutation) OldStatus(ctx context.Context) (v user.Status, err error) {
+func (m *UserMutation) OldStatus(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
 	}
@@ -6293,9 +6314,28 @@ func (m *UserMutation) OldStatus(ctx context.Context) (v user.Status, err error)
 	return oldValue.Status, nil
 }
 
+// AddStatus adds i to the "status" field.
+func (m *UserMutation) AddStatus(i int) {
+	if m.addstatus != nil {
+		*m.addstatus += i
+	} else {
+		m.addstatus = &i
+	}
+}
+
+// AddedStatus returns the value that was added to the "status" field in this mutation.
+func (m *UserMutation) AddedStatus() (r int, exists bool) {
+	v := m.addstatus
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
 // ResetStatus resets all changes to the "status" field.
 func (m *UserMutation) ResetStatus() {
 	m.status = nil
+	m.addstatus = nil
 }
 
 // SetCreatedAt sets the "createdAt" field.
@@ -7009,7 +7049,7 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 		m.SetAvatarUrl(v)
 		return nil
 	case user.FieldStatus:
-		v, ok := value.(user.Status)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -7036,13 +7076,21 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *UserMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	if m.addstatus != nil {
+		fields = append(fields, user.FieldStatus)
+	}
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *UserMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case user.FieldStatus:
+		return m.AddedStatus()
+	}
 	return nil, false
 }
 
@@ -7051,6 +7099,13 @@ func (m *UserMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *UserMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case user.FieldStatus:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddStatus(v)
+		return nil
 	}
 	return fmt.Errorf("unknown User numeric field %s", name)
 }

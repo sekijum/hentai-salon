@@ -84,15 +84,15 @@ func (cc *CommentCreate) SetIPAddress(s string) *CommentCreate {
 }
 
 // SetStatus sets the "status" field.
-func (cc *CommentCreate) SetStatus(c comment.Status) *CommentCreate {
-	cc.mutation.SetStatus(c)
+func (cc *CommentCreate) SetStatus(i int) *CommentCreate {
+	cc.mutation.SetStatus(i)
 	return cc
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (cc *CommentCreate) SetNillableStatus(c *comment.Status) *CommentCreate {
-	if c != nil {
-		cc.SetStatus(*c)
+func (cc *CommentCreate) SetNillableStatus(i *int) *CommentCreate {
+	if i != nil {
+		cc.SetStatus(*i)
 	}
 	return cc
 }
@@ -313,11 +313,6 @@ func (cc *CommentCreate) check() error {
 	if _, ok := cc.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Comment.status"`)}
 	}
-	if v, ok := cc.mutation.Status(); ok {
-		if err := comment.StatusValidator(v); err != nil {
-			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Comment.status": %w`, err)}
-		}
-	}
 	if _, ok := cc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "createdAt", err: errors.New(`ent: missing required field "Comment.createdAt"`)}
 	}
@@ -372,7 +367,7 @@ func (cc *CommentCreate) createSpec() (*Comment, *sqlgraph.CreateSpec) {
 		_node.IPAddress = value
 	}
 	if value, ok := cc.mutation.Status(); ok {
-		_spec.SetField(comment.FieldStatus, field.TypeEnum, value)
+		_spec.SetField(comment.FieldStatus, field.TypeInt, value)
 		_node.Status = value
 	}
 	if value, ok := cc.mutation.CreatedAt(); ok {

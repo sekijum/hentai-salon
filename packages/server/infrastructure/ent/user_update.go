@@ -114,16 +114,23 @@ func (uu *UserUpdate) ClearAvatarUrl() *UserUpdate {
 }
 
 // SetStatus sets the "status" field.
-func (uu *UserUpdate) SetStatus(u user.Status) *UserUpdate {
-	uu.mutation.SetStatus(u)
+func (uu *UserUpdate) SetStatus(i int) *UserUpdate {
+	uu.mutation.ResetStatus()
+	uu.mutation.SetStatus(i)
 	return uu
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (uu *UserUpdate) SetNillableStatus(u *user.Status) *UserUpdate {
-	if u != nil {
-		uu.SetStatus(*u)
+func (uu *UserUpdate) SetNillableStatus(i *int) *UserUpdate {
+	if i != nil {
+		uu.SetStatus(*i)
 	}
+	return uu
+}
+
+// AddStatus adds i to the "status" field.
+func (uu *UserUpdate) AddStatus(i int) *UserUpdate {
+	uu.mutation.AddStatus(i)
 	return uu
 }
 
@@ -529,11 +536,6 @@ func (uu *UserUpdate) check() error {
 			return &ValidationError{Name: "displayName", err: fmt.Errorf(`ent: validator failed for field "User.displayName": %w`, err)}
 		}
 	}
-	if v, ok := uu.mutation.Status(); ok {
-		if err := user.StatusValidator(v); err != nil {
-			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "User.status": %w`, err)}
-		}
-	}
 	return nil
 }
 
@@ -571,7 +573,10 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.ClearField(user.FieldAvatarUrl, field.TypeString)
 	}
 	if value, ok := uu.mutation.Status(); ok {
-		_spec.SetField(user.FieldStatus, field.TypeEnum, value)
+		_spec.SetField(user.FieldStatus, field.TypeInt, value)
+	}
+	if value, ok := uu.mutation.AddedStatus(); ok {
+		_spec.AddField(user.FieldStatus, field.TypeInt, value)
 	}
 	if value, ok := uu.mutation.CreatedAt(); ok {
 		_spec.SetField(user.FieldCreatedAt, field.TypeTime, value)
@@ -1159,16 +1164,23 @@ func (uuo *UserUpdateOne) ClearAvatarUrl() *UserUpdateOne {
 }
 
 // SetStatus sets the "status" field.
-func (uuo *UserUpdateOne) SetStatus(u user.Status) *UserUpdateOne {
-	uuo.mutation.SetStatus(u)
+func (uuo *UserUpdateOne) SetStatus(i int) *UserUpdateOne {
+	uuo.mutation.ResetStatus()
+	uuo.mutation.SetStatus(i)
 	return uuo
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (uuo *UserUpdateOne) SetNillableStatus(u *user.Status) *UserUpdateOne {
-	if u != nil {
-		uuo.SetStatus(*u)
+func (uuo *UserUpdateOne) SetNillableStatus(i *int) *UserUpdateOne {
+	if i != nil {
+		uuo.SetStatus(*i)
 	}
+	return uuo
+}
+
+// AddStatus adds i to the "status" field.
+func (uuo *UserUpdateOne) AddStatus(i int) *UserUpdateOne {
+	uuo.mutation.AddStatus(i)
 	return uuo
 }
 
@@ -1587,11 +1599,6 @@ func (uuo *UserUpdateOne) check() error {
 			return &ValidationError{Name: "displayName", err: fmt.Errorf(`ent: validator failed for field "User.displayName": %w`, err)}
 		}
 	}
-	if v, ok := uuo.mutation.Status(); ok {
-		if err := user.StatusValidator(v); err != nil {
-			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "User.status": %w`, err)}
-		}
-	}
 	return nil
 }
 
@@ -1646,7 +1653,10 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		_spec.ClearField(user.FieldAvatarUrl, field.TypeString)
 	}
 	if value, ok := uuo.mutation.Status(); ok {
-		_spec.SetField(user.FieldStatus, field.TypeEnum, value)
+		_spec.SetField(user.FieldStatus, field.TypeInt, value)
+	}
+	if value, ok := uuo.mutation.AddedStatus(); ok {
+		_spec.AddField(user.FieldStatus, field.TypeInt, value)
 	}
 	if value, ok := uuo.mutation.CreatedAt(); ok {
 		_spec.SetField(user.FieldCreatedAt, field.TypeTime, value)

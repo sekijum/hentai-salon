@@ -85,6 +85,11 @@ func IPAddress(v string) predicate.Comment {
 	return predicate.Comment(sql.FieldEQ(FieldIPAddress, v))
 }
 
+// Status applies equality check predicate on the "status" field. It's identical to StatusEQ.
+func Status(v int) predicate.Comment {
+	return predicate.Comment(sql.FieldEQ(FieldStatus, v))
+}
+
 // CreatedAt applies equality check predicate on the "createdAt" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.Comment {
 	return predicate.Comment(sql.FieldEQ(FieldCreatedAt, v))
@@ -381,23 +386,43 @@ func IPAddressContainsFold(v string) predicate.Comment {
 }
 
 // StatusEQ applies the EQ predicate on the "status" field.
-func StatusEQ(v Status) predicate.Comment {
+func StatusEQ(v int) predicate.Comment {
 	return predicate.Comment(sql.FieldEQ(FieldStatus, v))
 }
 
 // StatusNEQ applies the NEQ predicate on the "status" field.
-func StatusNEQ(v Status) predicate.Comment {
+func StatusNEQ(v int) predicate.Comment {
 	return predicate.Comment(sql.FieldNEQ(FieldStatus, v))
 }
 
 // StatusIn applies the In predicate on the "status" field.
-func StatusIn(vs ...Status) predicate.Comment {
+func StatusIn(vs ...int) predicate.Comment {
 	return predicate.Comment(sql.FieldIn(FieldStatus, vs...))
 }
 
 // StatusNotIn applies the NotIn predicate on the "status" field.
-func StatusNotIn(vs ...Status) predicate.Comment {
+func StatusNotIn(vs ...int) predicate.Comment {
 	return predicate.Comment(sql.FieldNotIn(FieldStatus, vs...))
+}
+
+// StatusGT applies the GT predicate on the "status" field.
+func StatusGT(v int) predicate.Comment {
+	return predicate.Comment(sql.FieldGT(FieldStatus, v))
+}
+
+// StatusGTE applies the GTE predicate on the "status" field.
+func StatusGTE(v int) predicate.Comment {
+	return predicate.Comment(sql.FieldGTE(FieldStatus, v))
+}
+
+// StatusLT applies the LT predicate on the "status" field.
+func StatusLT(v int) predicate.Comment {
+	return predicate.Comment(sql.FieldLT(FieldStatus, v))
+}
+
+// StatusLTE applies the LTE predicate on the "status" field.
+func StatusLTE(v int) predicate.Comment {
+	return predicate.Comment(sql.FieldLTE(FieldStatus, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "createdAt" field.

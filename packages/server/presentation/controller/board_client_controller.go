@@ -4,33 +4,31 @@ import (
 	"context"
 	"net/http"
 	service "server/application/service"
-	dto "server/presentation/dto/board"
+	request "server/presentation/request/board"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/wire"
 )
 
 type BoardClientController struct {
-	boardService *service.BoardClientService
+	boardClientService *service.BoardClientService
 }
 
-func NewBoardClientController(boardService *service.BoardClientService) *BoardClientController {
-	return &BoardClientController{boardService: boardService}
+func NewBoardClientController(boardClientService *service.BoardClientService) *BoardClientController {
+	return &BoardClientController{boardClientService: boardClientService}
 }
 
-func (bc *BoardClientController) CreateBoard(ctx *gin.Context) {
-	var req dto.BoardCreateClientRequest
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+func (boardClientController *BoardClientController) Create(ginCtx *gin.Context) {
+	var body request.BoardCreateClientRequest
+	if err := ginCtx.ShouldBindJSON(&body); err != nil {
+		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	board, err := bc.boardService.CreateBoard(context.Background(), req.Title, req.Description, req.UserId, req.DefaultThreadTitle, req.DefaultThreadDescription)
+	_, err := boardClientController.boardClientService.Create(context.Background(), ginCtx, body)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ginCtx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, board)
-}
 
-var Provider = wire.NewSet(NewBoardClientController)
+	ginCtx.JSON(http.StatusOK, nil)
+}

@@ -3,7 +3,6 @@
 package board
 
 import (
-	"fmt"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -23,8 +22,6 @@ const (
 	FieldDescription = "description"
 	// FieldThumbnailUrl holds the string denoting the thumbnailurl field in the database.
 	FieldThumbnailUrl = "thumbnail_url"
-	// FieldOrder holds the string denoting the order field in the database.
-	FieldOrder = "order"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
 	// FieldCreatedAt holds the string denoting the createdat field in the database.
@@ -35,6 +32,8 @@ const (
 	EdgeLikedUsers = "liked_users"
 	// EdgeSubscribedUsers holds the string denoting the subscribed_users edge name in mutations.
 	EdgeSubscribedUsers = "subscribed_users"
+	// EdgeOwner holds the string denoting the owner edge name in mutations.
+	EdgeOwner = "owner"
 	// EdgeThreads holds the string denoting the threads edge name in mutations.
 	EdgeThreads = "threads"
 	// EdgeUserBoardLike holds the string denoting the user_board_like edge name in mutations.
@@ -53,6 +52,13 @@ const (
 	// SubscribedUsersInverseTable is the table name for the User entity.
 	// It exists in this package in order to avoid circular dependency with the "user" package.
 	SubscribedUsersInverseTable = "users"
+	// OwnerTable is the table that holds the owner relation/edge.
+	OwnerTable = "boards"
+	// OwnerInverseTable is the table name for the User entity.
+	// It exists in this package in order to avoid circular dependency with the "user" package.
+	OwnerInverseTable = "users"
+	// OwnerColumn is the table column denoting the owner relation/edge.
+	OwnerColumn = "user_id"
 	// ThreadsTable is the table that holds the threads relation/edge.
 	ThreadsTable = "threads"
 	// ThreadsInverseTable is the table name for the Thread entity.
@@ -83,16 +89,9 @@ var Columns = []string{
 	FieldTitle,
 	FieldDescription,
 	FieldThumbnailUrl,
-	FieldOrder,
 	FieldStatus,
 	FieldCreatedAt,
 	FieldUpdatedAt,
-}
-
-// ForeignKeys holds the SQL foreign-keys that are owned by the "boards"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"user_boards",
 }
 
 var (
@@ -111,11 +110,6 @@ func ValidColumn(column string) bool {
 			return true
 		}
 	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
-			return true
-		}
-	}
 	return false
 }
 
@@ -124,8 +118,8 @@ var (
 	TitleValidator func(string) error
 	// DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
 	DescriptionValidator func(string) error
-	// DefaultOrder holds the default value on creation for the "order" field.
-	DefaultOrder int
+	// DefaultStatus holds the default value on creation for the "status" field.
+	DefaultStatus int
 	// DefaultCreatedAt holds the default value on creation for the "createdAt" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updatedAt" field.
@@ -133,34 +127,6 @@ var (
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updatedAt" field.
 	UpdateDefaultUpdatedAt func() time.Time
 )
-
-// Status defines the type for the "status" enum field.
-type Status string
-
-// StatusPublic is the default value of the Status enum.
-const DefaultStatus = StatusPublic
-
-// Status values.
-const (
-	StatusPublic   Status = "Public"
-	StatusPrivate  Status = "Private"
-	StatusArchived Status = "Archived"
-	StatusDeleted  Status = "Deleted"
-)
-
-func (s Status) String() string {
-	return string(s)
-}
-
-// StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
-func StatusValidator(s Status) error {
-	switch s {
-	case StatusPublic, StatusPrivate, StatusArchived, StatusDeleted:
-		return nil
-	default:
-		return fmt.Errorf("board: invalid enum value for status field: %q", s)
-	}
-}
 
 // OrderOption defines the ordering options for the Board queries.
 type OrderOption func(*sql.Selector)
@@ -188,11 +154,6 @@ func ByDescription(opts ...sql.OrderTermOption) OrderOption {
 // ByThumbnailUrl orders the results by the thumbnailUrl field.
 func ByThumbnailUrl(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldThumbnailUrl, opts...).ToFunc()
-}
-
-// ByOrder orders the results by the order field.
-func ByOrder(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldOrder, opts...).ToFunc()
 }
 
 // ByStatus orders the results by the status field.
@@ -235,6 +196,13 @@ func BySubscribedUsersCount(opts ...sql.OrderTermOption) OrderOption {
 func BySubscribedUsers(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newSubscribedUsersStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByOwnerField orders the results by owner field.
+func ByOwnerField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newOwnerStep(), sql.OrderByField(field, opts...))
 	}
 }
 
@@ -291,6 +259,13 @@ func newSubscribedUsersStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(SubscribedUsersInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, true, SubscribedUsersTable, SubscribedUsersPrimaryKey...),
+	)
+}
+func newOwnerStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(OwnerInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, OwnerTable, OwnerColumn),
 	)
 }
 func newThreadsStep() *sqlgraph.Step {

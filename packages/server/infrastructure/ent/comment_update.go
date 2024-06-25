@@ -134,16 +134,23 @@ func (cu *CommentUpdate) SetNillableIPAddress(s *string) *CommentUpdate {
 }
 
 // SetStatus sets the "status" field.
-func (cu *CommentUpdate) SetStatus(c comment.Status) *CommentUpdate {
-	cu.mutation.SetStatus(c)
+func (cu *CommentUpdate) SetStatus(i int) *CommentUpdate {
+	cu.mutation.ResetStatus()
+	cu.mutation.SetStatus(i)
 	return cu
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (cu *CommentUpdate) SetNillableStatus(c *comment.Status) *CommentUpdate {
-	if c != nil {
-		cu.SetStatus(*c)
+func (cu *CommentUpdate) SetNillableStatus(i *int) *CommentUpdate {
+	if i != nil {
+		cu.SetStatus(*i)
 	}
+	return cu
+}
+
+// AddStatus adds i to the "status" field.
+func (cu *CommentUpdate) AddStatus(i int) *CommentUpdate {
+	cu.mutation.AddStatus(i)
 	return cu
 }
 
@@ -431,11 +438,6 @@ func (cu *CommentUpdate) check() error {
 			return &ValidationError{Name: "ip_address", err: fmt.Errorf(`ent: validator failed for field "Comment.ip_address": %w`, err)}
 		}
 	}
-	if v, ok := cu.mutation.Status(); ok {
-		if err := comment.StatusValidator(v); err != nil {
-			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Comment.status": %w`, err)}
-		}
-	}
 	if _, ok := cu.mutation.ThreadID(); cu.mutation.ThreadCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Comment.thread"`)
 	}
@@ -467,7 +469,10 @@ func (cu *CommentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.SetField(comment.FieldIPAddress, field.TypeString, value)
 	}
 	if value, ok := cu.mutation.Status(); ok {
-		_spec.SetField(comment.FieldStatus, field.TypeEnum, value)
+		_spec.SetField(comment.FieldStatus, field.TypeInt, value)
+	}
+	if value, ok := cu.mutation.AddedStatus(); ok {
+		_spec.AddField(comment.FieldStatus, field.TypeInt, value)
 	}
 	if value, ok := cu.mutation.CreatedAt(); ok {
 		_spec.SetField(comment.FieldCreatedAt, field.TypeTime, value)
@@ -889,16 +894,23 @@ func (cuo *CommentUpdateOne) SetNillableIPAddress(s *string) *CommentUpdateOne {
 }
 
 // SetStatus sets the "status" field.
-func (cuo *CommentUpdateOne) SetStatus(c comment.Status) *CommentUpdateOne {
-	cuo.mutation.SetStatus(c)
+func (cuo *CommentUpdateOne) SetStatus(i int) *CommentUpdateOne {
+	cuo.mutation.ResetStatus()
+	cuo.mutation.SetStatus(i)
 	return cuo
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (cuo *CommentUpdateOne) SetNillableStatus(c *comment.Status) *CommentUpdateOne {
-	if c != nil {
-		cuo.SetStatus(*c)
+func (cuo *CommentUpdateOne) SetNillableStatus(i *int) *CommentUpdateOne {
+	if i != nil {
+		cuo.SetStatus(*i)
 	}
+	return cuo
+}
+
+// AddStatus adds i to the "status" field.
+func (cuo *CommentUpdateOne) AddStatus(i int) *CommentUpdateOne {
+	cuo.mutation.AddStatus(i)
 	return cuo
 }
 
@@ -1199,11 +1211,6 @@ func (cuo *CommentUpdateOne) check() error {
 			return &ValidationError{Name: "ip_address", err: fmt.Errorf(`ent: validator failed for field "Comment.ip_address": %w`, err)}
 		}
 	}
-	if v, ok := cuo.mutation.Status(); ok {
-		if err := comment.StatusValidator(v); err != nil {
-			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Comment.status": %w`, err)}
-		}
-	}
 	if _, ok := cuo.mutation.ThreadID(); cuo.mutation.ThreadCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Comment.thread"`)
 	}
@@ -1252,7 +1259,10 @@ func (cuo *CommentUpdateOne) sqlSave(ctx context.Context) (_node *Comment, err e
 		_spec.SetField(comment.FieldIPAddress, field.TypeString, value)
 	}
 	if value, ok := cuo.mutation.Status(); ok {
-		_spec.SetField(comment.FieldStatus, field.TypeEnum, value)
+		_spec.SetField(comment.FieldStatus, field.TypeInt, value)
+	}
+	if value, ok := cuo.mutation.AddedStatus(); ok {
+		_spec.AddField(comment.FieldStatus, field.TypeInt, value)
 	}
 	if value, ok := cuo.mutation.CreatedAt(); ok {
 		_spec.SetField(comment.FieldCreatedAt, field.TypeTime, value)

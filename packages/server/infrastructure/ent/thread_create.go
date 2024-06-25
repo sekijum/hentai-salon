@@ -42,14 +42,6 @@ func (tc *ThreadCreate) SetTitle(s string) *ThreadCreate {
 	return tc
 }
 
-// SetNillableTitle sets the "title" field if the given value is not nil.
-func (tc *ThreadCreate) SetNillableTitle(s *string) *ThreadCreate {
-	if s != nil {
-		tc.SetTitle(*s)
-	}
-	return tc
-}
-
 // SetDescription sets the "description" field.
 func (tc *ThreadCreate) SetDescription(s string) *ThreadCreate {
 	tc.mutation.SetDescription(s)
@@ -113,15 +105,15 @@ func (tc *ThreadCreate) SetIPAddress(s string) *ThreadCreate {
 }
 
 // SetStatus sets the "status" field.
-func (tc *ThreadCreate) SetStatus(t thread.Status) *ThreadCreate {
-	tc.mutation.SetStatus(t)
+func (tc *ThreadCreate) SetStatus(i int) *ThreadCreate {
+	tc.mutation.SetStatus(i)
 	return tc
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (tc *ThreadCreate) SetNillableStatus(t *thread.Status) *ThreadCreate {
-	if t != nil {
-		tc.SetStatus(*t)
+func (tc *ThreadCreate) SetNillableStatus(i *int) *ThreadCreate {
+	if i != nil {
+		tc.SetStatus(*i)
 	}
 	return tc
 }
@@ -307,6 +299,9 @@ func (tc *ThreadCreate) check() error {
 	if _, ok := tc.mutation.UserId(); !ok {
 		return &ValidationError{Name: "userId", err: errors.New(`ent: missing required field "Thread.userId"`)}
 	}
+	if _, ok := tc.mutation.Title(); !ok {
+		return &ValidationError{Name: "title", err: errors.New(`ent: missing required field "Thread.title"`)}
+	}
 	if v, ok := tc.mutation.Title(); ok {
 		if err := thread.TitleValidator(v); err != nil {
 			return &ValidationError{Name: "title", err: fmt.Errorf(`ent: validator failed for field "Thread.title": %w`, err)}
@@ -333,11 +328,6 @@ func (tc *ThreadCreate) check() error {
 	}
 	if _, ok := tc.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Thread.status"`)}
-	}
-	if v, ok := tc.mutation.Status(); ok {
-		if err := thread.StatusValidator(v); err != nil {
-			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Thread.status": %w`, err)}
-		}
 	}
 	if _, ok := tc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "createdAt", err: errors.New(`ent: missing required field "Thread.createdAt"`)}
@@ -408,7 +398,7 @@ func (tc *ThreadCreate) createSpec() (*Thread, *sqlgraph.CreateSpec) {
 		_node.IPAddress = value
 	}
 	if value, ok := tc.mutation.Status(); ok {
-		_spec.SetField(thread.FieldStatus, field.TypeEnum, value)
+		_spec.SetField(thread.FieldStatus, field.TypeInt, value)
 		_node.Status = value
 	}
 	if value, ok := tc.mutation.CreatedAt(); ok {

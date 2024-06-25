@@ -74,12 +74,6 @@ func (tu *ThreadUpdate) SetNillableTitle(s *string) *ThreadUpdate {
 	return tu
 }
 
-// ClearTitle clears the value of the "title" field.
-func (tu *ThreadUpdate) ClearTitle() *ThreadUpdate {
-	tu.mutation.ClearTitle()
-	return tu
-}
-
 // SetDescription sets the "description" field.
 func (tu *ThreadUpdate) SetDescription(s string) *ThreadUpdate {
 	tu.mutation.SetDescription(s)
@@ -163,16 +157,23 @@ func (tu *ThreadUpdate) SetNillableIPAddress(s *string) *ThreadUpdate {
 }
 
 // SetStatus sets the "status" field.
-func (tu *ThreadUpdate) SetStatus(t thread.Status) *ThreadUpdate {
-	tu.mutation.SetStatus(t)
+func (tu *ThreadUpdate) SetStatus(i int) *ThreadUpdate {
+	tu.mutation.ResetStatus()
+	tu.mutation.SetStatus(i)
 	return tu
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (tu *ThreadUpdate) SetNillableStatus(t *thread.Status) *ThreadUpdate {
-	if t != nil {
-		tu.SetStatus(*t)
+func (tu *ThreadUpdate) SetNillableStatus(i *int) *ThreadUpdate {
+	if i != nil {
+		tu.SetStatus(*i)
 	}
+	return tu
+}
+
+// AddStatus adds i to the "status" field.
+func (tu *ThreadUpdate) AddStatus(i int) *ThreadUpdate {
+	tu.mutation.AddStatus(i)
 	return tu
 }
 
@@ -432,11 +433,6 @@ func (tu *ThreadUpdate) check() error {
 			return &ValidationError{Name: "ip_address", err: fmt.Errorf(`ent: validator failed for field "Thread.ip_address": %w`, err)}
 		}
 	}
-	if v, ok := tu.mutation.Status(); ok {
-		if err := thread.StatusValidator(v); err != nil {
-			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Thread.status": %w`, err)}
-		}
-	}
 	if _, ok := tu.mutation.BoardID(); tu.mutation.BoardCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Thread.board"`)
 	}
@@ -461,9 +457,6 @@ func (tu *ThreadUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := tu.mutation.Title(); ok {
 		_spec.SetField(thread.FieldTitle, field.TypeString, value)
 	}
-	if tu.mutation.TitleCleared() {
-		_spec.ClearField(thread.FieldTitle, field.TypeString)
-	}
 	if value, ok := tu.mutation.Description(); ok {
 		_spec.SetField(thread.FieldDescription, field.TypeString, value)
 	}
@@ -486,7 +479,10 @@ func (tu *ThreadUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.SetField(thread.FieldIPAddress, field.TypeString, value)
 	}
 	if value, ok := tu.mutation.Status(); ok {
-		_spec.SetField(thread.FieldStatus, field.TypeEnum, value)
+		_spec.SetField(thread.FieldStatus, field.TypeInt, value)
+	}
+	if value, ok := tu.mutation.AddedStatus(); ok {
+		_spec.AddField(thread.FieldStatus, field.TypeInt, value)
 	}
 	if value, ok := tu.mutation.CreatedAt(); ok {
 		_spec.SetField(thread.FieldCreatedAt, field.TypeTime, value)
@@ -818,12 +814,6 @@ func (tuo *ThreadUpdateOne) SetNillableTitle(s *string) *ThreadUpdateOne {
 	return tuo
 }
 
-// ClearTitle clears the value of the "title" field.
-func (tuo *ThreadUpdateOne) ClearTitle() *ThreadUpdateOne {
-	tuo.mutation.ClearTitle()
-	return tuo
-}
-
 // SetDescription sets the "description" field.
 func (tuo *ThreadUpdateOne) SetDescription(s string) *ThreadUpdateOne {
 	tuo.mutation.SetDescription(s)
@@ -907,16 +897,23 @@ func (tuo *ThreadUpdateOne) SetNillableIPAddress(s *string) *ThreadUpdateOne {
 }
 
 // SetStatus sets the "status" field.
-func (tuo *ThreadUpdateOne) SetStatus(t thread.Status) *ThreadUpdateOne {
-	tuo.mutation.SetStatus(t)
+func (tuo *ThreadUpdateOne) SetStatus(i int) *ThreadUpdateOne {
+	tuo.mutation.ResetStatus()
+	tuo.mutation.SetStatus(i)
 	return tuo
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (tuo *ThreadUpdateOne) SetNillableStatus(t *thread.Status) *ThreadUpdateOne {
-	if t != nil {
-		tuo.SetStatus(*t)
+func (tuo *ThreadUpdateOne) SetNillableStatus(i *int) *ThreadUpdateOne {
+	if i != nil {
+		tuo.SetStatus(*i)
 	}
+	return tuo
+}
+
+// AddStatus adds i to the "status" field.
+func (tuo *ThreadUpdateOne) AddStatus(i int) *ThreadUpdateOne {
+	tuo.mutation.AddStatus(i)
 	return tuo
 }
 
@@ -1189,11 +1186,6 @@ func (tuo *ThreadUpdateOne) check() error {
 			return &ValidationError{Name: "ip_address", err: fmt.Errorf(`ent: validator failed for field "Thread.ip_address": %w`, err)}
 		}
 	}
-	if v, ok := tuo.mutation.Status(); ok {
-		if err := thread.StatusValidator(v); err != nil {
-			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Thread.status": %w`, err)}
-		}
-	}
 	if _, ok := tuo.mutation.BoardID(); tuo.mutation.BoardCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Thread.board"`)
 	}
@@ -1235,9 +1227,6 @@ func (tuo *ThreadUpdateOne) sqlSave(ctx context.Context) (_node *Thread, err err
 	if value, ok := tuo.mutation.Title(); ok {
 		_spec.SetField(thread.FieldTitle, field.TypeString, value)
 	}
-	if tuo.mutation.TitleCleared() {
-		_spec.ClearField(thread.FieldTitle, field.TypeString)
-	}
 	if value, ok := tuo.mutation.Description(); ok {
 		_spec.SetField(thread.FieldDescription, field.TypeString, value)
 	}
@@ -1260,7 +1249,10 @@ func (tuo *ThreadUpdateOne) sqlSave(ctx context.Context) (_node *Thread, err err
 		_spec.SetField(thread.FieldIPAddress, field.TypeString, value)
 	}
 	if value, ok := tuo.mutation.Status(); ok {
-		_spec.SetField(thread.FieldStatus, field.TypeEnum, value)
+		_spec.SetField(thread.FieldStatus, field.TypeInt, value)
+	}
+	if value, ok := tuo.mutation.AddedStatus(); ok {
+		_spec.AddField(thread.FieldStatus, field.TypeInt, value)
 	}
 	if value, ok := tuo.mutation.CreatedAt(); ok {
 		_spec.SetField(thread.FieldCreatedAt, field.TypeTime, value)

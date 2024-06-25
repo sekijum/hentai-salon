@@ -32,7 +32,6 @@ func (bu *BoardUpdate) Where(ps ...predicate.Board) *BoardUpdate {
 
 // SetUserId sets the "userId" field.
 func (bu *BoardUpdate) SetUserId(i int) *BoardUpdate {
-	bu.mutation.ResetUserId()
 	bu.mutation.SetUserId(i)
 	return bu
 }
@@ -42,12 +41,6 @@ func (bu *BoardUpdate) SetNillableUserId(i *int) *BoardUpdate {
 	if i != nil {
 		bu.SetUserId(*i)
 	}
-	return bu
-}
-
-// AddUserId adds i to the "userId" field.
-func (bu *BoardUpdate) AddUserId(i int) *BoardUpdate {
-	bu.mutation.AddUserId(i)
 	return bu
 }
 
@@ -105,38 +98,24 @@ func (bu *BoardUpdate) ClearThumbnailUrl() *BoardUpdate {
 	return bu
 }
 
-// SetOrder sets the "order" field.
-func (bu *BoardUpdate) SetOrder(i int) *BoardUpdate {
-	bu.mutation.ResetOrder()
-	bu.mutation.SetOrder(i)
-	return bu
-}
-
-// SetNillableOrder sets the "order" field if the given value is not nil.
-func (bu *BoardUpdate) SetNillableOrder(i *int) *BoardUpdate {
-	if i != nil {
-		bu.SetOrder(*i)
-	}
-	return bu
-}
-
-// AddOrder adds i to the "order" field.
-func (bu *BoardUpdate) AddOrder(i int) *BoardUpdate {
-	bu.mutation.AddOrder(i)
-	return bu
-}
-
 // SetStatus sets the "status" field.
-func (bu *BoardUpdate) SetStatus(b board.Status) *BoardUpdate {
-	bu.mutation.SetStatus(b)
+func (bu *BoardUpdate) SetStatus(i int) *BoardUpdate {
+	bu.mutation.ResetStatus()
+	bu.mutation.SetStatus(i)
 	return bu
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (bu *BoardUpdate) SetNillableStatus(b *board.Status) *BoardUpdate {
-	if b != nil {
-		bu.SetStatus(*b)
+func (bu *BoardUpdate) SetNillableStatus(i *int) *BoardUpdate {
+	if i != nil {
+		bu.SetStatus(*i)
 	}
+	return bu
+}
+
+// AddStatus adds i to the "status" field.
+func (bu *BoardUpdate) AddStatus(i int) *BoardUpdate {
+	bu.mutation.AddStatus(i)
 	return bu
 }
 
@@ -188,6 +167,17 @@ func (bu *BoardUpdate) AddSubscribedUsers(u ...*User) *BoardUpdate {
 		ids[i] = u[i].ID
 	}
 	return bu.AddSubscribedUserIDs(ids...)
+}
+
+// SetOwnerID sets the "owner" edge to the User entity by ID.
+func (bu *BoardUpdate) SetOwnerID(id int) *BoardUpdate {
+	bu.mutation.SetOwnerID(id)
+	return bu
+}
+
+// SetOwner sets the "owner" edge to the User entity.
+func (bu *BoardUpdate) SetOwner(u *User) *BoardUpdate {
+	return bu.SetOwnerID(u.ID)
 }
 
 // AddThreadIDs adds the "threads" edge to the Thread entity by IDs.
@@ -250,6 +240,12 @@ func (bu *BoardUpdate) RemoveSubscribedUsers(u ...*User) *BoardUpdate {
 		ids[i] = u[i].ID
 	}
 	return bu.RemoveSubscribedUserIDs(ids...)
+}
+
+// ClearOwner clears the "owner" edge to the User entity.
+func (bu *BoardUpdate) ClearOwner() *BoardUpdate {
+	bu.mutation.ClearOwner()
+	return bu
 }
 
 // ClearThreads clears all "threads" edges to the Thread entity.
@@ -321,10 +317,8 @@ func (bu *BoardUpdate) check() error {
 			return &ValidationError{Name: "description", err: fmt.Errorf(`ent: validator failed for field "Board.description": %w`, err)}
 		}
 	}
-	if v, ok := bu.mutation.Status(); ok {
-		if err := board.StatusValidator(v); err != nil {
-			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Board.status": %w`, err)}
-		}
+	if _, ok := bu.mutation.OwnerID(); bu.mutation.OwnerCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Board.owner"`)
 	}
 	return nil
 }
@@ -341,12 +335,6 @@ func (bu *BoardUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := bu.mutation.UserId(); ok {
-		_spec.SetField(board.FieldUserId, field.TypeInt, value)
-	}
-	if value, ok := bu.mutation.AddedUserId(); ok {
-		_spec.AddField(board.FieldUserId, field.TypeInt, value)
-	}
 	if value, ok := bu.mutation.Title(); ok {
 		_spec.SetField(board.FieldTitle, field.TypeString, value)
 	}
@@ -362,14 +350,11 @@ func (bu *BoardUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if bu.mutation.ThumbnailUrlCleared() {
 		_spec.ClearField(board.FieldThumbnailUrl, field.TypeString)
 	}
-	if value, ok := bu.mutation.Order(); ok {
-		_spec.SetField(board.FieldOrder, field.TypeInt, value)
-	}
-	if value, ok := bu.mutation.AddedOrder(); ok {
-		_spec.AddField(board.FieldOrder, field.TypeInt, value)
-	}
 	if value, ok := bu.mutation.Status(); ok {
-		_spec.SetField(board.FieldStatus, field.TypeEnum, value)
+		_spec.SetField(board.FieldStatus, field.TypeInt, value)
+	}
+	if value, ok := bu.mutation.AddedStatus(); ok {
+		_spec.AddField(board.FieldStatus, field.TypeInt, value)
 	}
 	if value, ok := bu.mutation.CreatedAt(); ok {
 		_spec.SetField(board.FieldCreatedAt, field.TypeTime, value)
@@ -491,6 +476,35 @@ func (bu *BoardUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if bu.mutation.OwnerCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   board.OwnerTable,
+			Columns: []string{board.OwnerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := bu.mutation.OwnerIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   board.OwnerTable,
+			Columns: []string{board.OwnerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if bu.mutation.ThreadsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -558,7 +572,6 @@ type BoardUpdateOne struct {
 
 // SetUserId sets the "userId" field.
 func (buo *BoardUpdateOne) SetUserId(i int) *BoardUpdateOne {
-	buo.mutation.ResetUserId()
 	buo.mutation.SetUserId(i)
 	return buo
 }
@@ -568,12 +581,6 @@ func (buo *BoardUpdateOne) SetNillableUserId(i *int) *BoardUpdateOne {
 	if i != nil {
 		buo.SetUserId(*i)
 	}
-	return buo
-}
-
-// AddUserId adds i to the "userId" field.
-func (buo *BoardUpdateOne) AddUserId(i int) *BoardUpdateOne {
-	buo.mutation.AddUserId(i)
 	return buo
 }
 
@@ -631,38 +638,24 @@ func (buo *BoardUpdateOne) ClearThumbnailUrl() *BoardUpdateOne {
 	return buo
 }
 
-// SetOrder sets the "order" field.
-func (buo *BoardUpdateOne) SetOrder(i int) *BoardUpdateOne {
-	buo.mutation.ResetOrder()
-	buo.mutation.SetOrder(i)
-	return buo
-}
-
-// SetNillableOrder sets the "order" field if the given value is not nil.
-func (buo *BoardUpdateOne) SetNillableOrder(i *int) *BoardUpdateOne {
-	if i != nil {
-		buo.SetOrder(*i)
-	}
-	return buo
-}
-
-// AddOrder adds i to the "order" field.
-func (buo *BoardUpdateOne) AddOrder(i int) *BoardUpdateOne {
-	buo.mutation.AddOrder(i)
-	return buo
-}
-
 // SetStatus sets the "status" field.
-func (buo *BoardUpdateOne) SetStatus(b board.Status) *BoardUpdateOne {
-	buo.mutation.SetStatus(b)
+func (buo *BoardUpdateOne) SetStatus(i int) *BoardUpdateOne {
+	buo.mutation.ResetStatus()
+	buo.mutation.SetStatus(i)
 	return buo
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (buo *BoardUpdateOne) SetNillableStatus(b *board.Status) *BoardUpdateOne {
-	if b != nil {
-		buo.SetStatus(*b)
+func (buo *BoardUpdateOne) SetNillableStatus(i *int) *BoardUpdateOne {
+	if i != nil {
+		buo.SetStatus(*i)
 	}
+	return buo
+}
+
+// AddStatus adds i to the "status" field.
+func (buo *BoardUpdateOne) AddStatus(i int) *BoardUpdateOne {
+	buo.mutation.AddStatus(i)
 	return buo
 }
 
@@ -714,6 +707,17 @@ func (buo *BoardUpdateOne) AddSubscribedUsers(u ...*User) *BoardUpdateOne {
 		ids[i] = u[i].ID
 	}
 	return buo.AddSubscribedUserIDs(ids...)
+}
+
+// SetOwnerID sets the "owner" edge to the User entity by ID.
+func (buo *BoardUpdateOne) SetOwnerID(id int) *BoardUpdateOne {
+	buo.mutation.SetOwnerID(id)
+	return buo
+}
+
+// SetOwner sets the "owner" edge to the User entity.
+func (buo *BoardUpdateOne) SetOwner(u *User) *BoardUpdateOne {
+	return buo.SetOwnerID(u.ID)
 }
 
 // AddThreadIDs adds the "threads" edge to the Thread entity by IDs.
@@ -776,6 +780,12 @@ func (buo *BoardUpdateOne) RemoveSubscribedUsers(u ...*User) *BoardUpdateOne {
 		ids[i] = u[i].ID
 	}
 	return buo.RemoveSubscribedUserIDs(ids...)
+}
+
+// ClearOwner clears the "owner" edge to the User entity.
+func (buo *BoardUpdateOne) ClearOwner() *BoardUpdateOne {
+	buo.mutation.ClearOwner()
+	return buo
 }
 
 // ClearThreads clears all "threads" edges to the Thread entity.
@@ -860,10 +870,8 @@ func (buo *BoardUpdateOne) check() error {
 			return &ValidationError{Name: "description", err: fmt.Errorf(`ent: validator failed for field "Board.description": %w`, err)}
 		}
 	}
-	if v, ok := buo.mutation.Status(); ok {
-		if err := board.StatusValidator(v); err != nil {
-			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Board.status": %w`, err)}
-		}
+	if _, ok := buo.mutation.OwnerID(); buo.mutation.OwnerCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Board.owner"`)
 	}
 	return nil
 }
@@ -897,12 +905,6 @@ func (buo *BoardUpdateOne) sqlSave(ctx context.Context) (_node *Board, err error
 			}
 		}
 	}
-	if value, ok := buo.mutation.UserId(); ok {
-		_spec.SetField(board.FieldUserId, field.TypeInt, value)
-	}
-	if value, ok := buo.mutation.AddedUserId(); ok {
-		_spec.AddField(board.FieldUserId, field.TypeInt, value)
-	}
 	if value, ok := buo.mutation.Title(); ok {
 		_spec.SetField(board.FieldTitle, field.TypeString, value)
 	}
@@ -918,14 +920,11 @@ func (buo *BoardUpdateOne) sqlSave(ctx context.Context) (_node *Board, err error
 	if buo.mutation.ThumbnailUrlCleared() {
 		_spec.ClearField(board.FieldThumbnailUrl, field.TypeString)
 	}
-	if value, ok := buo.mutation.Order(); ok {
-		_spec.SetField(board.FieldOrder, field.TypeInt, value)
-	}
-	if value, ok := buo.mutation.AddedOrder(); ok {
-		_spec.AddField(board.FieldOrder, field.TypeInt, value)
-	}
 	if value, ok := buo.mutation.Status(); ok {
-		_spec.SetField(board.FieldStatus, field.TypeEnum, value)
+		_spec.SetField(board.FieldStatus, field.TypeInt, value)
+	}
+	if value, ok := buo.mutation.AddedStatus(); ok {
+		_spec.AddField(board.FieldStatus, field.TypeInt, value)
 	}
 	if value, ok := buo.mutation.CreatedAt(); ok {
 		_spec.SetField(board.FieldCreatedAt, field.TypeTime, value)
@@ -1045,6 +1044,35 @@ func (buo *BoardUpdateOne) sqlSave(ctx context.Context) (_node *Board, err error
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if buo.mutation.OwnerCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   board.OwnerTable,
+			Columns: []string{board.OwnerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := buo.mutation.OwnerIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   board.OwnerTable,
+			Columns: []string{board.OwnerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if buo.mutation.ThreadsCleared() {

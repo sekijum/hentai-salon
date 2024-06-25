@@ -32,7 +32,7 @@ type Comment struct {
 	// コメント者のIPアドレス
 	IPAddress string `json:"ip_address,omitempty"`
 	// Status holds the value of the "status" field.
-	Status comment.Status `json:"status,omitempty"`
+	Status int `json:"status,omitempty"`
 	// CreatedAt holds the value of the "createdAt" field.
 	CreatedAt time.Time `json:"createdAt,omitempty"`
 	// UpdatedAt holds the value of the "updatedAt" field.
@@ -160,9 +160,9 @@ func (*Comment) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case comment.FieldID, comment.FieldThreadId, comment.FieldParentCommentId, comment.FieldUserId:
+		case comment.FieldID, comment.FieldThreadId, comment.FieldParentCommentId, comment.FieldUserId, comment.FieldStatus:
 			values[i] = new(sql.NullInt64)
-		case comment.FieldGuestName, comment.FieldMessage, comment.FieldIPAddress, comment.FieldStatus:
+		case comment.FieldGuestName, comment.FieldMessage, comment.FieldIPAddress:
 			values[i] = new(sql.NullString)
 		case comment.FieldCreatedAt, comment.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -224,10 +224,10 @@ func (c *Comment) assignValues(columns []string, values []any) error {
 				c.IPAddress = value.String
 			}
 		case comment.FieldStatus:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field status", values[i])
 			} else if value.Valid {
-				c.Status = comment.Status(value.String)
+				c.Status = int(value.Int64)
 			}
 		case comment.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {

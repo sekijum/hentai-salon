@@ -5,6 +5,7 @@ package ent
 import (
 	"fmt"
 	"server/infrastructure/ent/board"
+	"server/infrastructure/ent/user"
 	"strings"
 	"time"
 
@@ -25,10 +26,8 @@ type Board struct {
 	Description string `json:"description,omitempty"`
 	// ThumbnailUrl holds the value of the "thumbnailUrl" field.
 	ThumbnailUrl string `json:"thumbnailUrl,omitempty"`
-	// Order holds the value of the "order" field.
-	Order int `json:"order,omitempty"`
 	// Status holds the value of the "status" field.
-	Status board.Status `json:"status,omitempty"`
+	Status int `json:"status,omitempty"`
 	// CreatedAt holds the value of the "createdAt" field.
 	CreatedAt time.Time `json:"createdAt,omitempty"`
 	// UpdatedAt holds the value of the "updatedAt" field.
@@ -36,7 +35,6 @@ type Board struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the BoardQuery when eager-loading is set.
 	Edges        BoardEdges `json:"edges"`
-	user_boards  *int
 	selectValues sql.SelectValues
 }
 
@@ -46,6 +44,8 @@ type BoardEdges struct {
 	LikedUsers []*User `json:"liked_users,omitempty"`
 	// SubscribedUsers holds the value of the subscribed_users edge.
 	SubscribedUsers []*User `json:"subscribed_users,omitempty"`
+	// Owner holds the value of the owner edge.
+	Owner *User `json:"owner,omitempty"`
 	// Threads holds the value of the threads edge.
 	Threads []*Thread `json:"threads,omitempty"`
 	// UserBoardLike holds the value of the user_board_like edge.
@@ -54,7 +54,7 @@ type BoardEdges struct {
 	UserBoardSubscription []*UserBoardLike `json:"user_board_subscription,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [5]bool
+	loadedTypes [6]bool
 }
 
 // LikedUsersOrErr returns the LikedUsers value or an error if the edge
@@ -75,10 +75,21 @@ func (e BoardEdges) SubscribedUsersOrErr() ([]*User, error) {
 	return nil, &NotLoadedError{edge: "subscribed_users"}
 }
 
+// OwnerOrErr returns the Owner value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e BoardEdges) OwnerOrErr() (*User, error) {
+	if e.Owner != nil {
+		return e.Owner, nil
+	} else if e.loadedTypes[2] {
+		return nil, &NotFoundError{label: user.Label}
+	}
+	return nil, &NotLoadedError{edge: "owner"}
+}
+
 // ThreadsOrErr returns the Threads value or an error if the edge
 // was not loaded in eager-loading.
 func (e BoardEdges) ThreadsOrErr() ([]*Thread, error) {
-	if e.loadedTypes[2] {
+	if e.loadedTypes[3] {
 		return e.Threads, nil
 	}
 	return nil, &NotLoadedError{edge: "threads"}
@@ -87,7 +98,7 @@ func (e BoardEdges) ThreadsOrErr() ([]*Thread, error) {
 // UserBoardLikeOrErr returns the UserBoardLike value or an error if the edge
 // was not loaded in eager-loading.
 func (e BoardEdges) UserBoardLikeOrErr() ([]*UserBoardSubscription, error) {
-	if e.loadedTypes[3] {
+	if e.loadedTypes[4] {
 		return e.UserBoardLike, nil
 	}
 	return nil, &NotLoadedError{edge: "user_board_like"}
@@ -96,7 +107,7 @@ func (e BoardEdges) UserBoardLikeOrErr() ([]*UserBoardSubscription, error) {
 // UserBoardSubscriptionOrErr returns the UserBoardSubscription value or an error if the edge
 // was not loaded in eager-loading.
 func (e BoardEdges) UserBoardSubscriptionOrErr() ([]*UserBoardLike, error) {
-	if e.loadedTypes[4] {
+	if e.loadedTypes[5] {
 		return e.UserBoardSubscription, nil
 	}
 	return nil, &NotLoadedError{edge: "user_board_subscription"}
@@ -107,14 +118,12 @@ func (*Board) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case board.FieldID, board.FieldUserId, board.FieldOrder:
+		case board.FieldID, board.FieldUserId, board.FieldStatus:
 			values[i] = new(sql.NullInt64)
-		case board.FieldTitle, board.FieldDescription, board.FieldThumbnailUrl, board.FieldStatus:
+		case board.FieldTitle, board.FieldDescription, board.FieldThumbnailUrl:
 			values[i] = new(sql.NullString)
 		case board.FieldCreatedAt, board.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case board.ForeignKeys[0]: // user_boards
-			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -160,17 +169,11 @@ func (b *Board) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				b.ThumbnailUrl = value.String
 			}
-		case board.FieldOrder:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field order", values[i])
-			} else if value.Valid {
-				b.Order = int(value.Int64)
-			}
 		case board.FieldStatus:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field status", values[i])
 			} else if value.Valid {
-				b.Status = board.Status(value.String)
+				b.Status = int(value.Int64)
 			}
 		case board.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -183,13 +186,6 @@ func (b *Board) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field updatedAt", values[i])
 			} else if value.Valid {
 				b.UpdatedAt = value.Time
-			}
-		case board.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field user_boards", value)
-			} else if value.Valid {
-				b.user_boards = new(int)
-				*b.user_boards = int(value.Int64)
 			}
 		default:
 			b.selectValues.Set(columns[i], values[i])
@@ -212,6 +208,11 @@ func (b *Board) QueryLikedUsers() *UserQuery {
 // QuerySubscribedUsers queries the "subscribed_users" edge of the Board entity.
 func (b *Board) QuerySubscribedUsers() *UserQuery {
 	return NewBoardClient(b.config).QuerySubscribedUsers(b)
+}
+
+// QueryOwner queries the "owner" edge of the Board entity.
+func (b *Board) QueryOwner() *UserQuery {
+	return NewBoardClient(b.config).QueryOwner(b)
 }
 
 // QueryThreads queries the "threads" edge of the Board entity.
@@ -263,9 +264,6 @@ func (b *Board) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("thumbnailUrl=")
 	builder.WriteString(b.ThumbnailUrl)
-	builder.WriteString(", ")
-	builder.WriteString("order=")
-	builder.WriteString(fmt.Sprintf("%v", b.Order))
 	builder.WriteString(", ")
 	builder.WriteString("status=")
 	builder.WriteString(fmt.Sprintf("%v", b.Status))

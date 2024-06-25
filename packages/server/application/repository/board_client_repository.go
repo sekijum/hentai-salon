@@ -6,5 +6,5 @@ import (
 )
 
 type BoardClientRepository interface {
-	Create(ctx context.Context, board *model.Board) (*model.Board, error)
+	Create(ctx context.Context, board *model.Board, thread *model.Thread) (*model.Board, error)
 }

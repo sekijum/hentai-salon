@@ -54,16 +54,16 @@ func init() {
 	boardDescDescription := boardFields[3].Descriptor()
 	// board.DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
 	board.DescriptionValidator = boardDescDescription.Validators[0].(func(string) error)
-	// boardDescOrder is the schema descriptor for order field.
-	boardDescOrder := boardFields[5].Descriptor()
-	// board.DefaultOrder holds the default value on creation for the order field.
-	board.DefaultOrder = boardDescOrder.Default.(int)
+	// boardDescStatus is the schema descriptor for status field.
+	boardDescStatus := boardFields[5].Descriptor()
+	// board.DefaultStatus holds the default value on creation for the status field.
+	board.DefaultStatus = boardDescStatus.Default.(int)
 	// boardDescCreatedAt is the schema descriptor for createdAt field.
-	boardDescCreatedAt := boardFields[7].Descriptor()
+	boardDescCreatedAt := boardFields[6].Descriptor()
 	// board.DefaultCreatedAt holds the default value on creation for the createdAt field.
 	board.DefaultCreatedAt = boardDescCreatedAt.Default.(func() time.Time)
 	// boardDescUpdatedAt is the schema descriptor for updatedAt field.
-	boardDescUpdatedAt := boardFields[8].Descriptor()
+	boardDescUpdatedAt := boardFields[7].Descriptor()
 	// board.DefaultUpdatedAt holds the default value on creation for the updatedAt field.
 	board.DefaultUpdatedAt = boardDescUpdatedAt.Default.(func() time.Time)
 	// board.UpdateDefaultUpdatedAt holds the default value on update for the updatedAt field.
@@ -78,6 +78,10 @@ func init() {
 	commentDescIPAddress := commentFields[6].Descriptor()
 	// comment.IPAddressValidator is a validator for the "ip_address" field. It is called by the builders before save.
 	comment.IPAddressValidator = commentDescIPAddress.Validators[0].(func(string) error)
+	// commentDescStatus is the schema descriptor for status field.
+	commentDescStatus := commentFields[7].Descriptor()
+	// comment.DefaultStatus holds the default value on creation for the status field.
+	comment.DefaultStatus = commentDescStatus.Default.(int)
 	// commentDescCreatedAt is the schema descriptor for createdAt field.
 	commentDescCreatedAt := commentFields[8].Descriptor()
 	// comment.DefaultCreatedAt holds the default value on creation for the createdAt field.
@@ -116,6 +120,10 @@ func init() {
 	threadDescIPAddress := threadFields[8].Descriptor()
 	// thread.IPAddressValidator is a validator for the "ip_address" field. It is called by the builders before save.
 	thread.IPAddressValidator = threadDescIPAddress.Validators[0].(func(string) error)
+	// threadDescStatus is the schema descriptor for status field.
+	threadDescStatus := threadFields[9].Descriptor()
+	// thread.DefaultStatus holds the default value on creation for the status field.
+	thread.DefaultStatus = threadDescStatus.Default.(int)
 	// threadDescCreatedAt is the schema descriptor for createdAt field.
 	threadDescCreatedAt := threadFields[10].Descriptor()
 	// thread.DefaultCreatedAt holds the default value on creation for the createdAt field.
@@ -150,6 +158,10 @@ func init() {
 	userDescDisplayName := userFields[4].Descriptor()
 	// user.DisplayNameValidator is a validator for the "displayName" field. It is called by the builders before save.
 	user.DisplayNameValidator = userDescDisplayName.Validators[0].(func(string) error)
+	// userDescStatus is the schema descriptor for status field.
+	userDescStatus := userFields[6].Descriptor()
+	// user.DefaultStatus holds the default value on creation for the status field.
+	user.DefaultStatus = userDescStatus.Default.(int)
 	// userDescCreatedAt is the schema descriptor for createdAt field.
 	userDescCreatedAt := userFields[7].Descriptor()
 	// user.DefaultCreatedAt holds the default value on creation for the createdAt field.
