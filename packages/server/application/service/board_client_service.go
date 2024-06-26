@@ -19,7 +19,7 @@ func NewBoardClientService(boardClientDatasource *datasource.BoardClientDatasour
 	return &BoardClientService{boardClientDatasource: boardClientDatasource}
 }
 
-func (boardClientService *BoardClientService) Create(ctx context.Context, ginCtx *gin.Context, body board.BoardCreateClientRequest) (*model.Board, error) {
+func (svc *BoardClientService) Create(ctx context.Context, ginCtx *gin.Context, body board.BoardCreateClientRequest) (*model.Board, error) {
 	board := &model.Board{
 		Title:        body.Title,
 		Description:  body.Description,
@@ -40,7 +40,7 @@ func (boardClientService *BoardClientService) Create(ctx context.Context, ginCtx
 		CreatedAt:         time.Now(),
 		UpdatedAt:         time.Now(),
 	}
-	savedBoard, err := boardClientService.boardClientDatasource.Create(ctx, board, thread)
+	savedBoard, err := svc.boardClientDatasource.Create(ctx, board, thread)
 	if err != nil {
 		return nil, err
 	}

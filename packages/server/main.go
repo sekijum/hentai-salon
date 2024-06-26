@@ -2,8 +2,9 @@ package main
 
 import (
 	"log"
+	"os"
 
-	routes "server/presentation"
+	presentation "server/presentation"
 	"server/shared/di"
 
 	"github.com/gin-gonic/gin"
@@ -16,13 +17,16 @@ func main() {
 	}
 	defer cleanup()
 
-	// Ginルーターを新しく作成
+	if os.Getenv("GIN_MODE") != "release" {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	r := gin.Default()
 
-	// ルートを設定
-	routes.SetupRouter(r, controllers)
+	r.SetTrustedProxies([]string{"127.0.0.1"})
 
-	// サーバーを開始
+	presentation.SetupRouter(r, controllers)
+
 	if err := r.Run(":8080"); err != nil {
 		log.Fatalf("failed to run server: %v", err)
 	}

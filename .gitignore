@@ -23,6 +23,7 @@ go.work.sum
 */.DS_Store
 *.DS_Store
 packages/server/tmp
+packages/server/build/*
 
 logs
 *.log

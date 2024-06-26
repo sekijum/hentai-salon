@@ -16,8 +16,8 @@ func NewBoardClientDatasource(client *ent.Client) *BoardClientDatasource {
 	return &BoardClientDatasource{client: client}
 }
 
-func (boardClientDatasource *BoardClientDatasource) Create(ctx context.Context, board *model.Board, thread *model.Thread) (*model.Board, error) {
-	boardBuilder := boardClientDatasource.client.Board.Create().
+func (ds *BoardClientDatasource) Create(ctx context.Context, board *model.Board, thread *model.Thread) (*model.Board, error) {
+	boardBuilder := ds.client.Board.Create().
 		SetTitle(board.Title).
 		SetUserId(board.UserId).
 		SetStatus(int(board.Status)).
@@ -34,7 +34,7 @@ func (boardClientDatasource *BoardClientDatasource) Create(ctx context.Context, 
 		return nil, err
 	}
 
-	threadBuilder := boardClientDatasource.client.Thread.Create().
+	threadBuilder := ds.client.Thread.Create().
 		SetBoard(savedBoard).
 		SetTitle(thread.Title).
 		SetUserId(thread.UserId).

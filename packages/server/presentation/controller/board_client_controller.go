@@ -17,14 +17,14 @@ func NewBoardClientController(boardClientService *service.BoardClientService) *B
 	return &BoardClientController{boardClientService: boardClientService}
 }
 
-func (boardClientController *BoardClientController) Create(ginCtx *gin.Context) {
+func (ctrl *BoardClientController) Create(ginCtx *gin.Context) {
 	var body request.BoardCreateClientRequest
 	if err := ginCtx.ShouldBindJSON(&body); err != nil {
 		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	_, err := boardClientController.boardClientService.Create(context.Background(), ginCtx, body)
+	_, err := ctrl.boardClientService.Create(context.Background(), ginCtx, body)
 	if err != nil {
 		ginCtx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
