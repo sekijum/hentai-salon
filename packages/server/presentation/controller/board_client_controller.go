@@ -24,7 +24,7 @@ func (ctrl *BoardClientController) Create(ginCtx *gin.Context) {
 		return
 	}
 
-	_, err := ctrl.boardClientService.Create(context.Background(), ginCtx, body)
+	err := ctrl.boardClientService.Create(context.Background(), ginCtx, body)
 	if err != nil {
 		ginCtx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

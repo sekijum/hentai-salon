@@ -39,4 +39,4 @@ testdata_dir = "testdata"
 
 [screen]
   clear_on_rebuild = false
-  keep_scroll = true
+  keep_scroll = false

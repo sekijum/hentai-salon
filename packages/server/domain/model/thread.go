@@ -1,6 +1,8 @@
 package model
 
 import (
+	"errors"
+	"fmt"
 	"time"
 )
 
@@ -39,4 +41,17 @@ func (s ThreadStatus) String() string {
 	default:
 		return "Unknown"
 	}
+}
+
+func (s ThreadStatus) Validate() error {
+	switch s {
+	case ThreadStatusOpen, ThreadStatusArchived, ThreadStatusDeleted:
+		return nil
+	default:
+		return errors.New("無効なスレッドステータスです")
+	}
+}
+
+func (t *Thread) GenerateDefaultTitle() {
+	t.Title = fmt.Sprintf("%d", time.Now().Unix())
 }

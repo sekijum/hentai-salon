@@ -8,7 +8,8 @@ package di
 
 import (
 	"github.com/google/wire"
-	"server/application/service"
+	service2 "server/application/service"
+	"server/domain/service"
 	"server/infrastructure/datasource"
 	"server/infrastructure/ent"
 	"server/presentation/controller"
@@ -22,7 +23,8 @@ func InitializeControllers() (*ControllersSet, func(), error) {
 		return nil, nil, err
 	}
 	boardClientDatasource := datasource.NewBoardClientDatasource(client)
-	boardClientService := service.NewBoardClientService(boardClientDatasource)
+	boardDomainService := service.NewBoardDomainService(boardClientDatasource)
+	boardClientService := service2.NewBoardClientService(boardClientDatasource, boardDomainService)
 	boardClientController := board_client_controller.NewBoardClientController(boardClientService)
 	controllersSet := &ControllersSet{
 		BoardClientController: boardClientController,
@@ -38,7 +40,9 @@ var entSet = wire.NewSet(ent.ProvideClient)
 
 var datasourceSet = wire.NewSet(datasource.NewBoardClientDatasource)
 
-var serviceSet = wire.NewSet(service.NewBoardClientService)
+var domainServiceSet = wire.NewSet(service.NewBoardDomainService)
+
+var serviceSet = wire.NewSet(service2.NewBoardClientService)
 
 var controllerSet = wire.NewSet(board_client_controller.NewBoardClientController)
 

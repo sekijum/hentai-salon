@@ -7,6 +7,7 @@ package di
 
 import (
 	"server/application/service"
+	domainService "server/domain/service"
 	"server/infrastructure/datasource"
 	"server/infrastructure/ent"
 	controller "server/presentation/controller"
@@ -20,6 +21,10 @@ var entSet = wire.NewSet(
 
 var datasourceSet = wire.NewSet(
 	datasource.NewBoardClientDatasource,
+)
+
+var domainServiceSet = wire.NewSet(
+	domainService.NewBoardDomainService,
 )
 
 var serviceSet = wire.NewSet(
@@ -39,6 +44,7 @@ func InitializeControllers() (*ControllersSet, func(), error) {
 		entSet,
 		datasourceSet,
 		serviceSet,
+		domainServiceSet,
 		controllerSet,
 		wire.Struct(new(ControllersSet), "*"),
 	)
