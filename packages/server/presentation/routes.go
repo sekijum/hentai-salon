@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"server/presentation/middleware"
 	"server/shared/di"
 
 	"github.com/gin-gonic/gin"
@@ -11,10 +12,15 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 		c.JSON(200, gin.H{"message": "ok"})
 	})
 
-	r.GET("/users/me", controllers.UserController.GetAuthenticatedUser)
+	authMiddleware := middleware.AuthMiddleware()
+
+	r.GET("/users/me", authMiddleware, controllers.UserController.GetAuthenticatedUser)
 	r.POST("/signup", controllers.UserController.Signup)
 	r.POST("/signin", controllers.UserController.Signin)
 
 	clientGroup := r.Group("/client")
-	clientGroup.POST("/boards", controllers.BoardClientController.Create)
+	clientGroup.Use(authMiddleware)
+	{
+		clientGroup.POST("/boards", controllers.BoardClientController.Create)
+	}
 }

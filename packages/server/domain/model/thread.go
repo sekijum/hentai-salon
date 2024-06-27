@@ -64,7 +64,7 @@ func (s ThreadStatus) ToInt() int {
 func (s ThreadStatus) Label() string {
 	switch s {
 	case ThreadStatusOpen:
-		return "公開中"
+		return "公開"
 	case ThreadStatusPending:
 		return "保留"
 	case ThreadStatusArchived:

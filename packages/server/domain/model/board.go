@@ -2,7 +2,6 @@ package model
 
 import (
 	"errors"
-	"fmt"
 	"net"
 	"net/url"
 	"time"
@@ -82,23 +81,47 @@ func (b *Board) ValidateDefaultThreads() error {
 	return nil
 }
 
-type BoardStatus string
+type BoardStatus int
 
 const (
-	BoardStatusPublic   BoardStatus = "Public"
-	BoardStatusPrivate  BoardStatus = "Private"
-	BoardStatusPending  BoardStatus = "Pending"
-	BoardStatusArchived BoardStatus = "Archived"
+	BoardStatusPublic BoardStatus = iota
+	BoardStatusPrivate
+	BoardStatusPending
+	BoardStatusArchived
 )
 
-func (s BoardStatus) ToInt() int {
-	boardStatusToInt := map[BoardStatus]int{
+func (s BoardStatus) String() string {
+	switch s {
+	case BoardStatusPublic:
+		return "Public"
+	case BoardStatusPrivate:
+		return "Private"
+	case BoardStatusPending:
+		return "Pending"
+	case BoardStatusArchived:
+		return "Archived"
+	default:
+		return "Unknown"
+	}
+}
+
+func (s BoardStatus) Validate() error {
+	switch s {
+	case BoardStatusPublic, BoardStatusPrivate, BoardStatusPending, BoardStatusArchived:
+		return nil
+	default:
+		return errors.New("無効な板ステータスです")
+	}
+}
+
+func (b BoardStatus) ToInt() int {
+	BoardStatusToInt := map[BoardStatus]int{
 		BoardStatusPublic:   0,
 		BoardStatusPrivate:  1,
 		BoardStatusPending:  2,
 		BoardStatusArchived: 3,
 	}
-	return boardStatusToInt[s]
+	return BoardStatusToInt[b]
 }
 
 func (s BoardStatus) Label() string {
@@ -114,27 +137,4 @@ func (s BoardStatus) Label() string {
 	default:
 		return "不明なステータス"
 	}
-}
-
-func (s BoardStatus) Validate() error {
-	switch s {
-	case BoardStatusPublic, BoardStatusPrivate, BoardStatusPending, BoardStatusArchived:
-		return nil
-	default:
-		return fmt.Errorf("無効な板ステータスです: %s", s)
-	}
-}
-
-func BoardStatusFromInt(i int) (BoardStatus, error) {
-	intToBoardStatus := map[int]BoardStatus{
-		0: BoardStatusPublic,
-		1: BoardStatusPrivate,
-		2: BoardStatusPending,
-		3: BoardStatusArchived,
-	}
-	status, ok := intToBoardStatus[i]
-	if !ok {
-		return "", fmt.Errorf("無効な板ステータスです: %d", i)
-	}
-	return status, nil
 }
