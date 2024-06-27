@@ -6,15 +6,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetupRouter(router *gin.Engine, controllers *di.ControllersSet) {
-	{
-		router.GET("/health-check", func(c *gin.Context) {
-			c.JSON(200, gin.H{"message": "ok"})
-		})
-	}
+func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
+	r.GET("/health-check", func(c *gin.Context) {
+		c.JSON(200, gin.H{"message": "ok"})
+	})
 
-	clientGroup := router.Group("/client")
-	{
-		clientGroup.POST("/boards", controllers.BoardClientController.Create)
-	}
+	r.GET("/users/me", controllers.UserController.GetAuthenticatedUser)
+	r.POST("/signup", controllers.UserController.Signup)
+	r.POST("/signin", controllers.UserController.Signin)
+
+	clientGroup := r.Group("/client")
+	clientGroup.POST("/boards", controllers.BoardClientController.Create)
 }

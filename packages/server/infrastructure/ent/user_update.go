@@ -134,6 +134,27 @@ func (uu *UserUpdate) AddStatus(i int) *UserUpdate {
 	return uu
 }
 
+// SetRole sets the "role" field.
+func (uu *UserUpdate) SetRole(i int) *UserUpdate {
+	uu.mutation.ResetRole()
+	uu.mutation.SetRole(i)
+	return uu
+}
+
+// SetNillableRole sets the "role" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableRole(i *int) *UserUpdate {
+	if i != nil {
+		uu.SetRole(*i)
+	}
+	return uu
+}
+
+// AddRole adds i to the "role" field.
+func (uu *UserUpdate) AddRole(i int) *UserUpdate {
+	uu.mutation.AddRole(i)
+	return uu
+}
+
 // SetCreatedAt sets the "createdAt" field.
 func (uu *UserUpdate) SetCreatedAt(t time.Time) *UserUpdate {
 	uu.mutation.SetCreatedAt(t)
@@ -577,6 +598,12 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := uu.mutation.AddedStatus(); ok {
 		_spec.AddField(user.FieldStatus, field.TypeInt, value)
+	}
+	if value, ok := uu.mutation.Role(); ok {
+		_spec.SetField(user.FieldRole, field.TypeInt, value)
+	}
+	if value, ok := uu.mutation.AddedRole(); ok {
+		_spec.AddField(user.FieldRole, field.TypeInt, value)
 	}
 	if value, ok := uu.mutation.CreatedAt(); ok {
 		_spec.SetField(user.FieldCreatedAt, field.TypeTime, value)
@@ -1184,6 +1211,27 @@ func (uuo *UserUpdateOne) AddStatus(i int) *UserUpdateOne {
 	return uuo
 }
 
+// SetRole sets the "role" field.
+func (uuo *UserUpdateOne) SetRole(i int) *UserUpdateOne {
+	uuo.mutation.ResetRole()
+	uuo.mutation.SetRole(i)
+	return uuo
+}
+
+// SetNillableRole sets the "role" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableRole(i *int) *UserUpdateOne {
+	if i != nil {
+		uuo.SetRole(*i)
+	}
+	return uuo
+}
+
+// AddRole adds i to the "role" field.
+func (uuo *UserUpdateOne) AddRole(i int) *UserUpdateOne {
+	uuo.mutation.AddRole(i)
+	return uuo
+}
+
 // SetCreatedAt sets the "createdAt" field.
 func (uuo *UserUpdateOne) SetCreatedAt(t time.Time) *UserUpdateOne {
 	uuo.mutation.SetCreatedAt(t)
@@ -1657,6 +1705,12 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	}
 	if value, ok := uuo.mutation.AddedStatus(); ok {
 		_spec.AddField(user.FieldStatus, field.TypeInt, value)
+	}
+	if value, ok := uuo.mutation.Role(); ok {
+		_spec.SetField(user.FieldRole, field.TypeInt, value)
+	}
+	if value, ok := uuo.mutation.AddedRole(); ok {
+		_spec.AddField(user.FieldRole, field.TypeInt, value)
 	}
 	if value, ok := uuo.mutation.CreatedAt(); ok {
 		_spec.SetField(user.FieldCreatedAt, field.TypeTime, value)

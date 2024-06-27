@@ -25,9 +25,13 @@ func InitializeControllers() (*ControllersSet, func(), error) {
 	boardClientDatasource := datasource.NewBoardClientDatasource(client)
 	boardDomainService := service.NewBoardDomainService(boardClientDatasource)
 	boardClientService := service2.NewBoardClientService(boardClientDatasource, boardDomainService)
-	boardClientController := board_client_controller.NewBoardClientController(boardClientService)
+	boardClientController := controller.NewBoardClientController(boardClientService)
+	userDatasource := datasource.NewUserDatasource(client)
+	userService := service2.NewUserService(userDatasource)
+	userController := controller.NewUserController(userService)
 	controllersSet := &ControllersSet{
 		BoardClientController: boardClientController,
+		UserController:        userController,
 	}
 	return controllersSet, func() {
 		cleanup()
@@ -38,14 +42,15 @@ func InitializeControllers() (*ControllersSet, func(), error) {
 
 var entSet = wire.NewSet(ent.ProvideClient)
 
-var datasourceSet = wire.NewSet(datasource.NewBoardClientDatasource)
+var datasourceSet = wire.NewSet(datasource.NewBoardClientDatasource, datasource.NewUserDatasource)
 
 var domainServiceSet = wire.NewSet(service.NewBoardDomainService)
 
-var serviceSet = wire.NewSet(service2.NewBoardClientService)
+var serviceSet = wire.NewSet(service2.NewBoardClientService, service2.NewUserService)
 
-var controllerSet = wire.NewSet(board_client_controller.NewBoardClientController)
+var controllerSet = wire.NewSet(controller.NewBoardClientController, controller.NewUserController)
 
 type ControllersSet struct {
-	BoardClientController *board_client_controller.BoardClientController
+	BoardClientController *controller.BoardClientController
+	UserController        *controller.UserController
 }

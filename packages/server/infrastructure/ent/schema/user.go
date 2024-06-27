@@ -20,7 +20,8 @@ func (User) Fields() []ent.Field {
 		field.String("password"),
 		field.String("displayName").Optional().StorageKey("display_name").MaxLen(20),
 		field.String("avatarUrl").Optional().StorageKey("avatar_url"),
-		field.Int("status").Default(0), // 0: Active, 1: Withdrawn, 2: Suspended, 2: Inactive
+		field.Int("status").Default(0).Comment("0: Active, 1: Withdrawn, 2: Suspended, 2: Inactive"),
+		field.Int("role").Default(0).Comment("0: Member, 1: Admin"),
 		field.Time("createdAt").Default(time.Now).StorageKey("created_at"),
 		field.Time("updatedAt").Default(time.Now).UpdateDefault(time.Now).StorageKey("updated_at"),
 	}

@@ -20,7 +20,7 @@ func (Board) Fields() []ent.Field {
 		field.String("title").Unique().MaxLen(50).Comment("板名"),
 		field.String("description").Optional().MaxLen(255),
 		field.String("thumbnailUrl").Optional().StorageKey("thumbnail_url"),
-		field.Int("status").Default(0), // 0: Public, 1: Private, 2: Archived, 3: Deleted
+		field.Int("status").Default(0).Comment("0: Public, 1: Private, 3: Pending, 3: Archived"),
 		field.Time("createdAt").Default(time.Now).StorageKey("created_at"),
 		field.Time("updatedAt").Default(time.Now).UpdateDefault(time.Now).StorageKey("updated_at"),
 	}

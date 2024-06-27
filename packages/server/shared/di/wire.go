@@ -10,7 +10,7 @@ import (
 	domainService "server/domain/service"
 	"server/infrastructure/datasource"
 	"server/infrastructure/ent"
-	controller "server/presentation/controller"
+	"server/presentation/controller"
 
 	"github.com/google/wire"
 )
@@ -21,6 +21,7 @@ var entSet = wire.NewSet(
 
 var datasourceSet = wire.NewSet(
 	datasource.NewBoardClientDatasource,
+	datasource.NewUserDatasource,
 )
 
 var domainServiceSet = wire.NewSet(
@@ -29,14 +30,17 @@ var domainServiceSet = wire.NewSet(
 
 var serviceSet = wire.NewSet(
 	service.NewBoardClientService,
+	service.NewUserService,
 )
 
 var controllerSet = wire.NewSet(
 	controller.NewBoardClientController,
+	controller.NewUserController,
 )
 
 type ControllersSet struct {
 	BoardClientController *controller.BoardClientController
+	UserController        *controller.UserController
 }
 
 func InitializeControllers() (*ControllersSet, func(), error) {

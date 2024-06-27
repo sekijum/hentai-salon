@@ -8,21 +8,6 @@ import (
 )
 
 var (
-	// AdminUsersColumns holds the columns for the "admin_users" table.
-	AdminUsersColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "name", Type: field.TypeString, Unique: true, Size: 20},
-		{Name: "email", Type: field.TypeString, Unique: true, Size: 254},
-		{Name: "password", Type: field.TypeString},
-		{Name: "created_at", Type: field.TypeTime},
-		{Name: "updated_at", Type: field.TypeTime},
-	}
-	// AdminUsersTable holds the schema information for the "admin_users" table.
-	AdminUsersTable = &schema.Table{
-		Name:       "admin_users",
-		Columns:    AdminUsersColumns,
-		PrimaryKey: []*schema.Column{AdminUsersColumns[0]},
-	}
 	// BoardsColumns holds the columns for the "boards" table.
 	BoardsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -211,6 +196,7 @@ var (
 		{Name: "display_name", Type: field.TypeString, Nullable: true, Size: 20},
 		{Name: "avatar_url", Type: field.TypeString, Nullable: true},
 		{Name: "status", Type: field.TypeInt, Default: 0},
+		{Name: "role", Type: field.TypeInt, Default: 0},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 	}
@@ -384,7 +370,6 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
-		AdminUsersTable,
 		BoardsTable,
 		CommentsTable,
 		CommentAttachmentsTable,

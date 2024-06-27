@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
-	"server/infrastructure/ent/adminuser"
 	"server/infrastructure/ent/board"
 	"server/infrastructure/ent/comment"
 	"server/infrastructure/ent/commentattachment"
@@ -86,7 +85,6 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			adminuser.Table:               adminuser.ValidColumn,
 			board.Table:                   board.ValidColumn,
 			comment.Table:                 comment.ValidColumn,
 			commentattachment.Table:       commentattachment.ValidColumn,

@@ -1,4 +1,4 @@
-package board_client_controller
+package controller
 
 import (
 	"context"

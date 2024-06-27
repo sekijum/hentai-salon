@@ -3,7 +3,6 @@
 package ent
 
 import (
-	"server/infrastructure/ent/adminuser"
 	"server/infrastructure/ent/board"
 	"server/infrastructure/ent/comment"
 	"server/infrastructure/ent/commentattachment"
@@ -24,26 +23,6 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
-	adminuserFields := schema.AdminUser{}.Fields()
-	_ = adminuserFields
-	// adminuserDescName is the schema descriptor for name field.
-	adminuserDescName := adminuserFields[1].Descriptor()
-	// adminuser.NameValidator is a validator for the "name" field. It is called by the builders before save.
-	adminuser.NameValidator = adminuserDescName.Validators[0].(func(string) error)
-	// adminuserDescEmail is the schema descriptor for email field.
-	adminuserDescEmail := adminuserFields[2].Descriptor()
-	// adminuser.EmailValidator is a validator for the "email" field. It is called by the builders before save.
-	adminuser.EmailValidator = adminuserDescEmail.Validators[0].(func(string) error)
-	// adminuserDescCreatedAt is the schema descriptor for createdAt field.
-	adminuserDescCreatedAt := adminuserFields[4].Descriptor()
-	// adminuser.DefaultCreatedAt holds the default value on creation for the createdAt field.
-	adminuser.DefaultCreatedAt = adminuserDescCreatedAt.Default.(func() time.Time)
-	// adminuserDescUpdatedAt is the schema descriptor for updatedAt field.
-	adminuserDescUpdatedAt := adminuserFields[5].Descriptor()
-	// adminuser.DefaultUpdatedAt holds the default value on creation for the updatedAt field.
-	adminuser.DefaultUpdatedAt = adminuserDescUpdatedAt.Default.(func() time.Time)
-	// adminuser.UpdateDefaultUpdatedAt holds the default value on update for the updatedAt field.
-	adminuser.UpdateDefaultUpdatedAt = adminuserDescUpdatedAt.UpdateDefault.(func() time.Time)
 	boardFields := schema.Board{}.Fields()
 	_ = boardFields
 	// boardDescTitle is the schema descriptor for title field.
@@ -162,12 +141,16 @@ func init() {
 	userDescStatus := userFields[6].Descriptor()
 	// user.DefaultStatus holds the default value on creation for the status field.
 	user.DefaultStatus = userDescStatus.Default.(int)
+	// userDescRole is the schema descriptor for role field.
+	userDescRole := userFields[7].Descriptor()
+	// user.DefaultRole holds the default value on creation for the role field.
+	user.DefaultRole = userDescRole.Default.(int)
 	// userDescCreatedAt is the schema descriptor for createdAt field.
-	userDescCreatedAt := userFields[7].Descriptor()
+	userDescCreatedAt := userFields[8].Descriptor()
 	// user.DefaultCreatedAt holds the default value on creation for the createdAt field.
 	user.DefaultCreatedAt = userDescCreatedAt.Default.(func() time.Time)
 	// userDescUpdatedAt is the schema descriptor for updatedAt field.
-	userDescUpdatedAt := userFields[8].Descriptor()
+	userDescUpdatedAt := userFields[9].Descriptor()
 	// user.DefaultUpdatedAt holds the default value on creation for the updatedAt field.
 	user.DefaultUpdatedAt = userDescUpdatedAt.Default.(func() time.Time)
 	// user.UpdateDefaultUpdatedAt holds the default value on update for the updatedAt field.
