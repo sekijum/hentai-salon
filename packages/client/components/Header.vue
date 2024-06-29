@@ -1,0 +1,40 @@
+<template>
+  <v-row>
+    <v-col cols="3" class="d-flex justify-start align-center">
+      <v-btn text class="header-button" @click="() => router.push('/')">
+        <v-icon>mdi-home</v-icon>
+        <div>ホーム</div>
+      </v-btn>
+    </v-col>
+    <v-col cols="6" class="d-flex justify-center align-center">
+      <h1 class="header-title" @click="() => router.push('/')">変態サロン</h1>
+    </v-col>
+    <v-col cols="3" class="d-flex justify-end align-center">
+      <v-btn text class="header-button" @click="() => router.push('/setting')">
+        <v-icon>mdi-format-list-bulleted</v-icon>
+        <div>設定</div>
+      </v-btn>
+    </v-col>
+  </v-row>
+  <v-divider></v-divider>
+</template>
+
+<script setup>
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+</script>
+
+<style scoped>
+.header-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: none;
+  box-shadow: none;
+}
+
+.header-title {
+  cursor: pointer;
+}
+</style>
