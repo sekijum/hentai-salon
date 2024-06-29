@@ -3,6 +3,8 @@ package model
 import (
 	"errors"
 	"fmt"
+	"net"
+	"net/url"
 	"time"
 )
 
@@ -19,7 +21,41 @@ type Thread struct {
 	Status            ThreadStatus
 	CreatedAt         time.Time
 	UpdatedAt         time.Time
-	Board             *Board
+
+	User  *User
+	Board *Board
+}
+
+func (t *Thread) Validate() error {
+
+	if t.UserId == 0 {
+		return errors.New("ユーザーIDは必須です")
+	}
+	if t.Title == "" {
+		return errors.New("スレッドのタイトルは必須です")
+	}
+	if len(t.Title) > 50 {
+		return errors.New("スレッドのタイトルは50文字以内である必要があります")
+	}
+	if t.Description != nil && len(*t.Description) > 255 {
+		return errors.New("説明は255文字以内で入力してください")
+	}
+	if t.ThumbnailUrl != nil {
+		if _, err := url.ParseRequestURI(*t.ThumbnailUrl); err != nil {
+			return errors.New("サムネイルURLは有効なURLである必要があります")
+		}
+	}
+	if t.IpAddress == "" {
+		return errors.New("スレッドのIPアドレスは必須です")
+	}
+	if net.ParseIP(t.IpAddress) == nil {
+		return errors.New("スレッドのIPアドレスは有効な形式である必要があります")
+	}
+	if err := t.Status.Validate(); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 type ThreadStatus int

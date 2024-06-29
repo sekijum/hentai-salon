@@ -12,15 +12,25 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 		c.JSON(200, gin.H{"message": "ok"})
 	})
 
-	authMiddleware := middleware.AuthMiddleware()
-
-	r.GET("/users/me", authMiddleware, controllers.UserController.GetAuthenticatedUser)
 	r.POST("/signup", controllers.UserController.Signup)
 	r.POST("/signin", controllers.UserController.Signin)
 
-	clientGroup := r.Group("/client")
-	clientGroup.Use(authMiddleware)
+	r.GET("/boards", controllers.BoardController.FindAll)
+	r.GET("/threads", controllers.ThreadController.FindAll)
+
+	// 以下認証必須ルート
+	authMiddleware := middleware.AuthMiddleware()
+
+	authGroup := r.Group("/")
+	authGroup.Use(authMiddleware)
 	{
-		clientGroup.POST("/boards", controllers.BoardClientController.Create)
+		authGroup.POST("/threads", controllers.ThreadController.Create)
+		authGroup.GET("/users/me", controllers.UserController.FindAuthenticatedUser)
+	}
+
+	adminGroup := r.Group("/admin")
+	adminGroup.Use(authMiddleware)
+	{
+		adminGroup.POST("/boards", controllers.BoardAdminController.Create)
 	}
 }

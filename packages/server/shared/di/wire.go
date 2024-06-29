@@ -6,7 +6,7 @@
 package di
 
 import (
-	"server/application/service"
+	applicationService "server/application/service"
 	domainService "server/domain/service"
 	"server/infrastructure/datasource"
 	"server/infrastructure/ent"
@@ -15,41 +15,50 @@ import (
 	"github.com/google/wire"
 )
 
+var controllerSet = wire.NewSet(
+	controller.NewBoardAdminController,
+	controller.NewBoardController,
+	controller.NewUserController,
+	controller.NewThreadController,
+)
+
+var applicationServiceSet = wire.NewSet(
+	applicationService.NewBoardAdminApplicationService,
+	applicationService.NewBoardApplicationService,
+	applicationService.NewUserApplicationService,
+	applicationService.NewThreadApplicationService,
+)
+
+var domainServiceSet = wire.NewSet(
+	domainService.NewBoardDomainService,
+	domainService.NewUserDomainService,
+	domainService.NewThreadDomainService,
+)
+
 var entSet = wire.NewSet(
 	ent.ProvideClient,
 )
 
 var datasourceSet = wire.NewSet(
-	datasource.NewBoardClientDatasource,
+	datasource.NewBoardDatasource,
 	datasource.NewUserDatasource,
-)
-
-var domainServiceSet = wire.NewSet(
-	domainService.NewBoardDomainService,
-)
-
-var serviceSet = wire.NewSet(
-	service.NewBoardClientService,
-	service.NewUserService,
-)
-
-var controllerSet = wire.NewSet(
-	controller.NewBoardClientController,
-	controller.NewUserController,
+	datasource.NewThreadDatasource,
 )
 
 type ControllersSet struct {
-	BoardClientController *controller.BoardClientController
-	UserController        *controller.UserController
+	BoardController      *controller.BoardController
+	BoardAdminController *controller.BoardAdminController
+	UserController       *controller.UserController
+	ThreadController     *controller.ThreadController
 }
 
 func InitializeControllers() (*ControllersSet, func(), error) {
 	wire.Build(
+		controllerSet,
+		applicationServiceSet,
+		domainServiceSet,
 		entSet,
 		datasourceSet,
-		serviceSet,
-		domainServiceSet,
-		controllerSet,
 		wire.Struct(new(ControllersSet), "*"),
 	)
 	return &ControllersSet{}, nil, nil

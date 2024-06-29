@@ -6,31 +6,34 @@ import (
 	"server/domain/model"
 	domainService "server/domain/service"
 	"server/infrastructure/datasource"
-	board "server/presentation/request/board"
+	request "server/presentation/request/board"
 	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
-type BoardClientService struct {
-	boardClientDatasource *datasource.BoardClientDatasource
-	boardDomainService    *domainService.BoardDomainService
+type BoardAdminApplicationService struct {
+	boardDatasource     *datasource.BoardDatasource
+	boardDomainService  *domainService.BoardDomainService
+	threadDomainService *domainService.ThreadDomainService
 }
 
-func NewBoardClientService(
-	boardClientDatasource *datasource.BoardClientDatasource,
+func NewBoardAdminApplicationService(
+	boardDatasource *datasource.BoardDatasource,
 	boardDomainService *domainService.BoardDomainService,
-) *BoardClientService {
-	return &BoardClientService{
-		boardClientDatasource: boardClientDatasource,
-		boardDomainService:    boardDomainService,
+	threadDomainService *domainService.ThreadDomainService,
+) *BoardAdminApplicationService {
+	return &BoardAdminApplicationService{
+		boardDatasource:     boardDatasource,
+		boardDomainService:  boardDomainService,
+		threadDomainService: threadDomainService,
 	}
 }
 
-func (svc *BoardClientService) Create(
+func (svc *BoardAdminApplicationService) Create(
 	ctx context.Context,
 	ginCtx *gin.Context,
-	body board.BoardCreateClientRequest,
+	body request.BoardCreateRequest,
 ) error {
 	userId, exists := ginCtx.Get("user_id")
 	if !exists {
@@ -43,6 +46,14 @@ func (svc *BoardClientService) Create(
 		}
 		return errors.New("板タイトルが重複しています")
 	}
+
+	if duplicated, err := svc.threadDomainService.IsTitleDuplicated(ctx, body.DefaultThread.Title); err != nil || duplicated {
+		if err != nil {
+			return err
+		}
+		return errors.New("スレタイが重複しています")
+	}
+
 	thread := &model.Thread{
 		Title:             body.DefaultThread.Title,
 		Description:       body.DefaultThread.Description,
@@ -73,7 +84,7 @@ func (svc *BoardClientService) Create(
 		return err
 	}
 
-	_, err := svc.boardClientDatasource.Create(ctx, board)
+	_, err := svc.boardDatasource.CreateBoardWithDefaultThread(ctx, board)
 	if err != nil {
 		return err
 	}

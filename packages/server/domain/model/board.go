@@ -16,7 +16,9 @@ type Board struct {
 	Status       BoardStatus
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
-	Threads      []*Thread
+
+	User    *User
+	Threads []*Thread
 }
 
 func (b *Board) Validate() error {

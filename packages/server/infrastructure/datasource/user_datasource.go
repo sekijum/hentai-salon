@@ -9,40 +9,21 @@ import (
 	"github.com/mitchellh/mapstructure"
 )
 
-type UserDatasource interface {
-	Create(ctx context.Context, user *model.User) (*model.User, error)
-	GetUserByEmail(ctx context.Context, email string) (*model.User, error)
-	GetUserByID(ctx context.Context, id int) (*model.User, error)
-}
-
-type userDatasource struct {
+type UserDatasource struct {
 	client *ent.Client
 }
 
-func NewUserDatasource(client *ent.Client) UserDatasource {
-	return &userDatasource{client: client}
+func NewUserDatasource(client *ent.Client) *UserDatasource {
+	return &UserDatasource{client: client}
 }
 
-func (ds *userDatasource) Create(ctx context.Context, u *model.User) (*model.User, error) {
-	userBuilder := ds.client.User.Create().
-		SetName(u.Name).
-		SetEmail(u.Email).
-		SetPassword(u.Password).
-		SetStatus(u.Status).
-		SetRole(u.Role)
-	if u.DisplayName != nil {
-		userBuilder.SetDisplayName(*u.DisplayName)
-	}
-	if u.DisplayName != nil {
-		userBuilder.SetAvatarUrl(*u.AvatarUrl)
-	}
-
-	savedUser, err := userBuilder.Save(ctx)
+func (ds *UserDatasource) FindByID(ctx context.Context, id int) (*model.User, error) {
+	entUser, err := ds.client.User.Get(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 
-	modelUser, err := entUserToModelUser(savedUser)
+	modelUser, err := entUserToModelUser(entUser)
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +31,7 @@ func (ds *userDatasource) Create(ctx context.Context, u *model.User) (*model.Use
 	return modelUser, nil
 }
 
-func (ds *userDatasource) GetUserByEmail(ctx context.Context, email string) (*model.User, error) {
+func (ds *UserDatasource) FindByEmail(ctx context.Context, email string) (*model.User, error) {
 	entUser, err := ds.client.User.Query().Where(user.EmailEQ(email)).Only(ctx)
 	if err != nil {
 		return nil, err
@@ -64,13 +45,26 @@ func (ds *userDatasource) GetUserByEmail(ctx context.Context, email string) (*mo
 	return modelUser, nil
 }
 
-func (ds *userDatasource) GetUserByID(ctx context.Context, id int) (*model.User, error) {
-	entUser, err := ds.client.User.Get(ctx, id)
+func (ds *UserDatasource) Create(ctx context.Context, u *model.User) (*model.User, error) {
+	userBuilder := ds.client.User.Create().
+		SetName(u.Name).
+		SetEmail(u.Email).
+		SetPassword(u.Password).
+		SetStatus(u.Status.ToInt()).
+		SetRole(u.Role.ToInt())
+	if u.DisplayName != nil {
+		userBuilder.SetDisplayName(*u.DisplayName)
+	}
+	if u.DisplayName != nil {
+		userBuilder.SetAvatarUrl(*u.AvatarUrl)
+	}
+
+	savedUser, err := userBuilder.Save(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	modelUser, err := entUserToModelUser(entUser)
+	modelUser, err := entUserToModelUser(savedUser)
 	if err != nil {
 		return nil, err
 	}

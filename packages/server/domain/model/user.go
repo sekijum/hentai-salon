@@ -14,8 +14,8 @@ type User struct {
 	Password    string
 	DisplayName *string
 	AvatarUrl   *string
-	Status      int
-	Role        int
+	Status      UserStatus
+	Role        UserRole
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }
@@ -59,4 +59,112 @@ func (u *User) Validate() error {
 func isValidEmail(email string) bool {
 	re := regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
 	return re.MatchString(email)
+}
+
+type UserStatus int
+
+const (
+	UserRoleActive UserStatus = iota
+	UserRoleWithdrawn
+	UserRoleSuspended
+	UserRoleInactive
+)
+
+func (s UserStatus) String() string {
+	switch s {
+	case UserRoleActive:
+		return "Active"
+	case UserRoleWithdrawn:
+		return "Withdrawn"
+	case UserRoleSuspended:
+		return "Suspended"
+	case UserRoleInactive:
+		return "Inactive"
+	default:
+		return "Unknown"
+	}
+}
+
+func (s UserStatus) Validate() error {
+	switch s {
+	case UserRoleActive, UserRoleWithdrawn, UserRoleSuspended, UserRoleInactive:
+		return nil
+	default:
+		return errors.New("無効なユーザー権限です")
+	}
+}
+
+func (u UserStatus) ToInt() int {
+	UserStatusToIntToInt := map[UserStatus]int{
+		UserRoleActive:    0,
+		UserRoleWithdrawn: 1,
+		UserRoleSuspended: 2,
+		UserRoleInactive:  3,
+	}
+	return UserStatusToIntToInt[u]
+}
+
+func (s UserStatus) Label() string {
+	switch s {
+	case UserRoleActive:
+		return "有効"
+	case UserRoleWithdrawn:
+		return "退会済"
+	case UserRoleSuspended:
+		return "凍結"
+	case UserRoleInactive:
+		return "無効"
+	default:
+		return "不明なステータス"
+	}
+}
+
+type UserRole int
+
+const (
+	UserRoleMember UserRole = iota
+	UserRoleAdmin
+)
+
+func (s UserRole) String() string {
+	switch s {
+	case UserRoleMember:
+		return "Member"
+	case UserRoleAdmin:
+		return "Admin"
+	default:
+		return "Unknown"
+	}
+}
+
+func (s UserRole) Validate() error {
+	switch s {
+	case UserRoleMember, UserRoleAdmin:
+		return nil
+	default:
+		return errors.New("無効なユーザー権限です")
+	}
+}
+
+func (u UserRole) ToInt() int {
+	boardStatusToIntToInt := map[UserRole]int{
+		UserRoleMember: 0,
+		UserRoleAdmin:  1,
+	}
+	return boardStatusToIntToInt[u]
+}
+
+func (s UserRole) Label() string {
+	switch s {
+	case UserRoleMember:
+		return "会員"
+	case UserRoleAdmin:
+		return "管理者"
+	default:
+		return "不明なステータス"
+	}
+}
+
+func (u *User) IsAdmin() bool {
+	return u.Role == UserRoleAdmin
 }

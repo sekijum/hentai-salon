@@ -9,23 +9,27 @@ import (
 	"github.com/mitchellh/mapstructure"
 )
 
-type BoardClientDatasource struct {
+type BoardDatasource struct {
 	client *ent.Client
 }
 
-func NewBoardClientDatasource(client *ent.Client) *BoardClientDatasource {
-	return &BoardClientDatasource{client: client}
+func NewBoardDatasource(client *ent.Client) *BoardDatasource {
+	return &BoardDatasource{client: client}
 }
 
-func (ds *BoardClientDatasource) Create(
+func (ds *BoardDatasource) CreateBoardWithDefaultThread(
 	ctx context.Context,
 	b *model.Board,
 ) (*model.Board, error) {
-	boardBuilder := ds.client.Board.Create().
+	tx, err := ds.client.Tx(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	boardBuilder := tx.Board.Create().
 		SetUserId(b.UserId).
 		SetTitle(b.Title).
-		SetStatus(b.Status.ToInt()).
-		AddThreads()
+		SetStatus(b.Status.ToInt())
 	if b.Description != nil {
 		boardBuilder.SetDescription(*b.Description)
 	}
@@ -35,10 +39,11 @@ func (ds *BoardClientDatasource) Create(
 
 	savedBoard, err := boardBuilder.Save(ctx)
 	if err != nil {
+		tx.Rollback()
 		return nil, err
 	}
 
-	threadBuilder := ds.client.Thread.Create().
+	threadBuilder := tx.Thread.Create().
 		SetBoard(savedBoard).
 		SetUserId(b.Threads[0].UserId).
 		SetTitle(b.Threads[0].Title).
@@ -55,6 +60,11 @@ func (ds *BoardClientDatasource) Create(
 
 	_, err = threadBuilder.Save(ctx)
 	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	if err := tx.Commit(); err != nil {
 		return nil, err
 	}
 
@@ -66,7 +76,25 @@ func (ds *BoardClientDatasource) Create(
 	return modelBoard, nil
 }
 
-func (ds *BoardClientDatasource) GetByTitle(
+func (ds *BoardDatasource) FindAll(ctx context.Context) ([]*model.Board, error) {
+	boards, err := ds.client.Board.Query().WithThreads().All(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var modelBoards []*model.Board
+	for _, entBoard := range boards {
+		modelBoard, err := entBoardToModelBoard(entBoard)
+		if err != nil {
+			return nil, err
+		}
+		modelBoards = append(modelBoards, modelBoard)
+	}
+
+	return modelBoards, nil
+}
+
+func (ds *BoardDatasource) FindByTitle(
 	ctx context.Context,
 	title string,
 ) ([]*model.Board, error) {
@@ -93,5 +121,17 @@ func entBoardToModelBoard(entBoard *ent.Board) (*model.Board, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	var modelThreads []*model.Thread
+	for _, entThread := range entBoard.Edges.Threads {
+		var modelThread model.Thread
+		err := mapstructure.Decode(entThread, &modelThread)
+		if err != nil {
+			return nil, err
+		}
+		modelThreads = append(modelThreads, &modelThread)
+	}
+	modelBoard.Threads = modelThreads
+
 	return &modelBoard, nil
 }

@@ -3,7 +3,7 @@ package controller
 import (
 	"context"
 	"net/http"
-	service "server/application/service"
+	applicationService "server/application/service"
 	request "server/presentation/request"
 	"strings"
 
@@ -11,11 +11,11 @@ import (
 )
 
 type UserController struct {
-	userService service.UserService
+	userApplicationService *applicationService.UserApplicationService
 }
 
-func NewUserController(userService service.UserService) *UserController {
-	return &UserController{userService: userService}
+func NewUserController(userApplicationService *applicationService.UserApplicationService) *UserController {
+	return &UserController{userApplicationService: userApplicationService}
 }
 
 func (ctrl *UserController) Signup(ginCtx *gin.Context) {
@@ -25,7 +25,7 @@ func (ctrl *UserController) Signup(ginCtx *gin.Context) {
 		return
 	}
 
-	token, err := ctrl.userService.Signup(context.Background(), body)
+	token, err := ctrl.userApplicationService.Signup(context.Background(), body)
 	if err != nil {
 		ginCtx.JSON(http.StatusInternalServerError, gin.H{"error": "ユーザー登録に失敗しました: " + err.Error()})
 		return
@@ -42,7 +42,7 @@ func (ctrl *UserController) Signin(ginCtx *gin.Context) {
 		return
 	}
 
-	token, err := ctrl.userService.Signin(context.Background(), body.Email, body.Password)
+	token, err := ctrl.userApplicationService.Signin(context.Background(), body.Email, body.Password)
 	if err != nil {
 		ginCtx.JSON(http.StatusUnauthorized, gin.H{"error": "ログインに失敗しました: " + err.Error()})
 		return
@@ -52,7 +52,7 @@ func (ctrl *UserController) Signin(ginCtx *gin.Context) {
 	ginCtx.JSON(http.StatusOK, gin.H{"message": "ログインが成功しました"})
 }
 
-func (ctrl *UserController) GetAuthenticatedUser(ginCtx *gin.Context) {
+func (ctrl *UserController) FindAuthenticatedUser(ginCtx *gin.Context) {
 	authHeader := ginCtx.GetHeader("Authorization")
 	if authHeader == "" {
 		ginCtx.JSON(http.StatusUnauthorized, gin.H{"error": "トークンが必要です"})
@@ -62,7 +62,7 @@ func (ctrl *UserController) GetAuthenticatedUser(ginCtx *gin.Context) {
 	// Bearer プレフィックスを取り除く
 	token := strings.TrimPrefix(authHeader, "Bearer ")
 
-	user, err := ctrl.userService.GetAuthenticatedUser(context.Background(), token)
+	user, err := ctrl.userApplicationService.GetAuthenticatedUser(context.Background(), token)
 	if err != nil {
 		ginCtx.JSON(http.StatusUnauthorized, gin.H{"error": "認証に失敗しました: " + err.Error()})
 		return

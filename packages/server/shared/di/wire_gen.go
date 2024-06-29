@@ -8,8 +8,8 @@ package di
 
 import (
 	"github.com/google/wire"
-	service2 "server/application/service"
-	"server/domain/service"
+	"server/application/service"
+	service2 "server/domain/service"
 	"server/infrastructure/datasource"
 	"server/infrastructure/ent"
 	"server/presentation/controller"
@@ -22,16 +22,24 @@ func InitializeControllers() (*ControllersSet, func(), error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	boardClientDatasource := datasource.NewBoardClientDatasource(client)
-	boardDomainService := service.NewBoardDomainService(boardClientDatasource)
-	boardClientService := service2.NewBoardClientService(boardClientDatasource, boardDomainService)
-	boardClientController := controller.NewBoardClientController(boardClientService)
+	boardDatasource := datasource.NewBoardDatasource(client)
+	boardApplicationService := service.NewBoardApplicationService(boardDatasource)
+	boardController := controller.NewBoardController(boardApplicationService)
+	boardDomainService := service2.NewBoardDomainService(boardDatasource)
+	threadDatasource := datasource.NewThreadDatasource(client)
+	threadDomainService := service2.NewThreadDomainService(threadDatasource)
+	boardAdminApplicationService := service.NewBoardAdminApplicationService(boardDatasource, boardDomainService, threadDomainService)
+	boardAdminController := controller.NewBoardAdminController(boardAdminApplicationService)
 	userDatasource := datasource.NewUserDatasource(client)
-	userService := service2.NewUserService(userDatasource)
-	userController := controller.NewUserController(userService)
+	userApplicationService := service.NewUserApplicationService(userDatasource)
+	userController := controller.NewUserController(userApplicationService)
+	threadApplicationService := service.NewThreadApplicationService(threadDatasource, threadDomainService)
+	threadController := controller.NewThreadController(threadApplicationService)
 	controllersSet := &ControllersSet{
-		BoardClientController: boardClientController,
-		UserController:        userController,
+		BoardController:      boardController,
+		BoardAdminController: boardAdminController,
+		UserController:       userController,
+		ThreadController:     threadController,
 	}
 	return controllersSet, func() {
 		cleanup()
@@ -40,17 +48,19 @@ func InitializeControllers() (*ControllersSet, func(), error) {
 
 // wire.go:
 
+var controllerSet = wire.NewSet(controller.NewBoardAdminController, controller.NewBoardController, controller.NewUserController, controller.NewThreadController)
+
+var applicationServiceSet = wire.NewSet(service.NewBoardAdminApplicationService, service.NewBoardApplicationService, service.NewUserApplicationService, service.NewThreadApplicationService)
+
+var domainServiceSet = wire.NewSet(service2.NewBoardDomainService, service2.NewUserDomainService, service2.NewThreadDomainService)
+
 var entSet = wire.NewSet(ent.ProvideClient)
 
-var datasourceSet = wire.NewSet(datasource.NewBoardClientDatasource, datasource.NewUserDatasource)
-
-var domainServiceSet = wire.NewSet(service.NewBoardDomainService)
-
-var serviceSet = wire.NewSet(service2.NewBoardClientService, service2.NewUserService)
-
-var controllerSet = wire.NewSet(controller.NewBoardClientController, controller.NewUserController)
+var datasourceSet = wire.NewSet(datasource.NewBoardDatasource, datasource.NewUserDatasource, datasource.NewThreadDatasource)
 
 type ControllersSet struct {
-	BoardClientController *controller.BoardClientController
-	UserController        *controller.UserController
+	BoardController      *controller.BoardController
+	BoardAdminController *controller.BoardAdminController
+	UserController       *controller.UserController
+	ThreadController     *controller.ThreadController
 }

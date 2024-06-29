@@ -4,31 +4,25 @@ import (
 	"context"
 	"errors"
 	"os"
+	"server/domain/lib/util"
 	"server/domain/model"
 	"server/infrastructure/datasource"
-	request "server/presentation/request"
+	"server/presentation/request"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
-	"golang.org/x/crypto/bcrypt"
 )
 
-type UserService interface {
-	Signup(ctx context.Context, body request.UserSignupRequest) (string, error)
-	Signin(ctx context.Context, email, password string) (string, error)
-	GetAuthenticatedUser(ctx context.Context, tokenString string) (*model.User, error)
-}
-
-type userService struct {
+type UserApplicationService struct {
 	userDatasource datasource.UserDatasource
 }
 
-func NewUserService(userDatasource datasource.UserDatasource) UserService {
-	return &userService{userDatasource: userDatasource}
+func NewUserApplicationService(userDatasource *datasource.UserDatasource) *UserApplicationService {
+	return &UserApplicationService{userDatasource: *userDatasource}
 }
 
-func (svc *userService) Signup(ctx context.Context, body request.UserSignupRequest) (string, error) {
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(body.Password), bcrypt.DefaultCost)
+func (svc *UserApplicationService) Signup(ctx context.Context, body request.UserSignupRequest) (string, error) {
+	hashedPassword, err := util.HashPassword(body.Password)
 	if err != nil {
 		return "", err
 	}
@@ -36,7 +30,7 @@ func (svc *userService) Signup(ctx context.Context, body request.UserSignupReque
 	user := &model.User{
 		Name:        body.Name,
 		Email:       body.Email,
-		Password:    string(hashedPassword),
+		Password:    hashedPassword,
 		DisplayName: body.DisplayName,
 		AvatarUrl:   body.AvatarUrl,
 		Status:      0, // Active
@@ -51,13 +45,13 @@ func (svc *userService) Signup(ctx context.Context, body request.UserSignupReque
 	return svc.Signin(ctx, body.Email, body.Password)
 }
 
-func (svc *userService) Signin(ctx context.Context, email, password string) (string, error) {
-	user, err := svc.userDatasource.GetUserByEmail(ctx, email)
+func (svc *UserApplicationService) Signin(ctx context.Context, email, password string) (string, error) {
+	user, err := svc.userDatasource.FindByEmail(ctx, email)
 	if err != nil {
 		return "", err
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	err = util.ComparePassword(user.Password, password)
 	if err != nil {
 		return "", errors.New("認証情報が無効です")
 	}
@@ -80,7 +74,7 @@ func (svc *userService) Signin(ctx context.Context, email, password string) (str
 	return tokenString, nil
 }
 
-func (svc *userService) GetAuthenticatedUser(ctx context.Context, tokenString string) (*model.User, error) {
+func (svc *UserApplicationService) GetAuthenticatedUser(ctx context.Context, tokenString string) (*model.User, error) {
 	secretKey := os.Getenv("JWT_SECRET_KEY")
 	if secretKey == "" {
 		return nil, errors.New("秘密鍵が設定されていません")
@@ -99,7 +93,7 @@ func (svc *userService) GetAuthenticatedUser(ctx context.Context, tokenString st
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		userID := int(claims["user_id"].(float64))
-		user, err := svc.userDatasource.GetUserByID(ctx, userID)
+		user, err := svc.userDatasource.FindByID(ctx, userID)
 		if err != nil {
 			return nil, errors.New("ユーザーの取得に失敗しました")
 		}
