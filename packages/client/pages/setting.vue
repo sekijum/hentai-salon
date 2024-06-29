@@ -1,6 +1,6 @@
 <template>
-  <v-card>
-    <v-card-title>設定</v-card-title>
+  <div>
+    <h2>設定</h2>
 
     <v-divider></v-divider>
 
@@ -20,7 +20,7 @@
         <tr :class="{ highlight: item.type === 'header' }">
           <td>{{ item.name }}</td>
           <td>
-            <div v-if="item.key" class="d-flex align-center">
+            <div v-if="item.key">
               <v-btn v-if="item.key === 'board-history-delete'" small>削除</v-btn>
               <v-btn v-else-if="item.key === 'thread-history-delete'" small>削除</v-btn>
               <v-switch v-else-if="item.key === 'display-latest-50-replies-only'" flat small></v-switch>
@@ -29,9 +29,7 @@
         </tr>
       </template>
     </v-data-table>
-
-    <v-divider></v-divider>
-  </v-card>
+  </div>
 </template>
 
 <script setup>
@@ -39,15 +37,6 @@ import { ref } from 'vue';
 </script>
 
 <style scoped>
-.d-flex {
-  display: flex;
-  align-items: center;
-}
-
-.align-center {
-  align-items: center;
-}
-
 .highlight {
   background-color: #f0f0f0; /* グレー背景色 */
 }

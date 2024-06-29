@@ -26,13 +26,13 @@
         </v-btn>
       </v-col>
       <v-col cols="4">
-        <v-btn block text class="menu-button">
+        <v-btn block text class="menu-button" @click="navigateTo('/boards')">
           <v-icon class="menu-icon">mdi-format-list-bulleted</v-icon>
           板一覧
         </v-btn>
       </v-col>
       <v-col cols="4">
-        <v-btn block text class="menu-button">
+        <v-btn block text class="menu-button" @click="navigateTo('/setting')">
           <v-icon class="menu-icon">mdi-cog</v-icon>
           設定
         </v-btn>
@@ -41,7 +41,15 @@
   </v-sheet>
 </template>
 
-<script setup></script>
+<script setup>
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
+const navigateTo = link => {
+  router.push(link);
+};
+</script>
 
 <style scoped>
 .menu-button {

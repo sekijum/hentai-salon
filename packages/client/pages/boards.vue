@@ -1,22 +1,20 @@
 <template>
-  <v-card>
-    <v-card-title class="title">
-      <span class="headline">板一覧</span>
-    </v-card-title>
-    <v-card-subtitle>
-      <v-text-field v-model="search" label="板名で検索" prepend-inner-icon="mdi-magnify" single-line hide-details></v-text-field>
-    </v-card-subtitle>
-    <v-card-text>
-      <v-row>
-        <v-col v-for="(board, index) in filteredBoards" :key="index" cols="12" class="board-item" style="flex: 0 0 33.3333%; max-width: 33.3333%">
-          <v-card @click="navigateToBoard(board.link)" class="board-card">
-            <v-img :src="board.image" aspect-ratio="1" class="board-image"></v-img>
-            <v-card-title class="board-title">{{ board.title }}</v-card-title>
-          </v-card>
-        </v-col>
-      </v-row>
-    </v-card-text>
-  </v-card>
+  <div>
+    <h2>板一覧</h2>
+
+    <v-divider></v-divider>
+
+    <v-autocomplete label="板名で検索" :items="['California', 'Colorado', 'Florida', 'Georgia', 'Texas', 'Wyoming']"></v-autocomplete>
+
+    <v-row>
+      <v-col v-for="(board, index) in filteredBoards" :key="index" cols="12" class="board-item" style="flex: 0 0 33.3333%; max-width: 33.3333%">
+        <v-card @click="navigateToBoard(board.link)" class="board-card">
+          <v-img :src="board.image" aspect-ratio="1" class="board-image"></v-img>
+          <v-card-title class="board-title">{{ board.title }}</v-card-title>
+        </v-card>
+      </v-col>
+    </v-row>
+  </div>
 </template>
 
 <script setup>
@@ -48,44 +46,15 @@ const navigateToBoard = link => {
 const filteredBoards = computed(() => {
   return boards.value.filter(board => board.title.includes(search.value));
 });
-
-const close = () => {
-  // 閉じるロジックをここに追加
-};
 </script>
 
 <style scoped>
-.headline {
-  font-size: 1.25rem; /* タイトルを小さくする */
-  font-weight: bold;
-}
-
-.board-item {
-  padding: 8px;
-}
-
-.board-card {
-  cursor: pointer;
-  transition: transform 0.3s;
-}
-
-.board-card:hover {
-  transform: scale(1.05);
-}
-
 .board-image {
-  width: 100%; /* 画像の幅を固定 */
-  margin: 0 auto; /* 中央寄せ */
+  width: 100%;
 }
 
 .board-title {
   font-size: 0.75rem;
   text-align: center;
-  font-weight: bold;
-  margin-top: 8px;
-}
-
-.title {
-  padding-bottom: 0; /* タイトル下の余白を小さくする */
 }
 </style>

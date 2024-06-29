@@ -6,20 +6,27 @@
 
     <v-data-table :headers="headers" :items="items" hide-default-footer hide-default-header>
       <template v-slot:item="{ item, index }">
-        <div :class="{ alternate: index % 2 === 0 }" @click="navigateTo(item.link)" class="d-flex align-center p-2">
-          <div class="fixed-image mr-4">
+        <div :class="{ alternate: index % 2 === 0 }" @click="navigateTo(item.link)" class="d-flex align-center p-2 item-row">
+          <div class="fixed-image mr-1">
             <v-img :src="item.image || 'https://via.placeholder.com/80'" class="image"></v-img>
           </div>
           <div class="flex-grow-1">
-            <p class="item-title mb-0">
-              <strong>{{ item.title }}</strong>
+            <p class="item-title">
+              <strong>{{ truncateTitle(item.title) }}</strong>
             </p>
           </div>
-          <div class="text-right">
+          <div class="text-right mr-2">
             <small>
+              2024/01/09
+              <br />
+              {{ item.board }}
+              <br />
+              話題度
+              <v-icon small>mdi-comment</v-icon>
+              <br />
               {{ item.comments }}
               <v-icon small>mdi-comment</v-icon>
-              {{ item.board }}
+              <br />
             </small>
           </div>
         </div>
@@ -31,21 +38,25 @@
 <script setup>
 import { useRouter } from 'vue-router';
 
+defineProps({
+  title: String,
+  items: Array,
+});
+
 const router = useRouter();
 
 const navigateTo = link => {
   router.push(link);
 };
 
-defineProps({
-  title: String,
-  items: Array,
-});
+const truncateTitle = title => {
+  return title.length > 50 ? title.slice(0, 50) + '...' : title;
+};
 
 const headers = [
   { text: '', value: 'image', width: '20%' },
-  { text: 'Title', value: 'title', width: '50%' },
-  { text: 'Comments/Board', value: 'commentsBoard', width: '30%' },
+  { text: 'Title', value: 'title', width: '70%' },
+  { text: 'Comments/Board', value: 'commentsBoard', width: '10%' },
 ];
 </script>
 
@@ -62,6 +73,7 @@ const headers = [
 .fixed-image {
   width: 100px;
   height: 100px;
+  flex-shrink: 0;
 }
 
 .fixed-image .image {
