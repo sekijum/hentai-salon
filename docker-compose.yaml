@@ -5,7 +5,7 @@ services:
     container_name: hentai-salon-server
     build:
       context: .
-      dockerfile: docker/go/Dockerfile
+      dockerfile: docker/server/Dockerfile
     ports:
       - "8080:8080"
     depends_on:
@@ -21,6 +21,22 @@ services:
     networks:
       net1:
         ipv4_address: 192.168.10.10
+
+  client:
+    container_name: hentai-salon-client
+    build:
+      context: .
+      dockerfile: docker/client/Dockerfile
+    ports:
+      - 3000:3000
+    depends_on:
+      - server
+      - mysql
+    volumes:
+      - ./packages/client:/client
+    networks:
+      net1:
+        ipv4_address: 192.168.10.30
 
   mysql:
     image: mysql:8.0
