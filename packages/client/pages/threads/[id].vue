@@ -1,16 +1,17 @@
 <template>
   <div>
-    <h2>スレ一覧</h2>
+    <h2>{{ item.title }}</h2>
 
     <v-divider></v-divider>
 
-    <ThreadTable title="" :items="newsItems" moreLink="/news" :maxItems="5" />
+    <CommentList />
   </div>
 </template>
 
 <script setup>
 import Header from '~/components/Header.vue';
-import ThreadTable from '~/components/ThreadTable.vue';
+import ThreadTable from '~/components/thread/ThreadTable.vue';
+import CommentList from '~/components/comment/CommentList.vue';
 
 const route = useRoute();
 

@@ -11,7 +11,7 @@
     </v-col>
     <v-col cols="3" class="d-flex justify-end align-center">
       <v-btn text class="header-button" @click="() => router.push('/setting')">
-        <v-icon>mdi-format-list-bulleted</v-icon>
+        <v-icon>mdi-cog</v-icon>
         <div>設定</div>
       </v-btn>
     </v-col>

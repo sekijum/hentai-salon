@@ -10,7 +10,7 @@
 
 <script setup>
 import Header from '~/components/Header.vue';
-import ThreadTable from '~/components/ThreadTable.vue';
+import ThreadTable from '~/components/thread/ThreadTable.vue';
 import { ref } from 'vue';
 
 const newsItems = ref([
