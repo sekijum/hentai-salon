@@ -1,10 +1,22 @@
 <template>
   <div>
-    <h2>{{ item.title }}</h2>
+    <h1 class="thread-title">{{ item.title }}</h1>
 
     <v-divider></v-divider>
 
+    <v-chip-group>
+      <v-chip>Chip 1</v-chip>
+
+      <v-chip>Chip 2</v-chip>
+
+      <v-chip>Chip 3</v-chip>
+    </v-chip-group>
+
+    <v-divider></v-divider>
+
+    <CommentForm />
     <CommentList />
+    <CommentForm />
   </div>
 </template>
 
@@ -12,6 +24,7 @@
 import Header from '~/components/Header.vue';
 import ThreadTable from '~/components/thread/ThreadTable.vue';
 import CommentList from '~/components/comment/CommentList.vue';
+import CommentForm from '~/components/comment/CommentForm.vue';
 
 const route = useRoute();
 
@@ -26,3 +39,10 @@ const item = ref({
   board: 'ニュース',
 });
 </script>
+
+<style scoped>
+.thread-title {
+  font-size: 1rem;
+  text-align: center;
+}
+</style>

@@ -40,6 +40,6 @@ import { ref } from 'vue';
 
 <style scoped>
 .highlight {
-  background-color: #f0f0f0; /* グレー背景色 */
+  background-color: #f0f0f0;
 }
 </style>
