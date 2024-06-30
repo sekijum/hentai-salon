@@ -4,6 +4,8 @@
 
     <v-divider></v-divider>
 
+    <v-autocomplete label="スレを検索" :items="['California', 'Colorado', 'Florida', 'Georgia', 'Texas', 'Wyoming']" v-model="keyword" />
+
     <MenuSection
       :items="[
         {
@@ -38,8 +40,6 @@
         },
       ]"
     />
-
-    <v-autocomplete label="スレを検索" :items="['California', 'Colorado', 'Florida', 'Georgia', 'Texas', 'Wyoming']" v-model="keyword" />
 
     <ThreadTable title="" :items="newsItems" moreLink="/news" :maxItems="5" />
   </div>

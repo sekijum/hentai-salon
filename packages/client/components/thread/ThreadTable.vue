@@ -6,7 +6,7 @@
 
     <v-data-table :headers="headers" :items="items" hide-default-footer hide-default-header class="thread-section">
       <template v-slot:item="{ item, index }">
-        <div :class="{ alternate: index % 2 === 0 }" @click="navigateTo(item.link)" class="d-flex align-center p-2 item-row">
+        <div :class="{ alternate: index % 2 === 0 }" @click="navigateTo(item.id)" class="d-flex align-center p-2 item-row">
           <div class="fixed-image mr-1">
             <v-img :src="item.image || 'https://via.placeholder.com/80'" class="image"></v-img>
           </div>
@@ -45,8 +45,8 @@ defineProps({
 
 const router = useRouter();
 
-const navigateTo = link => {
-  router.push(link);
+const navigateTo = id => {
+  router.push(`/threads/${id}`);
 };
 
 const truncateTitle = title => {
