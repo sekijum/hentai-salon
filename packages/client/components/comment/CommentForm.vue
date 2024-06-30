@@ -1,27 +1,29 @@
 <template>
-  <div class="px-2">
-    <h3>書き込み</h3>
-    <v-form @submit.prevent="submitForm" class="mt-3">
-      <v-text-field v-model="name" label="名前(省略可)" outlined></v-text-field>
-      <v-text-field v-model="email" label="メールアドレス(省略可)" outlined></v-text-field>
-      <v-textarea v-model="comment" label="コメント" rows="4" outlined></v-textarea>
-      <input type="file" multiple @change="handleFileChange" style="display: none" ref="fileInput" />
+  <v-card>
+    <v-card-title>書き込み</v-card-title>
+    <v-card-text>
+      <v-form @submit.prevent="submitForm">
+        <v-text-field v-model="name" label="名前(省略可)" outlined></v-text-field>
+        <v-text-field v-model="email" label="E-mail(省略可)" outlined></v-text-field>
+        <v-textarea v-model="comment" label="コメント" rows="4" outlined></v-textarea>
+        <input type="file" multiple @change="handleFileChange" style="display: none" ref="fileInput" />
 
-      <v-file-input v-model="files" label="ファイルを選択" multiple>
-        <template v-slot:selection="{ fileNames }">
-          <template v-for="fileName in fileNames" :key="fileName">
-            <v-chip class="me-2" color="primary" size="small" label>
-              {{ fileName }}
-            </v-chip>
+        <v-file-input v-model="files" label="ファイルを選択" multiple>
+          <template v-slot:selection="{ fileNames }">
+            <template v-for="fileName in fileNames" :key="fileName">
+              <v-chip class="file-chip" color="primary" size="small" label>
+                {{ fileName }}
+              </v-chip>
+            </template>
           </template>
-        </template>
-      </v-file-input>
+        </v-file-input>
 
-      <v-btn type="submit" block class="my-3">書き込みをする</v-btn>
-    </v-form>
-  </div>
+        <v-btn type="submit" color="primary" block class="mt-3">書き込みをする</v-btn>
+      </v-form>
+    </v-card-text>
 
-  <v-divider></v-divider>
+    <ModalMedia :dialog="dialog" :mediaItems="dialogMedia" @update:dialog="dialog = $event" />
+  </v-card>
 </template>
 
 <script setup>
@@ -35,6 +37,7 @@ const files = ref([]);
 const previews = ref([]);
 const fileInput = ref(null);
 const dialog = ref(false);
+const dialogMedia = ref([]);
 
 const submitForm = () => {
   console.log('名前:', name.value);
@@ -72,8 +75,21 @@ const removeFile = index => {
 };
 
 const openDialog = () => {
+  dialogMedia.value = previews.value;
   dialog.value = true;
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.v-card {
+  padding: 16px;
+}
+
+.v-card-title {
+  font-weight: bold;
+}
+
+.file-chip {
+  margin-right: 8px;
+}
+</style>

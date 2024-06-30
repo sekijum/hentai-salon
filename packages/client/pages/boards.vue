@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2>板一覧</h2>
+    <PageTitle title="板一覧" />
 
     <v-divider></v-divider>
 
@@ -20,6 +20,7 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
+import PageTitle from '~/components/PageTitle.vue';
 
 const search = ref('');
 const boards = ref([

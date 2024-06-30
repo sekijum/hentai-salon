@@ -1,11 +1,46 @@
 <template>
   <div>
-    <h2>スレ一覧</h2>
+    <PageTitle title="スレ一覧" />
 
     <v-divider></v-divider>
 
+    <MenuSection
+      :items="[
+        {
+          title: '関連順',
+          to: '',
+          icon: 'mdi-format-list-bulleted',
+        },
+        {
+          title: '人気',
+          to: '',
+          icon: 'mdi-fire',
+        },
+        {
+          title: '閲覧履歴',
+          to: '',
+          icon: 'mdi-update',
+        },
+        {
+          title: '閲覧順',
+          to: '',
+          icon: 'mdi-earth',
+        },
+        {
+          title: '新着順',
+          to: '',
+          icon: 'mdi-new-box',
+        },
+        {
+          title: 'コメント数',
+          to: '',
+          icon: 'mdi-cog',
+        },
+      ]"
+    />
+
     <v-autocomplete label="スレを検索" :items="['California', 'Colorado', 'Florida', 'Georgia', 'Texas', 'Wyoming']" v-model="keyword" />
-    <ThreadMenuSection />
+
     <ThreadTable title="" :items="newsItems" moreLink="/news" :maxItems="5" />
   </div>
 </template>
@@ -13,7 +48,8 @@
 <script setup>
 import Header from '~/components/Header.vue';
 import ThreadTable from '~/components//thread/ThreadTable.vue';
-import ThreadMenuSection from '~/components//thread/ThreadMenuSection.vue';
+import MenuSection from '~/components//MenuSection.vue';
+import PageTitle from '~/components/PageTitle.vue';
 
 const route = useRoute();
 

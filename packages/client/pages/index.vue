@@ -1,7 +1,40 @@
 <template>
   <div>
-    <v-autocomplete label="話題を検索" :items="['California', 'Colorado', 'Florida', 'Georgia', 'Texas', 'Wyoming']"></v-autocomplete>
-    <MenuSection />
+    <MenuSection
+      :items="[
+        {
+          title: '人気',
+          to: '',
+          icon: 'mdi-fire',
+        },
+        {
+          title: '閲覧履歴',
+          to: '',
+          icon: 'mdi-update',
+        },
+        {
+          title: '閲覧順',
+          to: '',
+          icon: 'mdi-earth',
+        },
+        {
+          title: 'スレ一覧',
+          to: 'threads',
+          icon: 'mdi-new-box',
+        },
+        {
+          title: '板一覧',
+          to: 'boards',
+          icon: 'mdi-format-list-bulleted',
+        },
+        {
+          title: '設定',
+          to: 'setting',
+          icon: 'mdi-cog',
+        },
+      ]"
+    />
+
     <ThreadTable title="閲覧履歴" :items="historyItems" moreLink="/history" :maxItems="3" />
     <ThreadTable title="人気" :items="newsItems" moreLink="/news" :maxItems="5" />
     <ThreadTable title="新着" :items="popularItems" moreLink="/popular" :maxItems="3" />
@@ -9,6 +42,7 @@
 </template>
 
 <script setup>
+import MenuSection from '~/components/MenuSection.vue';
 import Header from '~/components/Header.vue';
 import ThreadTable from '~/components/thread/ThreadTable.vue';
 import { ref } from 'vue';

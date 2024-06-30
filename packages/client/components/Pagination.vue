@@ -1,8 +1,22 @@
 <template>
   <v-sheet>
     <v-row align="center" justify="center" class="m-0">
-      <template v-for="(item, idx) in items" :key="idx">
-        <v-col :cols="columnWidth" class="p-0">
+      <v-col cols="3" class="p-0">
+        <v-sheet class="menu-item" @click="showAll"> 全部 </v-sheet>
+      </v-col>
+      <v-col cols="3" class="p-0">
+        <v-sheet class="menu-item" @click="showPrev"> 前100 </v-sheet>
+      </v-col>
+      <v-col cols="3" class="p-0">
+        <v-sheet class="menu-item" @click="showNext"> 次100 </v-sheet>
+      </v-col>
+      <v-col cols="3" class="p-0">
+        <v-sheet class="menu-item" @click="showLatest"> 最新50 </v-sheet>
+      </v-col>
+    </v-row>
+    <v-row align="center" justify="center" class="m-0">
+      <template v-for="(item, idx) in displayedItems" :key="idx">
+        <v-col cols="3" class="p-0">
           <v-sheet class="menu-item" @click="navigateTo(item.to)">
             <v-icon class="menu-icon">{{ item.icon }}</v-icon>
             <span class="menu-title">{{ item.title }}</span>
@@ -15,21 +29,49 @@
 
 <script setup>
 const props = defineProps({
-  items: [{ title: '', to: '', icon: '' }],
+  items: {
+    type: Array,
+    default: () => [],
+  },
 });
 
-import { computed } from 'vue';
+import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
+const currentPage = ref(1);
+const itemsPerPage = ref(100);
 
 const navigateTo = link => {
   router.push(link);
 };
 
-const columnWidth = computed(() => {
-  return props.items.length <= 3 ? 12 / props.items.length : 4;
-});
+const showAll = () => {
+  itemsPerPage.value = props.items.length;
+  currentPage.value = 1;
+};
+
+const showPrev = () => {
+  if (currentPage.value > 1) {
+    currentPage.value--;
+  }
+};
+
+const showNext = () => {
+  if (currentPage.value * itemsPerPage.value < props.items.length) {
+    currentPage.value++;
+  }
+};
+
+const showLatest = () => {
+  itemsPerPage.value = 50;
+  currentPage.value = Math.ceil(props.items.length / itemsPerPage.value);
+};
+
+const startIdx = computed(() => (currentPage.value - 1) * itemsPerPage.value);
+const endIdx = computed(() => startIdx.value + itemsPerPage.value);
+
+const displayedItems = computed(() => props.items.slice(startIdx.value, endIdx.value));
 </script>
 
 <style scoped>

@@ -1,21 +1,40 @@
 <template>
   <div>
-    <h1 class="thread-title">{{ item.title }}</h1>
+    <PageTitle :title="item.title" />
 
     <v-divider></v-divider>
 
-    <v-chip-group>
-      <v-chip>Chip 1</v-chip>
-
-      <v-chip>Chip 2</v-chip>
-
-      <v-chip>Chip 3</v-chip>
+    <v-chip-group active-class="primary--text" column>
+      <v-chip small v-for="tag in ['Work', 'Home Improvement', 'Vacation', 'Food', 'Drawers', 'Shopping', 'Art', 'Tech', 'Creative Writing']" :key="tag">
+        {{ tag }}
+      </v-chip>
     </v-chip-group>
 
     <v-divider></v-divider>
 
+    <MenuSection
+      :items="[
+        {
+          title: 'コメント一覧',
+          to: '',
+          icon: 'mdi-fire',
+        },
+        {
+          title: 'メディア',
+          to: '',
+          icon: 'mdi-update',
+        },
+      ]"
+    />
+
     <CommentForm />
+
+    <v-divider></v-divider>
+
     <CommentList />
+
+    <Pagination />
+
     <CommentForm />
   </div>
 </template>
@@ -25,6 +44,9 @@ import Header from '~/components/Header.vue';
 import ThreadTable from '~/components/thread/ThreadTable.vue';
 import CommentList from '~/components/comment/CommentList.vue';
 import CommentForm from '~/components/comment/CommentForm.vue';
+import MenuSection from '~/components/MenuSection.vue';
+import PageTitle from '~/components/PageTitle.vue';
+import Pagination from '~/components/Pagination.vue';
 
 const route = useRoute();
 

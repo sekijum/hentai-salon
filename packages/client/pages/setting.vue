@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2>設定</h2>
+    <PageTitle title="設定" />
 
     <v-divider></v-divider>
 
@@ -36,6 +36,7 @@
 
 <script setup>
 import { ref } from 'vue';
+import PageTitle from '~/components/PageTitle.vue';
 </script>
 
 <style scoped>
