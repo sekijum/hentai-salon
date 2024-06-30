@@ -23,21 +23,21 @@
         <div class="interaction-section">
           <v-row dense>
             <v-col cols="6">
-              <router-link :to="'/reply/' + comment.id" class="interaction-link">
-                <v-icon small>mdi-reply</v-icon>
-              </router-link>
+              <v-icon small @click="toggleReplyForm">{{ showReplyForm ? 'mdi-close' : 'mdi-reply' }}</v-icon>
             </v-col>
             <v-col cols="6" class="interaction-right">
               <router-link :to="'/comment/' + comment.id" class="interaction-link">
                 <v-icon small>mdi-comment</v-icon>
                 <span class="interaction-text">{{ comment.commentCount }}</span>
               </router-link>
-              <span class="interaction-divider"></span>
-              <router-link :to="'/comment/' + comment.id" class="interaction-link">
+              <router-link :to="'/comment/' + comment.id" class="interaction-link id-link">
                 <span class="interaction-text">ID: {{ comment.id }}</span>
               </router-link>
             </v-col>
           </v-row>
+        </div>
+        <div v-if="showReplyForm" class="reply-form">
+          <CommentForm :formTitle="'返信 >> ' + comment.id" @submit="submitReply" @clear="clearReplyForm" />
         </div>
       </v-list-item-content>
     </v-list-item>
@@ -50,6 +50,7 @@
 <script setup>
 import { ref } from 'vue';
 import ModalMedia from '~/components/ModalMedia.vue';
+import CommentForm from '~/components/comment/CommentForm.vue';
 
 defineProps({
   idx: Number,
@@ -57,6 +58,25 @@ defineProps({
 });
 
 const dialog = ref(false);
+const showReplyForm = ref(false);
+
+const toggleReplyForm = () => {
+  showReplyForm.value = !showReplyForm.value;
+  if (!showReplyForm.value) {
+    clearReplyForm();
+  }
+};
+
+const submitReply = () => {
+  // 返信フォームの送信処理
+  console.log('返信を送信');
+  toggleReplyForm();
+};
+
+const clearReplyForm = () => {
+  // 返信フォームのクリア処理
+  console.log('返信フォームをクリア');
+};
 </script>
 
 <style scoped>
@@ -96,14 +116,13 @@ const dialog = ref(false);
   color: grey; /* 色をグレーに設定 */
 }
 
-.interaction-divider {
-  width: 16px; /* コメント数とコメントIDの間にスペースを追加 */
-}
-
 .interaction-right {
   display: flex;
   justify-content: flex-end;
-  align-items: center;
+}
+
+.id-link {
+  margin-left: 20px; /* コメント数とIDの間に間隔を追加 */
 }
 
 .comment-content {
@@ -137,5 +156,9 @@ const dialog = ref(false);
   width: 100%;
   margin: auto;
   object-fit: contain;
+}
+
+.reply-form {
+  margin-top: 16px;
 }
 </style>

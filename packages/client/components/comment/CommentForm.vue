@@ -1,37 +1,44 @@
 <template>
-  <div class="form-container">
-    <h3 class="form-title">書き込み</h3>
-    <v-form @submit.prevent="submitForm" class="form">
-      <v-row dense class="no-gutters">
-        <v-col cols="6">
-          <v-text-field v-model="name" label="名前(省略可)" variant="outlined" dense hide-details></v-text-field>
-        </v-col>
-        <v-col cols="6">
-          <v-text-field v-model="email" label="メールアドレス(省略可)" variant="outlined" dense hide-details></v-text-field>
-        </v-col>
-      </v-row>
-      <v-textarea v-model="comment" label="コメント" rows="4" variant="outlined" dense hide-details></v-textarea>
-      <input type="file" multiple @change="handleFileChange" style="display: none" ref="fileInput" />
+  <p class="form-title">{{ formTitle }}</p>
+  <v-form @submit.prevent="submitForm" class="form">
+    <v-row dense class="no-gutters">
+      <v-col cols="6">
+        <v-text-field v-model="name" label="名前(省略可)" variant="outlined" dense hide-details></v-text-field>
+      </v-col>
+      <v-col cols="6">
+        <v-text-field v-model="email" label="メールアドレス(省略可)" variant="outlined" dense hide-details></v-text-field>
+      </v-col>
+    </v-row>
+    <v-textarea v-model="comment" label="コメント" rows="4" variant="outlined" dense hide-details></v-textarea>
+    <input type="file" multiple @change="handleFileChange" style="display: none" ref="fileInput" />
 
-      <v-file-input v-model="files" label="ファイルを選択" multiple show-size truncate-length="25" prepend-icon="" variant="outlined" dense hide-details>
-        <template v-slot:selection="{ fileNames }">
-          <template v-for="fileName in fileNames" :key="fileName">
-            <v-chip class="me-2" color="primary" size="small" label>
-              {{ fileName }}
-            </v-chip>
-          </template>
+    <v-file-input v-model="files" label="ファイルを選択" multiple show-size truncate-length="25" prepend-icon="" variant="outlined" dense hide-details>
+      <template v-slot:selection="{ fileNames }">
+        <template v-for="fileName in fileNames" :key="fileName">
+          <v-chip class="me-2" color="primary" size="small" label>
+            {{ fileName }}
+          </v-chip>
         </template>
-      </v-file-input>
+      </template>
+    </v-file-input>
 
-      <v-btn class="clear-button" block @click="clearForm">クリア</v-btn>
-      <v-btn type="submit" class="submit-button" block>書き込みをする</v-btn>
-      <p class="note">＊書き込み反映には時間が掛かる場合があります＊</p>
-    </v-form>
-  </div>
+    <v-btn class="clear-button" block @click="clearForm">クリア</v-btn>
+    <v-btn type="submit" class="submit-button" block>書き込みをする</v-btn>
+    <p class="note">＊書き込み反映には時間が掛かる場合があります＊</p>
+  </v-form>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, defineEmits, defineProps } from 'vue';
+
+const emit = defineEmits(['submit', 'clear']);
+
+const props = defineProps({
+  formTitle: {
+    type: String,
+    default: '書き込み',
+  },
+});
 
 const name = ref('');
 const email = ref('');
@@ -44,6 +51,7 @@ const submitForm = () => {
   console.log('E-mail:', email.value);
   console.log('コメント:', comment.value);
   console.log('ファイル:', files.value);
+  emit('submit');
 };
 
 const triggerFileInput = () => {
@@ -55,6 +63,7 @@ const clearForm = () => {
   email.value = '';
   comment.value = '';
   files.value = [];
+  emit('clear');
 };
 
 const handleFileChange = event => {
@@ -65,8 +74,6 @@ const handleFileChange = event => {
 
 <style scoped>
 .form-title {
-  margin-bottom: 16px;
-  font-weight: bold;
   font-size: 1.2em;
 }
 
@@ -83,7 +90,12 @@ const handleFileChange = event => {
 .v-text-field,
 .v-textarea,
 .v-file-input {
-  margin-bottom: 0px !important; /* フィールド間の間隔を削除 */
+  margin-bottom: 0px !important;
+}
+
+.v-text-field input,
+.v-textarea textarea {
+  font-size: 12px;
 }
 
 .clear-button,
@@ -92,13 +104,13 @@ const handleFileChange = event => {
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  margin-bottom: 0px; /* ボタン間の間隔を削除 */
+  margin-bottom: 0px;
 }
 
 .clear-button {
   background-color: #f0f0f0;
   color: black;
-  margin-bottom: 8px; /* ボタン間の間隔を削除 */
+  margin-bottom: 8px;
 }
 
 .submit-button {
