@@ -14,4 +14,4 @@ RUN go install github.com/google/wire/cmd/wire@latest
 
 EXPOSE 8080
 
-CMD ["air"]
+ENTRYPOINT ["air"]
