@@ -2,15 +2,15 @@
   <div>
     <v-autocomplete label="話題を検索" :items="['California', 'Colorado', 'Florida', 'Georgia', 'Texas', 'Wyoming']"></v-autocomplete>
     <MenuSection />
-    <SectionList title="閲覧履歴" :items="historyItems" moreLink="/history" :maxItems="3" />
-    <SectionList title="人気" :items="newsItems" moreLink="/news" :maxItems="5" />
-    <SectionList title="新着" :items="popularItems" moreLink="/popular" :maxItems="3" />
+    <ThreadTable title="閲覧履歴" :items="historyItems" moreLink="/history" :maxItems="3" />
+    <ThreadTable title="人気" :items="newsItems" moreLink="/news" :maxItems="5" />
+    <ThreadTable title="新着" :items="popularItems" moreLink="/popular" :maxItems="3" />
   </div>
 </template>
 
 <script setup>
 import Header from '~/components/Header.vue';
-import SectionList from '~/components/SectionList.vue';
+import ThreadTable from '~/components/ThreadTable.vue';
 import { ref } from 'vue';
 
 const newsItems = ref([

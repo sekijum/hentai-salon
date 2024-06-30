@@ -16,13 +16,13 @@
       <v-col cols="4">
         <v-btn block text class="menu-button">
           <v-icon class="menu-icon">mdi-earth</v-icon>
-          ログイン
+          閲覧順
         </v-btn>
       </v-col>
       <v-col cols="4">
         <v-btn block text class="menu-button">
           <v-icon class="menu-icon">mdi-new-box</v-icon>
-          新着
+          新着順
         </v-btn>
       </v-col>
       <v-col cols="4">

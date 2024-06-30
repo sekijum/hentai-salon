@@ -1,10 +1,10 @@
 <template>
   <div>
-    <div class="section-title">
+    <div v-if="title" class="section-title">
       <h2>{{ title }}</h2>
     </div>
 
-    <v-data-table :headers="headers" :items="items" hide-default-footer hide-default-header>
+    <v-data-table :headers="headers" :items="items" hide-default-footer hide-default-header class="thread-section">
       <template v-slot:item="{ item, index }">
         <div :class="{ alternate: index % 2 === 0 }" @click="navigateTo(item.link)" class="d-flex align-center p-2 item-row">
           <div class="fixed-image mr-1">
@@ -61,6 +61,10 @@ const headers = [
 </script>
 
 <style scoped>
+.thread-section {
+  cursor: pointer;
+}
+
 .section-title h2 {
   color: orange;
   font-weight: bold;
