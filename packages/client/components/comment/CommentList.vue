@@ -20,6 +20,7 @@ const comments = ref([
     board: '垢版',
     type: '大砲',
     idCode: '+Q6HhT800',
+    commentCount: '11',
     media: [{ type: 'image', url: 'https://via.placeholder.com/300' }],
   },
   {
@@ -33,6 +34,7 @@ const comments = ref([
     board: '垢版',
     type: '大砲',
     idCode: 'X+z5zrq00',
+    commentCount: '11',
     media: [
       { type: 'image', url: 'https://via.placeholder.com/300' },
       { type: 'video/mp4', url: 'https://www.w3schools.com/html/mov_bbb.mp4', thumbnail: 'https://via.placeholder.com/300' },
@@ -47,6 +49,7 @@ const comments = ref([
     board: '垢版',
     type: '大砲',
     idCode: '6C/Ty2sa0',
+    commentCount: '11',
     media: [],
   },
   {
@@ -58,6 +61,7 @@ const comments = ref([
     board: '垢版',
     type: '大砲',
     idCode: 'mswGlHt',
+    commentCount: '11',
     media: [
       { type: 'image', url: 'https://via.placeholder.com/300' },
       { type: 'image', url: 'https://via.placeholder.com/300' },

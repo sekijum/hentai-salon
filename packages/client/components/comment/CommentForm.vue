@@ -1,95 +1,123 @@
 <template>
-  <v-card>
-    <v-card-title>書き込み</v-card-title>
-    <v-card-text>
-      <v-form @submit.prevent="submitForm">
-        <v-text-field v-model="name" label="名前(省略可)" outlined></v-text-field>
-        <v-text-field v-model="email" label="E-mail(省略可)" outlined></v-text-field>
-        <v-textarea v-model="comment" label="コメント" rows="4" outlined></v-textarea>
-        <input type="file" multiple @change="handleFileChange" style="display: none" ref="fileInput" />
+  <div class="form-container">
+    <h3 class="form-title">書き込み</h3>
+    <v-form @submit.prevent="submitForm" class="form">
+      <v-row dense class="no-gutters">
+        <v-col cols="6">
+          <v-text-field v-model="name" label="名前(省略可)" variant="outlined" dense hide-details></v-text-field>
+        </v-col>
+        <v-col cols="6">
+          <v-text-field v-model="email" label="メールアドレス(省略可)" variant="outlined" dense hide-details></v-text-field>
+        </v-col>
+      </v-row>
+      <v-textarea v-model="comment" label="コメント" rows="4" variant="outlined" dense hide-details></v-textarea>
+      <input type="file" multiple @change="handleFileChange" style="display: none" ref="fileInput" />
 
-        <v-file-input v-model="files" label="ファイルを選択" multiple>
-          <template v-slot:selection="{ fileNames }">
-            <template v-for="fileName in fileNames" :key="fileName">
-              <v-chip class="file-chip" color="primary" size="small" label>
-                {{ fileName }}
-              </v-chip>
-            </template>
+      <v-file-input v-model="files" label="ファイルを選択" multiple show-size truncate-length="25" prepend-icon="" variant="outlined" dense hide-details>
+        <template v-slot:selection="{ fileNames }">
+          <template v-for="fileName in fileNames" :key="fileName">
+            <v-chip class="me-2" color="primary" size="small" label>
+              {{ fileName }}
+            </v-chip>
           </template>
-        </v-file-input>
+        </template>
+      </v-file-input>
 
-        <v-btn type="submit" color="primary" block class="mt-3">書き込みをする</v-btn>
-      </v-form>
-    </v-card-text>
-
-    <ModalMedia :dialog="dialog" :mediaItems="dialogMedia" @update:dialog="dialog = $event" />
-  </v-card>
+      <v-btn class="clear-button" block @click="clearForm">クリア</v-btn>
+      <v-btn type="submit" class="submit-button" block>書き込みをする</v-btn>
+      <p class="note">＊書き込み反映には時間が掛かる場合があります＊</p>
+    </v-form>
+  </div>
 </template>
 
 <script setup>
 import { ref } from 'vue';
-import ModalMedia from '~/components/ModalMedia.vue';
 
 const name = ref('');
 const email = ref('');
 const comment = ref('');
 const files = ref([]);
-const previews = ref([]);
 const fileInput = ref(null);
-const dialog = ref(false);
-const dialogMedia = ref([]);
 
 const submitForm = () => {
   console.log('名前:', name.value);
   console.log('E-mail:', email.value);
   console.log('コメント:', comment.value);
   console.log('ファイル:', files.value);
-  // ここにフォーム送信のロジックを追加します
 };
 
 const triggerFileInput = () => {
   fileInput.value.click();
 };
 
+const clearForm = () => {
+  name.value = '';
+  email.value = '';
+  comment.value = '';
+  files.value = [];
+};
+
 const handleFileChange = event => {
   const selectedFiles = Array.from(event.target.files);
   files.value.push(...selectedFiles);
-  previewFiles();
-};
-
-const previewFiles = () => {
-  previews.value = files.value.map(file => {
-    const url = URL.createObjectURL(file);
-    console.log(file);
-    const preview = { url, type: file.type };
-    if (file.type.startsWith('video/')) {
-      preview.thumbnail = 'https://via.placeholder.com/300'; // サムネイル画像のURLを指定してください
-    }
-    return preview;
-  });
-};
-
-const removeFile = index => {
-  files.value.splice(index, 1);
-  previews.value.splice(index, 1);
-};
-
-const openDialog = () => {
-  dialogMedia.value = previews.value;
-  dialog.value = true;
 };
 </script>
 
 <style scoped>
-.v-card {
-  padding: 16px;
-}
-
-.v-card-title {
+.form-title {
+  margin-bottom: 16px;
   font-weight: bold;
+  font-size: 1.2em;
 }
 
-.file-chip {
-  margin-right: 8px;
+.v-row.no-gutters {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.v-row.no-gutters > .v-col {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.v-text-field,
+.v-textarea,
+.v-file-input {
+  margin-bottom: 0px !important; /* フィールド間の間隔を削除 */
+}
+
+.clear-button,
+.submit-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 0px; /* ボタン間の間隔を削除 */
+}
+
+.clear-button {
+  background-color: #f0f0f0;
+  color: black;
+  margin-bottom: 8px; /* ボタン間の間隔を削除 */
+}
+
+.submit-button {
+  background-color: #007bff;
+  color: white;
+}
+
+.submit-button:hover {
+  background-color: #0056b3;
+}
+
+.clear-button:hover {
+  background-color: #e0e0e0;
+}
+
+.note {
+  font-size: 12px;
+  color: grey;
+  text-align: center;
+  margin-top: 8px;
 }
 </style>
