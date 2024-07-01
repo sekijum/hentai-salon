@@ -27,7 +27,7 @@
               <v-icon small @click="toggleReplyForm">{{ showReplyForm ? 'mdi-close' : 'mdi-reply' }}</v-icon>
             </v-col>
             <v-col cols="6" class="interaction-right">
-              <router-link :to="'/comments/' + comment.id" class="interaction-link">
+              <router-link :to="'/comments/' + comment.id + '/replies'" class="interaction-link">
                 <v-icon small>mdi-comment</v-icon>
                 <span class="interaction-text">{{ comment.commentCount }}</span>
               </router-link>

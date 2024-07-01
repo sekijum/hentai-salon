@@ -1,28 +1,6 @@
 <template>
   <div>
-    <PageTitle :title="item.title" />
-
-    <v-divider></v-divider>
-
-    <v-chip-group active-class="primary--text" column>
-      <v-chip
-        small
-        v-for="tag in [
-          'Work',
-          'Home Improvement',
-          'Vacation',
-          'Food',
-          'Drawers',
-          'Shopping',
-          'Art',
-          'Tech',
-          'Creative Writing',
-        ]"
-        :key="tag"
-      >
-        {{ tag }}
-      </v-chip>
-    </v-chip-group>
+    <PageTitle title="返信" />
 
     <v-divider></v-divider>
 
@@ -89,7 +67,6 @@ const menuItems = [
     icon: 'mdi-update',
   },
 ];
-
 const item = ref({
   title: 'ラーメン店主異例の訴え',
   subtitle: '食事中にイヤホンやめて',

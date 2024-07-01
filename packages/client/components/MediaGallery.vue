@@ -1,6 +1,6 @@
 <template>
   <v-row class="pa-0 ma-0">
-    <v-col v-for="n in 9" :key="n" class="d-flex child-flex pa-0 ma-0" cols="4">
+    <v-col v-for="n in 100" :key="n" class="d-flex child-flex pa-0 ma-0" cols="4">
       <v-img
         :lazy-src="`https://picsum.photos/10/6?image=${n * 5 + 10}`"
         :src="`https://picsum.photos/500/300?image=${n * 5 + 10}`"
