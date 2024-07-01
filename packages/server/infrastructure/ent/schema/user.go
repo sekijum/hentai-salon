@@ -15,10 +15,9 @@ type User struct {
 func (User) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("id").Unique().Immutable(),
-		field.String("name").Unique().StorageKey("name").MaxLen(20),
+		field.String("name").StorageKey("name").MaxLen(20),
 		field.String("email").Unique().MaxLen(254),
 		field.String("password"),
-		field.String("displayName").Optional().StorageKey("display_name").MaxLen(20),
 		field.String("avatarUrl").Optional().StorageKey("avatar_url"),
 		field.Int("status").Default(0).Comment("0: Active, 1: Withdrawn, 2: Suspended, 2: Inactive"),
 		field.Int("role").Default(0).Comment("0: Member, 1: Admin"),
@@ -31,12 +30,12 @@ func (User) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("boards", Board.Type),
 		edge.To("threads", Thread.Type),
-		edge.To("comments", Comment.Type),
+		edge.To("comments", ThreadComment.Type),
 		edge.To("liked_boards", Board.Type).Through("user_board_like", UserBoardLike.Type),
 		edge.To("liked_threads", Thread.Type).Through("user_thread_like", UserThreadLike.Type),
-		edge.To("liked_comments", Comment.Type).Through("user_comment_like", UserCommentLike.Type),
+		edge.To("liked_comments", ThreadComment.Type).Through("user_comment_like", UserCommentLike.Type),
 		edge.To("subscribed_boards", Board.Type).Through("user_board_subscription", UserBoardSubscription.Type),
 		edge.To("subscribed_threads", Thread.Type).Through("user_thread_subscription", UserThreadSubscription.Type),
-		edge.To("subscribed_comments", Comment.Type).Through("user_comment_subscription", UserCommentSubscription.Type),
+		edge.To("subscribed_comments", ThreadComment.Type).Through("user_comment_subscription", UserCommentSubscription.Type),
 	}
 }

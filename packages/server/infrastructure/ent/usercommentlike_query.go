@@ -6,8 +6,8 @@ import (
 	"context"
 	"fmt"
 	"math"
-	"server/infrastructure/ent/comment"
 	"server/infrastructure/ent/predicate"
+	"server/infrastructure/ent/threadcomment"
 	"server/infrastructure/ent/user"
 	"server/infrastructure/ent/usercommentlike"
 
@@ -23,7 +23,7 @@ type UserCommentLikeQuery struct {
 	inters      []Interceptor
 	predicates  []predicate.UserCommentLike
 	withUser    *UserQuery
-	withComment *CommentQuery
+	withComment *ThreadCommentQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -83,8 +83,8 @@ func (uclq *UserCommentLikeQuery) QueryUser() *UserQuery {
 }
 
 // QueryComment chains the current query on the "comment" edge.
-func (uclq *UserCommentLikeQuery) QueryComment() *CommentQuery {
-	query := (&CommentClient{config: uclq.config}).Query()
+func (uclq *UserCommentLikeQuery) QueryComment() *ThreadCommentQuery {
+	query := (&ThreadCommentClient{config: uclq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := uclq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -95,7 +95,7 @@ func (uclq *UserCommentLikeQuery) QueryComment() *CommentQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(usercommentlike.Table, usercommentlike.CommentColumn, selector),
-			sqlgraph.To(comment.Table, comment.FieldID),
+			sqlgraph.To(threadcomment.Table, threadcomment.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, usercommentlike.CommentTable, usercommentlike.CommentColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(uclq.driver.Dialect(), step)
@@ -245,8 +245,8 @@ func (uclq *UserCommentLikeQuery) WithUser(opts ...func(*UserQuery)) *UserCommen
 
 // WithComment tells the query-builder to eager-load the nodes that are connected to
 // the "comment" edge. The optional arguments are used to configure the query builder of the edge.
-func (uclq *UserCommentLikeQuery) WithComment(opts ...func(*CommentQuery)) *UserCommentLikeQuery {
-	query := (&CommentClient{config: uclq.config}).Query()
+func (uclq *UserCommentLikeQuery) WithComment(opts ...func(*ThreadCommentQuery)) *UserCommentLikeQuery {
+	query := (&ThreadCommentClient{config: uclq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -363,7 +363,7 @@ func (uclq *UserCommentLikeQuery) sqlAll(ctx context.Context, hooks ...queryHook
 	}
 	if query := uclq.withComment; query != nil {
 		if err := uclq.loadComment(ctx, query, nodes, nil,
-			func(n *UserCommentLike, e *Comment) { n.Edges.Comment = e }); err != nil {
+			func(n *UserCommentLike, e *ThreadComment) { n.Edges.Comment = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -399,7 +399,7 @@ func (uclq *UserCommentLikeQuery) loadUser(ctx context.Context, query *UserQuery
 	}
 	return nil
 }
-func (uclq *UserCommentLikeQuery) loadComment(ctx context.Context, query *CommentQuery, nodes []*UserCommentLike, init func(*UserCommentLike), assign func(*UserCommentLike, *Comment)) error {
+func (uclq *UserCommentLikeQuery) loadComment(ctx context.Context, query *ThreadCommentQuery, nodes []*UserCommentLike, init func(*UserCommentLike), assign func(*UserCommentLike, *ThreadComment)) error {
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*UserCommentLike)
 	for i := range nodes {
@@ -412,7 +412,7 @@ func (uclq *UserCommentLikeQuery) loadComment(ctx context.Context, query *Commen
 	if len(ids) == 0 {
 		return nil
 	}
-	query.Where(comment.IDIn(ids...))
+	query.Where(threadcomment.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err

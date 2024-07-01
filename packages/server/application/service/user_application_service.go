@@ -31,7 +31,6 @@ func (svc *UserApplicationService) Signup(ctx context.Context, body request.User
 		Name:        body.Name,
 		Email:       body.Email,
 		Password:    hashedPassword,
-		DisplayName: body.DisplayName,
 		AvatarUrl:   body.AvatarUrl,
 		Status:      0, // Active
 		Role:        0, // Member

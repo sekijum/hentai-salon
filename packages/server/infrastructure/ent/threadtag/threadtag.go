@@ -3,8 +3,6 @@
 package threadtag
 
 import (
-	"time"
-
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 )
@@ -12,44 +10,41 @@ import (
 const (
 	// Label holds the string label denoting the threadtag type in the database.
 	Label = "thread_tag"
-	// FieldID holds the string denoting the id field in the database.
-	FieldID = "id"
-	// FieldName holds the string denoting the name field in the database.
-	FieldName = "name"
-	// FieldCreatedAt holds the string denoting the createdat field in the database.
-	FieldCreatedAt = "created_at"
-	// EdgeThreads holds the string denoting the threads edge name in mutations.
-	EdgeThreads = "threads"
-	// EdgeThreadTaggings holds the string denoting the thread_taggings edge name in mutations.
-	EdgeThreadTaggings = "thread_taggings"
+	// FieldThreadId holds the string denoting the threadid field in the database.
+	FieldThreadId = "thread_id"
+	// FieldTagId holds the string denoting the tagid field in the database.
+	FieldTagId = "tag_id"
+	// EdgeThread holds the string denoting the thread edge name in mutations.
+	EdgeThread = "thread"
+	// EdgeTag holds the string denoting the tag edge name in mutations.
+	EdgeTag = "tag"
+	// ThreadFieldID holds the string denoting the ID field of the Thread.
+	ThreadFieldID = "id"
+	// TagFieldID holds the string denoting the ID field of the Tag.
+	TagFieldID = "id"
 	// Table holds the table name of the threadtag in the database.
 	Table = "thread_tags"
-	// ThreadsTable is the table that holds the threads relation/edge. The primary key declared below.
-	ThreadsTable = "thread_taggings"
-	// ThreadsInverseTable is the table name for the Thread entity.
+	// ThreadTable is the table that holds the thread relation/edge.
+	ThreadTable = "thread_tags"
+	// ThreadInverseTable is the table name for the Thread entity.
 	// It exists in this package in order to avoid circular dependency with the "thread" package.
-	ThreadsInverseTable = "threads"
-	// ThreadTaggingsTable is the table that holds the thread_taggings relation/edge.
-	ThreadTaggingsTable = "thread_taggings"
-	// ThreadTaggingsInverseTable is the table name for the ThreadTagging entity.
-	// It exists in this package in order to avoid circular dependency with the "threadtagging" package.
-	ThreadTaggingsInverseTable = "thread_taggings"
-	// ThreadTaggingsColumn is the table column denoting the thread_taggings relation/edge.
-	ThreadTaggingsColumn = "tag_id"
+	ThreadInverseTable = "threads"
+	// ThreadColumn is the table column denoting the thread relation/edge.
+	ThreadColumn = "thread_id"
+	// TagTable is the table that holds the tag relation/edge.
+	TagTable = "thread_tags"
+	// TagInverseTable is the table name for the Tag entity.
+	// It exists in this package in order to avoid circular dependency with the "tag" package.
+	TagInverseTable = "tags"
+	// TagColumn is the table column denoting the tag relation/edge.
+	TagColumn = "tag_id"
 )
 
 // Columns holds all SQL columns for threadtag fields.
 var Columns = []string{
-	FieldID,
-	FieldName,
-	FieldCreatedAt,
+	FieldThreadId,
+	FieldTagId,
 }
-
-var (
-	// ThreadsPrimaryKey and ThreadsColumn2 are the table columns denoting the
-	// primary key for the threads relation (M2M).
-	ThreadsPrimaryKey = []string{"threadId", "tagId"}
-)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -61,69 +56,43 @@ func ValidColumn(column string) bool {
 	return false
 }
 
-var (
-	// NameValidator is a validator for the "name" field. It is called by the builders before save.
-	NameValidator func(string) error
-	// DefaultCreatedAt holds the default value on creation for the "createdAt" field.
-	DefaultCreatedAt func() time.Time
-)
-
 // OrderOption defines the ordering options for the ThreadTag queries.
 type OrderOption func(*sql.Selector)
 
-// ByID orders the results by the id field.
-func ByID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldID, opts...).ToFunc()
+// ByThreadId orders the results by the threadId field.
+func ByThreadId(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldThreadId, opts...).ToFunc()
 }
 
-// ByName orders the results by the name field.
-func ByName(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldName, opts...).ToFunc()
+// ByTagId orders the results by the tagId field.
+func ByTagId(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTagId, opts...).ToFunc()
 }
 
-// ByCreatedAt orders the results by the createdAt field.
-func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
-}
-
-// ByThreadsCount orders the results by threads count.
-func ByThreadsCount(opts ...sql.OrderTermOption) OrderOption {
+// ByThreadField orders the results by thread field.
+func ByThreadField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newThreadsStep(), opts...)
+		sqlgraph.OrderByNeighborTerms(s, newThreadStep(), sql.OrderByField(field, opts...))
 	}
 }
 
-// ByThreads orders the results by threads terms.
-func ByThreads(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByTagField orders the results by tag field.
+func ByTagField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newThreadsStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newTagStep(), sql.OrderByField(field, opts...))
 	}
 }
-
-// ByThreadTaggingsCount orders the results by thread_taggings count.
-func ByThreadTaggingsCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newThreadTaggingsStep(), opts...)
-	}
-}
-
-// ByThreadTaggings orders the results by thread_taggings terms.
-func ByThreadTaggings(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newThreadTaggingsStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-func newThreadsStep() *sqlgraph.Step {
+func newThreadStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ThreadsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, true, ThreadsTable, ThreadsPrimaryKey...),
+		sqlgraph.From(Table, ThreadColumn),
+		sqlgraph.To(ThreadInverseTable, ThreadFieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, ThreadTable, ThreadColumn),
 	)
 }
-func newThreadTaggingsStep() *sqlgraph.Step {
+func newTagStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ThreadTaggingsInverseTable, ThreadTaggingsColumn),
-		sqlgraph.Edge(sqlgraph.O2M, true, ThreadTaggingsTable, ThreadTaggingsColumn),
+		sqlgraph.From(Table, TagColumn),
+		sqlgraph.To(TagInverseTable, TagFieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, TagTable, TagColumn),
 	)
 }

@@ -6,9 +6,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"server/infrastructure/ent/tag"
 	"server/infrastructure/ent/thread"
 	"server/infrastructure/ent/threadtag"
-	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -21,45 +21,38 @@ type ThreadTagCreate struct {
 	hooks    []Hook
 }
 
-// SetName sets the "name" field.
-func (ttc *ThreadTagCreate) SetName(s string) *ThreadTagCreate {
-	ttc.mutation.SetName(s)
+// SetThreadId sets the "threadId" field.
+func (ttc *ThreadTagCreate) SetThreadId(i int) *ThreadTagCreate {
+	ttc.mutation.SetThreadId(i)
 	return ttc
 }
 
-// SetCreatedAt sets the "createdAt" field.
-func (ttc *ThreadTagCreate) SetCreatedAt(t time.Time) *ThreadTagCreate {
-	ttc.mutation.SetCreatedAt(t)
+// SetTagId sets the "tagId" field.
+func (ttc *ThreadTagCreate) SetTagId(i int) *ThreadTagCreate {
+	ttc.mutation.SetTagId(i)
 	return ttc
 }
 
-// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
-func (ttc *ThreadTagCreate) SetNillableCreatedAt(t *time.Time) *ThreadTagCreate {
-	if t != nil {
-		ttc.SetCreatedAt(*t)
-	}
+// SetThreadID sets the "thread" edge to the Thread entity by ID.
+func (ttc *ThreadTagCreate) SetThreadID(id int) *ThreadTagCreate {
+	ttc.mutation.SetThreadID(id)
 	return ttc
 }
 
-// SetID sets the "id" field.
-func (ttc *ThreadTagCreate) SetID(i int) *ThreadTagCreate {
-	ttc.mutation.SetID(i)
+// SetThread sets the "thread" edge to the Thread entity.
+func (ttc *ThreadTagCreate) SetThread(t *Thread) *ThreadTagCreate {
+	return ttc.SetThreadID(t.ID)
+}
+
+// SetTagID sets the "tag" edge to the Tag entity by ID.
+func (ttc *ThreadTagCreate) SetTagID(id int) *ThreadTagCreate {
+	ttc.mutation.SetTagID(id)
 	return ttc
 }
 
-// AddThreadIDs adds the "threads" edge to the Thread entity by IDs.
-func (ttc *ThreadTagCreate) AddThreadIDs(ids ...int) *ThreadTagCreate {
-	ttc.mutation.AddThreadIDs(ids...)
-	return ttc
-}
-
-// AddThreads adds the "threads" edges to the Thread entity.
-func (ttc *ThreadTagCreate) AddThreads(t ...*Thread) *ThreadTagCreate {
-	ids := make([]int, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
-	}
-	return ttc.AddThreadIDs(ids...)
+// SetTag sets the "tag" edge to the Tag entity.
+func (ttc *ThreadTagCreate) SetTag(t *Tag) *ThreadTagCreate {
+	return ttc.SetTagID(t.ID)
 }
 
 // Mutation returns the ThreadTagMutation object of the builder.
@@ -69,7 +62,6 @@ func (ttc *ThreadTagCreate) Mutation() *ThreadTagMutation {
 
 // Save creates the ThreadTag in the database.
 func (ttc *ThreadTagCreate) Save(ctx context.Context) (*ThreadTag, error) {
-	ttc.defaults()
 	return withHooks(ctx, ttc.sqlSave, ttc.mutation, ttc.hooks)
 }
 
@@ -95,26 +87,19 @@ func (ttc *ThreadTagCreate) ExecX(ctx context.Context) {
 	}
 }
 
-// defaults sets the default values of the builder before save.
-func (ttc *ThreadTagCreate) defaults() {
-	if _, ok := ttc.mutation.CreatedAt(); !ok {
-		v := threadtag.DefaultCreatedAt()
-		ttc.mutation.SetCreatedAt(v)
-	}
-}
-
 // check runs all checks and user-defined validators on the builder.
 func (ttc *ThreadTagCreate) check() error {
-	if _, ok := ttc.mutation.Name(); !ok {
-		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "ThreadTag.name"`)}
+	if _, ok := ttc.mutation.ThreadId(); !ok {
+		return &ValidationError{Name: "threadId", err: errors.New(`ent: missing required field "ThreadTag.threadId"`)}
 	}
-	if v, ok := ttc.mutation.Name(); ok {
-		if err := threadtag.NameValidator(v); err != nil {
-			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "ThreadTag.name": %w`, err)}
-		}
+	if _, ok := ttc.mutation.TagId(); !ok {
+		return &ValidationError{Name: "tagId", err: errors.New(`ent: missing required field "ThreadTag.tagId"`)}
 	}
-	if _, ok := ttc.mutation.CreatedAt(); !ok {
-		return &ValidationError{Name: "createdAt", err: errors.New(`ent: missing required field "ThreadTag.createdAt"`)}
+	if _, ok := ttc.mutation.ThreadID(); !ok {
+		return &ValidationError{Name: "thread", err: errors.New(`ent: missing required edge "ThreadTag.thread"`)}
+	}
+	if _, ok := ttc.mutation.TagID(); !ok {
+		return &ValidationError{Name: "tag", err: errors.New(`ent: missing required edge "ThreadTag.tag"`)}
 	}
 	return nil
 }
@@ -130,38 +115,20 @@ func (ttc *ThreadTagCreate) sqlSave(ctx context.Context) (*ThreadTag, error) {
 		}
 		return nil, err
 	}
-	if _spec.ID.Value != _node.ID {
-		id := _spec.ID.Value.(int64)
-		_node.ID = int(id)
-	}
-	ttc.mutation.id = &_node.ID
-	ttc.mutation.done = true
 	return _node, nil
 }
 
 func (ttc *ThreadTagCreate) createSpec() (*ThreadTag, *sqlgraph.CreateSpec) {
 	var (
 		_node = &ThreadTag{config: ttc.config}
-		_spec = sqlgraph.NewCreateSpec(threadtag.Table, sqlgraph.NewFieldSpec(threadtag.FieldID, field.TypeInt))
+		_spec = sqlgraph.NewCreateSpec(threadtag.Table, nil)
 	)
-	if id, ok := ttc.mutation.ID(); ok {
-		_node.ID = id
-		_spec.ID.Value = id
-	}
-	if value, ok := ttc.mutation.Name(); ok {
-		_spec.SetField(threadtag.FieldName, field.TypeString, value)
-		_node.Name = value
-	}
-	if value, ok := ttc.mutation.CreatedAt(); ok {
-		_spec.SetField(threadtag.FieldCreatedAt, field.TypeTime, value)
-		_node.CreatedAt = value
-	}
-	if nodes := ttc.mutation.ThreadsIDs(); len(nodes) > 0 {
+	if nodes := ttc.mutation.ThreadIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   threadtag.ThreadsTable,
-			Columns: threadtag.ThreadsPrimaryKey,
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   threadtag.ThreadTable,
+			Columns: []string{threadtag.ThreadColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(thread.FieldID, field.TypeInt),
@@ -170,6 +137,24 @@ func (ttc *ThreadTagCreate) createSpec() (*ThreadTag, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_node.ThreadId = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ttc.mutation.TagIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   threadtag.TagTable,
+			Columns: []string{threadtag.TagColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.TagId = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
@@ -193,7 +178,6 @@ func (ttcb *ThreadTagCreateBulk) Save(ctx context.Context) ([]*ThreadTag, error)
 	for i := range ttcb.builders {
 		func(i int, root context.Context) {
 			builder := ttcb.builders[i]
-			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*ThreadTagMutation)
 				if !ok {
@@ -218,11 +202,6 @@ func (ttcb *ThreadTagCreateBulk) Save(ctx context.Context) ([]*ThreadTag, error)
 				}
 				if err != nil {
 					return nil, err
-				}
-				mutation.id = &nodes[i].ID
-				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
-					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
 				}
 				mutation.done = true
 				return nodes[i], nil

@@ -40,64 +40,22 @@ var (
 			},
 		},
 	}
-	// CommentsColumns holds the columns for the "comments" table.
-	CommentsColumns = []*schema.Column{
+	// TagsColumns holds the columns for the "tags" table.
+	TagsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "guest_name", Type: field.TypeString, Nullable: true, Size: 20},
-		{Name: "message", Type: field.TypeString, Size: 2147483647},
-		{Name: "ip_address", Type: field.TypeString, Size: 64},
-		{Name: "status", Type: field.TypeInt, Default: 0},
+		{Name: "name", Type: field.TypeString, Unique: true, Size: 20},
 		{Name: "created_at", Type: field.TypeTime},
-		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "parent_comment_id", Type: field.TypeInt, Nullable: true},
-		{Name: "thread_id", Type: field.TypeInt},
-		{Name: "user_id", Type: field.TypeInt, Nullable: true},
 	}
-	// CommentsTable holds the schema information for the "comments" table.
-	CommentsTable = &schema.Table{
-		Name:       "comments",
-		Columns:    CommentsColumns,
-		PrimaryKey: []*schema.Column{CommentsColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
+	// TagsTable holds the schema information for the "tags" table.
+	TagsTable = &schema.Table{
+		Name:       "tags",
+		Columns:    TagsColumns,
+		PrimaryKey: []*schema.Column{TagsColumns[0]},
+		Indexes: []*schema.Index{
 			{
-				Symbol:     "comments_comments_replies",
-				Columns:    []*schema.Column{CommentsColumns[7]},
-				RefColumns: []*schema.Column{CommentsColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
-				Symbol:     "comments_threads_comments",
-				Columns:    []*schema.Column{CommentsColumns[8]},
-				RefColumns: []*schema.Column{ThreadsColumns[0]},
-				OnDelete:   schema.NoAction,
-			},
-			{
-				Symbol:     "comments_users_comments",
-				Columns:    []*schema.Column{CommentsColumns[9]},
-				RefColumns: []*schema.Column{UsersColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-		},
-	}
-	// CommentAttachmentsColumns holds the columns for the "comment_attachments" table.
-	CommentAttachmentsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "url", Type: field.TypeString},
-		{Name: "order", Type: field.TypeInt, Default: 0},
-		{Name: "type", Type: field.TypeEnum, Enums: []string{"image", "video"}},
-		{Name: "comment_id", Type: field.TypeInt},
-	}
-	// CommentAttachmentsTable holds the schema information for the "comment_attachments" table.
-	CommentAttachmentsTable = &schema.Table{
-		Name:       "comment_attachments",
-		Columns:    CommentAttachmentsColumns,
-		PrimaryKey: []*schema.Column{CommentAttachmentsColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "comment_attachments_comments_comment_attachments",
-				Columns:    []*schema.Column{CommentAttachmentsColumns[4]},
-				RefColumns: []*schema.Column{CommentsColumns[0]},
-				OnDelete:   schema.NoAction,
+				Name:    "tag_name",
+				Unique:  true,
+				Columns: []*schema.Column{TagsColumns[1]},
 			},
 		},
 	}
@@ -107,7 +65,6 @@ var (
 		{Name: "title", Type: field.TypeString, Unique: true, Size: 50},
 		{Name: "description", Type: field.TypeString, Nullable: true, Size: 255},
 		{Name: "thumbnail_url", Type: field.TypeString, Nullable: true},
-		{Name: "is_auto_generated", Type: field.TypeBool, Default: false},
 		{Name: "is_notify_on_comment", Type: field.TypeBool, Default: true},
 		{Name: "ip_address", Type: field.TypeString, Size: 64},
 		{Name: "status", Type: field.TypeInt, Default: 0},
@@ -124,13 +81,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "threads_boards_threads",
-				Columns:    []*schema.Column{ThreadsColumns[10]},
+				Columns:    []*schema.Column{ThreadsColumns[9]},
 				RefColumns: []*schema.Column{BoardsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "threads_users_threads",
-				Columns:    []*schema.Column{ThreadsColumns[11]},
+				Columns:    []*schema.Column{ThreadsColumns[10]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -143,46 +100,89 @@ var (
 			},
 		},
 	}
+	// ThreadCommentsColumns holds the columns for the "thread_comments" table.
+	ThreadCommentsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "guest_name", Type: field.TypeString, Nullable: true, Size: 20},
+		{Name: "content", Type: field.TypeString, Size: 2147483647},
+		{Name: "ip_address", Type: field.TypeString, Size: 64},
+		{Name: "status", Type: field.TypeInt, Default: 0},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "thread_id", Type: field.TypeInt},
+		{Name: "parent_comment_id", Type: field.TypeInt, Nullable: true},
+		{Name: "user_id", Type: field.TypeInt, Nullable: true},
+	}
+	// ThreadCommentsTable holds the schema information for the "thread_comments" table.
+	ThreadCommentsTable = &schema.Table{
+		Name:       "thread_comments",
+		Columns:    ThreadCommentsColumns,
+		PrimaryKey: []*schema.Column{ThreadCommentsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "thread_comments_threads_comments",
+				Columns:    []*schema.Column{ThreadCommentsColumns[7]},
+				RefColumns: []*schema.Column{ThreadsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "thread_comments_thread_comments_replies",
+				Columns:    []*schema.Column{ThreadCommentsColumns[8]},
+				RefColumns: []*schema.Column{ThreadCommentsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "thread_comments_users_comments",
+				Columns:    []*schema.Column{ThreadCommentsColumns[9]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// ThreadCommentAttachmentsColumns holds the columns for the "thread_comment_attachments" table.
+	ThreadCommentAttachmentsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "url", Type: field.TypeString},
+		{Name: "display_order", Type: field.TypeInt, Default: 0},
+		{Name: "type", Type: field.TypeInt, Default: 0},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "comment_id", Type: field.TypeInt},
+	}
+	// ThreadCommentAttachmentsTable holds the schema information for the "thread_comment_attachments" table.
+	ThreadCommentAttachmentsTable = &schema.Table{
+		Name:       "thread_comment_attachments",
+		Columns:    ThreadCommentAttachmentsColumns,
+		PrimaryKey: []*schema.Column{ThreadCommentAttachmentsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "thread_comment_attachments_thread_comments_attachments",
+				Columns:    []*schema.Column{ThreadCommentAttachmentsColumns[5]},
+				RefColumns: []*schema.Column{ThreadCommentsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
 	// ThreadTagsColumns holds the columns for the "thread_tags" table.
 	ThreadTagsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "name", Type: field.TypeString, Unique: true, Size: 20},
-		{Name: "created_at", Type: field.TypeTime},
+		{Name: "thread_id", Type: field.TypeInt},
+		{Name: "tag_id", Type: field.TypeInt},
 	}
 	// ThreadTagsTable holds the schema information for the "thread_tags" table.
 	ThreadTagsTable = &schema.Table{
 		Name:       "thread_tags",
 		Columns:    ThreadTagsColumns,
-		PrimaryKey: []*schema.Column{ThreadTagsColumns[0]},
-		Indexes: []*schema.Index{
-			{
-				Name:    "threadtag_name",
-				Unique:  true,
-				Columns: []*schema.Column{ThreadTagsColumns[1]},
-			},
-		},
-	}
-	// ThreadTaggingsColumns holds the columns for the "thread_taggings" table.
-	ThreadTaggingsColumns = []*schema.Column{
-		{Name: "thread_id", Type: field.TypeInt},
-		{Name: "tag_id", Type: field.TypeInt},
-	}
-	// ThreadTaggingsTable holds the schema information for the "thread_taggings" table.
-	ThreadTaggingsTable = &schema.Table{
-		Name:       "thread_taggings",
-		Columns:    ThreadTaggingsColumns,
-		PrimaryKey: []*schema.Column{ThreadTaggingsColumns[0], ThreadTaggingsColumns[1]},
+		PrimaryKey: []*schema.Column{ThreadTagsColumns[0], ThreadTagsColumns[1]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "thread_taggings_threads_thread",
-				Columns:    []*schema.Column{ThreadTaggingsColumns[0]},
+				Symbol:     "thread_tags_threads_thread",
+				Columns:    []*schema.Column{ThreadTagsColumns[0]},
 				RefColumns: []*schema.Column{ThreadsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "thread_taggings_thread_tags_tag",
-				Columns:    []*schema.Column{ThreadTaggingsColumns[1]},
-				RefColumns: []*schema.Column{ThreadTagsColumns[0]},
+				Symbol:     "thread_tags_tags_tag",
+				Columns:    []*schema.Column{ThreadTagsColumns[1]},
+				RefColumns: []*schema.Column{TagsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 		},
@@ -190,10 +190,9 @@ var (
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "name", Type: field.TypeString, Unique: true, Size: 20},
+		{Name: "name", Type: field.TypeString, Size: 20},
 		{Name: "email", Type: field.TypeString, Unique: true, Size: 254},
 		{Name: "password", Type: field.TypeString},
-		{Name: "display_name", Type: field.TypeString, Nullable: true, Size: 20},
 		{Name: "avatar_url", Type: field.TypeString, Nullable: true},
 		{Name: "status", Type: field.TypeInt, Default: 0},
 		{Name: "role", Type: field.TypeInt, Default: 0},
@@ -279,9 +278,9 @@ var (
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "user_comment_likes_comments_comment",
+				Symbol:     "user_comment_likes_thread_comments_comment",
 				Columns:    []*schema.Column{UserCommentLikesColumns[2]},
-				RefColumns: []*schema.Column{CommentsColumns[0]},
+				RefColumns: []*schema.Column{ThreadCommentsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 		},
@@ -307,9 +306,9 @@ var (
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "user_comment_subscriptions_comments_comment",
+				Symbol:     "user_comment_subscriptions_thread_comments_comment",
 				Columns:    []*schema.Column{UserCommentSubscriptionsColumns[4]},
-				RefColumns: []*schema.Column{CommentsColumns[0]},
+				RefColumns: []*schema.Column{ThreadCommentsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 		},
@@ -371,11 +370,11 @@ var (
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		BoardsTable,
-		CommentsTable,
-		CommentAttachmentsTable,
+		TagsTable,
 		ThreadsTable,
+		ThreadCommentsTable,
+		ThreadCommentAttachmentsTable,
 		ThreadTagsTable,
-		ThreadTaggingsTable,
 		UsersTable,
 		UserBoardLikesTable,
 		UserBoardSubscriptionsTable,
@@ -388,22 +387,22 @@ var (
 
 func init() {
 	BoardsTable.ForeignKeys[0].RefTable = UsersTable
-	CommentsTable.ForeignKeys[0].RefTable = CommentsTable
-	CommentsTable.ForeignKeys[1].RefTable = ThreadsTable
-	CommentsTable.ForeignKeys[2].RefTable = UsersTable
-	CommentAttachmentsTable.ForeignKeys[0].RefTable = CommentsTable
 	ThreadsTable.ForeignKeys[0].RefTable = BoardsTable
 	ThreadsTable.ForeignKeys[1].RefTable = UsersTable
-	ThreadTaggingsTable.ForeignKeys[0].RefTable = ThreadsTable
-	ThreadTaggingsTable.ForeignKeys[1].RefTable = ThreadTagsTable
+	ThreadCommentsTable.ForeignKeys[0].RefTable = ThreadsTable
+	ThreadCommentsTable.ForeignKeys[1].RefTable = ThreadCommentsTable
+	ThreadCommentsTable.ForeignKeys[2].RefTable = UsersTable
+	ThreadCommentAttachmentsTable.ForeignKeys[0].RefTable = ThreadCommentsTable
+	ThreadTagsTable.ForeignKeys[0].RefTable = ThreadsTable
+	ThreadTagsTable.ForeignKeys[1].RefTable = TagsTable
 	UserBoardLikesTable.ForeignKeys[0].RefTable = UsersTable
 	UserBoardLikesTable.ForeignKeys[1].RefTable = BoardsTable
 	UserBoardSubscriptionsTable.ForeignKeys[0].RefTable = UsersTable
 	UserBoardSubscriptionsTable.ForeignKeys[1].RefTable = BoardsTable
 	UserCommentLikesTable.ForeignKeys[0].RefTable = UsersTable
-	UserCommentLikesTable.ForeignKeys[1].RefTable = CommentsTable
+	UserCommentLikesTable.ForeignKeys[1].RefTable = ThreadCommentsTable
 	UserCommentSubscriptionsTable.ForeignKeys[0].RefTable = UsersTable
-	UserCommentSubscriptionsTable.ForeignKeys[1].RefTable = CommentsTable
+	UserCommentSubscriptionsTable.ForeignKeys[1].RefTable = ThreadCommentsTable
 	UserThreadLikesTable.ForeignKeys[0].RefTable = UsersTable
 	UserThreadLikesTable.ForeignKeys[1].RefTable = ThreadsTable
 	UserThreadSubscriptionsTable.ForeignKeys[0].RefTable = UsersTable

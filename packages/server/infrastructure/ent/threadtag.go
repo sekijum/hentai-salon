@@ -4,9 +4,10 @@ package ent
 
 import (
 	"fmt"
+	"server/infrastructure/ent/tag"
+	"server/infrastructure/ent/thread"
 	"server/infrastructure/ent/threadtag"
 	"strings"
-	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -15,12 +16,10 @@ import (
 // ThreadTag is the model entity for the ThreadTag schema.
 type ThreadTag struct {
 	config `json:"-"`
-	// ID of the ent.
-	ID int `json:"id,omitempty"`
-	// Name holds the value of the "name" field.
-	Name string `json:"name,omitempty"`
-	// CreatedAt holds the value of the "createdAt" field.
-	CreatedAt time.Time `json:"createdAt,omitempty"`
+	// ThreadId holds the value of the "threadId" field.
+	ThreadId int `json:"threadId,omitempty"`
+	// TagId holds the value of the "tagId" field.
+	TagId int `json:"tagId,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ThreadTagQuery when eager-loading is set.
 	Edges        ThreadTagEdges `json:"edges"`
@@ -29,31 +28,35 @@ type ThreadTag struct {
 
 // ThreadTagEdges holds the relations/edges for other nodes in the graph.
 type ThreadTagEdges struct {
-	// Threads holds the value of the threads edge.
-	Threads []*Thread `json:"threads,omitempty"`
-	// ThreadTaggings holds the value of the thread_taggings edge.
-	ThreadTaggings []*ThreadTagging `json:"thread_taggings,omitempty"`
+	// Thread holds the value of the thread edge.
+	Thread *Thread `json:"thread,omitempty"`
+	// Tag holds the value of the tag edge.
+	Tag *Tag `json:"tag,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [2]bool
 }
 
-// ThreadsOrErr returns the Threads value or an error if the edge
-// was not loaded in eager-loading.
-func (e ThreadTagEdges) ThreadsOrErr() ([]*Thread, error) {
-	if e.loadedTypes[0] {
-		return e.Threads, nil
+// ThreadOrErr returns the Thread value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ThreadTagEdges) ThreadOrErr() (*Thread, error) {
+	if e.Thread != nil {
+		return e.Thread, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: thread.Label}
 	}
-	return nil, &NotLoadedError{edge: "threads"}
+	return nil, &NotLoadedError{edge: "thread"}
 }
 
-// ThreadTaggingsOrErr returns the ThreadTaggings value or an error if the edge
-// was not loaded in eager-loading.
-func (e ThreadTagEdges) ThreadTaggingsOrErr() ([]*ThreadTagging, error) {
-	if e.loadedTypes[1] {
-		return e.ThreadTaggings, nil
+// TagOrErr returns the Tag value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ThreadTagEdges) TagOrErr() (*Tag, error) {
+	if e.Tag != nil {
+		return e.Tag, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: tag.Label}
 	}
-	return nil, &NotLoadedError{edge: "thread_taggings"}
+	return nil, &NotLoadedError{edge: "tag"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -61,12 +64,8 @@ func (*ThreadTag) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case threadtag.FieldID:
+		case threadtag.FieldThreadId, threadtag.FieldTagId:
 			values[i] = new(sql.NullInt64)
-		case threadtag.FieldName:
-			values[i] = new(sql.NullString)
-		case threadtag.FieldCreatedAt:
-			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -82,23 +81,17 @@ func (tt *ThreadTag) assignValues(columns []string, values []any) error {
 	}
 	for i := range columns {
 		switch columns[i] {
-		case threadtag.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
-			if !ok {
-				return fmt.Errorf("unexpected type %T for field id", value)
-			}
-			tt.ID = int(value.Int64)
-		case threadtag.FieldName:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field name", values[i])
+		case threadtag.FieldThreadId:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field threadId", values[i])
 			} else if value.Valid {
-				tt.Name = value.String
+				tt.ThreadId = int(value.Int64)
 			}
-		case threadtag.FieldCreatedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field createdAt", values[i])
+		case threadtag.FieldTagId:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field tagId", values[i])
 			} else if value.Valid {
-				tt.CreatedAt = value.Time
+				tt.TagId = int(value.Int64)
 			}
 		default:
 			tt.selectValues.Set(columns[i], values[i])
@@ -113,14 +106,14 @@ func (tt *ThreadTag) Value(name string) (ent.Value, error) {
 	return tt.selectValues.Get(name)
 }
 
-// QueryThreads queries the "threads" edge of the ThreadTag entity.
-func (tt *ThreadTag) QueryThreads() *ThreadQuery {
-	return NewThreadTagClient(tt.config).QueryThreads(tt)
+// QueryThread queries the "thread" edge of the ThreadTag entity.
+func (tt *ThreadTag) QueryThread() *ThreadQuery {
+	return NewThreadTagClient(tt.config).QueryThread(tt)
 }
 
-// QueryThreadTaggings queries the "thread_taggings" edge of the ThreadTag entity.
-func (tt *ThreadTag) QueryThreadTaggings() *ThreadTaggingQuery {
-	return NewThreadTagClient(tt.config).QueryThreadTaggings(tt)
+// QueryTag queries the "tag" edge of the ThreadTag entity.
+func (tt *ThreadTag) QueryTag() *TagQuery {
+	return NewThreadTagClient(tt.config).QueryTag(tt)
 }
 
 // Update returns a builder for updating this ThreadTag.
@@ -145,12 +138,11 @@ func (tt *ThreadTag) Unwrap() *ThreadTag {
 func (tt *ThreadTag) String() string {
 	var builder strings.Builder
 	builder.WriteString("ThreadTag(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", tt.ID))
-	builder.WriteString("name=")
-	builder.WriteString(tt.Name)
+	builder.WriteString("threadId=")
+	builder.WriteString(fmt.Sprintf("%v", tt.ThreadId))
 	builder.WriteString(", ")
-	builder.WriteString("createdAt=")
-	builder.WriteString(tt.CreatedAt.Format(time.ANSIC))
+	builder.WriteString("tagId=")
+	builder.WriteString(fmt.Sprintf("%v", tt.TagId))
 	builder.WriteByte(')')
 	return builder.String()
 }

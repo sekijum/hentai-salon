@@ -4,28 +4,26 @@ package ent
 
 import (
 	"context"
-	"database/sql/driver"
 	"fmt"
 	"math"
 	"server/infrastructure/ent/predicate"
+	"server/infrastructure/ent/tag"
 	"server/infrastructure/ent/thread"
 	"server/infrastructure/ent/threadtag"
-	"server/infrastructure/ent/threadtagging"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"entgo.io/ent/schema/field"
 )
 
 // ThreadTagQuery is the builder for querying ThreadTag entities.
 type ThreadTagQuery struct {
 	config
-	ctx                *QueryContext
-	order              []threadtag.OrderOption
-	inters             []Interceptor
-	predicates         []predicate.ThreadTag
-	withThreads        *ThreadQuery
-	withThreadTaggings *ThreadTaggingQuery
+	ctx        *QueryContext
+	order      []threadtag.OrderOption
+	inters     []Interceptor
+	predicates []predicate.ThreadTag
+	withThread *ThreadQuery
+	withTag    *TagQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -62,8 +60,8 @@ func (ttq *ThreadTagQuery) Order(o ...threadtag.OrderOption) *ThreadTagQuery {
 	return ttq
 }
 
-// QueryThreads chains the current query on the "threads" edge.
-func (ttq *ThreadTagQuery) QueryThreads() *ThreadQuery {
+// QueryThread chains the current query on the "thread" edge.
+func (ttq *ThreadTagQuery) QueryThread() *ThreadQuery {
 	query := (&ThreadClient{config: ttq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := ttq.prepareQuery(ctx); err != nil {
@@ -74,9 +72,9 @@ func (ttq *ThreadTagQuery) QueryThreads() *ThreadQuery {
 			return nil, err
 		}
 		step := sqlgraph.NewStep(
-			sqlgraph.From(threadtag.Table, threadtag.FieldID, selector),
+			sqlgraph.From(threadtag.Table, threadtag.ThreadColumn, selector),
 			sqlgraph.To(thread.Table, thread.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, threadtag.ThreadsTable, threadtag.ThreadsPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, false, threadtag.ThreadTable, threadtag.ThreadColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(ttq.driver.Dialect(), step)
 		return fromU, nil
@@ -84,9 +82,9 @@ func (ttq *ThreadTagQuery) QueryThreads() *ThreadQuery {
 	return query
 }
 
-// QueryThreadTaggings chains the current query on the "thread_taggings" edge.
-func (ttq *ThreadTagQuery) QueryThreadTaggings() *ThreadTaggingQuery {
-	query := (&ThreadTaggingClient{config: ttq.config}).Query()
+// QueryTag chains the current query on the "tag" edge.
+func (ttq *ThreadTagQuery) QueryTag() *TagQuery {
+	query := (&TagClient{config: ttq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := ttq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -96,9 +94,9 @@ func (ttq *ThreadTagQuery) QueryThreadTaggings() *ThreadTaggingQuery {
 			return nil, err
 		}
 		step := sqlgraph.NewStep(
-			sqlgraph.From(threadtag.Table, threadtag.FieldID, selector),
-			sqlgraph.To(threadtagging.Table, threadtagging.TagColumn),
-			sqlgraph.Edge(sqlgraph.O2M, true, threadtag.ThreadTaggingsTable, threadtag.ThreadTaggingsColumn),
+			sqlgraph.From(threadtag.Table, threadtag.TagColumn, selector),
+			sqlgraph.To(tag.Table, tag.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, threadtag.TagTable, threadtag.TagColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(ttq.driver.Dialect(), step)
 		return fromU, nil
@@ -128,29 +126,6 @@ func (ttq *ThreadTagQuery) FirstX(ctx context.Context) *ThreadTag {
 	return node
 }
 
-// FirstID returns the first ThreadTag ID from the query.
-// Returns a *NotFoundError when no ThreadTag ID was found.
-func (ttq *ThreadTagQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
-	if ids, err = ttq.Limit(1).IDs(setContextOp(ctx, ttq.ctx, "FirstID")); err != nil {
-		return
-	}
-	if len(ids) == 0 {
-		err = &NotFoundError{threadtag.Label}
-		return
-	}
-	return ids[0], nil
-}
-
-// FirstIDX is like FirstID, but panics if an error occurs.
-func (ttq *ThreadTagQuery) FirstIDX(ctx context.Context) int {
-	id, err := ttq.FirstID(ctx)
-	if err != nil && !IsNotFound(err) {
-		panic(err)
-	}
-	return id
-}
-
 // Only returns a single ThreadTag entity found by the query, ensuring it only returns one.
 // Returns a *NotSingularError when more than one ThreadTag entity is found.
 // Returns a *NotFoundError when no ThreadTag entities are found.
@@ -178,34 +153,6 @@ func (ttq *ThreadTagQuery) OnlyX(ctx context.Context) *ThreadTag {
 	return node
 }
 
-// OnlyID is like Only, but returns the only ThreadTag ID in the query.
-// Returns a *NotSingularError when more than one ThreadTag ID is found.
-// Returns a *NotFoundError when no entities are found.
-func (ttq *ThreadTagQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
-	if ids, err = ttq.Limit(2).IDs(setContextOp(ctx, ttq.ctx, "OnlyID")); err != nil {
-		return
-	}
-	switch len(ids) {
-	case 1:
-		id = ids[0]
-	case 0:
-		err = &NotFoundError{threadtag.Label}
-	default:
-		err = &NotSingularError{threadtag.Label}
-	}
-	return
-}
-
-// OnlyIDX is like OnlyID, but panics if an error occurs.
-func (ttq *ThreadTagQuery) OnlyIDX(ctx context.Context) int {
-	id, err := ttq.OnlyID(ctx)
-	if err != nil {
-		panic(err)
-	}
-	return id
-}
-
 // All executes the query and returns a list of ThreadTags.
 func (ttq *ThreadTagQuery) All(ctx context.Context) ([]*ThreadTag, error) {
 	ctx = setContextOp(ctx, ttq.ctx, "All")
@@ -223,27 +170,6 @@ func (ttq *ThreadTagQuery) AllX(ctx context.Context) []*ThreadTag {
 		panic(err)
 	}
 	return nodes
-}
-
-// IDs executes the query and returns a list of ThreadTag IDs.
-func (ttq *ThreadTagQuery) IDs(ctx context.Context) (ids []int, err error) {
-	if ttq.ctx.Unique == nil && ttq.path != nil {
-		ttq.Unique(true)
-	}
-	ctx = setContextOp(ctx, ttq.ctx, "IDs")
-	if err = ttq.Select(threadtag.FieldID).Scan(ctx, &ids); err != nil {
-		return nil, err
-	}
-	return ids, nil
-}
-
-// IDsX is like IDs, but panics if an error occurs.
-func (ttq *ThreadTagQuery) IDsX(ctx context.Context) []int {
-	ids, err := ttq.IDs(ctx)
-	if err != nil {
-		panic(err)
-	}
-	return ids
 }
 
 // Count returns the count of the given query.
@@ -267,7 +193,7 @@ func (ttq *ThreadTagQuery) CountX(ctx context.Context) int {
 // Exist returns true if the query has elements in the graph.
 func (ttq *ThreadTagQuery) Exist(ctx context.Context) (bool, error) {
 	ctx = setContextOp(ctx, ttq.ctx, "Exist")
-	switch _, err := ttq.FirstID(ctx); {
+	switch _, err := ttq.First(ctx); {
 	case IsNotFound(err):
 		return false, nil
 	case err != nil:
@@ -293,38 +219,38 @@ func (ttq *ThreadTagQuery) Clone() *ThreadTagQuery {
 		return nil
 	}
 	return &ThreadTagQuery{
-		config:             ttq.config,
-		ctx:                ttq.ctx.Clone(),
-		order:              append([]threadtag.OrderOption{}, ttq.order...),
-		inters:             append([]Interceptor{}, ttq.inters...),
-		predicates:         append([]predicate.ThreadTag{}, ttq.predicates...),
-		withThreads:        ttq.withThreads.Clone(),
-		withThreadTaggings: ttq.withThreadTaggings.Clone(),
+		config:     ttq.config,
+		ctx:        ttq.ctx.Clone(),
+		order:      append([]threadtag.OrderOption{}, ttq.order...),
+		inters:     append([]Interceptor{}, ttq.inters...),
+		predicates: append([]predicate.ThreadTag{}, ttq.predicates...),
+		withThread: ttq.withThread.Clone(),
+		withTag:    ttq.withTag.Clone(),
 		// clone intermediate query.
 		sql:  ttq.sql.Clone(),
 		path: ttq.path,
 	}
 }
 
-// WithThreads tells the query-builder to eager-load the nodes that are connected to
-// the "threads" edge. The optional arguments are used to configure the query builder of the edge.
-func (ttq *ThreadTagQuery) WithThreads(opts ...func(*ThreadQuery)) *ThreadTagQuery {
+// WithThread tells the query-builder to eager-load the nodes that are connected to
+// the "thread" edge. The optional arguments are used to configure the query builder of the edge.
+func (ttq *ThreadTagQuery) WithThread(opts ...func(*ThreadQuery)) *ThreadTagQuery {
 	query := (&ThreadClient{config: ttq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	ttq.withThreads = query
+	ttq.withThread = query
 	return ttq
 }
 
-// WithThreadTaggings tells the query-builder to eager-load the nodes that are connected to
-// the "thread_taggings" edge. The optional arguments are used to configure the query builder of the edge.
-func (ttq *ThreadTagQuery) WithThreadTaggings(opts ...func(*ThreadTaggingQuery)) *ThreadTagQuery {
-	query := (&ThreadTaggingClient{config: ttq.config}).Query()
+// WithTag tells the query-builder to eager-load the nodes that are connected to
+// the "tag" edge. The optional arguments are used to configure the query builder of the edge.
+func (ttq *ThreadTagQuery) WithTag(opts ...func(*TagQuery)) *ThreadTagQuery {
+	query := (&TagClient{config: ttq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	ttq.withThreadTaggings = query
+	ttq.withTag = query
 	return ttq
 }
 
@@ -334,12 +260,12 @@ func (ttq *ThreadTagQuery) WithThreadTaggings(opts ...func(*ThreadTaggingQuery))
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		ThreadId int `json:"threadId,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.ThreadTag.Query().
-//		GroupBy(threadtag.FieldName).
+//		GroupBy(threadtag.FieldThreadId).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (ttq *ThreadTagQuery) GroupBy(field string, fields ...string) *ThreadTagGroupBy {
@@ -357,11 +283,11 @@ func (ttq *ThreadTagQuery) GroupBy(field string, fields ...string) *ThreadTagGro
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		ThreadId int `json:"threadId,omitempty"`
 //	}
 //
 //	client.ThreadTag.Query().
-//		Select(threadtag.FieldName).
+//		Select(threadtag.FieldThreadId).
 //		Scan(ctx, &v)
 func (ttq *ThreadTagQuery) Select(fields ...string) *ThreadTagSelect {
 	ttq.ctx.Fields = append(ttq.ctx.Fields, fields...)
@@ -407,8 +333,8 @@ func (ttq *ThreadTagQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*T
 		nodes       = []*ThreadTag{}
 		_spec       = ttq.querySpec()
 		loadedTypes = [2]bool{
-			ttq.withThreads != nil,
-			ttq.withThreadTaggings != nil,
+			ttq.withThread != nil,
+			ttq.withTag != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -429,126 +355,89 @@ func (ttq *ThreadTagQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*T
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := ttq.withThreads; query != nil {
-		if err := ttq.loadThreads(ctx, query, nodes,
-			func(n *ThreadTag) { n.Edges.Threads = []*Thread{} },
-			func(n *ThreadTag, e *Thread) { n.Edges.Threads = append(n.Edges.Threads, e) }); err != nil {
+	if query := ttq.withThread; query != nil {
+		if err := ttq.loadThread(ctx, query, nodes, nil,
+			func(n *ThreadTag, e *Thread) { n.Edges.Thread = e }); err != nil {
 			return nil, err
 		}
 	}
-	if query := ttq.withThreadTaggings; query != nil {
-		if err := ttq.loadThreadTaggings(ctx, query, nodes,
-			func(n *ThreadTag) { n.Edges.ThreadTaggings = []*ThreadTagging{} },
-			func(n *ThreadTag, e *ThreadTagging) { n.Edges.ThreadTaggings = append(n.Edges.ThreadTaggings, e) }); err != nil {
+	if query := ttq.withTag; query != nil {
+		if err := ttq.loadTag(ctx, query, nodes, nil,
+			func(n *ThreadTag, e *Tag) { n.Edges.Tag = e }); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (ttq *ThreadTagQuery) loadThreads(ctx context.Context, query *ThreadQuery, nodes []*ThreadTag, init func(*ThreadTag), assign func(*ThreadTag, *Thread)) error {
-	edgeIDs := make([]driver.Value, len(nodes))
-	byID := make(map[int]*ThreadTag)
-	nids := make(map[int]map[*ThreadTag]struct{})
-	for i, node := range nodes {
-		edgeIDs[i] = node.ID
-		byID[node.ID] = node
-		if init != nil {
-			init(node)
-		}
-	}
-	query.Where(func(s *sql.Selector) {
-		joinT := sql.Table(threadtag.ThreadsTable)
-		s.Join(joinT).On(s.C(thread.FieldID), joinT.C(threadtag.ThreadsPrimaryKey[0]))
-		s.Where(sql.InValues(joinT.C(threadtag.ThreadsPrimaryKey[1]), edgeIDs...))
-		columns := s.SelectedColumns()
-		s.Select(joinT.C(threadtag.ThreadsPrimaryKey[1]))
-		s.AppendSelect(columns...)
-		s.SetDistinct(false)
-	})
-	if err := query.prepareQuery(ctx); err != nil {
-		return err
-	}
-	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
-		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
-			assign := spec.Assign
-			values := spec.ScanValues
-			spec.ScanValues = func(columns []string) ([]any, error) {
-				values, err := values(columns[1:])
-				if err != nil {
-					return nil, err
-				}
-				return append([]any{new(sql.NullInt64)}, values...), nil
-			}
-			spec.Assign = func(columns []string, values []any) error {
-				outValue := int(values[0].(*sql.NullInt64).Int64)
-				inValue := int(values[1].(*sql.NullInt64).Int64)
-				if nids[inValue] == nil {
-					nids[inValue] = map[*ThreadTag]struct{}{byID[outValue]: {}}
-					return assign(columns[1:], values[1:])
-				}
-				nids[inValue][byID[outValue]] = struct{}{}
-				return nil
-			}
-		})
-	})
-	neighbors, err := withInterceptors[[]*Thread](ctx, query, qr, query.inters)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected "threads" node returned %v`, n.ID)
-		}
-		for kn := range nodes {
-			assign(kn, n)
-		}
-	}
-	return nil
-}
-func (ttq *ThreadTagQuery) loadThreadTaggings(ctx context.Context, query *ThreadTaggingQuery, nodes []*ThreadTag, init func(*ThreadTag), assign func(*ThreadTag, *ThreadTagging)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*ThreadTag)
+func (ttq *ThreadTagQuery) loadThread(ctx context.Context, query *ThreadQuery, nodes []*ThreadTag, init func(*ThreadTag), assign func(*ThreadTag, *Thread)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*ThreadTag)
 	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
+		fk := nodes[i].ThreadId
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
 		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
-	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(threadtagging.FieldTagId)
+	if len(ids) == 0 {
+		return nil
 	}
-	query.Where(predicate.ThreadTagging(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(threadtag.ThreadTaggingsColumn), fks...))
-	}))
+	query.Where(thread.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.TagId
-		node, ok := nodeids[fk]
+		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "tagId" returned %v for node %v`, fk, n)
+			return fmt.Errorf(`unexpected foreign-key "threadId" returned %v`, n.ID)
 		}
-		assign(node, n)
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (ttq *ThreadTagQuery) loadTag(ctx context.Context, query *TagQuery, nodes []*ThreadTag, init func(*ThreadTag), assign func(*ThreadTag, *Tag)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*ThreadTag)
+	for i := range nodes {
+		fk := nodes[i].TagId
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(tag.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "tagId" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
 	}
 	return nil
 }
 
 func (ttq *ThreadTagQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := ttq.querySpec()
-	_spec.Node.Columns = ttq.ctx.Fields
-	if len(ttq.ctx.Fields) > 0 {
-		_spec.Unique = ttq.ctx.Unique != nil && *ttq.ctx.Unique
-	}
+	_spec.Unique = false
+	_spec.Node.Columns = nil
 	return sqlgraph.CountNodes(ctx, ttq.driver, _spec)
 }
 
 func (ttq *ThreadTagQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(threadtag.Table, threadtag.Columns, sqlgraph.NewFieldSpec(threadtag.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewQuerySpec(threadtag.Table, threadtag.Columns, nil)
 	_spec.From = ttq.sql
 	if unique := ttq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
@@ -557,11 +446,14 @@ func (ttq *ThreadTagQuery) querySpec() *sqlgraph.QuerySpec {
 	}
 	if fields := ttq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
-		_spec.Node.Columns = append(_spec.Node.Columns, threadtag.FieldID)
 		for i := range fields {
-			if fields[i] != threadtag.FieldID {
-				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
-			}
+			_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
+		}
+		if ttq.withThread != nil {
+			_spec.Node.AddColumnOnce(threadtag.FieldThreadId)
+		}
+		if ttq.withTag != nil {
+			_spec.Node.AddColumnOnce(threadtag.FieldTagId)
 		}
 	}
 	if ps := ttq.predicates; len(ps) > 0 {

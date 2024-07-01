@@ -24,8 +24,8 @@ const (
 	EdgeComment = "comment"
 	// UserFieldID holds the string denoting the ID field of the User.
 	UserFieldID = "id"
-	// CommentFieldID holds the string denoting the ID field of the Comment.
-	CommentFieldID = "id"
+	// ThreadCommentFieldID holds the string denoting the ID field of the ThreadComment.
+	ThreadCommentFieldID = "id"
 	// Table holds the table name of the usercommentlike in the database.
 	Table = "user_comment_likes"
 	// UserTable is the table that holds the user relation/edge.
@@ -37,9 +37,9 @@ const (
 	UserColumn = "user_id"
 	// CommentTable is the table that holds the comment relation/edge.
 	CommentTable = "user_comment_likes"
-	// CommentInverseTable is the table name for the Comment entity.
-	// It exists in this package in order to avoid circular dependency with the "comment" package.
-	CommentInverseTable = "comments"
+	// CommentInverseTable is the table name for the ThreadComment entity.
+	// It exists in this package in order to avoid circular dependency with the "threadcomment" package.
+	CommentInverseTable = "thread_comments"
 	// CommentColumn is the table column denoting the comment relation/edge.
 	CommentColumn = "comment_id"
 )
@@ -107,7 +107,7 @@ func newUserStep() *sqlgraph.Step {
 func newCommentStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, CommentColumn),
-		sqlgraph.To(CommentInverseTable, CommentFieldID),
+		sqlgraph.To(CommentInverseTable, ThreadCommentFieldID),
 		sqlgraph.Edge(sqlgraph.M2O, false, CommentTable, CommentColumn),
 	)
 }

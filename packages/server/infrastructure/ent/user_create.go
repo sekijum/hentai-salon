@@ -7,8 +7,8 @@ import (
 	"errors"
 	"fmt"
 	"server/infrastructure/ent/board"
-	"server/infrastructure/ent/comment"
 	"server/infrastructure/ent/thread"
+	"server/infrastructure/ent/threadcomment"
 	"server/infrastructure/ent/user"
 	"time"
 
@@ -38,20 +38,6 @@ func (uc *UserCreate) SetEmail(s string) *UserCreate {
 // SetPassword sets the "password" field.
 func (uc *UserCreate) SetPassword(s string) *UserCreate {
 	uc.mutation.SetPassword(s)
-	return uc
-}
-
-// SetDisplayName sets the "displayName" field.
-func (uc *UserCreate) SetDisplayName(s string) *UserCreate {
-	uc.mutation.SetDisplayName(s)
-	return uc
-}
-
-// SetNillableDisplayName sets the "displayName" field if the given value is not nil.
-func (uc *UserCreate) SetNillableDisplayName(s *string) *UserCreate {
-	if s != nil {
-		uc.SetDisplayName(*s)
-	}
 	return uc
 }
 
@@ -161,17 +147,17 @@ func (uc *UserCreate) AddThreads(t ...*Thread) *UserCreate {
 	return uc.AddThreadIDs(ids...)
 }
 
-// AddCommentIDs adds the "comments" edge to the Comment entity by IDs.
+// AddCommentIDs adds the "comments" edge to the ThreadComment entity by IDs.
 func (uc *UserCreate) AddCommentIDs(ids ...int) *UserCreate {
 	uc.mutation.AddCommentIDs(ids...)
 	return uc
 }
 
-// AddComments adds the "comments" edges to the Comment entity.
-func (uc *UserCreate) AddComments(c ...*Comment) *UserCreate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+// AddComments adds the "comments" edges to the ThreadComment entity.
+func (uc *UserCreate) AddComments(t ...*ThreadComment) *UserCreate {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
 	}
 	return uc.AddCommentIDs(ids...)
 }
@@ -206,17 +192,17 @@ func (uc *UserCreate) AddLikedThreads(t ...*Thread) *UserCreate {
 	return uc.AddLikedThreadIDs(ids...)
 }
 
-// AddLikedCommentIDs adds the "liked_comments" edge to the Comment entity by IDs.
+// AddLikedCommentIDs adds the "liked_comments" edge to the ThreadComment entity by IDs.
 func (uc *UserCreate) AddLikedCommentIDs(ids ...int) *UserCreate {
 	uc.mutation.AddLikedCommentIDs(ids...)
 	return uc
 }
 
-// AddLikedComments adds the "liked_comments" edges to the Comment entity.
-func (uc *UserCreate) AddLikedComments(c ...*Comment) *UserCreate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+// AddLikedComments adds the "liked_comments" edges to the ThreadComment entity.
+func (uc *UserCreate) AddLikedComments(t ...*ThreadComment) *UserCreate {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
 	}
 	return uc.AddLikedCommentIDs(ids...)
 }
@@ -251,17 +237,17 @@ func (uc *UserCreate) AddSubscribedThreads(t ...*Thread) *UserCreate {
 	return uc.AddSubscribedThreadIDs(ids...)
 }
 
-// AddSubscribedCommentIDs adds the "subscribed_comments" edge to the Comment entity by IDs.
+// AddSubscribedCommentIDs adds the "subscribed_comments" edge to the ThreadComment entity by IDs.
 func (uc *UserCreate) AddSubscribedCommentIDs(ids ...int) *UserCreate {
 	uc.mutation.AddSubscribedCommentIDs(ids...)
 	return uc
 }
 
-// AddSubscribedComments adds the "subscribed_comments" edges to the Comment entity.
-func (uc *UserCreate) AddSubscribedComments(c ...*Comment) *UserCreate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+// AddSubscribedComments adds the "subscribed_comments" edges to the ThreadComment entity.
+func (uc *UserCreate) AddSubscribedComments(t ...*ThreadComment) *UserCreate {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
 	}
 	return uc.AddSubscribedCommentIDs(ids...)
 }
@@ -340,11 +326,6 @@ func (uc *UserCreate) check() error {
 	if _, ok := uc.mutation.Password(); !ok {
 		return &ValidationError{Name: "password", err: errors.New(`ent: missing required field "User.password"`)}
 	}
-	if v, ok := uc.mutation.DisplayName(); ok {
-		if err := user.DisplayNameValidator(v); err != nil {
-			return &ValidationError{Name: "displayName", err: fmt.Errorf(`ent: validator failed for field "User.displayName": %w`, err)}
-		}
-	}
 	if _, ok := uc.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "User.status"`)}
 	}
@@ -400,10 +381,6 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	if value, ok := uc.mutation.Password(); ok {
 		_spec.SetField(user.FieldPassword, field.TypeString, value)
 		_node.Password = value
-	}
-	if value, ok := uc.mutation.DisplayName(); ok {
-		_spec.SetField(user.FieldDisplayName, field.TypeString, value)
-		_node.DisplayName = value
 	}
 	if value, ok := uc.mutation.AvatarUrl(); ok {
 		_spec.SetField(user.FieldAvatarUrl, field.TypeString, value)
@@ -465,7 +442,7 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Columns: []string{user.CommentsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -521,7 +498,7 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Columns: user.LikedCommentsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -581,7 +558,7 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Columns: user.SubscribedCommentsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

@@ -52,10 +52,7 @@ func (ds *UserDatasource) Create(ctx context.Context, u *model.User) (*model.Use
 		SetPassword(u.Password).
 		SetStatus(u.Status.ToInt()).
 		SetRole(u.Role.ToInt())
-	if u.DisplayName != nil {
-		userBuilder.SetDisplayName(*u.DisplayName)
-	}
-	if u.DisplayName != nil {
+	if u.AvatarUrl != nil {
 		userBuilder.SetAvatarUrl(*u.AvatarUrl)
 	}
 

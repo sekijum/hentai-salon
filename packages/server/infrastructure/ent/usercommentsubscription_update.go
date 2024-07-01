@@ -6,8 +6,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"server/infrastructure/ent/comment"
 	"server/infrastructure/ent/predicate"
+	"server/infrastructure/ent/threadcomment"
 	"server/infrastructure/ent/user"
 	"server/infrastructure/ent/usercommentsubscription"
 	"time"
@@ -111,15 +111,15 @@ func (ucsu *UserCommentSubscriptionUpdate) SetUser(u *User) *UserCommentSubscrip
 	return ucsu.SetUserID(u.ID)
 }
 
-// SetCommentID sets the "comment" edge to the Comment entity by ID.
+// SetCommentID sets the "comment" edge to the ThreadComment entity by ID.
 func (ucsu *UserCommentSubscriptionUpdate) SetCommentID(id int) *UserCommentSubscriptionUpdate {
 	ucsu.mutation.SetCommentID(id)
 	return ucsu
 }
 
-// SetComment sets the "comment" edge to the Comment entity.
-func (ucsu *UserCommentSubscriptionUpdate) SetComment(c *Comment) *UserCommentSubscriptionUpdate {
-	return ucsu.SetCommentID(c.ID)
+// SetComment sets the "comment" edge to the ThreadComment entity.
+func (ucsu *UserCommentSubscriptionUpdate) SetComment(t *ThreadComment) *UserCommentSubscriptionUpdate {
+	return ucsu.SetCommentID(t.ID)
 }
 
 // Mutation returns the UserCommentSubscriptionMutation object of the builder.
@@ -133,7 +133,7 @@ func (ucsu *UserCommentSubscriptionUpdate) ClearUser() *UserCommentSubscriptionU
 	return ucsu
 }
 
-// ClearComment clears the "comment" edge to the Comment entity.
+// ClearComment clears the "comment" edge to the ThreadComment entity.
 func (ucsu *UserCommentSubscriptionUpdate) ClearComment() *UserCommentSubscriptionUpdate {
 	ucsu.mutation.ClearComment()
 	return ucsu
@@ -235,7 +235,7 @@ func (ucsu *UserCommentSubscriptionUpdate) sqlSave(ctx context.Context) (n int, 
 			Columns: []string{usercommentsubscription.CommentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -248,7 +248,7 @@ func (ucsu *UserCommentSubscriptionUpdate) sqlSave(ctx context.Context) (n int, 
 			Columns: []string{usercommentsubscription.CommentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -357,15 +357,15 @@ func (ucsuo *UserCommentSubscriptionUpdateOne) SetUser(u *User) *UserCommentSubs
 	return ucsuo.SetUserID(u.ID)
 }
 
-// SetCommentID sets the "comment" edge to the Comment entity by ID.
+// SetCommentID sets the "comment" edge to the ThreadComment entity by ID.
 func (ucsuo *UserCommentSubscriptionUpdateOne) SetCommentID(id int) *UserCommentSubscriptionUpdateOne {
 	ucsuo.mutation.SetCommentID(id)
 	return ucsuo
 }
 
-// SetComment sets the "comment" edge to the Comment entity.
-func (ucsuo *UserCommentSubscriptionUpdateOne) SetComment(c *Comment) *UserCommentSubscriptionUpdateOne {
-	return ucsuo.SetCommentID(c.ID)
+// SetComment sets the "comment" edge to the ThreadComment entity.
+func (ucsuo *UserCommentSubscriptionUpdateOne) SetComment(t *ThreadComment) *UserCommentSubscriptionUpdateOne {
+	return ucsuo.SetCommentID(t.ID)
 }
 
 // Mutation returns the UserCommentSubscriptionMutation object of the builder.
@@ -379,7 +379,7 @@ func (ucsuo *UserCommentSubscriptionUpdateOne) ClearUser() *UserCommentSubscript
 	return ucsuo
 }
 
-// ClearComment clears the "comment" edge to the Comment entity.
+// ClearComment clears the "comment" edge to the ThreadComment entity.
 func (ucsuo *UserCommentSubscriptionUpdateOne) ClearComment() *UserCommentSubscriptionUpdateOne {
 	ucsuo.mutation.ClearComment()
 	return ucsuo
@@ -513,7 +513,7 @@ func (ucsuo *UserCommentSubscriptionUpdateOne) sqlSave(ctx context.Context) (_no
 			Columns: []string{usercommentsubscription.CommentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -526,7 +526,7 @@ func (ucsuo *UserCommentSubscriptionUpdateOne) sqlSave(ctx context.Context) (_no
 			Columns: []string{usercommentsubscription.CommentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

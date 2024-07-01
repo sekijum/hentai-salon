@@ -23,13 +23,11 @@ type User struct {
 	Email string `json:"email,omitempty"`
 	// Password holds the value of the "password" field.
 	Password string `json:"password,omitempty"`
-	// DisplayName holds the value of the "displayName" field.
-	DisplayName string `json:"displayName,omitempty"`
 	// AvatarUrl holds the value of the "avatarUrl" field.
 	AvatarUrl string `json:"avatarUrl,omitempty"`
-	// Status holds the value of the "status" field.
+	// 0: Active, 1: Withdrawn, 2: Suspended, 2: Inactive
 	Status int `json:"status,omitempty"`
-	// Role holds the value of the "role" field.
+	// 0: Member, 1: Admin
 	Role int `json:"role,omitempty"`
 	// CreatedAt holds the value of the "createdAt" field.
 	CreatedAt time.Time `json:"createdAt,omitempty"`
@@ -48,19 +46,19 @@ type UserEdges struct {
 	// Threads holds the value of the threads edge.
 	Threads []*Thread `json:"threads,omitempty"`
 	// Comments holds the value of the comments edge.
-	Comments []*Comment `json:"comments,omitempty"`
+	Comments []*ThreadComment `json:"comments,omitempty"`
 	// LikedBoards holds the value of the liked_boards edge.
 	LikedBoards []*Board `json:"liked_boards,omitempty"`
 	// LikedThreads holds the value of the liked_threads edge.
 	LikedThreads []*Thread `json:"liked_threads,omitempty"`
 	// LikedComments holds the value of the liked_comments edge.
-	LikedComments []*Comment `json:"liked_comments,omitempty"`
+	LikedComments []*ThreadComment `json:"liked_comments,omitempty"`
 	// SubscribedBoards holds the value of the subscribed_boards edge.
 	SubscribedBoards []*Board `json:"subscribed_boards,omitempty"`
 	// SubscribedThreads holds the value of the subscribed_threads edge.
 	SubscribedThreads []*Thread `json:"subscribed_threads,omitempty"`
 	// SubscribedComments holds the value of the subscribed_comments edge.
-	SubscribedComments []*Comment `json:"subscribed_comments,omitempty"`
+	SubscribedComments []*ThreadComment `json:"subscribed_comments,omitempty"`
 	// UserBoardLike holds the value of the user_board_like edge.
 	UserBoardLike []*UserBoardLike `json:"user_board_like,omitempty"`
 	// UserThreadLike holds the value of the user_thread_like edge.
@@ -98,7 +96,7 @@ func (e UserEdges) ThreadsOrErr() ([]*Thread, error) {
 
 // CommentsOrErr returns the Comments value or an error if the edge
 // was not loaded in eager-loading.
-func (e UserEdges) CommentsOrErr() ([]*Comment, error) {
+func (e UserEdges) CommentsOrErr() ([]*ThreadComment, error) {
 	if e.loadedTypes[2] {
 		return e.Comments, nil
 	}
@@ -125,7 +123,7 @@ func (e UserEdges) LikedThreadsOrErr() ([]*Thread, error) {
 
 // LikedCommentsOrErr returns the LikedComments value or an error if the edge
 // was not loaded in eager-loading.
-func (e UserEdges) LikedCommentsOrErr() ([]*Comment, error) {
+func (e UserEdges) LikedCommentsOrErr() ([]*ThreadComment, error) {
 	if e.loadedTypes[5] {
 		return e.LikedComments, nil
 	}
@@ -152,7 +150,7 @@ func (e UserEdges) SubscribedThreadsOrErr() ([]*Thread, error) {
 
 // SubscribedCommentsOrErr returns the SubscribedComments value or an error if the edge
 // was not loaded in eager-loading.
-func (e UserEdges) SubscribedCommentsOrErr() ([]*Comment, error) {
+func (e UserEdges) SubscribedCommentsOrErr() ([]*ThreadComment, error) {
 	if e.loadedTypes[8] {
 		return e.SubscribedComments, nil
 	}
@@ -220,7 +218,7 @@ func (*User) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case user.FieldID, user.FieldStatus, user.FieldRole:
 			values[i] = new(sql.NullInt64)
-		case user.FieldName, user.FieldEmail, user.FieldPassword, user.FieldDisplayName, user.FieldAvatarUrl:
+		case user.FieldName, user.FieldEmail, user.FieldPassword, user.FieldAvatarUrl:
 			values[i] = new(sql.NullString)
 		case user.FieldCreatedAt, user.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -262,12 +260,6 @@ func (u *User) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field password", values[i])
 			} else if value.Valid {
 				u.Password = value.String
-			}
-		case user.FieldDisplayName:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field displayName", values[i])
-			} else if value.Valid {
-				u.DisplayName = value.String
 			}
 		case user.FieldAvatarUrl:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -323,7 +315,7 @@ func (u *User) QueryThreads() *ThreadQuery {
 }
 
 // QueryComments queries the "comments" edge of the User entity.
-func (u *User) QueryComments() *CommentQuery {
+func (u *User) QueryComments() *ThreadCommentQuery {
 	return NewUserClient(u.config).QueryComments(u)
 }
 
@@ -338,7 +330,7 @@ func (u *User) QueryLikedThreads() *ThreadQuery {
 }
 
 // QueryLikedComments queries the "liked_comments" edge of the User entity.
-func (u *User) QueryLikedComments() *CommentQuery {
+func (u *User) QueryLikedComments() *ThreadCommentQuery {
 	return NewUserClient(u.config).QueryLikedComments(u)
 }
 
@@ -353,7 +345,7 @@ func (u *User) QuerySubscribedThreads() *ThreadQuery {
 }
 
 // QuerySubscribedComments queries the "subscribed_comments" edge of the User entity.
-func (u *User) QuerySubscribedComments() *CommentQuery {
+func (u *User) QuerySubscribedComments() *ThreadCommentQuery {
 	return NewUserClient(u.config).QuerySubscribedComments(u)
 }
 
@@ -418,9 +410,6 @@ func (u *User) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("password=")
 	builder.WriteString(u.Password)
-	builder.WriteString(", ")
-	builder.WriteString("displayName=")
-	builder.WriteString(u.DisplayName)
 	builder.WriteString(", ")
 	builder.WriteString("avatarUrl=")
 	builder.WriteString(u.AvatarUrl)

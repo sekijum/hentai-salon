@@ -170,7 +170,7 @@ func HasComment() predicate.UserCommentSubscription {
 }
 
 // HasCommentWith applies the HasEdge predicate on the "comment" edge with a given conditions (other predicates).
-func HasCommentWith(preds ...predicate.Comment) predicate.UserCommentSubscription {
+func HasCommentWith(preds ...predicate.ThreadComment) predicate.UserCommentSubscription {
 	return predicate.UserCommentSubscription(func(s *sql.Selector) {
 		step := newCommentStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {

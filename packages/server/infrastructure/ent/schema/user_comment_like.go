@@ -1,11 +1,12 @@
 package schema
 
 import (
-    "time"
-    "entgo.io/ent"
-    "entgo.io/ent/schema/field"
-    "entgo.io/ent/schema/edge"
-    "entgo.io/ent/schema"
+	"time"
+
+	"entgo.io/ent"
+	"entgo.io/ent/schema"
+	"entgo.io/ent/schema/edge"
+	"entgo.io/ent/schema/field"
 )
 
 type UserCommentLike struct {
@@ -29,6 +30,6 @@ func (UserCommentLike) Fields() []ent.Field {
 func (UserCommentLike) Edges() []ent.Edge {
     return []ent.Edge{
         edge.To("user", User.Type).Unique().Required().Field("userId"),
-        edge.To("comment", Comment.Type).Unique().Required().Field("commentId"),
+        edge.To("comment", ThreadComment.Type).Unique().Required().Field("commentId"),
     }
 }

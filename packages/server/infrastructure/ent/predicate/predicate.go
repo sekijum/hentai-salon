@@ -9,20 +9,20 @@ import (
 // Board is the predicate function for board builders.
 type Board func(*sql.Selector)
 
-// Comment is the predicate function for comment builders.
-type Comment func(*sql.Selector)
-
-// CommentAttachment is the predicate function for commentattachment builders.
-type CommentAttachment func(*sql.Selector)
+// Tag is the predicate function for tag builders.
+type Tag func(*sql.Selector)
 
 // Thread is the predicate function for thread builders.
 type Thread func(*sql.Selector)
 
+// ThreadComment is the predicate function for threadcomment builders.
+type ThreadComment func(*sql.Selector)
+
+// ThreadCommentAttachment is the predicate function for threadcommentattachment builders.
+type ThreadCommentAttachment func(*sql.Selector)
+
 // ThreadTag is the predicate function for threadtag builders.
 type ThreadTag func(*sql.Selector)
-
-// ThreadTagging is the predicate function for threadtagging builders.
-type ThreadTagging func(*sql.Selector)
 
 // User is the predicate function for user builders.
 type User func(*sql.Selector)

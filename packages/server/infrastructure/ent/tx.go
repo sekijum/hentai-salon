@@ -14,16 +14,16 @@ type Tx struct {
 	config
 	// Board is the client for interacting with the Board builders.
 	Board *BoardClient
-	// Comment is the client for interacting with the Comment builders.
-	Comment *CommentClient
-	// CommentAttachment is the client for interacting with the CommentAttachment builders.
-	CommentAttachment *CommentAttachmentClient
+	// Tag is the client for interacting with the Tag builders.
+	Tag *TagClient
 	// Thread is the client for interacting with the Thread builders.
 	Thread *ThreadClient
+	// ThreadComment is the client for interacting with the ThreadComment builders.
+	ThreadComment *ThreadCommentClient
+	// ThreadCommentAttachment is the client for interacting with the ThreadCommentAttachment builders.
+	ThreadCommentAttachment *ThreadCommentAttachmentClient
 	// ThreadTag is the client for interacting with the ThreadTag builders.
 	ThreadTag *ThreadTagClient
-	// ThreadTagging is the client for interacting with the ThreadTagging builders.
-	ThreadTagging *ThreadTaggingClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 	// UserBoardLike is the client for interacting with the UserBoardLike builders.
@@ -170,11 +170,11 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.Board = NewBoardClient(tx.config)
-	tx.Comment = NewCommentClient(tx.config)
-	tx.CommentAttachment = NewCommentAttachmentClient(tx.config)
+	tx.Tag = NewTagClient(tx.config)
 	tx.Thread = NewThreadClient(tx.config)
+	tx.ThreadComment = NewThreadCommentClient(tx.config)
+	tx.ThreadCommentAttachment = NewThreadCommentAttachmentClient(tx.config)
 	tx.ThreadTag = NewThreadTagClient(tx.config)
-	tx.ThreadTagging = NewThreadTaggingClient(tx.config)
 	tx.User = NewUserClient(tx.config)
 	tx.UserBoardLike = NewUserBoardLikeClient(tx.config)
 	tx.UserBoardSubscription = NewUserBoardSubscriptionClient(tx.config)

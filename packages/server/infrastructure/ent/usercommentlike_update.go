@@ -6,8 +6,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"server/infrastructure/ent/comment"
 	"server/infrastructure/ent/predicate"
+	"server/infrastructure/ent/threadcomment"
 	"server/infrastructure/ent/user"
 	"server/infrastructure/ent/usercommentlike"
 	"time"
@@ -83,15 +83,15 @@ func (uclu *UserCommentLikeUpdate) SetUser(u *User) *UserCommentLikeUpdate {
 	return uclu.SetUserID(u.ID)
 }
 
-// SetCommentID sets the "comment" edge to the Comment entity by ID.
+// SetCommentID sets the "comment" edge to the ThreadComment entity by ID.
 func (uclu *UserCommentLikeUpdate) SetCommentID(id int) *UserCommentLikeUpdate {
 	uclu.mutation.SetCommentID(id)
 	return uclu
 }
 
-// SetComment sets the "comment" edge to the Comment entity.
-func (uclu *UserCommentLikeUpdate) SetComment(c *Comment) *UserCommentLikeUpdate {
-	return uclu.SetCommentID(c.ID)
+// SetComment sets the "comment" edge to the ThreadComment entity.
+func (uclu *UserCommentLikeUpdate) SetComment(t *ThreadComment) *UserCommentLikeUpdate {
+	return uclu.SetCommentID(t.ID)
 }
 
 // Mutation returns the UserCommentLikeMutation object of the builder.
@@ -105,7 +105,7 @@ func (uclu *UserCommentLikeUpdate) ClearUser() *UserCommentLikeUpdate {
 	return uclu
 }
 
-// ClearComment clears the "comment" edge to the Comment entity.
+// ClearComment clears the "comment" edge to the ThreadComment entity.
 func (uclu *UserCommentLikeUpdate) ClearComment() *UserCommentLikeUpdate {
 	uclu.mutation.ClearComment()
 	return uclu
@@ -201,7 +201,7 @@ func (uclu *UserCommentLikeUpdate) sqlSave(ctx context.Context) (n int, err erro
 			Columns: []string{usercommentlike.CommentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -214,7 +214,7 @@ func (uclu *UserCommentLikeUpdate) sqlSave(ctx context.Context) (n int, err erro
 			Columns: []string{usercommentlike.CommentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -295,15 +295,15 @@ func (ucluo *UserCommentLikeUpdateOne) SetUser(u *User) *UserCommentLikeUpdateOn
 	return ucluo.SetUserID(u.ID)
 }
 
-// SetCommentID sets the "comment" edge to the Comment entity by ID.
+// SetCommentID sets the "comment" edge to the ThreadComment entity by ID.
 func (ucluo *UserCommentLikeUpdateOne) SetCommentID(id int) *UserCommentLikeUpdateOne {
 	ucluo.mutation.SetCommentID(id)
 	return ucluo
 }
 
-// SetComment sets the "comment" edge to the Comment entity.
-func (ucluo *UserCommentLikeUpdateOne) SetComment(c *Comment) *UserCommentLikeUpdateOne {
-	return ucluo.SetCommentID(c.ID)
+// SetComment sets the "comment" edge to the ThreadComment entity.
+func (ucluo *UserCommentLikeUpdateOne) SetComment(t *ThreadComment) *UserCommentLikeUpdateOne {
+	return ucluo.SetCommentID(t.ID)
 }
 
 // Mutation returns the UserCommentLikeMutation object of the builder.
@@ -317,7 +317,7 @@ func (ucluo *UserCommentLikeUpdateOne) ClearUser() *UserCommentLikeUpdateOne {
 	return ucluo
 }
 
-// ClearComment clears the "comment" edge to the Comment entity.
+// ClearComment clears the "comment" edge to the ThreadComment entity.
 func (ucluo *UserCommentLikeUpdateOne) ClearComment() *UserCommentLikeUpdateOne {
 	ucluo.mutation.ClearComment()
 	return ucluo
@@ -445,7 +445,7 @@ func (ucluo *UserCommentLikeUpdateOne) sqlSave(ctx context.Context) (_node *User
 			Columns: []string{usercommentlike.CommentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -458,7 +458,7 @@ func (ucluo *UserCommentLikeUpdateOne) sqlSave(ctx context.Context) (_node *User
 			Columns: []string{usercommentlike.CommentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

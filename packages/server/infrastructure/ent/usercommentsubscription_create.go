@@ -6,7 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"server/infrastructure/ent/comment"
+	"server/infrastructure/ent/threadcomment"
 	"server/infrastructure/ent/user"
 	"server/infrastructure/ent/usercommentsubscription"
 	"time"
@@ -87,15 +87,15 @@ func (ucsc *UserCommentSubscriptionCreate) SetUser(u *User) *UserCommentSubscrip
 	return ucsc.SetUserID(u.ID)
 }
 
-// SetCommentID sets the "comment" edge to the Comment entity by ID.
+// SetCommentID sets the "comment" edge to the ThreadComment entity by ID.
 func (ucsc *UserCommentSubscriptionCreate) SetCommentID(id int) *UserCommentSubscriptionCreate {
 	ucsc.mutation.SetCommentID(id)
 	return ucsc
 }
 
-// SetComment sets the "comment" edge to the Comment entity.
-func (ucsc *UserCommentSubscriptionCreate) SetComment(c *Comment) *UserCommentSubscriptionCreate {
-	return ucsc.SetCommentID(c.ID)
+// SetComment sets the "comment" edge to the ThreadComment entity.
+func (ucsc *UserCommentSubscriptionCreate) SetComment(t *ThreadComment) *UserCommentSubscriptionCreate {
+	return ucsc.SetCommentID(t.ID)
 }
 
 // Mutation returns the UserCommentSubscriptionMutation object of the builder.
@@ -229,7 +229,7 @@ func (ucsc *UserCommentSubscriptionCreate) createSpec() (*UserCommentSubscriptio
 			Columns: []string{usercommentsubscription.CommentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

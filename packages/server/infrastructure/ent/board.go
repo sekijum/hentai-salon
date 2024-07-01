@@ -26,7 +26,7 @@ type Board struct {
 	Description string `json:"description,omitempty"`
 	// ThumbnailUrl holds the value of the "thumbnailUrl" field.
 	ThumbnailUrl string `json:"thumbnailUrl,omitempty"`
-	// Status holds the value of the "status" field.
+	// 0: Public, 1: Private, 3: Pending, 3: Archived
 	Status int `json:"status,omitempty"`
 	// CreatedAt holds the value of the "createdAt" field.
 	CreatedAt time.Time `json:"createdAt,omitempty"`

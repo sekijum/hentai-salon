@@ -6,8 +6,8 @@ import (
 	"context"
 	"fmt"
 	"math"
-	"server/infrastructure/ent/comment"
 	"server/infrastructure/ent/predicate"
+	"server/infrastructure/ent/threadcomment"
 	"server/infrastructure/ent/user"
 	"server/infrastructure/ent/usercommentsubscription"
 
@@ -23,7 +23,7 @@ type UserCommentSubscriptionQuery struct {
 	inters      []Interceptor
 	predicates  []predicate.UserCommentSubscription
 	withUser    *UserQuery
-	withComment *CommentQuery
+	withComment *ThreadCommentQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -83,8 +83,8 @@ func (ucsq *UserCommentSubscriptionQuery) QueryUser() *UserQuery {
 }
 
 // QueryComment chains the current query on the "comment" edge.
-func (ucsq *UserCommentSubscriptionQuery) QueryComment() *CommentQuery {
-	query := (&CommentClient{config: ucsq.config}).Query()
+func (ucsq *UserCommentSubscriptionQuery) QueryComment() *ThreadCommentQuery {
+	query := (&ThreadCommentClient{config: ucsq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := ucsq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -95,7 +95,7 @@ func (ucsq *UserCommentSubscriptionQuery) QueryComment() *CommentQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(usercommentsubscription.Table, usercommentsubscription.CommentColumn, selector),
-			sqlgraph.To(comment.Table, comment.FieldID),
+			sqlgraph.To(threadcomment.Table, threadcomment.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, usercommentsubscription.CommentTable, usercommentsubscription.CommentColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(ucsq.driver.Dialect(), step)
@@ -245,8 +245,8 @@ func (ucsq *UserCommentSubscriptionQuery) WithUser(opts ...func(*UserQuery)) *Us
 
 // WithComment tells the query-builder to eager-load the nodes that are connected to
 // the "comment" edge. The optional arguments are used to configure the query builder of the edge.
-func (ucsq *UserCommentSubscriptionQuery) WithComment(opts ...func(*CommentQuery)) *UserCommentSubscriptionQuery {
-	query := (&CommentClient{config: ucsq.config}).Query()
+func (ucsq *UserCommentSubscriptionQuery) WithComment(opts ...func(*ThreadCommentQuery)) *UserCommentSubscriptionQuery {
+	query := (&ThreadCommentClient{config: ucsq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -363,7 +363,7 @@ func (ucsq *UserCommentSubscriptionQuery) sqlAll(ctx context.Context, hooks ...q
 	}
 	if query := ucsq.withComment; query != nil {
 		if err := ucsq.loadComment(ctx, query, nodes, nil,
-			func(n *UserCommentSubscription, e *Comment) { n.Edges.Comment = e }); err != nil {
+			func(n *UserCommentSubscription, e *ThreadComment) { n.Edges.Comment = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -399,7 +399,7 @@ func (ucsq *UserCommentSubscriptionQuery) loadUser(ctx context.Context, query *U
 	}
 	return nil
 }
-func (ucsq *UserCommentSubscriptionQuery) loadComment(ctx context.Context, query *CommentQuery, nodes []*UserCommentSubscription, init func(*UserCommentSubscription), assign func(*UserCommentSubscription, *Comment)) error {
+func (ucsq *UserCommentSubscriptionQuery) loadComment(ctx context.Context, query *ThreadCommentQuery, nodes []*UserCommentSubscription, init func(*UserCommentSubscription), assign func(*UserCommentSubscription, *ThreadComment)) error {
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*UserCommentSubscription)
 	for i := range nodes {
@@ -412,7 +412,7 @@ func (ucsq *UserCommentSubscriptionQuery) loadComment(ctx context.Context, query
 	if len(ids) == 0 {
 		return nil
 	}
-	query.Where(comment.IDIn(ids...))
+	query.Where(threadcomment.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err

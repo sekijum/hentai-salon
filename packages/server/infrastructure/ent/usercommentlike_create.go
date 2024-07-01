@@ -6,7 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"server/infrastructure/ent/comment"
+	"server/infrastructure/ent/threadcomment"
 	"server/infrastructure/ent/user"
 	"server/infrastructure/ent/usercommentlike"
 	"time"
@@ -59,15 +59,15 @@ func (uclc *UserCommentLikeCreate) SetUser(u *User) *UserCommentLikeCreate {
 	return uclc.SetUserID(u.ID)
 }
 
-// SetCommentID sets the "comment" edge to the Comment entity by ID.
+// SetCommentID sets the "comment" edge to the ThreadComment entity by ID.
 func (uclc *UserCommentLikeCreate) SetCommentID(id int) *UserCommentLikeCreate {
 	uclc.mutation.SetCommentID(id)
 	return uclc
 }
 
-// SetComment sets the "comment" edge to the Comment entity.
-func (uclc *UserCommentLikeCreate) SetComment(c *Comment) *UserCommentLikeCreate {
-	return uclc.SetCommentID(c.ID)
+// SetComment sets the "comment" edge to the ThreadComment entity.
+func (uclc *UserCommentLikeCreate) SetComment(t *ThreadComment) *UserCommentLikeCreate {
+	return uclc.SetCommentID(t.ID)
 }
 
 // Mutation returns the UserCommentLikeMutation object of the builder.
@@ -179,7 +179,7 @@ func (uclc *UserCommentLikeCreate) createSpec() (*UserCommentLike, *sqlgraph.Cre
 			Columns: []string{usercommentlike.CommentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

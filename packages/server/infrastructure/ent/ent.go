@@ -8,11 +8,11 @@ import (
 	"fmt"
 	"reflect"
 	"server/infrastructure/ent/board"
-	"server/infrastructure/ent/comment"
-	"server/infrastructure/ent/commentattachment"
+	"server/infrastructure/ent/tag"
 	"server/infrastructure/ent/thread"
+	"server/infrastructure/ent/threadcomment"
+	"server/infrastructure/ent/threadcommentattachment"
 	"server/infrastructure/ent/threadtag"
-	"server/infrastructure/ent/threadtagging"
 	"server/infrastructure/ent/user"
 	"server/infrastructure/ent/userboardlike"
 	"server/infrastructure/ent/userboardsubscription"
@@ -86,11 +86,11 @@ func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
 			board.Table:                   board.ValidColumn,
-			comment.Table:                 comment.ValidColumn,
-			commentattachment.Table:       commentattachment.ValidColumn,
+			tag.Table:                     tag.ValidColumn,
 			thread.Table:                  thread.ValidColumn,
+			threadcomment.Table:           threadcomment.ValidColumn,
+			threadcommentattachment.Table: threadcommentattachment.ValidColumn,
 			threadtag.Table:               threadtag.ValidColumn,
-			threadtagging.Table:           threadtagging.ValidColumn,
 			user.Table:                    user.ValidColumn,
 			userboardlike.Table:           userboardlike.ValidColumn,
 			userboardsubscription.Table:   userboardsubscription.ValidColumn,

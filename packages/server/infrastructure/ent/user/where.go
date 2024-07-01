@@ -70,11 +70,6 @@ func Password(v string) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldPassword, v))
 }
 
-// DisplayName applies equality check predicate on the "displayName" field. It's identical to DisplayNameEQ.
-func DisplayName(v string) predicate.User {
-	return predicate.User(sql.FieldEQ(FieldDisplayName, v))
-}
-
 // AvatarUrl applies equality check predicate on the "avatarUrl" field. It's identical to AvatarUrlEQ.
 func AvatarUrl(v string) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldAvatarUrl, v))
@@ -293,81 +288,6 @@ func PasswordEqualFold(v string) predicate.User {
 // PasswordContainsFold applies the ContainsFold predicate on the "password" field.
 func PasswordContainsFold(v string) predicate.User {
 	return predicate.User(sql.FieldContainsFold(FieldPassword, v))
-}
-
-// DisplayNameEQ applies the EQ predicate on the "displayName" field.
-func DisplayNameEQ(v string) predicate.User {
-	return predicate.User(sql.FieldEQ(FieldDisplayName, v))
-}
-
-// DisplayNameNEQ applies the NEQ predicate on the "displayName" field.
-func DisplayNameNEQ(v string) predicate.User {
-	return predicate.User(sql.FieldNEQ(FieldDisplayName, v))
-}
-
-// DisplayNameIn applies the In predicate on the "displayName" field.
-func DisplayNameIn(vs ...string) predicate.User {
-	return predicate.User(sql.FieldIn(FieldDisplayName, vs...))
-}
-
-// DisplayNameNotIn applies the NotIn predicate on the "displayName" field.
-func DisplayNameNotIn(vs ...string) predicate.User {
-	return predicate.User(sql.FieldNotIn(FieldDisplayName, vs...))
-}
-
-// DisplayNameGT applies the GT predicate on the "displayName" field.
-func DisplayNameGT(v string) predicate.User {
-	return predicate.User(sql.FieldGT(FieldDisplayName, v))
-}
-
-// DisplayNameGTE applies the GTE predicate on the "displayName" field.
-func DisplayNameGTE(v string) predicate.User {
-	return predicate.User(sql.FieldGTE(FieldDisplayName, v))
-}
-
-// DisplayNameLT applies the LT predicate on the "displayName" field.
-func DisplayNameLT(v string) predicate.User {
-	return predicate.User(sql.FieldLT(FieldDisplayName, v))
-}
-
-// DisplayNameLTE applies the LTE predicate on the "displayName" field.
-func DisplayNameLTE(v string) predicate.User {
-	return predicate.User(sql.FieldLTE(FieldDisplayName, v))
-}
-
-// DisplayNameContains applies the Contains predicate on the "displayName" field.
-func DisplayNameContains(v string) predicate.User {
-	return predicate.User(sql.FieldContains(FieldDisplayName, v))
-}
-
-// DisplayNameHasPrefix applies the HasPrefix predicate on the "displayName" field.
-func DisplayNameHasPrefix(v string) predicate.User {
-	return predicate.User(sql.FieldHasPrefix(FieldDisplayName, v))
-}
-
-// DisplayNameHasSuffix applies the HasSuffix predicate on the "displayName" field.
-func DisplayNameHasSuffix(v string) predicate.User {
-	return predicate.User(sql.FieldHasSuffix(FieldDisplayName, v))
-}
-
-// DisplayNameIsNil applies the IsNil predicate on the "displayName" field.
-func DisplayNameIsNil() predicate.User {
-	return predicate.User(sql.FieldIsNull(FieldDisplayName))
-}
-
-// DisplayNameNotNil applies the NotNil predicate on the "displayName" field.
-func DisplayNameNotNil() predicate.User {
-	return predicate.User(sql.FieldNotNull(FieldDisplayName))
-}
-
-// DisplayNameEqualFold applies the EqualFold predicate on the "displayName" field.
-func DisplayNameEqualFold(v string) predicate.User {
-	return predicate.User(sql.FieldEqualFold(FieldDisplayName, v))
-}
-
-// DisplayNameContainsFold applies the ContainsFold predicate on the "displayName" field.
-func DisplayNameContainsFold(v string) predicate.User {
-	return predicate.User(sql.FieldContainsFold(FieldDisplayName, v))
 }
 
 // AvatarUrlEQ applies the EQ predicate on the "avatarUrl" field.
@@ -663,7 +583,7 @@ func HasComments() predicate.User {
 }
 
 // HasCommentsWith applies the HasEdge predicate on the "comments" edge with a given conditions (other predicates).
-func HasCommentsWith(preds ...predicate.Comment) predicate.User {
+func HasCommentsWith(preds ...predicate.ThreadComment) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		step := newCommentsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
@@ -732,7 +652,7 @@ func HasLikedComments() predicate.User {
 }
 
 // HasLikedCommentsWith applies the HasEdge predicate on the "liked_comments" edge with a given conditions (other predicates).
-func HasLikedCommentsWith(preds ...predicate.Comment) predicate.User {
+func HasLikedCommentsWith(preds ...predicate.ThreadComment) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		step := newLikedCommentsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
@@ -801,7 +721,7 @@ func HasSubscribedComments() predicate.User {
 }
 
 // HasSubscribedCommentsWith applies the HasEdge predicate on the "subscribed_comments" edge with a given conditions (other predicates).
-func HasSubscribedCommentsWith(preds ...predicate.Comment) predicate.User {
+func HasSubscribedCommentsWith(preds ...predicate.ThreadComment) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		step := newSubscribedCommentsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {

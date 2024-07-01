@@ -12,11 +12,11 @@ import (
 	"server/infrastructure/ent/migrate"
 
 	"server/infrastructure/ent/board"
-	"server/infrastructure/ent/comment"
-	"server/infrastructure/ent/commentattachment"
+	"server/infrastructure/ent/tag"
 	"server/infrastructure/ent/thread"
+	"server/infrastructure/ent/threadcomment"
+	"server/infrastructure/ent/threadcommentattachment"
 	"server/infrastructure/ent/threadtag"
-	"server/infrastructure/ent/threadtagging"
 	"server/infrastructure/ent/user"
 	"server/infrastructure/ent/userboardlike"
 	"server/infrastructure/ent/userboardsubscription"
@@ -38,16 +38,16 @@ type Client struct {
 	Schema *migrate.Schema
 	// Board is the client for interacting with the Board builders.
 	Board *BoardClient
-	// Comment is the client for interacting with the Comment builders.
-	Comment *CommentClient
-	// CommentAttachment is the client for interacting with the CommentAttachment builders.
-	CommentAttachment *CommentAttachmentClient
+	// Tag is the client for interacting with the Tag builders.
+	Tag *TagClient
 	// Thread is the client for interacting with the Thread builders.
 	Thread *ThreadClient
+	// ThreadComment is the client for interacting with the ThreadComment builders.
+	ThreadComment *ThreadCommentClient
+	// ThreadCommentAttachment is the client for interacting with the ThreadCommentAttachment builders.
+	ThreadCommentAttachment *ThreadCommentAttachmentClient
 	// ThreadTag is the client for interacting with the ThreadTag builders.
 	ThreadTag *ThreadTagClient
-	// ThreadTagging is the client for interacting with the ThreadTagging builders.
-	ThreadTagging *ThreadTaggingClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 	// UserBoardLike is the client for interacting with the UserBoardLike builders.
@@ -74,11 +74,11 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Board = NewBoardClient(c.config)
-	c.Comment = NewCommentClient(c.config)
-	c.CommentAttachment = NewCommentAttachmentClient(c.config)
+	c.Tag = NewTagClient(c.config)
 	c.Thread = NewThreadClient(c.config)
+	c.ThreadComment = NewThreadCommentClient(c.config)
+	c.ThreadCommentAttachment = NewThreadCommentAttachmentClient(c.config)
 	c.ThreadTag = NewThreadTagClient(c.config)
-	c.ThreadTagging = NewThreadTaggingClient(c.config)
 	c.User = NewUserClient(c.config)
 	c.UserBoardLike = NewUserBoardLikeClient(c.config)
 	c.UserBoardSubscription = NewUserBoardSubscriptionClient(c.config)
@@ -179,11 +179,11 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ctx:                     ctx,
 		config:                  cfg,
 		Board:                   NewBoardClient(cfg),
-		Comment:                 NewCommentClient(cfg),
-		CommentAttachment:       NewCommentAttachmentClient(cfg),
+		Tag:                     NewTagClient(cfg),
 		Thread:                  NewThreadClient(cfg),
+		ThreadComment:           NewThreadCommentClient(cfg),
+		ThreadCommentAttachment: NewThreadCommentAttachmentClient(cfg),
 		ThreadTag:               NewThreadTagClient(cfg),
-		ThreadTagging:           NewThreadTaggingClient(cfg),
 		User:                    NewUserClient(cfg),
 		UserBoardLike:           NewUserBoardLikeClient(cfg),
 		UserBoardSubscription:   NewUserBoardSubscriptionClient(cfg),
@@ -211,11 +211,11 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ctx:                     ctx,
 		config:                  cfg,
 		Board:                   NewBoardClient(cfg),
-		Comment:                 NewCommentClient(cfg),
-		CommentAttachment:       NewCommentAttachmentClient(cfg),
+		Tag:                     NewTagClient(cfg),
 		Thread:                  NewThreadClient(cfg),
+		ThreadComment:           NewThreadCommentClient(cfg),
+		ThreadCommentAttachment: NewThreadCommentAttachmentClient(cfg),
 		ThreadTag:               NewThreadTagClient(cfg),
-		ThreadTagging:           NewThreadTaggingClient(cfg),
 		User:                    NewUserClient(cfg),
 		UserBoardLike:           NewUserBoardLikeClient(cfg),
 		UserBoardSubscription:   NewUserBoardSubscriptionClient(cfg),
@@ -252,9 +252,10 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.Board, c.Comment, c.CommentAttachment, c.Thread, c.ThreadTag, c.ThreadTagging,
-		c.User, c.UserBoardLike, c.UserBoardSubscription, c.UserCommentLike,
-		c.UserCommentSubscription, c.UserThreadLike, c.UserThreadSubscription,
+		c.Board, c.Tag, c.Thread, c.ThreadComment, c.ThreadCommentAttachment,
+		c.ThreadTag, c.User, c.UserBoardLike, c.UserBoardSubscription,
+		c.UserCommentLike, c.UserCommentSubscription, c.UserThreadLike,
+		c.UserThreadSubscription,
 	} {
 		n.Use(hooks...)
 	}
@@ -264,9 +265,10 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.Board, c.Comment, c.CommentAttachment, c.Thread, c.ThreadTag, c.ThreadTagging,
-		c.User, c.UserBoardLike, c.UserBoardSubscription, c.UserCommentLike,
-		c.UserCommentSubscription, c.UserThreadLike, c.UserThreadSubscription,
+		c.Board, c.Tag, c.Thread, c.ThreadComment, c.ThreadCommentAttachment,
+		c.ThreadTag, c.User, c.UserBoardLike, c.UserBoardSubscription,
+		c.UserCommentLike, c.UserCommentSubscription, c.UserThreadLike,
+		c.UserThreadSubscription,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -277,16 +279,16 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
 	case *BoardMutation:
 		return c.Board.mutate(ctx, m)
-	case *CommentMutation:
-		return c.Comment.mutate(ctx, m)
-	case *CommentAttachmentMutation:
-		return c.CommentAttachment.mutate(ctx, m)
+	case *TagMutation:
+		return c.Tag.mutate(ctx, m)
 	case *ThreadMutation:
 		return c.Thread.mutate(ctx, m)
+	case *ThreadCommentMutation:
+		return c.ThreadComment.mutate(ctx, m)
+	case *ThreadCommentAttachmentMutation:
+		return c.ThreadCommentAttachment.mutate(ctx, m)
 	case *ThreadTagMutation:
 		return c.ThreadTag.mutate(ctx, m)
-	case *ThreadTaggingMutation:
-		return c.ThreadTagging.mutate(ctx, m)
 	case *UserMutation:
 		return c.User.mutate(ctx, m)
 	case *UserBoardLikeMutation:
@@ -535,107 +537,107 @@ func (c *BoardClient) mutate(ctx context.Context, m *BoardMutation) (Value, erro
 	}
 }
 
-// CommentClient is a client for the Comment schema.
-type CommentClient struct {
+// TagClient is a client for the Tag schema.
+type TagClient struct {
 	config
 }
 
-// NewCommentClient returns a client for the Comment from the given config.
-func NewCommentClient(c config) *CommentClient {
-	return &CommentClient{config: c}
+// NewTagClient returns a client for the Tag from the given config.
+func NewTagClient(c config) *TagClient {
+	return &TagClient{config: c}
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `comment.Hooks(f(g(h())))`.
-func (c *CommentClient) Use(hooks ...Hook) {
-	c.hooks.Comment = append(c.hooks.Comment, hooks...)
+// A call to `Use(f, g, h)` equals to `tag.Hooks(f(g(h())))`.
+func (c *TagClient) Use(hooks ...Hook) {
+	c.hooks.Tag = append(c.hooks.Tag, hooks...)
 }
 
 // Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `comment.Intercept(f(g(h())))`.
-func (c *CommentClient) Intercept(interceptors ...Interceptor) {
-	c.inters.Comment = append(c.inters.Comment, interceptors...)
+// A call to `Intercept(f, g, h)` equals to `tag.Intercept(f(g(h())))`.
+func (c *TagClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Tag = append(c.inters.Tag, interceptors...)
 }
 
-// Create returns a builder for creating a Comment entity.
-func (c *CommentClient) Create() *CommentCreate {
-	mutation := newCommentMutation(c.config, OpCreate)
-	return &CommentCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Create returns a builder for creating a Tag entity.
+func (c *TagClient) Create() *TagCreate {
+	mutation := newTagMutation(c.config, OpCreate)
+	return &TagCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// CreateBulk returns a builder for creating a bulk of Comment entities.
-func (c *CommentClient) CreateBulk(builders ...*CommentCreate) *CommentCreateBulk {
-	return &CommentCreateBulk{config: c.config, builders: builders}
+// CreateBulk returns a builder for creating a bulk of Tag entities.
+func (c *TagClient) CreateBulk(builders ...*TagCreate) *TagCreateBulk {
+	return &TagCreateBulk{config: c.config, builders: builders}
 }
 
 // MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
 // a builder and applies setFunc on it.
-func (c *CommentClient) MapCreateBulk(slice any, setFunc func(*CommentCreate, int)) *CommentCreateBulk {
+func (c *TagClient) MapCreateBulk(slice any, setFunc func(*TagCreate, int)) *TagCreateBulk {
 	rv := reflect.ValueOf(slice)
 	if rv.Kind() != reflect.Slice {
-		return &CommentCreateBulk{err: fmt.Errorf("calling to CommentClient.MapCreateBulk with wrong type %T, need slice", slice)}
+		return &TagCreateBulk{err: fmt.Errorf("calling to TagClient.MapCreateBulk with wrong type %T, need slice", slice)}
 	}
-	builders := make([]*CommentCreate, rv.Len())
+	builders := make([]*TagCreate, rv.Len())
 	for i := 0; i < rv.Len(); i++ {
 		builders[i] = c.Create()
 		setFunc(builders[i], i)
 	}
-	return &CommentCreateBulk{config: c.config, builders: builders}
+	return &TagCreateBulk{config: c.config, builders: builders}
 }
 
-// Update returns an update builder for Comment.
-func (c *CommentClient) Update() *CommentUpdate {
-	mutation := newCommentMutation(c.config, OpUpdate)
-	return &CommentUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Update returns an update builder for Tag.
+func (c *TagClient) Update() *TagUpdate {
+	mutation := newTagMutation(c.config, OpUpdate)
+	return &TagUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *CommentClient) UpdateOne(co *Comment) *CommentUpdateOne {
-	mutation := newCommentMutation(c.config, OpUpdateOne, withComment(co))
-	return &CommentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *TagClient) UpdateOne(t *Tag) *TagUpdateOne {
+	mutation := newTagMutation(c.config, OpUpdateOne, withTag(t))
+	return &TagUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *CommentClient) UpdateOneID(id int) *CommentUpdateOne {
-	mutation := newCommentMutation(c.config, OpUpdateOne, withCommentID(id))
-	return &CommentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *TagClient) UpdateOneID(id int) *TagUpdateOne {
+	mutation := newTagMutation(c.config, OpUpdateOne, withTagID(id))
+	return &TagUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Delete returns a delete builder for Comment.
-func (c *CommentClient) Delete() *CommentDelete {
-	mutation := newCommentMutation(c.config, OpDelete)
-	return &CommentDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Delete returns a delete builder for Tag.
+func (c *TagClient) Delete() *TagDelete {
+	mutation := newTagMutation(c.config, OpDelete)
+	return &TagDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *CommentClient) DeleteOne(co *Comment) *CommentDeleteOne {
-	return c.DeleteOneID(co.ID)
+func (c *TagClient) DeleteOne(t *Tag) *TagDeleteOne {
+	return c.DeleteOneID(t.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *CommentClient) DeleteOneID(id int) *CommentDeleteOne {
-	builder := c.Delete().Where(comment.ID(id))
+func (c *TagClient) DeleteOneID(id int) *TagDeleteOne {
+	builder := c.Delete().Where(tag.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
-	return &CommentDeleteOne{builder}
+	return &TagDeleteOne{builder}
 }
 
-// Query returns a query builder for Comment.
-func (c *CommentClient) Query() *CommentQuery {
-	return &CommentQuery{
+// Query returns a query builder for Tag.
+func (c *TagClient) Query() *TagQuery {
+	return &TagQuery{
 		config: c.config,
-		ctx:    &QueryContext{Type: TypeComment},
+		ctx:    &QueryContext{Type: TypeTag},
 		inters: c.Interceptors(),
 	}
 }
 
-// Get returns a Comment entity by its id.
-func (c *CommentClient) Get(ctx context.Context, id int) (*Comment, error) {
-	return c.Query().Where(comment.ID(id)).Only(ctx)
+// Get returns a Tag entity by its id.
+func (c *TagClient) Get(ctx context.Context, id int) (*Tag, error) {
+	return c.Query().Where(tag.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *CommentClient) GetX(ctx context.Context, id int) *Comment {
+func (c *TagClient) GetX(ctx context.Context, id int) *Tag {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -643,321 +645,60 @@ func (c *CommentClient) GetX(ctx context.Context, id int) *Comment {
 	return obj
 }
 
-// QueryThread queries the thread edge of a Comment.
-func (c *CommentClient) QueryThread(co *Comment) *ThreadQuery {
+// QueryThreads queries the threads edge of a Tag.
+func (c *TagClient) QueryThreads(t *Tag) *ThreadQuery {
 	query := (&ThreadClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := co.ID
+		id := t.ID
 		step := sqlgraph.NewStep(
-			sqlgraph.From(comment.Table, comment.FieldID, id),
+			sqlgraph.From(tag.Table, tag.FieldID, id),
 			sqlgraph.To(thread.Table, thread.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, comment.ThreadTable, comment.ThreadColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, tag.ThreadsTable, tag.ThreadsPrimaryKey...),
 		)
-		fromV = sqlgraph.Neighbors(co.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
-// QueryAuthor queries the author edge of a Comment.
-func (c *CommentClient) QueryAuthor(co *Comment) *UserQuery {
-	query := (&UserClient{config: c.config}).Query()
+// QueryThreadTags queries the thread_tags edge of a Tag.
+func (c *TagClient) QueryThreadTags(t *Tag) *ThreadTagQuery {
+	query := (&ThreadTagClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := co.ID
+		id := t.ID
 		step := sqlgraph.NewStep(
-			sqlgraph.From(comment.Table, comment.FieldID, id),
-			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, comment.AuthorTable, comment.AuthorColumn),
+			sqlgraph.From(tag.Table, tag.FieldID, id),
+			sqlgraph.To(threadtag.Table, threadtag.TagColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, tag.ThreadTagsTable, tag.ThreadTagsColumn),
 		)
-		fromV = sqlgraph.Neighbors(co.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryParentComment queries the parent_comment edge of a Comment.
-func (c *CommentClient) QueryParentComment(co *Comment) *CommentQuery {
-	query := (&CommentClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := co.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(comment.Table, comment.FieldID, id),
-			sqlgraph.To(comment.Table, comment.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, comment.ParentCommentTable, comment.ParentCommentColumn),
-		)
-		fromV = sqlgraph.Neighbors(co.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryReplies queries the replies edge of a Comment.
-func (c *CommentClient) QueryReplies(co *Comment) *CommentQuery {
-	query := (&CommentClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := co.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(comment.Table, comment.FieldID, id),
-			sqlgraph.To(comment.Table, comment.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, comment.RepliesTable, comment.RepliesColumn),
-		)
-		fromV = sqlgraph.Neighbors(co.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryCommentAttachments queries the comment_attachments edge of a Comment.
-func (c *CommentClient) QueryCommentAttachments(co *Comment) *CommentAttachmentQuery {
-	query := (&CommentAttachmentClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := co.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(comment.Table, comment.FieldID, id),
-			sqlgraph.To(commentattachment.Table, commentattachment.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, comment.CommentAttachmentsTable, comment.CommentAttachmentsColumn),
-		)
-		fromV = sqlgraph.Neighbors(co.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryLikedUsers queries the liked_users edge of a Comment.
-func (c *CommentClient) QueryLikedUsers(co *Comment) *UserQuery {
-	query := (&UserClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := co.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(comment.Table, comment.FieldID, id),
-			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, comment.LikedUsersTable, comment.LikedUsersPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(co.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QuerySubscribedUsers queries the subscribed_users edge of a Comment.
-func (c *CommentClient) QuerySubscribedUsers(co *Comment) *UserQuery {
-	query := (&UserClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := co.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(comment.Table, comment.FieldID, id),
-			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, comment.SubscribedUsersTable, comment.SubscribedUsersPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(co.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryUserCommentLike queries the user_comment_like edge of a Comment.
-func (c *CommentClient) QueryUserCommentLike(co *Comment) *UserCommentLikeQuery {
-	query := (&UserCommentLikeClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := co.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(comment.Table, comment.FieldID, id),
-			sqlgraph.To(usercommentlike.Table, usercommentlike.CommentColumn),
-			sqlgraph.Edge(sqlgraph.O2M, true, comment.UserCommentLikeTable, comment.UserCommentLikeColumn),
-		)
-		fromV = sqlgraph.Neighbors(co.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryUserCommentSubscription queries the user_comment_subscription edge of a Comment.
-func (c *CommentClient) QueryUserCommentSubscription(co *Comment) *UserCommentSubscriptionQuery {
-	query := (&UserCommentSubscriptionClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := co.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(comment.Table, comment.FieldID, id),
-			sqlgraph.To(usercommentsubscription.Table, usercommentsubscription.CommentColumn),
-			sqlgraph.Edge(sqlgraph.O2M, true, comment.UserCommentSubscriptionTable, comment.UserCommentSubscriptionColumn),
-		)
-		fromV = sqlgraph.Neighbors(co.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // Hooks returns the client hooks.
-func (c *CommentClient) Hooks() []Hook {
-	return c.hooks.Comment
+func (c *TagClient) Hooks() []Hook {
+	return c.hooks.Tag
 }
 
 // Interceptors returns the client interceptors.
-func (c *CommentClient) Interceptors() []Interceptor {
-	return c.inters.Comment
+func (c *TagClient) Interceptors() []Interceptor {
+	return c.inters.Tag
 }
 
-func (c *CommentClient) mutate(ctx context.Context, m *CommentMutation) (Value, error) {
+func (c *TagClient) mutate(ctx context.Context, m *TagMutation) (Value, error) {
 	switch m.Op() {
 	case OpCreate:
-		return (&CommentCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&TagCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdate:
-		return (&CommentUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&TagUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdateOne:
-		return (&CommentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&TagUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpDelete, OpDeleteOne:
-		return (&CommentDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+		return (&TagDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
-		return nil, fmt.Errorf("ent: unknown Comment mutation op: %q", m.Op())
-	}
-}
-
-// CommentAttachmentClient is a client for the CommentAttachment schema.
-type CommentAttachmentClient struct {
-	config
-}
-
-// NewCommentAttachmentClient returns a client for the CommentAttachment from the given config.
-func NewCommentAttachmentClient(c config) *CommentAttachmentClient {
-	return &CommentAttachmentClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `commentattachment.Hooks(f(g(h())))`.
-func (c *CommentAttachmentClient) Use(hooks ...Hook) {
-	c.hooks.CommentAttachment = append(c.hooks.CommentAttachment, hooks...)
-}
-
-// Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `commentattachment.Intercept(f(g(h())))`.
-func (c *CommentAttachmentClient) Intercept(interceptors ...Interceptor) {
-	c.inters.CommentAttachment = append(c.inters.CommentAttachment, interceptors...)
-}
-
-// Create returns a builder for creating a CommentAttachment entity.
-func (c *CommentAttachmentClient) Create() *CommentAttachmentCreate {
-	mutation := newCommentAttachmentMutation(c.config, OpCreate)
-	return &CommentAttachmentCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of CommentAttachment entities.
-func (c *CommentAttachmentClient) CreateBulk(builders ...*CommentAttachmentCreate) *CommentAttachmentCreateBulk {
-	return &CommentAttachmentCreateBulk{config: c.config, builders: builders}
-}
-
-// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
-// a builder and applies setFunc on it.
-func (c *CommentAttachmentClient) MapCreateBulk(slice any, setFunc func(*CommentAttachmentCreate, int)) *CommentAttachmentCreateBulk {
-	rv := reflect.ValueOf(slice)
-	if rv.Kind() != reflect.Slice {
-		return &CommentAttachmentCreateBulk{err: fmt.Errorf("calling to CommentAttachmentClient.MapCreateBulk with wrong type %T, need slice", slice)}
-	}
-	builders := make([]*CommentAttachmentCreate, rv.Len())
-	for i := 0; i < rv.Len(); i++ {
-		builders[i] = c.Create()
-		setFunc(builders[i], i)
-	}
-	return &CommentAttachmentCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for CommentAttachment.
-func (c *CommentAttachmentClient) Update() *CommentAttachmentUpdate {
-	mutation := newCommentAttachmentMutation(c.config, OpUpdate)
-	return &CommentAttachmentUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *CommentAttachmentClient) UpdateOne(ca *CommentAttachment) *CommentAttachmentUpdateOne {
-	mutation := newCommentAttachmentMutation(c.config, OpUpdateOne, withCommentAttachment(ca))
-	return &CommentAttachmentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *CommentAttachmentClient) UpdateOneID(id int) *CommentAttachmentUpdateOne {
-	mutation := newCommentAttachmentMutation(c.config, OpUpdateOne, withCommentAttachmentID(id))
-	return &CommentAttachmentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for CommentAttachment.
-func (c *CommentAttachmentClient) Delete() *CommentAttachmentDelete {
-	mutation := newCommentAttachmentMutation(c.config, OpDelete)
-	return &CommentAttachmentDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a builder for deleting the given entity.
-func (c *CommentAttachmentClient) DeleteOne(ca *CommentAttachment) *CommentAttachmentDeleteOne {
-	return c.DeleteOneID(ca.ID)
-}
-
-// DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *CommentAttachmentClient) DeleteOneID(id int) *CommentAttachmentDeleteOne {
-	builder := c.Delete().Where(commentattachment.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &CommentAttachmentDeleteOne{builder}
-}
-
-// Query returns a query builder for CommentAttachment.
-func (c *CommentAttachmentClient) Query() *CommentAttachmentQuery {
-	return &CommentAttachmentQuery{
-		config: c.config,
-		ctx:    &QueryContext{Type: TypeCommentAttachment},
-		inters: c.Interceptors(),
-	}
-}
-
-// Get returns a CommentAttachment entity by its id.
-func (c *CommentAttachmentClient) Get(ctx context.Context, id int) (*CommentAttachment, error) {
-	return c.Query().Where(commentattachment.ID(id)).Only(ctx)
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *CommentAttachmentClient) GetX(ctx context.Context, id int) *CommentAttachment {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
-}
-
-// QueryComment queries the comment edge of a CommentAttachment.
-func (c *CommentAttachmentClient) QueryComment(ca *CommentAttachment) *CommentQuery {
-	query := (&CommentClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := ca.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(commentattachment.Table, commentattachment.FieldID, id),
-			sqlgraph.To(comment.Table, comment.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, commentattachment.CommentTable, commentattachment.CommentColumn),
-		)
-		fromV = sqlgraph.Neighbors(ca.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// Hooks returns the client hooks.
-func (c *CommentAttachmentClient) Hooks() []Hook {
-	return c.hooks.CommentAttachment
-}
-
-// Interceptors returns the client interceptors.
-func (c *CommentAttachmentClient) Interceptors() []Interceptor {
-	return c.inters.CommentAttachment
-}
-
-func (c *CommentAttachmentClient) mutate(ctx context.Context, m *CommentAttachmentMutation) (Value, error) {
-	switch m.Op() {
-	case OpCreate:
-		return (&CommentAttachmentCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdate:
-		return (&CommentAttachmentUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdateOne:
-		return (&CommentAttachmentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpDelete, OpDeleteOne:
-		return (&CommentAttachmentDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
-	default:
-		return nil, fmt.Errorf("ent: unknown CommentAttachment mutation op: %q", m.Op())
+		return nil, fmt.Errorf("ent: unknown Tag mutation op: %q", m.Op())
 	}
 }
 
@@ -1102,13 +843,13 @@ func (c *ThreadClient) QueryOwner(t *Thread) *UserQuery {
 }
 
 // QueryComments queries the comments edge of a Thread.
-func (c *ThreadClient) QueryComments(t *Thread) *CommentQuery {
-	query := (&CommentClient{config: c.config}).Query()
+func (c *ThreadClient) QueryComments(t *Thread) *ThreadCommentQuery {
+	query := (&ThreadCommentClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := t.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(thread.Table, thread.FieldID, id),
-			sqlgraph.To(comment.Table, comment.FieldID),
+			sqlgraph.To(threadcomment.Table, threadcomment.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, thread.CommentsTable, thread.CommentsColumn),
 		)
 		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
@@ -1118,13 +859,13 @@ func (c *ThreadClient) QueryComments(t *Thread) *CommentQuery {
 }
 
 // QueryTags queries the tags edge of a Thread.
-func (c *ThreadClient) QueryTags(t *Thread) *ThreadTagQuery {
-	query := (&ThreadTagClient{config: c.config}).Query()
+func (c *ThreadClient) QueryTags(t *Thread) *TagQuery {
+	query := (&TagClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := t.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(thread.Table, thread.FieldID, id),
-			sqlgraph.To(threadtag.Table, threadtag.FieldID),
+			sqlgraph.To(tag.Table, tag.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, thread.TagsTable, thread.TagsPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
@@ -1165,15 +906,15 @@ func (c *ThreadClient) QuerySubscribedUsers(t *Thread) *UserQuery {
 	return query
 }
 
-// QueryThreadTaggings queries the thread_taggings edge of a Thread.
-func (c *ThreadClient) QueryThreadTaggings(t *Thread) *ThreadTaggingQuery {
-	query := (&ThreadTaggingClient{config: c.config}).Query()
+// QueryThreadTags queries the thread_tags edge of a Thread.
+func (c *ThreadClient) QueryThreadTags(t *Thread) *ThreadTagQuery {
+	query := (&ThreadTagClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := t.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(thread.Table, thread.FieldID, id),
-			sqlgraph.To(threadtagging.Table, threadtagging.ThreadColumn),
-			sqlgraph.Edge(sqlgraph.O2M, true, thread.ThreadTaggingsTable, thread.ThreadTaggingsColumn),
+			sqlgraph.To(threadtag.Table, threadtag.ThreadColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, thread.ThreadTagsTable, thread.ThreadTagsColumn),
 		)
 		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
 		return fromV, nil
@@ -1238,6 +979,432 @@ func (c *ThreadClient) mutate(ctx context.Context, m *ThreadMutation) (Value, er
 	}
 }
 
+// ThreadCommentClient is a client for the ThreadComment schema.
+type ThreadCommentClient struct {
+	config
+}
+
+// NewThreadCommentClient returns a client for the ThreadComment from the given config.
+func NewThreadCommentClient(c config) *ThreadCommentClient {
+	return &ThreadCommentClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `threadcomment.Hooks(f(g(h())))`.
+func (c *ThreadCommentClient) Use(hooks ...Hook) {
+	c.hooks.ThreadComment = append(c.hooks.ThreadComment, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `threadcomment.Intercept(f(g(h())))`.
+func (c *ThreadCommentClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ThreadComment = append(c.inters.ThreadComment, interceptors...)
+}
+
+// Create returns a builder for creating a ThreadComment entity.
+func (c *ThreadCommentClient) Create() *ThreadCommentCreate {
+	mutation := newThreadCommentMutation(c.config, OpCreate)
+	return &ThreadCommentCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ThreadComment entities.
+func (c *ThreadCommentClient) CreateBulk(builders ...*ThreadCommentCreate) *ThreadCommentCreateBulk {
+	return &ThreadCommentCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ThreadCommentClient) MapCreateBulk(slice any, setFunc func(*ThreadCommentCreate, int)) *ThreadCommentCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ThreadCommentCreateBulk{err: fmt.Errorf("calling to ThreadCommentClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ThreadCommentCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ThreadCommentCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ThreadComment.
+func (c *ThreadCommentClient) Update() *ThreadCommentUpdate {
+	mutation := newThreadCommentMutation(c.config, OpUpdate)
+	return &ThreadCommentUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ThreadCommentClient) UpdateOne(tc *ThreadComment) *ThreadCommentUpdateOne {
+	mutation := newThreadCommentMutation(c.config, OpUpdateOne, withThreadComment(tc))
+	return &ThreadCommentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ThreadCommentClient) UpdateOneID(id int) *ThreadCommentUpdateOne {
+	mutation := newThreadCommentMutation(c.config, OpUpdateOne, withThreadCommentID(id))
+	return &ThreadCommentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ThreadComment.
+func (c *ThreadCommentClient) Delete() *ThreadCommentDelete {
+	mutation := newThreadCommentMutation(c.config, OpDelete)
+	return &ThreadCommentDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ThreadCommentClient) DeleteOne(tc *ThreadComment) *ThreadCommentDeleteOne {
+	return c.DeleteOneID(tc.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ThreadCommentClient) DeleteOneID(id int) *ThreadCommentDeleteOne {
+	builder := c.Delete().Where(threadcomment.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ThreadCommentDeleteOne{builder}
+}
+
+// Query returns a query builder for ThreadComment.
+func (c *ThreadCommentClient) Query() *ThreadCommentQuery {
+	return &ThreadCommentQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeThreadComment},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ThreadComment entity by its id.
+func (c *ThreadCommentClient) Get(ctx context.Context, id int) (*ThreadComment, error) {
+	return c.Query().Where(threadcomment.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ThreadCommentClient) GetX(ctx context.Context, id int) *ThreadComment {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryThread queries the thread edge of a ThreadComment.
+func (c *ThreadCommentClient) QueryThread(tc *ThreadComment) *ThreadQuery {
+	query := (&ThreadClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := tc.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(threadcomment.Table, threadcomment.FieldID, id),
+			sqlgraph.To(thread.Table, thread.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, threadcomment.ThreadTable, threadcomment.ThreadColumn),
+		)
+		fromV = sqlgraph.Neighbors(tc.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAuthor queries the author edge of a ThreadComment.
+func (c *ThreadCommentClient) QueryAuthor(tc *ThreadComment) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := tc.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(threadcomment.Table, threadcomment.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, threadcomment.AuthorTable, threadcomment.AuthorColumn),
+		)
+		fromV = sqlgraph.Neighbors(tc.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryParentComment queries the parent_comment edge of a ThreadComment.
+func (c *ThreadCommentClient) QueryParentComment(tc *ThreadComment) *ThreadCommentQuery {
+	query := (&ThreadCommentClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := tc.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(threadcomment.Table, threadcomment.FieldID, id),
+			sqlgraph.To(threadcomment.Table, threadcomment.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, threadcomment.ParentCommentTable, threadcomment.ParentCommentColumn),
+		)
+		fromV = sqlgraph.Neighbors(tc.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryReplies queries the replies edge of a ThreadComment.
+func (c *ThreadCommentClient) QueryReplies(tc *ThreadComment) *ThreadCommentQuery {
+	query := (&ThreadCommentClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := tc.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(threadcomment.Table, threadcomment.FieldID, id),
+			sqlgraph.To(threadcomment.Table, threadcomment.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, threadcomment.RepliesTable, threadcomment.RepliesColumn),
+		)
+		fromV = sqlgraph.Neighbors(tc.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAttachments queries the attachments edge of a ThreadComment.
+func (c *ThreadCommentClient) QueryAttachments(tc *ThreadComment) *ThreadCommentAttachmentQuery {
+	query := (&ThreadCommentAttachmentClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := tc.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(threadcomment.Table, threadcomment.FieldID, id),
+			sqlgraph.To(threadcommentattachment.Table, threadcommentattachment.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, threadcomment.AttachmentsTable, threadcomment.AttachmentsColumn),
+		)
+		fromV = sqlgraph.Neighbors(tc.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryLikedUsers queries the liked_users edge of a ThreadComment.
+func (c *ThreadCommentClient) QueryLikedUsers(tc *ThreadComment) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := tc.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(threadcomment.Table, threadcomment.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, threadcomment.LikedUsersTable, threadcomment.LikedUsersPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(tc.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySubscribedUsers queries the subscribed_users edge of a ThreadComment.
+func (c *ThreadCommentClient) QuerySubscribedUsers(tc *ThreadComment) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := tc.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(threadcomment.Table, threadcomment.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, threadcomment.SubscribedUsersTable, threadcomment.SubscribedUsersPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(tc.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUserCommentLike queries the user_comment_like edge of a ThreadComment.
+func (c *ThreadCommentClient) QueryUserCommentLike(tc *ThreadComment) *UserCommentLikeQuery {
+	query := (&UserCommentLikeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := tc.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(threadcomment.Table, threadcomment.FieldID, id),
+			sqlgraph.To(usercommentlike.Table, usercommentlike.CommentColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, threadcomment.UserCommentLikeTable, threadcomment.UserCommentLikeColumn),
+		)
+		fromV = sqlgraph.Neighbors(tc.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUserCommentSubscription queries the user_comment_subscription edge of a ThreadComment.
+func (c *ThreadCommentClient) QueryUserCommentSubscription(tc *ThreadComment) *UserCommentSubscriptionQuery {
+	query := (&UserCommentSubscriptionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := tc.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(threadcomment.Table, threadcomment.FieldID, id),
+			sqlgraph.To(usercommentsubscription.Table, usercommentsubscription.CommentColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, threadcomment.UserCommentSubscriptionTable, threadcomment.UserCommentSubscriptionColumn),
+		)
+		fromV = sqlgraph.Neighbors(tc.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *ThreadCommentClient) Hooks() []Hook {
+	return c.hooks.ThreadComment
+}
+
+// Interceptors returns the client interceptors.
+func (c *ThreadCommentClient) Interceptors() []Interceptor {
+	return c.inters.ThreadComment
+}
+
+func (c *ThreadCommentClient) mutate(ctx context.Context, m *ThreadCommentMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ThreadCommentCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ThreadCommentUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ThreadCommentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ThreadCommentDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ThreadComment mutation op: %q", m.Op())
+	}
+}
+
+// ThreadCommentAttachmentClient is a client for the ThreadCommentAttachment schema.
+type ThreadCommentAttachmentClient struct {
+	config
+}
+
+// NewThreadCommentAttachmentClient returns a client for the ThreadCommentAttachment from the given config.
+func NewThreadCommentAttachmentClient(c config) *ThreadCommentAttachmentClient {
+	return &ThreadCommentAttachmentClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `threadcommentattachment.Hooks(f(g(h())))`.
+func (c *ThreadCommentAttachmentClient) Use(hooks ...Hook) {
+	c.hooks.ThreadCommentAttachment = append(c.hooks.ThreadCommentAttachment, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `threadcommentattachment.Intercept(f(g(h())))`.
+func (c *ThreadCommentAttachmentClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ThreadCommentAttachment = append(c.inters.ThreadCommentAttachment, interceptors...)
+}
+
+// Create returns a builder for creating a ThreadCommentAttachment entity.
+func (c *ThreadCommentAttachmentClient) Create() *ThreadCommentAttachmentCreate {
+	mutation := newThreadCommentAttachmentMutation(c.config, OpCreate)
+	return &ThreadCommentAttachmentCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ThreadCommentAttachment entities.
+func (c *ThreadCommentAttachmentClient) CreateBulk(builders ...*ThreadCommentAttachmentCreate) *ThreadCommentAttachmentCreateBulk {
+	return &ThreadCommentAttachmentCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ThreadCommentAttachmentClient) MapCreateBulk(slice any, setFunc func(*ThreadCommentAttachmentCreate, int)) *ThreadCommentAttachmentCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ThreadCommentAttachmentCreateBulk{err: fmt.Errorf("calling to ThreadCommentAttachmentClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ThreadCommentAttachmentCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ThreadCommentAttachmentCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ThreadCommentAttachment.
+func (c *ThreadCommentAttachmentClient) Update() *ThreadCommentAttachmentUpdate {
+	mutation := newThreadCommentAttachmentMutation(c.config, OpUpdate)
+	return &ThreadCommentAttachmentUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ThreadCommentAttachmentClient) UpdateOne(tca *ThreadCommentAttachment) *ThreadCommentAttachmentUpdateOne {
+	mutation := newThreadCommentAttachmentMutation(c.config, OpUpdateOne, withThreadCommentAttachment(tca))
+	return &ThreadCommentAttachmentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ThreadCommentAttachmentClient) UpdateOneID(id int) *ThreadCommentAttachmentUpdateOne {
+	mutation := newThreadCommentAttachmentMutation(c.config, OpUpdateOne, withThreadCommentAttachmentID(id))
+	return &ThreadCommentAttachmentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ThreadCommentAttachment.
+func (c *ThreadCommentAttachmentClient) Delete() *ThreadCommentAttachmentDelete {
+	mutation := newThreadCommentAttachmentMutation(c.config, OpDelete)
+	return &ThreadCommentAttachmentDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ThreadCommentAttachmentClient) DeleteOne(tca *ThreadCommentAttachment) *ThreadCommentAttachmentDeleteOne {
+	return c.DeleteOneID(tca.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ThreadCommentAttachmentClient) DeleteOneID(id int) *ThreadCommentAttachmentDeleteOne {
+	builder := c.Delete().Where(threadcommentattachment.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ThreadCommentAttachmentDeleteOne{builder}
+}
+
+// Query returns a query builder for ThreadCommentAttachment.
+func (c *ThreadCommentAttachmentClient) Query() *ThreadCommentAttachmentQuery {
+	return &ThreadCommentAttachmentQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeThreadCommentAttachment},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ThreadCommentAttachment entity by its id.
+func (c *ThreadCommentAttachmentClient) Get(ctx context.Context, id int) (*ThreadCommentAttachment, error) {
+	return c.Query().Where(threadcommentattachment.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ThreadCommentAttachmentClient) GetX(ctx context.Context, id int) *ThreadCommentAttachment {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryComment queries the comment edge of a ThreadCommentAttachment.
+func (c *ThreadCommentAttachmentClient) QueryComment(tca *ThreadCommentAttachment) *ThreadCommentQuery {
+	query := (&ThreadCommentClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := tca.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(threadcommentattachment.Table, threadcommentattachment.FieldID, id),
+			sqlgraph.To(threadcomment.Table, threadcomment.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, threadcommentattachment.CommentTable, threadcommentattachment.CommentColumn),
+		)
+		fromV = sqlgraph.Neighbors(tca.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *ThreadCommentAttachmentClient) Hooks() []Hook {
+	return c.hooks.ThreadCommentAttachment
+}
+
+// Interceptors returns the client interceptors.
+func (c *ThreadCommentAttachmentClient) Interceptors() []Interceptor {
+	return c.inters.ThreadCommentAttachment
+}
+
+func (c *ThreadCommentAttachmentClient) mutate(ctx context.Context, m *ThreadCommentAttachmentMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ThreadCommentAttachmentCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ThreadCommentAttachmentUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ThreadCommentAttachmentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ThreadCommentAttachmentDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ThreadCommentAttachment mutation op: %q", m.Op())
+	}
+}
+
 // ThreadTagClient is a client for the ThreadTag schema.
 type ThreadTagClient struct {
 	config
@@ -1294,13 +1461,9 @@ func (c *ThreadTagClient) Update() *ThreadTagUpdate {
 
 // UpdateOne returns an update builder for the given entity.
 func (c *ThreadTagClient) UpdateOne(tt *ThreadTag) *ThreadTagUpdateOne {
-	mutation := newThreadTagMutation(c.config, OpUpdateOne, withThreadTag(tt))
-	return &ThreadTagUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *ThreadTagClient) UpdateOneID(id int) *ThreadTagUpdateOne {
-	mutation := newThreadTagMutation(c.config, OpUpdateOne, withThreadTagID(id))
+	mutation := newThreadTagMutation(c.config, OpUpdateOne)
+	mutation.thread = &tt.ThreadId
+	mutation.tag = &tt.TagId
 	return &ThreadTagUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
@@ -1308,19 +1471,6 @@ func (c *ThreadTagClient) UpdateOneID(id int) *ThreadTagUpdateOne {
 func (c *ThreadTagClient) Delete() *ThreadTagDelete {
 	mutation := newThreadTagMutation(c.config, OpDelete)
 	return &ThreadTagDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a builder for deleting the given entity.
-func (c *ThreadTagClient) DeleteOne(tt *ThreadTag) *ThreadTagDeleteOne {
-	return c.DeleteOneID(tt.ID)
-}
-
-// DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *ThreadTagClient) DeleteOneID(id int) *ThreadTagDeleteOne {
-	builder := c.Delete().Where(threadtag.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &ThreadTagDeleteOne{builder}
 }
 
 // Query returns a query builder for ThreadTag.
@@ -1332,50 +1482,18 @@ func (c *ThreadTagClient) Query() *ThreadTagQuery {
 	}
 }
 
-// Get returns a ThreadTag entity by its id.
-func (c *ThreadTagClient) Get(ctx context.Context, id int) (*ThreadTag, error) {
-	return c.Query().Where(threadtag.ID(id)).Only(ctx)
+// QueryThread queries the thread edge of a ThreadTag.
+func (c *ThreadTagClient) QueryThread(tt *ThreadTag) *ThreadQuery {
+	return c.Query().
+		Where(threadtag.ThreadId(tt.ThreadId), threadtag.TagId(tt.TagId)).
+		QueryThread()
 }
 
-// GetX is like Get, but panics if an error occurs.
-func (c *ThreadTagClient) GetX(ctx context.Context, id int) *ThreadTag {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
-}
-
-// QueryThreads queries the threads edge of a ThreadTag.
-func (c *ThreadTagClient) QueryThreads(tt *ThreadTag) *ThreadQuery {
-	query := (&ThreadClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := tt.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(threadtag.Table, threadtag.FieldID, id),
-			sqlgraph.To(thread.Table, thread.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, threadtag.ThreadsTable, threadtag.ThreadsPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(tt.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryThreadTaggings queries the thread_taggings edge of a ThreadTag.
-func (c *ThreadTagClient) QueryThreadTaggings(tt *ThreadTag) *ThreadTaggingQuery {
-	query := (&ThreadTaggingClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := tt.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(threadtag.Table, threadtag.FieldID, id),
-			sqlgraph.To(threadtagging.Table, threadtagging.TagColumn),
-			sqlgraph.Edge(sqlgraph.O2M, true, threadtag.ThreadTaggingsTable, threadtag.ThreadTaggingsColumn),
-		)
-		fromV = sqlgraph.Neighbors(tt.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
+// QueryTag queries the tag edge of a ThreadTag.
+func (c *ThreadTagClient) QueryTag(tt *ThreadTag) *TagQuery {
+	return c.Query().
+		Where(threadtag.ThreadId(tt.ThreadId), threadtag.TagId(tt.TagId)).
+		QueryTag()
 }
 
 // Hooks returns the client hooks.
@@ -1400,122 +1518,6 @@ func (c *ThreadTagClient) mutate(ctx context.Context, m *ThreadTagMutation) (Val
 		return (&ThreadTagDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown ThreadTag mutation op: %q", m.Op())
-	}
-}
-
-// ThreadTaggingClient is a client for the ThreadTagging schema.
-type ThreadTaggingClient struct {
-	config
-}
-
-// NewThreadTaggingClient returns a client for the ThreadTagging from the given config.
-func NewThreadTaggingClient(c config) *ThreadTaggingClient {
-	return &ThreadTaggingClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `threadtagging.Hooks(f(g(h())))`.
-func (c *ThreadTaggingClient) Use(hooks ...Hook) {
-	c.hooks.ThreadTagging = append(c.hooks.ThreadTagging, hooks...)
-}
-
-// Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `threadtagging.Intercept(f(g(h())))`.
-func (c *ThreadTaggingClient) Intercept(interceptors ...Interceptor) {
-	c.inters.ThreadTagging = append(c.inters.ThreadTagging, interceptors...)
-}
-
-// Create returns a builder for creating a ThreadTagging entity.
-func (c *ThreadTaggingClient) Create() *ThreadTaggingCreate {
-	mutation := newThreadTaggingMutation(c.config, OpCreate)
-	return &ThreadTaggingCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of ThreadTagging entities.
-func (c *ThreadTaggingClient) CreateBulk(builders ...*ThreadTaggingCreate) *ThreadTaggingCreateBulk {
-	return &ThreadTaggingCreateBulk{config: c.config, builders: builders}
-}
-
-// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
-// a builder and applies setFunc on it.
-func (c *ThreadTaggingClient) MapCreateBulk(slice any, setFunc func(*ThreadTaggingCreate, int)) *ThreadTaggingCreateBulk {
-	rv := reflect.ValueOf(slice)
-	if rv.Kind() != reflect.Slice {
-		return &ThreadTaggingCreateBulk{err: fmt.Errorf("calling to ThreadTaggingClient.MapCreateBulk with wrong type %T, need slice", slice)}
-	}
-	builders := make([]*ThreadTaggingCreate, rv.Len())
-	for i := 0; i < rv.Len(); i++ {
-		builders[i] = c.Create()
-		setFunc(builders[i], i)
-	}
-	return &ThreadTaggingCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for ThreadTagging.
-func (c *ThreadTaggingClient) Update() *ThreadTaggingUpdate {
-	mutation := newThreadTaggingMutation(c.config, OpUpdate)
-	return &ThreadTaggingUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *ThreadTaggingClient) UpdateOne(tt *ThreadTagging) *ThreadTaggingUpdateOne {
-	mutation := newThreadTaggingMutation(c.config, OpUpdateOne)
-	mutation.thread = &tt.ThreadId
-	mutation.tag = &tt.TagId
-	return &ThreadTaggingUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for ThreadTagging.
-func (c *ThreadTaggingClient) Delete() *ThreadTaggingDelete {
-	mutation := newThreadTaggingMutation(c.config, OpDelete)
-	return &ThreadTaggingDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Query returns a query builder for ThreadTagging.
-func (c *ThreadTaggingClient) Query() *ThreadTaggingQuery {
-	return &ThreadTaggingQuery{
-		config: c.config,
-		ctx:    &QueryContext{Type: TypeThreadTagging},
-		inters: c.Interceptors(),
-	}
-}
-
-// QueryThread queries the thread edge of a ThreadTagging.
-func (c *ThreadTaggingClient) QueryThread(tt *ThreadTagging) *ThreadQuery {
-	return c.Query().
-		Where(threadtagging.ThreadId(tt.ThreadId), threadtagging.TagId(tt.TagId)).
-		QueryThread()
-}
-
-// QueryTag queries the tag edge of a ThreadTagging.
-func (c *ThreadTaggingClient) QueryTag(tt *ThreadTagging) *ThreadTagQuery {
-	return c.Query().
-		Where(threadtagging.ThreadId(tt.ThreadId), threadtagging.TagId(tt.TagId)).
-		QueryTag()
-}
-
-// Hooks returns the client hooks.
-func (c *ThreadTaggingClient) Hooks() []Hook {
-	return c.hooks.ThreadTagging
-}
-
-// Interceptors returns the client interceptors.
-func (c *ThreadTaggingClient) Interceptors() []Interceptor {
-	return c.inters.ThreadTagging
-}
-
-func (c *ThreadTaggingClient) mutate(ctx context.Context, m *ThreadTaggingMutation) (Value, error) {
-	switch m.Op() {
-	case OpCreate:
-		return (&ThreadTaggingCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdate:
-		return (&ThreadTaggingUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdateOne:
-		return (&ThreadTaggingUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpDelete, OpDeleteOne:
-		return (&ThreadTaggingDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
-	default:
-		return nil, fmt.Errorf("ent: unknown ThreadTagging mutation op: %q", m.Op())
 	}
 }
 
@@ -1660,13 +1662,13 @@ func (c *UserClient) QueryThreads(u *User) *ThreadQuery {
 }
 
 // QueryComments queries the comments edge of a User.
-func (c *UserClient) QueryComments(u *User) *CommentQuery {
-	query := (&CommentClient{config: c.config}).Query()
+func (c *UserClient) QueryComments(u *User) *ThreadCommentQuery {
+	query := (&ThreadCommentClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := u.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, id),
-			sqlgraph.To(comment.Table, comment.FieldID),
+			sqlgraph.To(threadcomment.Table, threadcomment.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, user.CommentsTable, user.CommentsColumn),
 		)
 		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
@@ -1708,13 +1710,13 @@ func (c *UserClient) QueryLikedThreads(u *User) *ThreadQuery {
 }
 
 // QueryLikedComments queries the liked_comments edge of a User.
-func (c *UserClient) QueryLikedComments(u *User) *CommentQuery {
-	query := (&CommentClient{config: c.config}).Query()
+func (c *UserClient) QueryLikedComments(u *User) *ThreadCommentQuery {
+	query := (&ThreadCommentClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := u.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, id),
-			sqlgraph.To(comment.Table, comment.FieldID),
+			sqlgraph.To(threadcomment.Table, threadcomment.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, user.LikedCommentsTable, user.LikedCommentsPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
@@ -1756,13 +1758,13 @@ func (c *UserClient) QuerySubscribedThreads(u *User) *ThreadQuery {
 }
 
 // QuerySubscribedComments queries the subscribed_comments edge of a User.
-func (c *UserClient) QuerySubscribedComments(u *User) *CommentQuery {
-	query := (&CommentClient{config: c.config}).Query()
+func (c *UserClient) QuerySubscribedComments(u *User) *ThreadCommentQuery {
+	query := (&ThreadCommentClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := u.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, id),
-			sqlgraph.To(comment.Table, comment.FieldID),
+			sqlgraph.To(threadcomment.Table, threadcomment.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, user.SubscribedCommentsTable, user.SubscribedCommentsPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
@@ -2209,7 +2211,7 @@ func (c *UserCommentLikeClient) QueryUser(ucl *UserCommentLike) *UserQuery {
 }
 
 // QueryComment queries the comment edge of a UserCommentLike.
-func (c *UserCommentLikeClient) QueryComment(ucl *UserCommentLike) *CommentQuery {
+func (c *UserCommentLikeClient) QueryComment(ucl *UserCommentLike) *ThreadCommentQuery {
 	return c.Query().
 		Where(usercommentlike.UserId(ucl.UserId), usercommentlike.CommentId(ucl.CommentId)).
 		QueryComment()
@@ -2325,7 +2327,7 @@ func (c *UserCommentSubscriptionClient) QueryUser(ucs *UserCommentSubscription) 
 }
 
 // QueryComment queries the comment edge of a UserCommentSubscription.
-func (c *UserCommentSubscriptionClient) QueryComment(ucs *UserCommentSubscription) *CommentQuery {
+func (c *UserCommentSubscriptionClient) QueryComment(ucs *UserCommentSubscription) *ThreadCommentQuery {
 	return c.Query().
 		Where(usercommentsubscription.UserId(ucs.UserId), usercommentsubscription.CommentId(ucs.CommentId)).
 		QueryComment()
@@ -2591,12 +2593,12 @@ func (c *UserThreadSubscriptionClient) mutate(ctx context.Context, m *UserThread
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Board, Comment, CommentAttachment, Thread, ThreadTag, ThreadTagging, User,
+		Board, Tag, Thread, ThreadComment, ThreadCommentAttachment, ThreadTag, User,
 		UserBoardLike, UserBoardSubscription, UserCommentLike, UserCommentSubscription,
 		UserThreadLike, UserThreadSubscription []ent.Hook
 	}
 	inters struct {
-		Board, Comment, CommentAttachment, Thread, ThreadTag, ThreadTagging, User,
+		Board, Tag, Thread, ThreadComment, ThreadCommentAttachment, ThreadTag, User,
 		UserBoardLike, UserBoardSubscription, UserCommentLike, UserCommentSubscription,
 		UserThreadLike, UserThreadSubscription []ent.Interceptor
 	}

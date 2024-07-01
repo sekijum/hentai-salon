@@ -8,11 +8,11 @@ import (
 	"fmt"
 	"math"
 	"server/infrastructure/ent/board"
-	"server/infrastructure/ent/comment"
 	"server/infrastructure/ent/predicate"
+	"server/infrastructure/ent/tag"
 	"server/infrastructure/ent/thread"
+	"server/infrastructure/ent/threadcomment"
 	"server/infrastructure/ent/threadtag"
-	"server/infrastructure/ent/threadtagging"
 	"server/infrastructure/ent/user"
 	"server/infrastructure/ent/userthreadlike"
 	"server/infrastructure/ent/userthreadsubscription"
@@ -31,11 +31,11 @@ type ThreadQuery struct {
 	predicates                 []predicate.Thread
 	withBoard                  *BoardQuery
 	withOwner                  *UserQuery
-	withComments               *CommentQuery
-	withTags                   *ThreadTagQuery
+	withComments               *ThreadCommentQuery
+	withTags                   *TagQuery
 	withLikedUsers             *UserQuery
 	withSubscribedUsers        *UserQuery
-	withThreadTaggings         *ThreadTaggingQuery
+	withThreadTags             *ThreadTagQuery
 	withUserThreadLike         *UserThreadLikeQuery
 	withUserThreadSubscription *UserThreadSubscriptionQuery
 	// intermediate query (i.e. traversal path).
@@ -119,8 +119,8 @@ func (tq *ThreadQuery) QueryOwner() *UserQuery {
 }
 
 // QueryComments chains the current query on the "comments" edge.
-func (tq *ThreadQuery) QueryComments() *CommentQuery {
-	query := (&CommentClient{config: tq.config}).Query()
+func (tq *ThreadQuery) QueryComments() *ThreadCommentQuery {
+	query := (&ThreadCommentClient{config: tq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := tq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -131,7 +131,7 @@ func (tq *ThreadQuery) QueryComments() *CommentQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(thread.Table, thread.FieldID, selector),
-			sqlgraph.To(comment.Table, comment.FieldID),
+			sqlgraph.To(threadcomment.Table, threadcomment.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, thread.CommentsTable, thread.CommentsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(tq.driver.Dialect(), step)
@@ -141,8 +141,8 @@ func (tq *ThreadQuery) QueryComments() *CommentQuery {
 }
 
 // QueryTags chains the current query on the "tags" edge.
-func (tq *ThreadQuery) QueryTags() *ThreadTagQuery {
-	query := (&ThreadTagClient{config: tq.config}).Query()
+func (tq *ThreadQuery) QueryTags() *TagQuery {
+	query := (&TagClient{config: tq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := tq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -153,7 +153,7 @@ func (tq *ThreadQuery) QueryTags() *ThreadTagQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(thread.Table, thread.FieldID, selector),
-			sqlgraph.To(threadtag.Table, threadtag.FieldID),
+			sqlgraph.To(tag.Table, tag.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, thread.TagsTable, thread.TagsPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(tq.driver.Dialect(), step)
@@ -206,9 +206,9 @@ func (tq *ThreadQuery) QuerySubscribedUsers() *UserQuery {
 	return query
 }
 
-// QueryThreadTaggings chains the current query on the "thread_taggings" edge.
-func (tq *ThreadQuery) QueryThreadTaggings() *ThreadTaggingQuery {
-	query := (&ThreadTaggingClient{config: tq.config}).Query()
+// QueryThreadTags chains the current query on the "thread_tags" edge.
+func (tq *ThreadQuery) QueryThreadTags() *ThreadTagQuery {
+	query := (&ThreadTagClient{config: tq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := tq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -219,8 +219,8 @@ func (tq *ThreadQuery) QueryThreadTaggings() *ThreadTaggingQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(thread.Table, thread.FieldID, selector),
-			sqlgraph.To(threadtagging.Table, threadtagging.ThreadColumn),
-			sqlgraph.Edge(sqlgraph.O2M, true, thread.ThreadTaggingsTable, thread.ThreadTaggingsColumn),
+			sqlgraph.To(threadtag.Table, threadtag.ThreadColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, thread.ThreadTagsTable, thread.ThreadTagsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(tq.driver.Dialect(), step)
 		return fromU, nil
@@ -470,7 +470,7 @@ func (tq *ThreadQuery) Clone() *ThreadQuery {
 		withTags:                   tq.withTags.Clone(),
 		withLikedUsers:             tq.withLikedUsers.Clone(),
 		withSubscribedUsers:        tq.withSubscribedUsers.Clone(),
-		withThreadTaggings:         tq.withThreadTaggings.Clone(),
+		withThreadTags:             tq.withThreadTags.Clone(),
 		withUserThreadLike:         tq.withUserThreadLike.Clone(),
 		withUserThreadSubscription: tq.withUserThreadSubscription.Clone(),
 		// clone intermediate query.
@@ -503,8 +503,8 @@ func (tq *ThreadQuery) WithOwner(opts ...func(*UserQuery)) *ThreadQuery {
 
 // WithComments tells the query-builder to eager-load the nodes that are connected to
 // the "comments" edge. The optional arguments are used to configure the query builder of the edge.
-func (tq *ThreadQuery) WithComments(opts ...func(*CommentQuery)) *ThreadQuery {
-	query := (&CommentClient{config: tq.config}).Query()
+func (tq *ThreadQuery) WithComments(opts ...func(*ThreadCommentQuery)) *ThreadQuery {
+	query := (&ThreadCommentClient{config: tq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -514,8 +514,8 @@ func (tq *ThreadQuery) WithComments(opts ...func(*CommentQuery)) *ThreadQuery {
 
 // WithTags tells the query-builder to eager-load the nodes that are connected to
 // the "tags" edge. The optional arguments are used to configure the query builder of the edge.
-func (tq *ThreadQuery) WithTags(opts ...func(*ThreadTagQuery)) *ThreadQuery {
-	query := (&ThreadTagClient{config: tq.config}).Query()
+func (tq *ThreadQuery) WithTags(opts ...func(*TagQuery)) *ThreadQuery {
+	query := (&TagClient{config: tq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -545,14 +545,14 @@ func (tq *ThreadQuery) WithSubscribedUsers(opts ...func(*UserQuery)) *ThreadQuer
 	return tq
 }
 
-// WithThreadTaggings tells the query-builder to eager-load the nodes that are connected to
-// the "thread_taggings" edge. The optional arguments are used to configure the query builder of the edge.
-func (tq *ThreadQuery) WithThreadTaggings(opts ...func(*ThreadTaggingQuery)) *ThreadQuery {
-	query := (&ThreadTaggingClient{config: tq.config}).Query()
+// WithThreadTags tells the query-builder to eager-load the nodes that are connected to
+// the "thread_tags" edge. The optional arguments are used to configure the query builder of the edge.
+func (tq *ThreadQuery) WithThreadTags(opts ...func(*ThreadTagQuery)) *ThreadQuery {
+	query := (&ThreadTagClient{config: tq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	tq.withThreadTaggings = query
+	tq.withThreadTags = query
 	return tq
 }
 
@@ -663,7 +663,7 @@ func (tq *ThreadQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Threa
 			tq.withTags != nil,
 			tq.withLikedUsers != nil,
 			tq.withSubscribedUsers != nil,
-			tq.withThreadTaggings != nil,
+			tq.withThreadTags != nil,
 			tq.withUserThreadLike != nil,
 			tq.withUserThreadSubscription != nil,
 		}
@@ -700,15 +700,15 @@ func (tq *ThreadQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Threa
 	}
 	if query := tq.withComments; query != nil {
 		if err := tq.loadComments(ctx, query, nodes,
-			func(n *Thread) { n.Edges.Comments = []*Comment{} },
-			func(n *Thread, e *Comment) { n.Edges.Comments = append(n.Edges.Comments, e) }); err != nil {
+			func(n *Thread) { n.Edges.Comments = []*ThreadComment{} },
+			func(n *Thread, e *ThreadComment) { n.Edges.Comments = append(n.Edges.Comments, e) }); err != nil {
 			return nil, err
 		}
 	}
 	if query := tq.withTags; query != nil {
 		if err := tq.loadTags(ctx, query, nodes,
-			func(n *Thread) { n.Edges.Tags = []*ThreadTag{} },
-			func(n *Thread, e *ThreadTag) { n.Edges.Tags = append(n.Edges.Tags, e) }); err != nil {
+			func(n *Thread) { n.Edges.Tags = []*Tag{} },
+			func(n *Thread, e *Tag) { n.Edges.Tags = append(n.Edges.Tags, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -726,10 +726,10 @@ func (tq *ThreadQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Threa
 			return nil, err
 		}
 	}
-	if query := tq.withThreadTaggings; query != nil {
-		if err := tq.loadThreadTaggings(ctx, query, nodes,
-			func(n *Thread) { n.Edges.ThreadTaggings = []*ThreadTagging{} },
-			func(n *Thread, e *ThreadTagging) { n.Edges.ThreadTaggings = append(n.Edges.ThreadTaggings, e) }); err != nil {
+	if query := tq.withThreadTags; query != nil {
+		if err := tq.loadThreadTags(ctx, query, nodes,
+			func(n *Thread) { n.Edges.ThreadTags = []*ThreadTag{} },
+			func(n *Thread, e *ThreadTag) { n.Edges.ThreadTags = append(n.Edges.ThreadTags, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -810,7 +810,7 @@ func (tq *ThreadQuery) loadOwner(ctx context.Context, query *UserQuery, nodes []
 	}
 	return nil
 }
-func (tq *ThreadQuery) loadComments(ctx context.Context, query *CommentQuery, nodes []*Thread, init func(*Thread), assign func(*Thread, *Comment)) error {
+func (tq *ThreadQuery) loadComments(ctx context.Context, query *ThreadCommentQuery, nodes []*Thread, init func(*Thread), assign func(*Thread, *ThreadComment)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*Thread)
 	for i := range nodes {
@@ -821,9 +821,9 @@ func (tq *ThreadQuery) loadComments(ctx context.Context, query *CommentQuery, no
 		}
 	}
 	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(comment.FieldThreadId)
+		query.ctx.AppendFieldOnce(threadcomment.FieldThreadId)
 	}
-	query.Where(predicate.Comment(func(s *sql.Selector) {
+	query.Where(predicate.ThreadComment(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(thread.CommentsColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
@@ -840,7 +840,7 @@ func (tq *ThreadQuery) loadComments(ctx context.Context, query *CommentQuery, no
 	}
 	return nil
 }
-func (tq *ThreadQuery) loadTags(ctx context.Context, query *ThreadTagQuery, nodes []*Thread, init func(*Thread), assign func(*Thread, *ThreadTag)) error {
+func (tq *ThreadQuery) loadTags(ctx context.Context, query *TagQuery, nodes []*Thread, init func(*Thread), assign func(*Thread, *Tag)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
 	byID := make(map[int]*Thread)
 	nids := make(map[int]map[*Thread]struct{})
@@ -853,7 +853,7 @@ func (tq *ThreadQuery) loadTags(ctx context.Context, query *ThreadTagQuery, node
 	}
 	query.Where(func(s *sql.Selector) {
 		joinT := sql.Table(thread.TagsTable)
-		s.Join(joinT).On(s.C(threadtag.FieldID), joinT.C(thread.TagsPrimaryKey[1]))
+		s.Join(joinT).On(s.C(tag.FieldID), joinT.C(thread.TagsPrimaryKey[1]))
 		s.Where(sql.InValues(joinT.C(thread.TagsPrimaryKey[0]), edgeIDs...))
 		columns := s.SelectedColumns()
 		s.Select(joinT.C(thread.TagsPrimaryKey[0]))
@@ -886,7 +886,7 @@ func (tq *ThreadQuery) loadTags(ctx context.Context, query *ThreadTagQuery, node
 			}
 		})
 	})
-	neighbors, err := withInterceptors[[]*ThreadTag](ctx, query, qr, query.inters)
+	neighbors, err := withInterceptors[[]*Tag](ctx, query, qr, query.inters)
 	if err != nil {
 		return err
 	}
@@ -1023,7 +1023,7 @@ func (tq *ThreadQuery) loadSubscribedUsers(ctx context.Context, query *UserQuery
 	}
 	return nil
 }
-func (tq *ThreadQuery) loadThreadTaggings(ctx context.Context, query *ThreadTaggingQuery, nodes []*Thread, init func(*Thread), assign func(*Thread, *ThreadTagging)) error {
+func (tq *ThreadQuery) loadThreadTags(ctx context.Context, query *ThreadTagQuery, nodes []*Thread, init func(*Thread), assign func(*Thread, *ThreadTag)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*Thread)
 	for i := range nodes {
@@ -1034,10 +1034,10 @@ func (tq *ThreadQuery) loadThreadTaggings(ctx context.Context, query *ThreadTagg
 		}
 	}
 	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(threadtagging.FieldThreadId)
+		query.ctx.AppendFieldOnce(threadtag.FieldThreadId)
 	}
-	query.Where(predicate.ThreadTagging(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(thread.ThreadTaggingsColumn), fks...))
+	query.Where(predicate.ThreadTag(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(thread.ThreadTagsColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {

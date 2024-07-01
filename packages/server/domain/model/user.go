@@ -12,7 +12,6 @@ type User struct {
 	Name        string
 	Email       string
 	Password    string
-	DisplayName *string
 	AvatarUrl   *string
 	Status      UserStatus
 	Role        UserRole
@@ -38,9 +37,6 @@ func (u *User) Validate() error {
 	}
 	if len(u.Password) < 6 {
 		return errors.New("パスワードは6文字以上で入力してください")
-	}
-	if u.DisplayName != nil && len(*u.DisplayName) > 20 {
-		return errors.New("表示名は20文字以内で入力してください")
 	}
 	if u.AvatarUrl != nil {
 		if _, err := url.ParseRequestURI(*u.AvatarUrl); err != nil {

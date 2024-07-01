@@ -7,9 +7,9 @@ import (
 	"errors"
 	"fmt"
 	"server/infrastructure/ent/predicate"
+	"server/infrastructure/ent/tag"
 	"server/infrastructure/ent/thread"
 	"server/infrastructure/ent/threadtag"
-	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -29,47 +29,54 @@ func (ttu *ThreadTagUpdate) Where(ps ...predicate.ThreadTag) *ThreadTagUpdate {
 	return ttu
 }
 
-// SetName sets the "name" field.
-func (ttu *ThreadTagUpdate) SetName(s string) *ThreadTagUpdate {
-	ttu.mutation.SetName(s)
+// SetThreadId sets the "threadId" field.
+func (ttu *ThreadTagUpdate) SetThreadId(i int) *ThreadTagUpdate {
+	ttu.mutation.SetThreadId(i)
 	return ttu
 }
 
-// SetNillableName sets the "name" field if the given value is not nil.
-func (ttu *ThreadTagUpdate) SetNillableName(s *string) *ThreadTagUpdate {
-	if s != nil {
-		ttu.SetName(*s)
+// SetNillableThreadId sets the "threadId" field if the given value is not nil.
+func (ttu *ThreadTagUpdate) SetNillableThreadId(i *int) *ThreadTagUpdate {
+	if i != nil {
+		ttu.SetThreadId(*i)
 	}
 	return ttu
 }
 
-// SetCreatedAt sets the "createdAt" field.
-func (ttu *ThreadTagUpdate) SetCreatedAt(t time.Time) *ThreadTagUpdate {
-	ttu.mutation.SetCreatedAt(t)
+// SetTagId sets the "tagId" field.
+func (ttu *ThreadTagUpdate) SetTagId(i int) *ThreadTagUpdate {
+	ttu.mutation.SetTagId(i)
 	return ttu
 }
 
-// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
-func (ttu *ThreadTagUpdate) SetNillableCreatedAt(t *time.Time) *ThreadTagUpdate {
-	if t != nil {
-		ttu.SetCreatedAt(*t)
+// SetNillableTagId sets the "tagId" field if the given value is not nil.
+func (ttu *ThreadTagUpdate) SetNillableTagId(i *int) *ThreadTagUpdate {
+	if i != nil {
+		ttu.SetTagId(*i)
 	}
 	return ttu
 }
 
-// AddThreadIDs adds the "threads" edge to the Thread entity by IDs.
-func (ttu *ThreadTagUpdate) AddThreadIDs(ids ...int) *ThreadTagUpdate {
-	ttu.mutation.AddThreadIDs(ids...)
+// SetThreadID sets the "thread" edge to the Thread entity by ID.
+func (ttu *ThreadTagUpdate) SetThreadID(id int) *ThreadTagUpdate {
+	ttu.mutation.SetThreadID(id)
 	return ttu
 }
 
-// AddThreads adds the "threads" edges to the Thread entity.
-func (ttu *ThreadTagUpdate) AddThreads(t ...*Thread) *ThreadTagUpdate {
-	ids := make([]int, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
-	}
-	return ttu.AddThreadIDs(ids...)
+// SetThread sets the "thread" edge to the Thread entity.
+func (ttu *ThreadTagUpdate) SetThread(t *Thread) *ThreadTagUpdate {
+	return ttu.SetThreadID(t.ID)
+}
+
+// SetTagID sets the "tag" edge to the Tag entity by ID.
+func (ttu *ThreadTagUpdate) SetTagID(id int) *ThreadTagUpdate {
+	ttu.mutation.SetTagID(id)
+	return ttu
+}
+
+// SetTag sets the "tag" edge to the Tag entity.
+func (ttu *ThreadTagUpdate) SetTag(t *Tag) *ThreadTagUpdate {
+	return ttu.SetTagID(t.ID)
 }
 
 // Mutation returns the ThreadTagMutation object of the builder.
@@ -77,25 +84,16 @@ func (ttu *ThreadTagUpdate) Mutation() *ThreadTagMutation {
 	return ttu.mutation
 }
 
-// ClearThreads clears all "threads" edges to the Thread entity.
-func (ttu *ThreadTagUpdate) ClearThreads() *ThreadTagUpdate {
-	ttu.mutation.ClearThreads()
+// ClearThread clears the "thread" edge to the Thread entity.
+func (ttu *ThreadTagUpdate) ClearThread() *ThreadTagUpdate {
+	ttu.mutation.ClearThread()
 	return ttu
 }
 
-// RemoveThreadIDs removes the "threads" edge to Thread entities by IDs.
-func (ttu *ThreadTagUpdate) RemoveThreadIDs(ids ...int) *ThreadTagUpdate {
-	ttu.mutation.RemoveThreadIDs(ids...)
+// ClearTag clears the "tag" edge to the Tag entity.
+func (ttu *ThreadTagUpdate) ClearTag() *ThreadTagUpdate {
+	ttu.mutation.ClearTag()
 	return ttu
-}
-
-// RemoveThreads removes "threads" edges to Thread entities.
-func (ttu *ThreadTagUpdate) RemoveThreads(t ...*Thread) *ThreadTagUpdate {
-	ids := make([]int, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
-	}
-	return ttu.RemoveThreadIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -127,10 +125,11 @@ func (ttu *ThreadTagUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (ttu *ThreadTagUpdate) check() error {
-	if v, ok := ttu.mutation.Name(); ok {
-		if err := threadtag.NameValidator(v); err != nil {
-			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "ThreadTag.name": %w`, err)}
-		}
+	if _, ok := ttu.mutation.ThreadID(); ttu.mutation.ThreadCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "ThreadTag.thread"`)
+	}
+	if _, ok := ttu.mutation.TagID(); ttu.mutation.TagCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "ThreadTag.tag"`)
 	}
 	return nil
 }
@@ -139,7 +138,7 @@ func (ttu *ThreadTagUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if err := ttu.check(); err != nil {
 		return n, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(threadtag.Table, threadtag.Columns, sqlgraph.NewFieldSpec(threadtag.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(threadtag.Table, threadtag.Columns, sqlgraph.NewFieldSpec(threadtag.FieldThreadId, field.TypeInt), sqlgraph.NewFieldSpec(threadtag.FieldTagId, field.TypeInt))
 	if ps := ttu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -147,18 +146,12 @@ func (ttu *ThreadTagUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := ttu.mutation.Name(); ok {
-		_spec.SetField(threadtag.FieldName, field.TypeString, value)
-	}
-	if value, ok := ttu.mutation.CreatedAt(); ok {
-		_spec.SetField(threadtag.FieldCreatedAt, field.TypeTime, value)
-	}
-	if ttu.mutation.ThreadsCleared() {
+	if ttu.mutation.ThreadCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   threadtag.ThreadsTable,
-			Columns: threadtag.ThreadsPrimaryKey,
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   threadtag.ThreadTable,
+			Columns: []string{threadtag.ThreadColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(thread.FieldID, field.TypeInt),
@@ -166,12 +159,12 @@ func (ttu *ThreadTagUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ttu.mutation.RemovedThreadsIDs(); len(nodes) > 0 && !ttu.mutation.ThreadsCleared() {
+	if nodes := ttu.mutation.ThreadIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   threadtag.ThreadsTable,
-			Columns: threadtag.ThreadsPrimaryKey,
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   threadtag.ThreadTable,
+			Columns: []string{threadtag.ThreadColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(thread.FieldID, field.TypeInt),
@@ -180,17 +173,30 @@ func (ttu *ThreadTagUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if nodes := ttu.mutation.ThreadsIDs(); len(nodes) > 0 {
+	if ttu.mutation.TagCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   threadtag.ThreadsTable,
-			Columns: threadtag.ThreadsPrimaryKey,
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   threadtag.TagTable,
+			Columns: []string{threadtag.TagColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(thread.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ttu.mutation.TagIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   threadtag.TagTable,
+			Columns: []string{threadtag.TagColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -218,47 +224,54 @@ type ThreadTagUpdateOne struct {
 	mutation *ThreadTagMutation
 }
 
-// SetName sets the "name" field.
-func (ttuo *ThreadTagUpdateOne) SetName(s string) *ThreadTagUpdateOne {
-	ttuo.mutation.SetName(s)
+// SetThreadId sets the "threadId" field.
+func (ttuo *ThreadTagUpdateOne) SetThreadId(i int) *ThreadTagUpdateOne {
+	ttuo.mutation.SetThreadId(i)
 	return ttuo
 }
 
-// SetNillableName sets the "name" field if the given value is not nil.
-func (ttuo *ThreadTagUpdateOne) SetNillableName(s *string) *ThreadTagUpdateOne {
-	if s != nil {
-		ttuo.SetName(*s)
+// SetNillableThreadId sets the "threadId" field if the given value is not nil.
+func (ttuo *ThreadTagUpdateOne) SetNillableThreadId(i *int) *ThreadTagUpdateOne {
+	if i != nil {
+		ttuo.SetThreadId(*i)
 	}
 	return ttuo
 }
 
-// SetCreatedAt sets the "createdAt" field.
-func (ttuo *ThreadTagUpdateOne) SetCreatedAt(t time.Time) *ThreadTagUpdateOne {
-	ttuo.mutation.SetCreatedAt(t)
+// SetTagId sets the "tagId" field.
+func (ttuo *ThreadTagUpdateOne) SetTagId(i int) *ThreadTagUpdateOne {
+	ttuo.mutation.SetTagId(i)
 	return ttuo
 }
 
-// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
-func (ttuo *ThreadTagUpdateOne) SetNillableCreatedAt(t *time.Time) *ThreadTagUpdateOne {
-	if t != nil {
-		ttuo.SetCreatedAt(*t)
+// SetNillableTagId sets the "tagId" field if the given value is not nil.
+func (ttuo *ThreadTagUpdateOne) SetNillableTagId(i *int) *ThreadTagUpdateOne {
+	if i != nil {
+		ttuo.SetTagId(*i)
 	}
 	return ttuo
 }
 
-// AddThreadIDs adds the "threads" edge to the Thread entity by IDs.
-func (ttuo *ThreadTagUpdateOne) AddThreadIDs(ids ...int) *ThreadTagUpdateOne {
-	ttuo.mutation.AddThreadIDs(ids...)
+// SetThreadID sets the "thread" edge to the Thread entity by ID.
+func (ttuo *ThreadTagUpdateOne) SetThreadID(id int) *ThreadTagUpdateOne {
+	ttuo.mutation.SetThreadID(id)
 	return ttuo
 }
 
-// AddThreads adds the "threads" edges to the Thread entity.
-func (ttuo *ThreadTagUpdateOne) AddThreads(t ...*Thread) *ThreadTagUpdateOne {
-	ids := make([]int, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
-	}
-	return ttuo.AddThreadIDs(ids...)
+// SetThread sets the "thread" edge to the Thread entity.
+func (ttuo *ThreadTagUpdateOne) SetThread(t *Thread) *ThreadTagUpdateOne {
+	return ttuo.SetThreadID(t.ID)
+}
+
+// SetTagID sets the "tag" edge to the Tag entity by ID.
+func (ttuo *ThreadTagUpdateOne) SetTagID(id int) *ThreadTagUpdateOne {
+	ttuo.mutation.SetTagID(id)
+	return ttuo
+}
+
+// SetTag sets the "tag" edge to the Tag entity.
+func (ttuo *ThreadTagUpdateOne) SetTag(t *Tag) *ThreadTagUpdateOne {
+	return ttuo.SetTagID(t.ID)
 }
 
 // Mutation returns the ThreadTagMutation object of the builder.
@@ -266,25 +279,16 @@ func (ttuo *ThreadTagUpdateOne) Mutation() *ThreadTagMutation {
 	return ttuo.mutation
 }
 
-// ClearThreads clears all "threads" edges to the Thread entity.
-func (ttuo *ThreadTagUpdateOne) ClearThreads() *ThreadTagUpdateOne {
-	ttuo.mutation.ClearThreads()
+// ClearThread clears the "thread" edge to the Thread entity.
+func (ttuo *ThreadTagUpdateOne) ClearThread() *ThreadTagUpdateOne {
+	ttuo.mutation.ClearThread()
 	return ttuo
 }
 
-// RemoveThreadIDs removes the "threads" edge to Thread entities by IDs.
-func (ttuo *ThreadTagUpdateOne) RemoveThreadIDs(ids ...int) *ThreadTagUpdateOne {
-	ttuo.mutation.RemoveThreadIDs(ids...)
+// ClearTag clears the "tag" edge to the Tag entity.
+func (ttuo *ThreadTagUpdateOne) ClearTag() *ThreadTagUpdateOne {
+	ttuo.mutation.ClearTag()
 	return ttuo
-}
-
-// RemoveThreads removes "threads" edges to Thread entities.
-func (ttuo *ThreadTagUpdateOne) RemoveThreads(t ...*Thread) *ThreadTagUpdateOne {
-	ids := make([]int, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
-	}
-	return ttuo.RemoveThreadIDs(ids...)
 }
 
 // Where appends a list predicates to the ThreadTagUpdate builder.
@@ -329,10 +333,11 @@ func (ttuo *ThreadTagUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (ttuo *ThreadTagUpdateOne) check() error {
-	if v, ok := ttuo.mutation.Name(); ok {
-		if err := threadtag.NameValidator(v); err != nil {
-			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "ThreadTag.name": %w`, err)}
-		}
+	if _, ok := ttuo.mutation.ThreadID(); ttuo.mutation.ThreadCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "ThreadTag.thread"`)
+	}
+	if _, ok := ttuo.mutation.TagID(); ttuo.mutation.TagCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "ThreadTag.tag"`)
 	}
 	return nil
 }
@@ -341,22 +346,24 @@ func (ttuo *ThreadTagUpdateOne) sqlSave(ctx context.Context) (_node *ThreadTag, 
 	if err := ttuo.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(threadtag.Table, threadtag.Columns, sqlgraph.NewFieldSpec(threadtag.FieldID, field.TypeInt))
-	id, ok := ttuo.mutation.ID()
-	if !ok {
-		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "ThreadTag.id" for update`)}
+	_spec := sqlgraph.NewUpdateSpec(threadtag.Table, threadtag.Columns, sqlgraph.NewFieldSpec(threadtag.FieldThreadId, field.TypeInt), sqlgraph.NewFieldSpec(threadtag.FieldTagId, field.TypeInt))
+	if id, ok := ttuo.mutation.ThreadId(); !ok {
+		return nil, &ValidationError{Name: "threadId", err: errors.New(`ent: missing "ThreadTag.threadId" for update`)}
+	} else {
+		_spec.Node.CompositeID[0].Value = id
 	}
-	_spec.Node.ID.Value = id
+	if id, ok := ttuo.mutation.TagId(); !ok {
+		return nil, &ValidationError{Name: "tagId", err: errors.New(`ent: missing "ThreadTag.tagId" for update`)}
+	} else {
+		_spec.Node.CompositeID[1].Value = id
+	}
 	if fields := ttuo.fields; len(fields) > 0 {
-		_spec.Node.Columns = make([]string, 0, len(fields))
-		_spec.Node.Columns = append(_spec.Node.Columns, threadtag.FieldID)
-		for _, f := range fields {
+		_spec.Node.Columns = make([]string, len(fields))
+		for i, f := range fields {
 			if !threadtag.ValidColumn(f) {
 				return nil, &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 			}
-			if f != threadtag.FieldID {
-				_spec.Node.Columns = append(_spec.Node.Columns, f)
-			}
+			_spec.Node.Columns[i] = f
 		}
 	}
 	if ps := ttuo.mutation.predicates; len(ps) > 0 {
@@ -366,18 +373,12 @@ func (ttuo *ThreadTagUpdateOne) sqlSave(ctx context.Context) (_node *ThreadTag, 
 			}
 		}
 	}
-	if value, ok := ttuo.mutation.Name(); ok {
-		_spec.SetField(threadtag.FieldName, field.TypeString, value)
-	}
-	if value, ok := ttuo.mutation.CreatedAt(); ok {
-		_spec.SetField(threadtag.FieldCreatedAt, field.TypeTime, value)
-	}
-	if ttuo.mutation.ThreadsCleared() {
+	if ttuo.mutation.ThreadCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   threadtag.ThreadsTable,
-			Columns: threadtag.ThreadsPrimaryKey,
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   threadtag.ThreadTable,
+			Columns: []string{threadtag.ThreadColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(thread.FieldID, field.TypeInt),
@@ -385,12 +386,12 @@ func (ttuo *ThreadTagUpdateOne) sqlSave(ctx context.Context) (_node *ThreadTag, 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ttuo.mutation.RemovedThreadsIDs(); len(nodes) > 0 && !ttuo.mutation.ThreadsCleared() {
+	if nodes := ttuo.mutation.ThreadIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   threadtag.ThreadsTable,
-			Columns: threadtag.ThreadsPrimaryKey,
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   threadtag.ThreadTable,
+			Columns: []string{threadtag.ThreadColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(thread.FieldID, field.TypeInt),
@@ -399,17 +400,30 @@ func (ttuo *ThreadTagUpdateOne) sqlSave(ctx context.Context) (_node *ThreadTag, 
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if nodes := ttuo.mutation.ThreadsIDs(); len(nodes) > 0 {
+	if ttuo.mutation.TagCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   threadtag.ThreadsTable,
-			Columns: threadtag.ThreadsPrimaryKey,
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   threadtag.TagTable,
+			Columns: []string{threadtag.TagColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(thread.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ttuo.mutation.TagIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   threadtag.TagTable,
+			Columns: []string{threadtag.TagColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

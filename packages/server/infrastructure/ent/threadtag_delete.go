@@ -9,7 +9,6 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"entgo.io/ent/schema/field"
 )
 
 // ThreadTagDelete is the builder for deleting a ThreadTag entity.
@@ -40,7 +39,7 @@ func (ttd *ThreadTagDelete) ExecX(ctx context.Context) int {
 }
 
 func (ttd *ThreadTagDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := sqlgraph.NewDeleteSpec(threadtag.Table, sqlgraph.NewFieldSpec(threadtag.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewDeleteSpec(threadtag.Table, nil)
 	if ps := ttd.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {

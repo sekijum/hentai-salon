@@ -20,28 +20,16 @@ func (f BoardFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.BoardMutation", m)
 }
 
-// The CommentFunc type is an adapter to allow the use of ordinary
-// function as Comment mutator.
-type CommentFunc func(context.Context, *ent.CommentMutation) (ent.Value, error)
+// The TagFunc type is an adapter to allow the use of ordinary
+// function as Tag mutator.
+type TagFunc func(context.Context, *ent.TagMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
-func (f CommentFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.CommentMutation); ok {
+func (f TagFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.TagMutation); ok {
 		return f(ctx, mv)
 	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CommentMutation", m)
-}
-
-// The CommentAttachmentFunc type is an adapter to allow the use of ordinary
-// function as CommentAttachment mutator.
-type CommentAttachmentFunc func(context.Context, *ent.CommentAttachmentMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f CommentAttachmentFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.CommentAttachmentMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CommentAttachmentMutation", m)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TagMutation", m)
 }
 
 // The ThreadFunc type is an adapter to allow the use of ordinary
@@ -56,6 +44,30 @@ func (f ThreadFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, erro
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ThreadMutation", m)
 }
 
+// The ThreadCommentFunc type is an adapter to allow the use of ordinary
+// function as ThreadComment mutator.
+type ThreadCommentFunc func(context.Context, *ent.ThreadCommentMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ThreadCommentFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ThreadCommentMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ThreadCommentMutation", m)
+}
+
+// The ThreadCommentAttachmentFunc type is an adapter to allow the use of ordinary
+// function as ThreadCommentAttachment mutator.
+type ThreadCommentAttachmentFunc func(context.Context, *ent.ThreadCommentAttachmentMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ThreadCommentAttachmentFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ThreadCommentAttachmentMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ThreadCommentAttachmentMutation", m)
+}
+
 // The ThreadTagFunc type is an adapter to allow the use of ordinary
 // function as ThreadTag mutator.
 type ThreadTagFunc func(context.Context, *ent.ThreadTagMutation) (ent.Value, error)
@@ -66,18 +78,6 @@ func (f ThreadTagFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, e
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ThreadTagMutation", m)
-}
-
-// The ThreadTaggingFunc type is an adapter to allow the use of ordinary
-// function as ThreadTagging mutator.
-type ThreadTaggingFunc func(context.Context, *ent.ThreadTaggingMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f ThreadTaggingFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.ThreadTaggingMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ThreadTaggingMutation", m)
 }
 
 // The UserFunc type is an adapter to allow the use of ordinary

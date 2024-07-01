@@ -7,9 +7,9 @@ import (
 	"errors"
 	"fmt"
 	"server/infrastructure/ent/board"
-	"server/infrastructure/ent/comment"
 	"server/infrastructure/ent/predicate"
 	"server/infrastructure/ent/thread"
+	"server/infrastructure/ent/threadcomment"
 	"server/infrastructure/ent/user"
 	"time"
 
@@ -70,26 +70,6 @@ func (uu *UserUpdate) SetNillablePassword(s *string) *UserUpdate {
 	if s != nil {
 		uu.SetPassword(*s)
 	}
-	return uu
-}
-
-// SetDisplayName sets the "displayName" field.
-func (uu *UserUpdate) SetDisplayName(s string) *UserUpdate {
-	uu.mutation.SetDisplayName(s)
-	return uu
-}
-
-// SetNillableDisplayName sets the "displayName" field if the given value is not nil.
-func (uu *UserUpdate) SetNillableDisplayName(s *string) *UserUpdate {
-	if s != nil {
-		uu.SetDisplayName(*s)
-	}
-	return uu
-}
-
-// ClearDisplayName clears the value of the "displayName" field.
-func (uu *UserUpdate) ClearDisplayName() *UserUpdate {
-	uu.mutation.ClearDisplayName()
 	return uu
 }
 
@@ -205,17 +185,17 @@ func (uu *UserUpdate) AddThreads(t ...*Thread) *UserUpdate {
 	return uu.AddThreadIDs(ids...)
 }
 
-// AddCommentIDs adds the "comments" edge to the Comment entity by IDs.
+// AddCommentIDs adds the "comments" edge to the ThreadComment entity by IDs.
 func (uu *UserUpdate) AddCommentIDs(ids ...int) *UserUpdate {
 	uu.mutation.AddCommentIDs(ids...)
 	return uu
 }
 
-// AddComments adds the "comments" edges to the Comment entity.
-func (uu *UserUpdate) AddComments(c ...*Comment) *UserUpdate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+// AddComments adds the "comments" edges to the ThreadComment entity.
+func (uu *UserUpdate) AddComments(t ...*ThreadComment) *UserUpdate {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
 	}
 	return uu.AddCommentIDs(ids...)
 }
@@ -250,17 +230,17 @@ func (uu *UserUpdate) AddLikedThreads(t ...*Thread) *UserUpdate {
 	return uu.AddLikedThreadIDs(ids...)
 }
 
-// AddLikedCommentIDs adds the "liked_comments" edge to the Comment entity by IDs.
+// AddLikedCommentIDs adds the "liked_comments" edge to the ThreadComment entity by IDs.
 func (uu *UserUpdate) AddLikedCommentIDs(ids ...int) *UserUpdate {
 	uu.mutation.AddLikedCommentIDs(ids...)
 	return uu
 }
 
-// AddLikedComments adds the "liked_comments" edges to the Comment entity.
-func (uu *UserUpdate) AddLikedComments(c ...*Comment) *UserUpdate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+// AddLikedComments adds the "liked_comments" edges to the ThreadComment entity.
+func (uu *UserUpdate) AddLikedComments(t ...*ThreadComment) *UserUpdate {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
 	}
 	return uu.AddLikedCommentIDs(ids...)
 }
@@ -295,17 +275,17 @@ func (uu *UserUpdate) AddSubscribedThreads(t ...*Thread) *UserUpdate {
 	return uu.AddSubscribedThreadIDs(ids...)
 }
 
-// AddSubscribedCommentIDs adds the "subscribed_comments" edge to the Comment entity by IDs.
+// AddSubscribedCommentIDs adds the "subscribed_comments" edge to the ThreadComment entity by IDs.
 func (uu *UserUpdate) AddSubscribedCommentIDs(ids ...int) *UserUpdate {
 	uu.mutation.AddSubscribedCommentIDs(ids...)
 	return uu
 }
 
-// AddSubscribedComments adds the "subscribed_comments" edges to the Comment entity.
-func (uu *UserUpdate) AddSubscribedComments(c ...*Comment) *UserUpdate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+// AddSubscribedComments adds the "subscribed_comments" edges to the ThreadComment entity.
+func (uu *UserUpdate) AddSubscribedComments(t ...*ThreadComment) *UserUpdate {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
 	}
 	return uu.AddSubscribedCommentIDs(ids...)
 }
@@ -357,23 +337,23 @@ func (uu *UserUpdate) RemoveThreads(t ...*Thread) *UserUpdate {
 	return uu.RemoveThreadIDs(ids...)
 }
 
-// ClearComments clears all "comments" edges to the Comment entity.
+// ClearComments clears all "comments" edges to the ThreadComment entity.
 func (uu *UserUpdate) ClearComments() *UserUpdate {
 	uu.mutation.ClearComments()
 	return uu
 }
 
-// RemoveCommentIDs removes the "comments" edge to Comment entities by IDs.
+// RemoveCommentIDs removes the "comments" edge to ThreadComment entities by IDs.
 func (uu *UserUpdate) RemoveCommentIDs(ids ...int) *UserUpdate {
 	uu.mutation.RemoveCommentIDs(ids...)
 	return uu
 }
 
-// RemoveComments removes "comments" edges to Comment entities.
-func (uu *UserUpdate) RemoveComments(c ...*Comment) *UserUpdate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+// RemoveComments removes "comments" edges to ThreadComment entities.
+func (uu *UserUpdate) RemoveComments(t ...*ThreadComment) *UserUpdate {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
 	}
 	return uu.RemoveCommentIDs(ids...)
 }
@@ -420,23 +400,23 @@ func (uu *UserUpdate) RemoveLikedThreads(t ...*Thread) *UserUpdate {
 	return uu.RemoveLikedThreadIDs(ids...)
 }
 
-// ClearLikedComments clears all "liked_comments" edges to the Comment entity.
+// ClearLikedComments clears all "liked_comments" edges to the ThreadComment entity.
 func (uu *UserUpdate) ClearLikedComments() *UserUpdate {
 	uu.mutation.ClearLikedComments()
 	return uu
 }
 
-// RemoveLikedCommentIDs removes the "liked_comments" edge to Comment entities by IDs.
+// RemoveLikedCommentIDs removes the "liked_comments" edge to ThreadComment entities by IDs.
 func (uu *UserUpdate) RemoveLikedCommentIDs(ids ...int) *UserUpdate {
 	uu.mutation.RemoveLikedCommentIDs(ids...)
 	return uu
 }
 
-// RemoveLikedComments removes "liked_comments" edges to Comment entities.
-func (uu *UserUpdate) RemoveLikedComments(c ...*Comment) *UserUpdate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+// RemoveLikedComments removes "liked_comments" edges to ThreadComment entities.
+func (uu *UserUpdate) RemoveLikedComments(t ...*ThreadComment) *UserUpdate {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
 	}
 	return uu.RemoveLikedCommentIDs(ids...)
 }
@@ -483,23 +463,23 @@ func (uu *UserUpdate) RemoveSubscribedThreads(t ...*Thread) *UserUpdate {
 	return uu.RemoveSubscribedThreadIDs(ids...)
 }
 
-// ClearSubscribedComments clears all "subscribed_comments" edges to the Comment entity.
+// ClearSubscribedComments clears all "subscribed_comments" edges to the ThreadComment entity.
 func (uu *UserUpdate) ClearSubscribedComments() *UserUpdate {
 	uu.mutation.ClearSubscribedComments()
 	return uu
 }
 
-// RemoveSubscribedCommentIDs removes the "subscribed_comments" edge to Comment entities by IDs.
+// RemoveSubscribedCommentIDs removes the "subscribed_comments" edge to ThreadComment entities by IDs.
 func (uu *UserUpdate) RemoveSubscribedCommentIDs(ids ...int) *UserUpdate {
 	uu.mutation.RemoveSubscribedCommentIDs(ids...)
 	return uu
 }
 
-// RemoveSubscribedComments removes "subscribed_comments" edges to Comment entities.
-func (uu *UserUpdate) RemoveSubscribedComments(c ...*Comment) *UserUpdate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+// RemoveSubscribedComments removes "subscribed_comments" edges to ThreadComment entities.
+func (uu *UserUpdate) RemoveSubscribedComments(t ...*ThreadComment) *UserUpdate {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
 	}
 	return uu.RemoveSubscribedCommentIDs(ids...)
 }
@@ -552,11 +532,6 @@ func (uu *UserUpdate) check() error {
 			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "User.email": %w`, err)}
 		}
 	}
-	if v, ok := uu.mutation.DisplayName(); ok {
-		if err := user.DisplayNameValidator(v); err != nil {
-			return &ValidationError{Name: "displayName", err: fmt.Errorf(`ent: validator failed for field "User.displayName": %w`, err)}
-		}
-	}
 	return nil
 }
 
@@ -580,12 +555,6 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := uu.mutation.Password(); ok {
 		_spec.SetField(user.FieldPassword, field.TypeString, value)
-	}
-	if value, ok := uu.mutation.DisplayName(); ok {
-		_spec.SetField(user.FieldDisplayName, field.TypeString, value)
-	}
-	if uu.mutation.DisplayNameCleared() {
-		_spec.ClearField(user.FieldDisplayName, field.TypeString)
 	}
 	if value, ok := uu.mutation.AvatarUrl(); ok {
 		_spec.SetField(user.FieldAvatarUrl, field.TypeString, value)
@@ -709,7 +678,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{user.CommentsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -722,7 +691,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{user.CommentsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -738,7 +707,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{user.CommentsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -868,7 +837,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: user.LikedCommentsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
 			},
 		}
 		createE := &UserCommentLikeCreate{config: uu.config, mutation: newUserCommentLikeMutation(uu.config, OpCreate)}
@@ -885,7 +854,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: user.LikedCommentsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -905,7 +874,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: user.LikedCommentsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -1039,7 +1008,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: user.SubscribedCommentsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
 			},
 		}
 		createE := &UserCommentSubscriptionCreate{config: uu.config, mutation: newUserCommentSubscriptionMutation(uu.config, OpCreate)}
@@ -1056,7 +1025,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: user.SubscribedCommentsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -1076,7 +1045,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: user.SubscribedCommentsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -1147,26 +1116,6 @@ func (uuo *UserUpdateOne) SetNillablePassword(s *string) *UserUpdateOne {
 	if s != nil {
 		uuo.SetPassword(*s)
 	}
-	return uuo
-}
-
-// SetDisplayName sets the "displayName" field.
-func (uuo *UserUpdateOne) SetDisplayName(s string) *UserUpdateOne {
-	uuo.mutation.SetDisplayName(s)
-	return uuo
-}
-
-// SetNillableDisplayName sets the "displayName" field if the given value is not nil.
-func (uuo *UserUpdateOne) SetNillableDisplayName(s *string) *UserUpdateOne {
-	if s != nil {
-		uuo.SetDisplayName(*s)
-	}
-	return uuo
-}
-
-// ClearDisplayName clears the value of the "displayName" field.
-func (uuo *UserUpdateOne) ClearDisplayName() *UserUpdateOne {
-	uuo.mutation.ClearDisplayName()
 	return uuo
 }
 
@@ -1282,17 +1231,17 @@ func (uuo *UserUpdateOne) AddThreads(t ...*Thread) *UserUpdateOne {
 	return uuo.AddThreadIDs(ids...)
 }
 
-// AddCommentIDs adds the "comments" edge to the Comment entity by IDs.
+// AddCommentIDs adds the "comments" edge to the ThreadComment entity by IDs.
 func (uuo *UserUpdateOne) AddCommentIDs(ids ...int) *UserUpdateOne {
 	uuo.mutation.AddCommentIDs(ids...)
 	return uuo
 }
 
-// AddComments adds the "comments" edges to the Comment entity.
-func (uuo *UserUpdateOne) AddComments(c ...*Comment) *UserUpdateOne {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+// AddComments adds the "comments" edges to the ThreadComment entity.
+func (uuo *UserUpdateOne) AddComments(t ...*ThreadComment) *UserUpdateOne {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
 	}
 	return uuo.AddCommentIDs(ids...)
 }
@@ -1327,17 +1276,17 @@ func (uuo *UserUpdateOne) AddLikedThreads(t ...*Thread) *UserUpdateOne {
 	return uuo.AddLikedThreadIDs(ids...)
 }
 
-// AddLikedCommentIDs adds the "liked_comments" edge to the Comment entity by IDs.
+// AddLikedCommentIDs adds the "liked_comments" edge to the ThreadComment entity by IDs.
 func (uuo *UserUpdateOne) AddLikedCommentIDs(ids ...int) *UserUpdateOne {
 	uuo.mutation.AddLikedCommentIDs(ids...)
 	return uuo
 }
 
-// AddLikedComments adds the "liked_comments" edges to the Comment entity.
-func (uuo *UserUpdateOne) AddLikedComments(c ...*Comment) *UserUpdateOne {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+// AddLikedComments adds the "liked_comments" edges to the ThreadComment entity.
+func (uuo *UserUpdateOne) AddLikedComments(t ...*ThreadComment) *UserUpdateOne {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
 	}
 	return uuo.AddLikedCommentIDs(ids...)
 }
@@ -1372,17 +1321,17 @@ func (uuo *UserUpdateOne) AddSubscribedThreads(t ...*Thread) *UserUpdateOne {
 	return uuo.AddSubscribedThreadIDs(ids...)
 }
 
-// AddSubscribedCommentIDs adds the "subscribed_comments" edge to the Comment entity by IDs.
+// AddSubscribedCommentIDs adds the "subscribed_comments" edge to the ThreadComment entity by IDs.
 func (uuo *UserUpdateOne) AddSubscribedCommentIDs(ids ...int) *UserUpdateOne {
 	uuo.mutation.AddSubscribedCommentIDs(ids...)
 	return uuo
 }
 
-// AddSubscribedComments adds the "subscribed_comments" edges to the Comment entity.
-func (uuo *UserUpdateOne) AddSubscribedComments(c ...*Comment) *UserUpdateOne {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+// AddSubscribedComments adds the "subscribed_comments" edges to the ThreadComment entity.
+func (uuo *UserUpdateOne) AddSubscribedComments(t ...*ThreadComment) *UserUpdateOne {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
 	}
 	return uuo.AddSubscribedCommentIDs(ids...)
 }
@@ -1434,23 +1383,23 @@ func (uuo *UserUpdateOne) RemoveThreads(t ...*Thread) *UserUpdateOne {
 	return uuo.RemoveThreadIDs(ids...)
 }
 
-// ClearComments clears all "comments" edges to the Comment entity.
+// ClearComments clears all "comments" edges to the ThreadComment entity.
 func (uuo *UserUpdateOne) ClearComments() *UserUpdateOne {
 	uuo.mutation.ClearComments()
 	return uuo
 }
 
-// RemoveCommentIDs removes the "comments" edge to Comment entities by IDs.
+// RemoveCommentIDs removes the "comments" edge to ThreadComment entities by IDs.
 func (uuo *UserUpdateOne) RemoveCommentIDs(ids ...int) *UserUpdateOne {
 	uuo.mutation.RemoveCommentIDs(ids...)
 	return uuo
 }
 
-// RemoveComments removes "comments" edges to Comment entities.
-func (uuo *UserUpdateOne) RemoveComments(c ...*Comment) *UserUpdateOne {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+// RemoveComments removes "comments" edges to ThreadComment entities.
+func (uuo *UserUpdateOne) RemoveComments(t ...*ThreadComment) *UserUpdateOne {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
 	}
 	return uuo.RemoveCommentIDs(ids...)
 }
@@ -1497,23 +1446,23 @@ func (uuo *UserUpdateOne) RemoveLikedThreads(t ...*Thread) *UserUpdateOne {
 	return uuo.RemoveLikedThreadIDs(ids...)
 }
 
-// ClearLikedComments clears all "liked_comments" edges to the Comment entity.
+// ClearLikedComments clears all "liked_comments" edges to the ThreadComment entity.
 func (uuo *UserUpdateOne) ClearLikedComments() *UserUpdateOne {
 	uuo.mutation.ClearLikedComments()
 	return uuo
 }
 
-// RemoveLikedCommentIDs removes the "liked_comments" edge to Comment entities by IDs.
+// RemoveLikedCommentIDs removes the "liked_comments" edge to ThreadComment entities by IDs.
 func (uuo *UserUpdateOne) RemoveLikedCommentIDs(ids ...int) *UserUpdateOne {
 	uuo.mutation.RemoveLikedCommentIDs(ids...)
 	return uuo
 }
 
-// RemoveLikedComments removes "liked_comments" edges to Comment entities.
-func (uuo *UserUpdateOne) RemoveLikedComments(c ...*Comment) *UserUpdateOne {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+// RemoveLikedComments removes "liked_comments" edges to ThreadComment entities.
+func (uuo *UserUpdateOne) RemoveLikedComments(t ...*ThreadComment) *UserUpdateOne {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
 	}
 	return uuo.RemoveLikedCommentIDs(ids...)
 }
@@ -1560,23 +1509,23 @@ func (uuo *UserUpdateOne) RemoveSubscribedThreads(t ...*Thread) *UserUpdateOne {
 	return uuo.RemoveSubscribedThreadIDs(ids...)
 }
 
-// ClearSubscribedComments clears all "subscribed_comments" edges to the Comment entity.
+// ClearSubscribedComments clears all "subscribed_comments" edges to the ThreadComment entity.
 func (uuo *UserUpdateOne) ClearSubscribedComments() *UserUpdateOne {
 	uuo.mutation.ClearSubscribedComments()
 	return uuo
 }
 
-// RemoveSubscribedCommentIDs removes the "subscribed_comments" edge to Comment entities by IDs.
+// RemoveSubscribedCommentIDs removes the "subscribed_comments" edge to ThreadComment entities by IDs.
 func (uuo *UserUpdateOne) RemoveSubscribedCommentIDs(ids ...int) *UserUpdateOne {
 	uuo.mutation.RemoveSubscribedCommentIDs(ids...)
 	return uuo
 }
 
-// RemoveSubscribedComments removes "subscribed_comments" edges to Comment entities.
-func (uuo *UserUpdateOne) RemoveSubscribedComments(c ...*Comment) *UserUpdateOne {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+// RemoveSubscribedComments removes "subscribed_comments" edges to ThreadComment entities.
+func (uuo *UserUpdateOne) RemoveSubscribedComments(t ...*ThreadComment) *UserUpdateOne {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
 	}
 	return uuo.RemoveSubscribedCommentIDs(ids...)
 }
@@ -1642,11 +1591,6 @@ func (uuo *UserUpdateOne) check() error {
 			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "User.email": %w`, err)}
 		}
 	}
-	if v, ok := uuo.mutation.DisplayName(); ok {
-		if err := user.DisplayNameValidator(v); err != nil {
-			return &ValidationError{Name: "displayName", err: fmt.Errorf(`ent: validator failed for field "User.displayName": %w`, err)}
-		}
-	}
 	return nil
 }
 
@@ -1687,12 +1631,6 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	}
 	if value, ok := uuo.mutation.Password(); ok {
 		_spec.SetField(user.FieldPassword, field.TypeString, value)
-	}
-	if value, ok := uuo.mutation.DisplayName(); ok {
-		_spec.SetField(user.FieldDisplayName, field.TypeString, value)
-	}
-	if uuo.mutation.DisplayNameCleared() {
-		_spec.ClearField(user.FieldDisplayName, field.TypeString)
 	}
 	if value, ok := uuo.mutation.AvatarUrl(); ok {
 		_spec.SetField(user.FieldAvatarUrl, field.TypeString, value)
@@ -1816,7 +1754,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Columns: []string{user.CommentsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -1829,7 +1767,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Columns: []string{user.CommentsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -1845,7 +1783,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Columns: []string{user.CommentsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -1975,7 +1913,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Columns: user.LikedCommentsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
 			},
 		}
 		createE := &UserCommentLikeCreate{config: uuo.config, mutation: newUserCommentLikeMutation(uuo.config, OpCreate)}
@@ -1992,7 +1930,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Columns: user.LikedCommentsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -2012,7 +1950,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Columns: user.LikedCommentsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -2146,7 +2084,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Columns: user.SubscribedCommentsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
 			},
 		}
 		createE := &UserCommentSubscriptionCreate{config: uuo.config, mutation: newUserCommentSubscriptionMutation(uuo.config, OpCreate)}
@@ -2163,7 +2101,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Columns: user.SubscribedCommentsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -2183,7 +2121,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Columns: user.SubscribedCommentsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

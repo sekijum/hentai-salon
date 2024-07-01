@@ -4,8 +4,8 @@ package ent
 
 import (
 	"fmt"
-	"server/infrastructure/ent/comment"
 	"server/infrastructure/ent/thread"
+	"server/infrastructure/ent/threadcomment"
 	"server/infrastructure/ent/user"
 	"strings"
 	"time"
@@ -14,8 +14,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
-// Comment is the model entity for the Comment schema.
-type Comment struct {
+// ThreadComment is the model entity for the ThreadComment schema.
+type ThreadComment struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
@@ -27,34 +27,34 @@ type Comment struct {
 	UserId int `json:"userId,omitempty"`
 	// ゲストユーザーの場合
 	GuestName string `json:"guestName,omitempty"`
-	// Message holds the value of the "message" field.
-	Message string `json:"message,omitempty"`
+	// Content holds the value of the "content" field.
+	Content string `json:"content,omitempty"`
 	// コメント者のIPアドレス
 	IPAddress string `json:"ip_address,omitempty"`
-	// Status holds the value of the "status" field.
+	// 0: Visible, 1: Deleted
 	Status int `json:"status,omitempty"`
 	// CreatedAt holds the value of the "createdAt" field.
 	CreatedAt time.Time `json:"createdAt,omitempty"`
 	// UpdatedAt holds the value of the "updatedAt" field.
 	UpdatedAt time.Time `json:"updatedAt,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
-	// The values are being populated by the CommentQuery when eager-loading is set.
-	Edges        CommentEdges `json:"edges"`
+	// The values are being populated by the ThreadCommentQuery when eager-loading is set.
+	Edges        ThreadCommentEdges `json:"edges"`
 	selectValues sql.SelectValues
 }
 
-// CommentEdges holds the relations/edges for other nodes in the graph.
-type CommentEdges struct {
+// ThreadCommentEdges holds the relations/edges for other nodes in the graph.
+type ThreadCommentEdges struct {
 	// Thread holds the value of the thread edge.
 	Thread *Thread `json:"thread,omitempty"`
 	// Author holds the value of the author edge.
 	Author *User `json:"author,omitempty"`
 	// ParentComment holds the value of the parent_comment edge.
-	ParentComment *Comment `json:"parent_comment,omitempty"`
+	ParentComment *ThreadComment `json:"parent_comment,omitempty"`
 	// Replies holds the value of the replies edge.
-	Replies []*Comment `json:"replies,omitempty"`
-	// CommentAttachments holds the value of the comment_attachments edge.
-	CommentAttachments []*CommentAttachment `json:"comment_attachments,omitempty"`
+	Replies []*ThreadComment `json:"replies,omitempty"`
+	// Attachments holds the value of the attachments edge.
+	Attachments []*ThreadCommentAttachment `json:"attachments,omitempty"`
 	// LikedUsers holds the value of the liked_users edge.
 	LikedUsers []*User `json:"liked_users,omitempty"`
 	// SubscribedUsers holds the value of the subscribed_users edge.
@@ -70,7 +70,7 @@ type CommentEdges struct {
 
 // ThreadOrErr returns the Thread value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e CommentEdges) ThreadOrErr() (*Thread, error) {
+func (e ThreadCommentEdges) ThreadOrErr() (*Thread, error) {
 	if e.Thread != nil {
 		return e.Thread, nil
 	} else if e.loadedTypes[0] {
@@ -81,7 +81,7 @@ func (e CommentEdges) ThreadOrErr() (*Thread, error) {
 
 // AuthorOrErr returns the Author value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e CommentEdges) AuthorOrErr() (*User, error) {
+func (e ThreadCommentEdges) AuthorOrErr() (*User, error) {
 	if e.Author != nil {
 		return e.Author, nil
 	} else if e.loadedTypes[1] {
@@ -92,36 +92,36 @@ func (e CommentEdges) AuthorOrErr() (*User, error) {
 
 // ParentCommentOrErr returns the ParentComment value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e CommentEdges) ParentCommentOrErr() (*Comment, error) {
+func (e ThreadCommentEdges) ParentCommentOrErr() (*ThreadComment, error) {
 	if e.ParentComment != nil {
 		return e.ParentComment, nil
 	} else if e.loadedTypes[2] {
-		return nil, &NotFoundError{label: comment.Label}
+		return nil, &NotFoundError{label: threadcomment.Label}
 	}
 	return nil, &NotLoadedError{edge: "parent_comment"}
 }
 
 // RepliesOrErr returns the Replies value or an error if the edge
 // was not loaded in eager-loading.
-func (e CommentEdges) RepliesOrErr() ([]*Comment, error) {
+func (e ThreadCommentEdges) RepliesOrErr() ([]*ThreadComment, error) {
 	if e.loadedTypes[3] {
 		return e.Replies, nil
 	}
 	return nil, &NotLoadedError{edge: "replies"}
 }
 
-// CommentAttachmentsOrErr returns the CommentAttachments value or an error if the edge
+// AttachmentsOrErr returns the Attachments value or an error if the edge
 // was not loaded in eager-loading.
-func (e CommentEdges) CommentAttachmentsOrErr() ([]*CommentAttachment, error) {
+func (e ThreadCommentEdges) AttachmentsOrErr() ([]*ThreadCommentAttachment, error) {
 	if e.loadedTypes[4] {
-		return e.CommentAttachments, nil
+		return e.Attachments, nil
 	}
-	return nil, &NotLoadedError{edge: "comment_attachments"}
+	return nil, &NotLoadedError{edge: "attachments"}
 }
 
 // LikedUsersOrErr returns the LikedUsers value or an error if the edge
 // was not loaded in eager-loading.
-func (e CommentEdges) LikedUsersOrErr() ([]*User, error) {
+func (e ThreadCommentEdges) LikedUsersOrErr() ([]*User, error) {
 	if e.loadedTypes[5] {
 		return e.LikedUsers, nil
 	}
@@ -130,7 +130,7 @@ func (e CommentEdges) LikedUsersOrErr() ([]*User, error) {
 
 // SubscribedUsersOrErr returns the SubscribedUsers value or an error if the edge
 // was not loaded in eager-loading.
-func (e CommentEdges) SubscribedUsersOrErr() ([]*User, error) {
+func (e ThreadCommentEdges) SubscribedUsersOrErr() ([]*User, error) {
 	if e.loadedTypes[6] {
 		return e.SubscribedUsers, nil
 	}
@@ -139,7 +139,7 @@ func (e CommentEdges) SubscribedUsersOrErr() ([]*User, error) {
 
 // UserCommentLikeOrErr returns the UserCommentLike value or an error if the edge
 // was not loaded in eager-loading.
-func (e CommentEdges) UserCommentLikeOrErr() ([]*UserCommentLike, error) {
+func (e ThreadCommentEdges) UserCommentLikeOrErr() ([]*UserCommentLike, error) {
 	if e.loadedTypes[7] {
 		return e.UserCommentLike, nil
 	}
@@ -148,7 +148,7 @@ func (e CommentEdges) UserCommentLikeOrErr() ([]*UserCommentLike, error) {
 
 // UserCommentSubscriptionOrErr returns the UserCommentSubscription value or an error if the edge
 // was not loaded in eager-loading.
-func (e CommentEdges) UserCommentSubscriptionOrErr() ([]*UserCommentSubscription, error) {
+func (e ThreadCommentEdges) UserCommentSubscriptionOrErr() ([]*UserCommentSubscription, error) {
 	if e.loadedTypes[8] {
 		return e.UserCommentSubscription, nil
 	}
@@ -156,15 +156,15 @@ func (e CommentEdges) UserCommentSubscriptionOrErr() ([]*UserCommentSubscription
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
-func (*Comment) scanValues(columns []string) ([]any, error) {
+func (*ThreadComment) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case comment.FieldID, comment.FieldThreadId, comment.FieldParentCommentId, comment.FieldUserId, comment.FieldStatus:
+		case threadcomment.FieldID, threadcomment.FieldThreadId, threadcomment.FieldParentCommentId, threadcomment.FieldUserId, threadcomment.FieldStatus:
 			values[i] = new(sql.NullInt64)
-		case comment.FieldGuestName, comment.FieldMessage, comment.FieldIPAddress:
+		case threadcomment.FieldGuestName, threadcomment.FieldContent, threadcomment.FieldIPAddress:
 			values[i] = new(sql.NullString)
-		case comment.FieldCreatedAt, comment.FieldUpdatedAt:
+		case threadcomment.FieldCreatedAt, threadcomment.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -174,183 +174,183 @@ func (*Comment) scanValues(columns []string) ([]any, error) {
 }
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
-// to the Comment fields.
-func (c *Comment) assignValues(columns []string, values []any) error {
+// to the ThreadComment fields.
+func (tc *ThreadComment) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
 	for i := range columns {
 		switch columns[i] {
-		case comment.FieldID:
+		case threadcomment.FieldID:
 			value, ok := values[i].(*sql.NullInt64)
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			c.ID = int(value.Int64)
-		case comment.FieldThreadId:
+			tc.ID = int(value.Int64)
+		case threadcomment.FieldThreadId:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field threadId", values[i])
 			} else if value.Valid {
-				c.ThreadId = int(value.Int64)
+				tc.ThreadId = int(value.Int64)
 			}
-		case comment.FieldParentCommentId:
+		case threadcomment.FieldParentCommentId:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field parentCommentId", values[i])
 			} else if value.Valid {
-				c.ParentCommentId = int(value.Int64)
+				tc.ParentCommentId = int(value.Int64)
 			}
-		case comment.FieldUserId:
+		case threadcomment.FieldUserId:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field userId", values[i])
 			} else if value.Valid {
-				c.UserId = int(value.Int64)
+				tc.UserId = int(value.Int64)
 			}
-		case comment.FieldGuestName:
+		case threadcomment.FieldGuestName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field guestName", values[i])
 			} else if value.Valid {
-				c.GuestName = value.String
+				tc.GuestName = value.String
 			}
-		case comment.FieldMessage:
+		case threadcomment.FieldContent:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field message", values[i])
+				return fmt.Errorf("unexpected type %T for field content", values[i])
 			} else if value.Valid {
-				c.Message = value.String
+				tc.Content = value.String
 			}
-		case comment.FieldIPAddress:
+		case threadcomment.FieldIPAddress:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field ip_address", values[i])
 			} else if value.Valid {
-				c.IPAddress = value.String
+				tc.IPAddress = value.String
 			}
-		case comment.FieldStatus:
+		case threadcomment.FieldStatus:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field status", values[i])
 			} else if value.Valid {
-				c.Status = int(value.Int64)
+				tc.Status = int(value.Int64)
 			}
-		case comment.FieldCreatedAt:
+		case threadcomment.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field createdAt", values[i])
 			} else if value.Valid {
-				c.CreatedAt = value.Time
+				tc.CreatedAt = value.Time
 			}
-		case comment.FieldUpdatedAt:
+		case threadcomment.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updatedAt", values[i])
 			} else if value.Valid {
-				c.UpdatedAt = value.Time
+				tc.UpdatedAt = value.Time
 			}
 		default:
-			c.selectValues.Set(columns[i], values[i])
+			tc.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
 }
 
-// Value returns the ent.Value that was dynamically selected and assigned to the Comment.
+// Value returns the ent.Value that was dynamically selected and assigned to the ThreadComment.
 // This includes values selected through modifiers, order, etc.
-func (c *Comment) Value(name string) (ent.Value, error) {
-	return c.selectValues.Get(name)
+func (tc *ThreadComment) Value(name string) (ent.Value, error) {
+	return tc.selectValues.Get(name)
 }
 
-// QueryThread queries the "thread" edge of the Comment entity.
-func (c *Comment) QueryThread() *ThreadQuery {
-	return NewCommentClient(c.config).QueryThread(c)
+// QueryThread queries the "thread" edge of the ThreadComment entity.
+func (tc *ThreadComment) QueryThread() *ThreadQuery {
+	return NewThreadCommentClient(tc.config).QueryThread(tc)
 }
 
-// QueryAuthor queries the "author" edge of the Comment entity.
-func (c *Comment) QueryAuthor() *UserQuery {
-	return NewCommentClient(c.config).QueryAuthor(c)
+// QueryAuthor queries the "author" edge of the ThreadComment entity.
+func (tc *ThreadComment) QueryAuthor() *UserQuery {
+	return NewThreadCommentClient(tc.config).QueryAuthor(tc)
 }
 
-// QueryParentComment queries the "parent_comment" edge of the Comment entity.
-func (c *Comment) QueryParentComment() *CommentQuery {
-	return NewCommentClient(c.config).QueryParentComment(c)
+// QueryParentComment queries the "parent_comment" edge of the ThreadComment entity.
+func (tc *ThreadComment) QueryParentComment() *ThreadCommentQuery {
+	return NewThreadCommentClient(tc.config).QueryParentComment(tc)
 }
 
-// QueryReplies queries the "replies" edge of the Comment entity.
-func (c *Comment) QueryReplies() *CommentQuery {
-	return NewCommentClient(c.config).QueryReplies(c)
+// QueryReplies queries the "replies" edge of the ThreadComment entity.
+func (tc *ThreadComment) QueryReplies() *ThreadCommentQuery {
+	return NewThreadCommentClient(tc.config).QueryReplies(tc)
 }
 
-// QueryCommentAttachments queries the "comment_attachments" edge of the Comment entity.
-func (c *Comment) QueryCommentAttachments() *CommentAttachmentQuery {
-	return NewCommentClient(c.config).QueryCommentAttachments(c)
+// QueryAttachments queries the "attachments" edge of the ThreadComment entity.
+func (tc *ThreadComment) QueryAttachments() *ThreadCommentAttachmentQuery {
+	return NewThreadCommentClient(tc.config).QueryAttachments(tc)
 }
 
-// QueryLikedUsers queries the "liked_users" edge of the Comment entity.
-func (c *Comment) QueryLikedUsers() *UserQuery {
-	return NewCommentClient(c.config).QueryLikedUsers(c)
+// QueryLikedUsers queries the "liked_users" edge of the ThreadComment entity.
+func (tc *ThreadComment) QueryLikedUsers() *UserQuery {
+	return NewThreadCommentClient(tc.config).QueryLikedUsers(tc)
 }
 
-// QuerySubscribedUsers queries the "subscribed_users" edge of the Comment entity.
-func (c *Comment) QuerySubscribedUsers() *UserQuery {
-	return NewCommentClient(c.config).QuerySubscribedUsers(c)
+// QuerySubscribedUsers queries the "subscribed_users" edge of the ThreadComment entity.
+func (tc *ThreadComment) QuerySubscribedUsers() *UserQuery {
+	return NewThreadCommentClient(tc.config).QuerySubscribedUsers(tc)
 }
 
-// QueryUserCommentLike queries the "user_comment_like" edge of the Comment entity.
-func (c *Comment) QueryUserCommentLike() *UserCommentLikeQuery {
-	return NewCommentClient(c.config).QueryUserCommentLike(c)
+// QueryUserCommentLike queries the "user_comment_like" edge of the ThreadComment entity.
+func (tc *ThreadComment) QueryUserCommentLike() *UserCommentLikeQuery {
+	return NewThreadCommentClient(tc.config).QueryUserCommentLike(tc)
 }
 
-// QueryUserCommentSubscription queries the "user_comment_subscription" edge of the Comment entity.
-func (c *Comment) QueryUserCommentSubscription() *UserCommentSubscriptionQuery {
-	return NewCommentClient(c.config).QueryUserCommentSubscription(c)
+// QueryUserCommentSubscription queries the "user_comment_subscription" edge of the ThreadComment entity.
+func (tc *ThreadComment) QueryUserCommentSubscription() *UserCommentSubscriptionQuery {
+	return NewThreadCommentClient(tc.config).QueryUserCommentSubscription(tc)
 }
 
-// Update returns a builder for updating this Comment.
-// Note that you need to call Comment.Unwrap() before calling this method if this Comment
+// Update returns a builder for updating this ThreadComment.
+// Note that you need to call ThreadComment.Unwrap() before calling this method if this ThreadComment
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (c *Comment) Update() *CommentUpdateOne {
-	return NewCommentClient(c.config).UpdateOne(c)
+func (tc *ThreadComment) Update() *ThreadCommentUpdateOne {
+	return NewThreadCommentClient(tc.config).UpdateOne(tc)
 }
 
-// Unwrap unwraps the Comment entity that was returned from a transaction after it was closed,
+// Unwrap unwraps the ThreadComment entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (c *Comment) Unwrap() *Comment {
-	_tx, ok := c.config.driver.(*txDriver)
+func (tc *ThreadComment) Unwrap() *ThreadComment {
+	_tx, ok := tc.config.driver.(*txDriver)
 	if !ok {
-		panic("ent: Comment is not a transactional entity")
+		panic("ent: ThreadComment is not a transactional entity")
 	}
-	c.config.driver = _tx.drv
-	return c
+	tc.config.driver = _tx.drv
+	return tc
 }
 
 // String implements the fmt.Stringer.
-func (c *Comment) String() string {
+func (tc *ThreadComment) String() string {
 	var builder strings.Builder
-	builder.WriteString("Comment(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", c.ID))
+	builder.WriteString("ThreadComment(")
+	builder.WriteString(fmt.Sprintf("id=%v, ", tc.ID))
 	builder.WriteString("threadId=")
-	builder.WriteString(fmt.Sprintf("%v", c.ThreadId))
+	builder.WriteString(fmt.Sprintf("%v", tc.ThreadId))
 	builder.WriteString(", ")
 	builder.WriteString("parentCommentId=")
-	builder.WriteString(fmt.Sprintf("%v", c.ParentCommentId))
+	builder.WriteString(fmt.Sprintf("%v", tc.ParentCommentId))
 	builder.WriteString(", ")
 	builder.WriteString("userId=")
-	builder.WriteString(fmt.Sprintf("%v", c.UserId))
+	builder.WriteString(fmt.Sprintf("%v", tc.UserId))
 	builder.WriteString(", ")
 	builder.WriteString("guestName=")
-	builder.WriteString(c.GuestName)
+	builder.WriteString(tc.GuestName)
 	builder.WriteString(", ")
-	builder.WriteString("message=")
-	builder.WriteString(c.Message)
+	builder.WriteString("content=")
+	builder.WriteString(tc.Content)
 	builder.WriteString(", ")
 	builder.WriteString("ip_address=")
-	builder.WriteString(c.IPAddress)
+	builder.WriteString(tc.IPAddress)
 	builder.WriteString(", ")
 	builder.WriteString("status=")
-	builder.WriteString(fmt.Sprintf("%v", c.Status))
+	builder.WriteString(fmt.Sprintf("%v", tc.Status))
 	builder.WriteString(", ")
 	builder.WriteString("createdAt=")
-	builder.WriteString(c.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(tc.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("updatedAt=")
-	builder.WriteString(c.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(tc.UpdatedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }
 
-// Comments is a parsable slice of Comment.
-type Comments []*Comment
+// ThreadComments is a parsable slice of ThreadComment.
+type ThreadComments []*ThreadComment

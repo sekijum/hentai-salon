@@ -4,187 +4,76 @@ package threadtag
 
 import (
 	"server/infrastructure/ent/predicate"
-	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
-// ID filters vertices based on their ID field.
-func ID(id int) predicate.ThreadTag {
-	return predicate.ThreadTag(sql.FieldEQ(FieldID, id))
+// ThreadId applies equality check predicate on the "threadId" field. It's identical to ThreadIdEQ.
+func ThreadId(v int) predicate.ThreadTag {
+	return predicate.ThreadTag(sql.FieldEQ(FieldThreadId, v))
 }
 
-// IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id int) predicate.ThreadTag {
-	return predicate.ThreadTag(sql.FieldEQ(FieldID, id))
+// TagId applies equality check predicate on the "tagId" field. It's identical to TagIdEQ.
+func TagId(v int) predicate.ThreadTag {
+	return predicate.ThreadTag(sql.FieldEQ(FieldTagId, v))
 }
 
-// IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id int) predicate.ThreadTag {
-	return predicate.ThreadTag(sql.FieldNEQ(FieldID, id))
+// ThreadIdEQ applies the EQ predicate on the "threadId" field.
+func ThreadIdEQ(v int) predicate.ThreadTag {
+	return predicate.ThreadTag(sql.FieldEQ(FieldThreadId, v))
 }
 
-// IDIn applies the In predicate on the ID field.
-func IDIn(ids ...int) predicate.ThreadTag {
-	return predicate.ThreadTag(sql.FieldIn(FieldID, ids...))
+// ThreadIdNEQ applies the NEQ predicate on the "threadId" field.
+func ThreadIdNEQ(v int) predicate.ThreadTag {
+	return predicate.ThreadTag(sql.FieldNEQ(FieldThreadId, v))
 }
 
-// IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...int) predicate.ThreadTag {
-	return predicate.ThreadTag(sql.FieldNotIn(FieldID, ids...))
+// ThreadIdIn applies the In predicate on the "threadId" field.
+func ThreadIdIn(vs ...int) predicate.ThreadTag {
+	return predicate.ThreadTag(sql.FieldIn(FieldThreadId, vs...))
 }
 
-// IDGT applies the GT predicate on the ID field.
-func IDGT(id int) predicate.ThreadTag {
-	return predicate.ThreadTag(sql.FieldGT(FieldID, id))
+// ThreadIdNotIn applies the NotIn predicate on the "threadId" field.
+func ThreadIdNotIn(vs ...int) predicate.ThreadTag {
+	return predicate.ThreadTag(sql.FieldNotIn(FieldThreadId, vs...))
 }
 
-// IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id int) predicate.ThreadTag {
-	return predicate.ThreadTag(sql.FieldGTE(FieldID, id))
+// TagIdEQ applies the EQ predicate on the "tagId" field.
+func TagIdEQ(v int) predicate.ThreadTag {
+	return predicate.ThreadTag(sql.FieldEQ(FieldTagId, v))
 }
 
-// IDLT applies the LT predicate on the ID field.
-func IDLT(id int) predicate.ThreadTag {
-	return predicate.ThreadTag(sql.FieldLT(FieldID, id))
+// TagIdNEQ applies the NEQ predicate on the "tagId" field.
+func TagIdNEQ(v int) predicate.ThreadTag {
+	return predicate.ThreadTag(sql.FieldNEQ(FieldTagId, v))
 }
 
-// IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id int) predicate.ThreadTag {
-	return predicate.ThreadTag(sql.FieldLTE(FieldID, id))
+// TagIdIn applies the In predicate on the "tagId" field.
+func TagIdIn(vs ...int) predicate.ThreadTag {
+	return predicate.ThreadTag(sql.FieldIn(FieldTagId, vs...))
 }
 
-// Name applies equality check predicate on the "name" field. It's identical to NameEQ.
-func Name(v string) predicate.ThreadTag {
-	return predicate.ThreadTag(sql.FieldEQ(FieldName, v))
+// TagIdNotIn applies the NotIn predicate on the "tagId" field.
+func TagIdNotIn(vs ...int) predicate.ThreadTag {
+	return predicate.ThreadTag(sql.FieldNotIn(FieldTagId, vs...))
 }
 
-// CreatedAt applies equality check predicate on the "createdAt" field. It's identical to CreatedAtEQ.
-func CreatedAt(v time.Time) predicate.ThreadTag {
-	return predicate.ThreadTag(sql.FieldEQ(FieldCreatedAt, v))
-}
-
-// NameEQ applies the EQ predicate on the "name" field.
-func NameEQ(v string) predicate.ThreadTag {
-	return predicate.ThreadTag(sql.FieldEQ(FieldName, v))
-}
-
-// NameNEQ applies the NEQ predicate on the "name" field.
-func NameNEQ(v string) predicate.ThreadTag {
-	return predicate.ThreadTag(sql.FieldNEQ(FieldName, v))
-}
-
-// NameIn applies the In predicate on the "name" field.
-func NameIn(vs ...string) predicate.ThreadTag {
-	return predicate.ThreadTag(sql.FieldIn(FieldName, vs...))
-}
-
-// NameNotIn applies the NotIn predicate on the "name" field.
-func NameNotIn(vs ...string) predicate.ThreadTag {
-	return predicate.ThreadTag(sql.FieldNotIn(FieldName, vs...))
-}
-
-// NameGT applies the GT predicate on the "name" field.
-func NameGT(v string) predicate.ThreadTag {
-	return predicate.ThreadTag(sql.FieldGT(FieldName, v))
-}
-
-// NameGTE applies the GTE predicate on the "name" field.
-func NameGTE(v string) predicate.ThreadTag {
-	return predicate.ThreadTag(sql.FieldGTE(FieldName, v))
-}
-
-// NameLT applies the LT predicate on the "name" field.
-func NameLT(v string) predicate.ThreadTag {
-	return predicate.ThreadTag(sql.FieldLT(FieldName, v))
-}
-
-// NameLTE applies the LTE predicate on the "name" field.
-func NameLTE(v string) predicate.ThreadTag {
-	return predicate.ThreadTag(sql.FieldLTE(FieldName, v))
-}
-
-// NameContains applies the Contains predicate on the "name" field.
-func NameContains(v string) predicate.ThreadTag {
-	return predicate.ThreadTag(sql.FieldContains(FieldName, v))
-}
-
-// NameHasPrefix applies the HasPrefix predicate on the "name" field.
-func NameHasPrefix(v string) predicate.ThreadTag {
-	return predicate.ThreadTag(sql.FieldHasPrefix(FieldName, v))
-}
-
-// NameHasSuffix applies the HasSuffix predicate on the "name" field.
-func NameHasSuffix(v string) predicate.ThreadTag {
-	return predicate.ThreadTag(sql.FieldHasSuffix(FieldName, v))
-}
-
-// NameEqualFold applies the EqualFold predicate on the "name" field.
-func NameEqualFold(v string) predicate.ThreadTag {
-	return predicate.ThreadTag(sql.FieldEqualFold(FieldName, v))
-}
-
-// NameContainsFold applies the ContainsFold predicate on the "name" field.
-func NameContainsFold(v string) predicate.ThreadTag {
-	return predicate.ThreadTag(sql.FieldContainsFold(FieldName, v))
-}
-
-// CreatedAtEQ applies the EQ predicate on the "createdAt" field.
-func CreatedAtEQ(v time.Time) predicate.ThreadTag {
-	return predicate.ThreadTag(sql.FieldEQ(FieldCreatedAt, v))
-}
-
-// CreatedAtNEQ applies the NEQ predicate on the "createdAt" field.
-func CreatedAtNEQ(v time.Time) predicate.ThreadTag {
-	return predicate.ThreadTag(sql.FieldNEQ(FieldCreatedAt, v))
-}
-
-// CreatedAtIn applies the In predicate on the "createdAt" field.
-func CreatedAtIn(vs ...time.Time) predicate.ThreadTag {
-	return predicate.ThreadTag(sql.FieldIn(FieldCreatedAt, vs...))
-}
-
-// CreatedAtNotIn applies the NotIn predicate on the "createdAt" field.
-func CreatedAtNotIn(vs ...time.Time) predicate.ThreadTag {
-	return predicate.ThreadTag(sql.FieldNotIn(FieldCreatedAt, vs...))
-}
-
-// CreatedAtGT applies the GT predicate on the "createdAt" field.
-func CreatedAtGT(v time.Time) predicate.ThreadTag {
-	return predicate.ThreadTag(sql.FieldGT(FieldCreatedAt, v))
-}
-
-// CreatedAtGTE applies the GTE predicate on the "createdAt" field.
-func CreatedAtGTE(v time.Time) predicate.ThreadTag {
-	return predicate.ThreadTag(sql.FieldGTE(FieldCreatedAt, v))
-}
-
-// CreatedAtLT applies the LT predicate on the "createdAt" field.
-func CreatedAtLT(v time.Time) predicate.ThreadTag {
-	return predicate.ThreadTag(sql.FieldLT(FieldCreatedAt, v))
-}
-
-// CreatedAtLTE applies the LTE predicate on the "createdAt" field.
-func CreatedAtLTE(v time.Time) predicate.ThreadTag {
-	return predicate.ThreadTag(sql.FieldLTE(FieldCreatedAt, v))
-}
-
-// HasThreads applies the HasEdge predicate on the "threads" edge.
-func HasThreads() predicate.ThreadTag {
+// HasThread applies the HasEdge predicate on the "thread" edge.
+func HasThread() predicate.ThreadTag {
 	return predicate.ThreadTag(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, ThreadsTable, ThreadsPrimaryKey...),
+			sqlgraph.From(Table, ThreadColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, ThreadTable, ThreadColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasThreadsWith applies the HasEdge predicate on the "threads" edge with a given conditions (other predicates).
-func HasThreadsWith(preds ...predicate.Thread) predicate.ThreadTag {
+// HasThreadWith applies the HasEdge predicate on the "thread" edge with a given conditions (other predicates).
+func HasThreadWith(preds ...predicate.Thread) predicate.ThreadTag {
 	return predicate.ThreadTag(func(s *sql.Selector) {
-		step := newThreadsStep()
+		step := newThreadStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -193,21 +82,21 @@ func HasThreadsWith(preds ...predicate.Thread) predicate.ThreadTag {
 	})
 }
 
-// HasThreadTaggings applies the HasEdge predicate on the "thread_taggings" edge.
-func HasThreadTaggings() predicate.ThreadTag {
+// HasTag applies the HasEdge predicate on the "tag" edge.
+func HasTag() predicate.ThreadTag {
 	return predicate.ThreadTag(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, ThreadTaggingsTable, ThreadTaggingsColumn),
+			sqlgraph.From(Table, TagColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, TagTable, TagColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasThreadTaggingsWith applies the HasEdge predicate on the "thread_taggings" edge with a given conditions (other predicates).
-func HasThreadTaggingsWith(preds ...predicate.ThreadTagging) predicate.ThreadTag {
+// HasTagWith applies the HasEdge predicate on the "tag" edge with a given conditions (other predicates).
+func HasTagWith(preds ...predicate.Tag) predicate.ThreadTag {
 	return predicate.ThreadTag(func(s *sql.Selector) {
-		step := newThreadTaggingsStep()
+		step := newTagStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

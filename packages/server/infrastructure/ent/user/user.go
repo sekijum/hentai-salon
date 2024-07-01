@@ -20,8 +20,6 @@ const (
 	FieldEmail = "email"
 	// FieldPassword holds the string denoting the password field in the database.
 	FieldPassword = "password"
-	// FieldDisplayName holds the string denoting the displayname field in the database.
-	FieldDisplayName = "display_name"
 	// FieldAvatarUrl holds the string denoting the avatarurl field in the database.
 	FieldAvatarUrl = "avatar_url"
 	// FieldStatus holds the string denoting the status field in the database.
@@ -79,10 +77,10 @@ const (
 	// ThreadsColumn is the table column denoting the threads relation/edge.
 	ThreadsColumn = "user_id"
 	// CommentsTable is the table that holds the comments relation/edge.
-	CommentsTable = "comments"
-	// CommentsInverseTable is the table name for the Comment entity.
-	// It exists in this package in order to avoid circular dependency with the "comment" package.
-	CommentsInverseTable = "comments"
+	CommentsTable = "thread_comments"
+	// CommentsInverseTable is the table name for the ThreadComment entity.
+	// It exists in this package in order to avoid circular dependency with the "threadcomment" package.
+	CommentsInverseTable = "thread_comments"
 	// CommentsColumn is the table column denoting the comments relation/edge.
 	CommentsColumn = "user_id"
 	// LikedBoardsTable is the table that holds the liked_boards relation/edge. The primary key declared below.
@@ -97,9 +95,9 @@ const (
 	LikedThreadsInverseTable = "threads"
 	// LikedCommentsTable is the table that holds the liked_comments relation/edge. The primary key declared below.
 	LikedCommentsTable = "user_comment_likes"
-	// LikedCommentsInverseTable is the table name for the Comment entity.
-	// It exists in this package in order to avoid circular dependency with the "comment" package.
-	LikedCommentsInverseTable = "comments"
+	// LikedCommentsInverseTable is the table name for the ThreadComment entity.
+	// It exists in this package in order to avoid circular dependency with the "threadcomment" package.
+	LikedCommentsInverseTable = "thread_comments"
 	// SubscribedBoardsTable is the table that holds the subscribed_boards relation/edge. The primary key declared below.
 	SubscribedBoardsTable = "user_board_subscriptions"
 	// SubscribedBoardsInverseTable is the table name for the Board entity.
@@ -112,9 +110,9 @@ const (
 	SubscribedThreadsInverseTable = "threads"
 	// SubscribedCommentsTable is the table that holds the subscribed_comments relation/edge. The primary key declared below.
 	SubscribedCommentsTable = "user_comment_subscriptions"
-	// SubscribedCommentsInverseTable is the table name for the Comment entity.
-	// It exists in this package in order to avoid circular dependency with the "comment" package.
-	SubscribedCommentsInverseTable = "comments"
+	// SubscribedCommentsInverseTable is the table name for the ThreadComment entity.
+	// It exists in this package in order to avoid circular dependency with the "threadcomment" package.
+	SubscribedCommentsInverseTable = "thread_comments"
 	// UserBoardLikeTable is the table that holds the user_board_like relation/edge.
 	UserBoardLikeTable = "user_board_likes"
 	// UserBoardLikeInverseTable is the table name for the UserBoardLike entity.
@@ -165,7 +163,6 @@ var Columns = []string{
 	FieldName,
 	FieldEmail,
 	FieldPassword,
-	FieldDisplayName,
 	FieldAvatarUrl,
 	FieldStatus,
 	FieldRole,
@@ -209,8 +206,6 @@ var (
 	NameValidator func(string) error
 	// EmailValidator is a validator for the "email" field. It is called by the builders before save.
 	EmailValidator func(string) error
-	// DisplayNameValidator is a validator for the "displayName" field. It is called by the builders before save.
-	DisplayNameValidator func(string) error
 	// DefaultStatus holds the default value on creation for the "status" field.
 	DefaultStatus int
 	// DefaultRole holds the default value on creation for the "role" field.
@@ -244,11 +239,6 @@ func ByEmail(opts ...sql.OrderTermOption) OrderOption {
 // ByPassword orders the results by the password field.
 func ByPassword(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldPassword, opts...).ToFunc()
-}
-
-// ByDisplayName orders the results by the displayName field.
-func ByDisplayName(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldDisplayName, opts...).ToFunc()
 }
 
 // ByAvatarUrl orders the results by the avatarUrl field.

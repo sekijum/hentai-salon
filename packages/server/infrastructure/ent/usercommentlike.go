@@ -4,7 +4,7 @@ package ent
 
 import (
 	"fmt"
-	"server/infrastructure/ent/comment"
+	"server/infrastructure/ent/threadcomment"
 	"server/infrastructure/ent/user"
 	"server/infrastructure/ent/usercommentlike"
 	"strings"
@@ -34,7 +34,7 @@ type UserCommentLikeEdges struct {
 	// User holds the value of the user edge.
 	User *User `json:"user,omitempty"`
 	// Comment holds the value of the comment edge.
-	Comment *Comment `json:"comment,omitempty"`
+	Comment *ThreadComment `json:"comment,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [2]bool
@@ -53,11 +53,11 @@ func (e UserCommentLikeEdges) UserOrErr() (*User, error) {
 
 // CommentOrErr returns the Comment value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e UserCommentLikeEdges) CommentOrErr() (*Comment, error) {
+func (e UserCommentLikeEdges) CommentOrErr() (*ThreadComment, error) {
 	if e.Comment != nil {
 		return e.Comment, nil
 	} else if e.loadedTypes[1] {
-		return nil, &NotFoundError{label: comment.Label}
+		return nil, &NotFoundError{label: threadcomment.Label}
 	}
 	return nil, &NotLoadedError{edge: "comment"}
 }
@@ -123,7 +123,7 @@ func (ucl *UserCommentLike) QueryUser() *UserQuery {
 }
 
 // QueryComment queries the "comment" edge of the UserCommentLike entity.
-func (ucl *UserCommentLike) QueryComment() *CommentQuery {
+func (ucl *UserCommentLike) QueryComment() *ThreadCommentQuery {
 	return NewUserCommentLikeClient(ucl.config).QueryComment(ucl)
 }
 
