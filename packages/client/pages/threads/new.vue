@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="mx-2">
     <PageTitle title="スレ作成" />
 
     <v-divider></v-divider>
@@ -16,7 +16,7 @@
 
       <v-file-input
         v-model="form.thumbnailFile"
-        label="サムネイル"
+        label="サムネイルを選択"
         multiple
         show-size
         truncate-length="25"

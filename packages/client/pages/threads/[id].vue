@@ -29,7 +29,12 @@
     <Menu :items="menuItems" />
 
     <template v-if="route.query.tab === 'media'">
+      <div id="media-top" />
       <MediaGallery />
+
+      <v-btn icon large color="primary" class="fab fab-top" @click="scrollToMediaTop">
+        <v-icon>mdi-arrow-up</v-icon>
+      </v-btn>
     </template>
     <template v-else>
       <CommentForm />
@@ -168,6 +173,13 @@ const comments = ref([
     ],
   },
 ]);
+
+const scrollToMediaTop = () => {
+  const mediaTop = document.getElementById('media-top');
+  if (mediaTop) {
+    mediaTop.scrollIntoView({ behavior: 'smooth' });
+  }
+};
 
 const scrollToCommentTop = () => {
   const commentTop = document.getElementById('comment-top');

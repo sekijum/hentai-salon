@@ -1,41 +1,36 @@
 <template>
   <div>
-    <PageTitle title="返信" />
+    <PageTitle title="コメント返信" />
 
     <v-divider></v-divider>
 
-    <Menu :items="menuItems" />
+    <CommentItem :comment="comment" />
 
-    <template v-if="route.query.tab === 'media'">
-      <MediaGallery />
-    </template>
-    <template v-else>
-      <CommentForm />
+    <CommentForm formTitle="返信する" />
 
-      <br />
+    <br />
 
-      <v-divider></v-divider>
+    <v-divider></v-divider>
 
-      <div id="comment-top" />
-      <CommentList :comments="comments" />
-      <div id="comment-bottom" />
+    <div id="comment-top" />
+    <CommentList :comments="comments" />
+    <div id="comment-bottom" />
 
-      <Pagination />
+    <Pagination />
 
-      <br />
+    <br />
 
-      <CommentForm />
+    <CommentForm formTitle="返信する" />
 
-      <!-- 上にスクロールするFAB -->
-      <v-btn icon large color="primary" class="fab fab-top" @click="scrollToCommentTop">
-        <v-icon>mdi-arrow-up</v-icon>
-      </v-btn>
+    <!-- 上にスクロールするFAB -->
+    <v-btn icon large color="primary" class="fab fab-top" @click="scrollToCommentTop">
+      <v-icon>mdi-arrow-up</v-icon>
+    </v-btn>
 
-      <!-- 下にスクロールするFAB -->
-      <v-btn icon large color="primary" class="fab fab-bottom" @click="scrollToCommentBottom">
-        <v-icon>mdi-arrow-down</v-icon>
-      </v-btn>
-    </template>
+    <!-- 下にスクロールするFAB -->
+    <v-btn icon large color="primary" class="fab fab-bottom" @click="scrollToCommentBottom">
+      <v-icon>mdi-arrow-down</v-icon>
+    </v-btn>
   </div>
 </template>
 
@@ -67,12 +62,27 @@ const menuItems = [
     icon: 'mdi-update',
   },
 ];
-const item = ref({
-  title: 'ラーメン店主異例の訴え',
-  subtitle: '食事中にイヤホンやめて',
-  link: '/news/1',
-  comments: 12,
-  board: 'ニュース',
+
+const comment = ref({
+  id: 4,
+  username: '名無しさん@恐縮です',
+  date: '2024/06/30',
+  time: '14:28',
+  content: '歌舞伎俳優も未成年の舞妓と疑惑があっても伝統芸能の嗜みでOKのナゾのルールがあったみたいなものかw',
+  board: '垢版',
+  type: '大砲',
+  idCode: 'mswGlHt',
+  commentCount: '11',
+  media: [
+    { type: 'image', url: 'https://via.placeholder.com/300' },
+    { type: 'image', url: 'https://via.placeholder.com/300' },
+    { type: 'image', url: 'https://via.placeholder.com/300' },
+    {
+      type: 'video/mp4',
+      url: 'https://www.w3schools.com/html/mov_bbb.mp4',
+      thumbnail: 'https://via.placeholder.com/300',
+    },
+  ],
 });
 
 const comments = ref([
@@ -145,20 +155,6 @@ const comments = ref([
     ],
   },
 ]);
-
-const scrollToCommentTop = () => {
-  const commentTop = document.getElementById('comment-top');
-  if (commentTop) {
-    commentTop.scrollIntoView({ behavior: 'smooth' });
-  }
-};
-
-const scrollToCommentBottom = () => {
-  const commentBottom = document.getElementById('comment-bottom');
-  if (commentBottom) {
-    commentBottom.scrollIntoView({ behavior: 'smooth' });
-  }
-};
 </script>
 
 <style scoped>

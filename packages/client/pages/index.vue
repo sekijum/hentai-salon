@@ -23,6 +23,9 @@ const menuItems = [
   { title: 'スレ一覧', navigate: () => router.push('/threads'), icon: 'mdi-new-box' },
   { title: '板一覧', navigate: () => router.push('/boards'), icon: 'mdi-format-list-bulleted' },
   { title: '設定', navigate: () => router.push('/setting'), icon: 'mdi-cog' },
+  { title: 'サインイン', navigate: () => router.push('/signin'), icon: 'mdi-login' },
+  { title: 'サインアップ', navigate: () => router.push('/signup'), icon: 'mdi-account-plus' },
+  { title: 'スレ作成', navigate: () => router.push('/threads/new'), icon: 'mdi-forum' },
 ];
 const newsItems = ref([
   {
