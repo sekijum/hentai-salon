@@ -32,7 +32,7 @@
       <div id="media-top" />
       <MediaGallery />
 
-      <v-btn icon large color="primary" class="fab fab-top" @click="scrollToMediaTop">
+      <v-btn icon large color="primary" class="fab fab-bottom" @click="scrollToMediaTop">
         <v-icon>mdi-arrow-up</v-icon>
       </v-btn>
     </template>
