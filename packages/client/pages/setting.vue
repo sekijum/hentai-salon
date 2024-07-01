@@ -4,20 +4,7 @@
 
     <v-divider></v-divider>
 
-    <v-data-table
-      :headers="headers"
-      :items="[
-        { name: '板', type: 'header' },
-        { name: '閲覧履歴', key: 'board-history-delete' },
-        { name: 'スレッド', type: 'header' },
-        { name: '閲覧履歴', key: 'thread-history-delete' },
-        { name: '最新レス50レスのみ表示', key: 'display-latest-50-replies-only' },
-        { name: 'コメント', type: 'header' },
-        { name: '昇順/降順', key: 'display-latest-50-replies-only' },
-      ]"
-      hide-default-footer
-      hide-default-header
-    >
+    <v-data-table :items="menuItems" hide-default-footer hide-default-header>
       <template v-slot:item="{ item }">
         <tr :class="{ highlight: item.type === 'header' }">
           <td>{{ item.name }}</td>
@@ -37,6 +24,16 @@
 <script setup>
 import { ref } from 'vue';
 import PageTitle from '~/components/PageTitle.vue';
+
+const menuItems = [
+  { name: '板', type: 'header' },
+  { name: '閲覧履歴', key: 'board-history-delete' },
+  { name: 'スレッド', type: 'header' },
+  { name: '閲覧履歴', key: 'thread-history-delete' },
+  { name: '最新レス50レスのみ表示', key: 'display-latest-50-replies-only' },
+  { name: 'コメント', type: 'header' },
+  { name: '昇順/降順', key: 'display-latest-50-replies-only' },
+];
 </script>
 
 <style scoped>

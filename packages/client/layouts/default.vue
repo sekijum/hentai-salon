@@ -7,9 +7,7 @@
   </v-app>
 </template>
 
-<script setup>
-import MenuSection from '~/components/MenuSection.vue';
-</script>
+<script setup></script>
 
 <style scoped>
 .main-container {

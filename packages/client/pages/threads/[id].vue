@@ -81,12 +81,12 @@ const tab = ref(route.query.tab ?? 'comments');
 const menuItems = [
   {
     title: 'コメント一覧',
-    to: '',
+    to: '?tab=comments',
     icon: 'mdi-fire',
   },
   {
     title: 'メディア',
-    to: '',
+    to: '?tab=media',
     icon: 'mdi-update',
   },
 ];

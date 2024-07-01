@@ -1,14 +1,12 @@
 <template>
   <v-sheet>
     <v-row align="center" justify="center" class="m-0">
-      <template v-for="(item, idx) in items" :key="idx">
-        <v-col :cols="columnWidth" class="p-0">
-          <v-sheet class="menu-item" @click="navigateTo(item.to)">
-            <v-icon class="menu-icon">{{ item.icon }}</v-icon>
-            <span class="menu-title">{{ item.title }}</span>
-          </v-sheet>
-        </v-col>
-      </template>
+      <v-col v-for="(item, idx) in items" :key="idx" :cols="columnWidth" class="p-0">
+        <v-sheet class="menu-item" @click="navigateTo(item.to)">
+          <v-icon class="menu-icon">{{ item.icon }}</v-icon>
+          <span class="menu-title">{{ item.title }}</span>
+        </v-sheet>
+      </v-col>
     </v-row>
   </v-sheet>
 </template>
