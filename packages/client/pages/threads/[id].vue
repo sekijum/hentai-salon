@@ -12,53 +12,44 @@
 
     <v-divider></v-divider>
 
-    <MenuSection
-      :items="[
-        {
-          title: 'コメント一覧',
-          to: '',
-          icon: 'mdi-fire',
-        },
-        {
-          title: 'メディア',
-          to: '',
-          icon: 'mdi-update',
-        },
-      ]"
-    />
+    <MenuSection :items="menuItems" />
 
     <br />
 
-    <CommentForm />
+    <template v-if="tab === 'comments'">
+      <CommentForm />
 
-    <br />
+      <br />
 
-    <v-divider></v-divider>
+      <v-divider></v-divider>
 
-    <div id="comment-top" />
-    <CommentList />
-    <div id="comment-bottom" />
+      <div id="comment-top" />
+      <CommentList />
+      <div id="comment-bottom" />
 
-    <Pagination />
+      <Pagination />
 
-    <br />
+      <br />
 
-    <CommentForm />
+      <CommentForm />
 
-    <!-- 上にスクロールするFAB -->
-    <v-btn icon large color="primary" class="fab fab-top" @click="scrollToCommentTop">
-      <v-icon>mdi-arrow-up</v-icon>
-    </v-btn>
+      <!-- 上にスクロールするFAB -->
+      <v-btn icon large color="primary" class="fab fab-top" @click="scrollToCommentTop">
+        <v-icon>mdi-arrow-up</v-icon>
+      </v-btn>
 
-    <!-- 下にスクロールするFAB -->
-    <v-btn icon large color="primary" class="fab fab-bottom" @click="scrollToCommentBottom">
-      <v-icon>mdi-arrow-down</v-icon>
-    </v-btn>
+      <!-- 下にスクロールするFAB -->
+      <v-btn icon large color="primary" class="fab fab-bottom" @click="scrollToCommentBottom">
+        <v-icon>mdi-arrow-down</v-icon>
+      </v-btn>
+    </template>
+    <template v-else-if="tab === 'media'">
+      <MediaGallery />
+    </template>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
 import { useRoute } from 'vue-router';
 import Header from '~/components/Header.vue';
 import ThreadTable from '~/components/thread/ThreadTable.vue';
@@ -67,10 +58,24 @@ import CommentForm from '~/components/comment/CommentForm.vue';
 import MenuSection from '~/components/MenuSection.vue';
 import PageTitle from '~/components/PageTitle.vue';
 import Pagination from '~/components/Pagination.vue';
+import MediaGallery from '~/components/MediaGallery.vue';
 
 const route = useRoute();
 const keyword = ref(route.query.keyword ?? '');
+const tab = ref(route.query.tab ?? 'comments');
 
+const menuItems = [
+  {
+    title: 'コメント一覧',
+    to: '',
+    icon: 'mdi-fire',
+  },
+  {
+    title: 'メディア',
+    to: '',
+    icon: 'mdi-update',
+  },
+];
 const item = ref({
   title: 'ラーメン店主異例の訴え',
   subtitle: '食事中にイヤホンやめて',
