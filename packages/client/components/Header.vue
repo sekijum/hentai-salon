@@ -8,7 +8,7 @@
         </v-sheet>
       </v-col>
       <v-col cols="6" class="d-flex justify-center align-center">
-        <h1 class="font-weight-thin header-title" @click="router.push('/')">変態サロン</h1>
+        <h1 class="font-weight-regular header-title" @click="router.push('/')">変態サロン</h1>
       </v-col>
       <v-col cols="3" class="d-flex justify-end align-center">
         <v-sheet class="menu-item" @click="router.push('/setting')">

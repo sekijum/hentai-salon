@@ -2,7 +2,7 @@
   <div>
     <Menu :items="menuItems" />
 
-    <ThreadTable title="閲覧履歴" :items="historyItems" moreLink="/history" :maxItems="3" />
+    <ThreadTable title="閲覧履歴" :items="historyItems" moreLink="/history" link="/hoge" :maxItems="3" />
     <ThreadTable title="人気" :items="newsItems" moreLink="/news" :maxItems="5" />
     <ThreadTable title="新着" :items="popularItems" moreLink="/popular" :maxItems="3" />
   </div>

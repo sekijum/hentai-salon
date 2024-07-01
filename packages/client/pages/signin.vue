@@ -20,9 +20,7 @@
 <script setup>
 import PageTitle from '~/components/PageTitle.vue';
 import Menu from '~/components/Menu.vue';
-import { useRouter } from 'vue-router';
 
-const router = useRouter();
 const menuItems = [
   { title: 'サインイン', navigate: () => router.push('/signin'), icon: 'mdi-login' },
   { title: 'サインアップ', navigate: () => router.push('/signup'), icon: 'mdi-account-plus' },

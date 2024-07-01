@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-if="title" class="section-title">
-      <h2>{{ title }}</h2>
+      <h2 class="font-weight-regular">{{ title }}</h2>
     </div>
 
     <v-data-table :headers="headers" :items="items" hide-default-footer hide-default-header class="thread-section">
@@ -36,6 +36,10 @@
         </div>
       </template>
     </v-data-table>
+
+    <div v-if="link && items.length > 0" class="more-link" @click="() => router.push(link)">
+      {{ title }}をもっと見る <v-icon down>mdi-chevron-down</v-icon>
+    </div>
   </div>
 </template>
 
@@ -45,11 +49,15 @@ import { useRouter } from 'vue-router';
 defineProps({
   title: String,
   items: Array,
+  link: {
+    type: String,
+    default: null,
+  },
 });
 
 const router = useRouter();
 
-const truncateTitle = title => {
+const truncateTitle = (title: string) => {
   return title.length > 50 ? title.slice(0, 50) + '...' : title;
 };
 
@@ -88,5 +96,13 @@ const headers = [
 .item-row {
   border-top: 1px solid #ccc;
   border-bottom: 1px solid #ccc;
+}
+
+.more-link {
+  text-align: center;
+  cursor: pointer;
+  background-color: #f0f0f0;
+  padding: 10px;
+  text-decoration: underline;
 }
 </style>
