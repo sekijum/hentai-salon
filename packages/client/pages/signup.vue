@@ -1,10 +1,14 @@
 <template>
-  <div class="mx-2">
+  <div>
     <PageTitle title="サインアップ" />
 
     <v-divider></v-divider>
 
-    <v-form @submit.prevent="signup">
+    <Menu :items="menuItems" />
+
+    <br />
+
+    <v-form @submit.prevent="signup" class="mx-2">
       <v-text-field label="名前(コメントの表示名になります)" v-model="name" type="text" required></v-text-field>
 
       <v-text-field label="メールアドレス" v-model="email" type="email" required></v-text-field>
@@ -34,6 +38,14 @@
 <script setup>
 import { ref } from 'vue';
 import PageTitle from '~/components/PageTitle.vue';
+import Menu from '~/components/Menu.vue';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+const menuItems = [
+  { title: 'サインイン', navigate: () => router.push('/signin'), icon: 'mdi-login' },
+  { title: 'サインアップ', navigate: () => router.push('/signup'), icon: 'mdi-account-plus' },
+];
 
 const name = ref('');
 const email = ref('');
