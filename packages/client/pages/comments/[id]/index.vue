@@ -15,7 +15,7 @@ import Header from '~/components/Header.vue';
 import ThreadTable from '~/components/thread/ThreadTable.vue';
 import CommentList from '~/components/comment/CommentList.vue';
 import CommentForm from '~/components/comment/CommentForm.vue';
-import MenuSection from '~/components/MenuSection.vue';
+import Menu from '~/components/Menu.vue';
 import PageTitle from '~/components/PageTitle.vue';
 import Pagination from '~/components/Pagination.vue';
 import CommentItem from '~/components/comment/CommentItem.vue';

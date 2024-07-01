@@ -1,6 +1,6 @@
 <template>
   <div>
-    <MenuSection :items="menuItems" />
+    <Menu :items="menuItems" />
 
     <ThreadTable title="閲覧履歴" :items="historyItems" moreLink="/history" :maxItems="3" />
     <ThreadTable title="人気" :items="newsItems" moreLink="/news" :maxItems="5" />
@@ -9,7 +9,7 @@
 </template>
 
 <script setup>
-import MenuSection from '~/components/MenuSection.vue';
+import Menu from '~/components/Menu.vue';
 import Header from '~/components/Header.vue';
 import ThreadTable from '~/components/thread/ThreadTable.vue';
 import { ref } from 'vue';

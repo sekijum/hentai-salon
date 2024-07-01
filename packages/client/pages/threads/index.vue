@@ -10,7 +10,7 @@
       v-model="keyword"
     />
 
-    <MenuSection :items="menuItems" />
+    <Menu :items="menuItems" />
 
     <ThreadTable title="" :items="newsItems" moreLink="/news" :maxItems="5" />
   </div>
@@ -19,7 +19,7 @@
 <script setup>
 import Header from '~/components/Header.vue';
 import ThreadTable from '~/components//thread/ThreadTable.vue';
-import MenuSection from '~/components//MenuSection.vue';
+import Menu from '~/components//Menu.vue';
 import PageTitle from '~/components/PageTitle.vue';
 
 const route = useRoute();
