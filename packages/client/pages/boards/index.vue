@@ -4,11 +4,6 @@
 
     <v-divider></v-divider>
 
-    <v-autocomplete
-      label="板名で検索"
-      :items="['California', 'Colorado', 'Florida', 'Georgia', 'Texas', 'Wyoming']"
-    ></v-autocomplete>
-
     <v-row>
       <v-col
         v-for="(board, index) in filteredBoards"

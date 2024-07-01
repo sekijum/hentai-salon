@@ -80,11 +80,6 @@ func ThumbnailUrl(v string) predicate.Thread {
 	return predicate.Thread(sql.FieldEQ(FieldThumbnailUrl, v))
 }
 
-// IsNotifyOnComment applies equality check predicate on the "isNotifyOnComment" field. It's identical to IsNotifyOnCommentEQ.
-func IsNotifyOnComment(v bool) predicate.Thread {
-	return predicate.Thread(sql.FieldEQ(FieldIsNotifyOnComment, v))
-}
-
 // IPAddress applies equality check predicate on the "ip_address" field. It's identical to IPAddressEQ.
 func IPAddress(v string) predicate.Thread {
 	return predicate.Thread(sql.FieldEQ(FieldIPAddress, v))
@@ -358,16 +353,6 @@ func ThumbnailUrlEqualFold(v string) predicate.Thread {
 // ThumbnailUrlContainsFold applies the ContainsFold predicate on the "thumbnailUrl" field.
 func ThumbnailUrlContainsFold(v string) predicate.Thread {
 	return predicate.Thread(sql.FieldContainsFold(FieldThumbnailUrl, v))
-}
-
-// IsNotifyOnCommentEQ applies the EQ predicate on the "isNotifyOnComment" field.
-func IsNotifyOnCommentEQ(v bool) predicate.Thread {
-	return predicate.Thread(sql.FieldEQ(FieldIsNotifyOnComment, v))
-}
-
-// IsNotifyOnCommentNEQ applies the NEQ predicate on the "isNotifyOnComment" field.
-func IsNotifyOnCommentNEQ(v bool) predicate.Thread {
-	return predicate.Thread(sql.FieldNEQ(FieldIsNotifyOnComment, v))
 }
 
 // IPAddressEQ applies the EQ predicate on the "ip_address" field.

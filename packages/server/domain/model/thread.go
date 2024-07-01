@@ -15,7 +15,6 @@ type Thread struct {
 	Title             string
 	Description       *string
 	ThumbnailUrl      *string
-	IsNotifyOnComment bool
 	IpAddress         string
 	Status            ThreadStatus
 	CreatedAt         time.Time

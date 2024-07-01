@@ -61,7 +61,6 @@ func (ds *ThreadDatasource) Create(ctx context.Context, t *model.Thread) (*model
 		SetTitle(t.Title).
 		SetUserId(t.UserId).
 		SetBoardId(t.BoardId).
-		SetIsNotifyOnComment(t.IsNotifyOnComment).
 		SetIPAddress(t.IpAddress).
 		SetStatus(t.Status.ToInt())
 	if t.Description != nil {

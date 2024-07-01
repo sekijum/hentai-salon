@@ -114,20 +114,6 @@ func (tu *ThreadUpdate) ClearThumbnailUrl() *ThreadUpdate {
 	return tu
 }
 
-// SetIsNotifyOnComment sets the "isNotifyOnComment" field.
-func (tu *ThreadUpdate) SetIsNotifyOnComment(b bool) *ThreadUpdate {
-	tu.mutation.SetIsNotifyOnComment(b)
-	return tu
-}
-
-// SetNillableIsNotifyOnComment sets the "isNotifyOnComment" field if the given value is not nil.
-func (tu *ThreadUpdate) SetNillableIsNotifyOnComment(b *bool) *ThreadUpdate {
-	if b != nil {
-		tu.SetIsNotifyOnComment(*b)
-	}
-	return tu
-}
-
 // SetIPAddress sets the "ip_address" field.
 func (tu *ThreadUpdate) SetIPAddress(s string) *ThreadUpdate {
 	tu.mutation.SetIPAddress(s)
@@ -454,9 +440,6 @@ func (tu *ThreadUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if tu.mutation.ThumbnailUrlCleared() {
 		_spec.ClearField(thread.FieldThumbnailUrl, field.TypeString)
-	}
-	if value, ok := tu.mutation.IsNotifyOnComment(); ok {
-		_spec.SetField(thread.FieldIsNotifyOnComment, field.TypeBool, value)
 	}
 	if value, ok := tu.mutation.IPAddress(); ok {
 		_spec.SetField(thread.FieldIPAddress, field.TypeString, value)
@@ -837,20 +820,6 @@ func (tuo *ThreadUpdateOne) ClearThumbnailUrl() *ThreadUpdateOne {
 	return tuo
 }
 
-// SetIsNotifyOnComment sets the "isNotifyOnComment" field.
-func (tuo *ThreadUpdateOne) SetIsNotifyOnComment(b bool) *ThreadUpdateOne {
-	tuo.mutation.SetIsNotifyOnComment(b)
-	return tuo
-}
-
-// SetNillableIsNotifyOnComment sets the "isNotifyOnComment" field if the given value is not nil.
-func (tuo *ThreadUpdateOne) SetNillableIsNotifyOnComment(b *bool) *ThreadUpdateOne {
-	if b != nil {
-		tuo.SetIsNotifyOnComment(*b)
-	}
-	return tuo
-}
-
 // SetIPAddress sets the "ip_address" field.
 func (tuo *ThreadUpdateOne) SetIPAddress(s string) *ThreadUpdateOne {
 	tuo.mutation.SetIPAddress(s)
@@ -1207,9 +1176,6 @@ func (tuo *ThreadUpdateOne) sqlSave(ctx context.Context) (_node *Thread, err err
 	}
 	if tuo.mutation.ThumbnailUrlCleared() {
 		_spec.ClearField(thread.FieldThumbnailUrl, field.TypeString)
-	}
-	if value, ok := tuo.mutation.IsNotifyOnComment(); ok {
-		_spec.SetField(thread.FieldIsNotifyOnComment, field.TypeBool, value)
 	}
 	if value, ok := tuo.mutation.IPAddress(); ok {
 		_spec.SetField(thread.FieldIPAddress, field.TypeString, value)

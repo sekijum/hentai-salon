@@ -55,7 +55,6 @@ func (svc *ThreadApplicationService) Create(
 		ThumbnailUrl:      body.ThumbnailUrl,
 		IpAddress:         ginCtx.ClientIP(),
 		Status:            model.ThreadStatusOpen,
-		IsNotifyOnComment: body.IsNotifyOnComment,
 		CreatedAt:         time.Now(),
 		UpdatedAt:         time.Now(),
 	}

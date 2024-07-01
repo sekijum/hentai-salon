@@ -24,8 +24,6 @@ const (
 	FieldDescription = "description"
 	// FieldThumbnailUrl holds the string denoting the thumbnailurl field in the database.
 	FieldThumbnailUrl = "thumbnail_url"
-	// FieldIsNotifyOnComment holds the string denoting the isnotifyoncomment field in the database.
-	FieldIsNotifyOnComment = "is_notify_on_comment"
 	// FieldIPAddress holds the string denoting the ip_address field in the database.
 	FieldIPAddress = "ip_address"
 	// FieldStatus holds the string denoting the status field in the database.
@@ -121,7 +119,6 @@ var Columns = []string{
 	FieldTitle,
 	FieldDescription,
 	FieldThumbnailUrl,
-	FieldIsNotifyOnComment,
 	FieldIPAddress,
 	FieldStatus,
 	FieldCreatedAt,
@@ -155,8 +152,6 @@ var (
 	TitleValidator func(string) error
 	// DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
 	DescriptionValidator func(string) error
-	// DefaultIsNotifyOnComment holds the default value on creation for the "isNotifyOnComment" field.
-	DefaultIsNotifyOnComment bool
 	// IPAddressValidator is a validator for the "ip_address" field. It is called by the builders before save.
 	IPAddressValidator func(string) error
 	// DefaultStatus holds the default value on creation for the "status" field.
@@ -200,11 +195,6 @@ func ByDescription(opts ...sql.OrderTermOption) OrderOption {
 // ByThumbnailUrl orders the results by the thumbnailUrl field.
 func ByThumbnailUrl(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldThumbnailUrl, opts...).ToFunc()
-}
-
-// ByIsNotifyOnComment orders the results by the isNotifyOnComment field.
-func ByIsNotifyOnComment(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldIsNotifyOnComment, opts...).ToFunc()
 }
 
 // ByIPAddress orders the results by the ip_address field.

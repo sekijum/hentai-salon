@@ -67,24 +67,20 @@ func init() {
 	threadDescDescription := threadFields[4].Descriptor()
 	// thread.DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
 	thread.DescriptionValidator = threadDescDescription.Validators[0].(func(string) error)
-	// threadDescIsNotifyOnComment is the schema descriptor for isNotifyOnComment field.
-	threadDescIsNotifyOnComment := threadFields[6].Descriptor()
-	// thread.DefaultIsNotifyOnComment holds the default value on creation for the isNotifyOnComment field.
-	thread.DefaultIsNotifyOnComment = threadDescIsNotifyOnComment.Default.(bool)
 	// threadDescIPAddress is the schema descriptor for ip_address field.
-	threadDescIPAddress := threadFields[7].Descriptor()
+	threadDescIPAddress := threadFields[6].Descriptor()
 	// thread.IPAddressValidator is a validator for the "ip_address" field. It is called by the builders before save.
 	thread.IPAddressValidator = threadDescIPAddress.Validators[0].(func(string) error)
 	// threadDescStatus is the schema descriptor for status field.
-	threadDescStatus := threadFields[8].Descriptor()
+	threadDescStatus := threadFields[7].Descriptor()
 	// thread.DefaultStatus holds the default value on creation for the status field.
 	thread.DefaultStatus = threadDescStatus.Default.(int)
 	// threadDescCreatedAt is the schema descriptor for createdAt field.
-	threadDescCreatedAt := threadFields[9].Descriptor()
+	threadDescCreatedAt := threadFields[8].Descriptor()
 	// thread.DefaultCreatedAt holds the default value on creation for the createdAt field.
 	thread.DefaultCreatedAt = threadDescCreatedAt.Default.(func() time.Time)
 	// threadDescUpdatedAt is the schema descriptor for updatedAt field.
-	threadDescUpdatedAt := threadFields[10].Descriptor()
+	threadDescUpdatedAt := threadFields[9].Descriptor()
 	// thread.DefaultUpdatedAt holds the default value on creation for the updatedAt field.
 	thread.DefaultUpdatedAt = threadDescUpdatedAt.Default.(func() time.Time)
 	// thread.UpdateDefaultUpdatedAt holds the default value on update for the updatedAt field.

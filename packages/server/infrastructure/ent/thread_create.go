@@ -70,20 +70,6 @@ func (tc *ThreadCreate) SetNillableThumbnailUrl(s *string) *ThreadCreate {
 	return tc
 }
 
-// SetIsNotifyOnComment sets the "isNotifyOnComment" field.
-func (tc *ThreadCreate) SetIsNotifyOnComment(b bool) *ThreadCreate {
-	tc.mutation.SetIsNotifyOnComment(b)
-	return tc
-}
-
-// SetNillableIsNotifyOnComment sets the "isNotifyOnComment" field if the given value is not nil.
-func (tc *ThreadCreate) SetNillableIsNotifyOnComment(b *bool) *ThreadCreate {
-	if b != nil {
-		tc.SetIsNotifyOnComment(*b)
-	}
-	return tc
-}
-
 // SetIPAddress sets the "ip_address" field.
 func (tc *ThreadCreate) SetIPAddress(s string) *ThreadCreate {
 	tc.mutation.SetIPAddress(s)
@@ -255,10 +241,6 @@ func (tc *ThreadCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (tc *ThreadCreate) defaults() {
-	if _, ok := tc.mutation.IsNotifyOnComment(); !ok {
-		v := thread.DefaultIsNotifyOnComment
-		tc.mutation.SetIsNotifyOnComment(v)
-	}
 	if _, ok := tc.mutation.Status(); !ok {
 		v := thread.DefaultStatus
 		tc.mutation.SetStatus(v)
@@ -293,9 +275,6 @@ func (tc *ThreadCreate) check() error {
 		if err := thread.DescriptionValidator(v); err != nil {
 			return &ValidationError{Name: "description", err: fmt.Errorf(`ent: validator failed for field "Thread.description": %w`, err)}
 		}
-	}
-	if _, ok := tc.mutation.IsNotifyOnComment(); !ok {
-		return &ValidationError{Name: "isNotifyOnComment", err: errors.New(`ent: missing required field "Thread.isNotifyOnComment"`)}
 	}
 	if _, ok := tc.mutation.IPAddress(); !ok {
 		return &ValidationError{Name: "ip_address", err: errors.New(`ent: missing required field "Thread.ip_address"`)}
@@ -363,10 +342,6 @@ func (tc *ThreadCreate) createSpec() (*Thread, *sqlgraph.CreateSpec) {
 	if value, ok := tc.mutation.ThumbnailUrl(); ok {
 		_spec.SetField(thread.FieldThumbnailUrl, field.TypeString, value)
 		_node.ThumbnailUrl = value
-	}
-	if value, ok := tc.mutation.IsNotifyOnComment(); ok {
-		_spec.SetField(thread.FieldIsNotifyOnComment, field.TypeBool, value)
-		_node.IsNotifyOnComment = value
 	}
 	if value, ok := tc.mutation.IPAddress(); ok {
 		_spec.SetField(thread.FieldIPAddress, field.TypeString, value)

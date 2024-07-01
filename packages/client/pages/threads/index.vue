@@ -4,13 +4,13 @@
 
     <v-divider></v-divider>
 
+    <Menu :items="menuItems" />
+
     <v-autocomplete
       label="スレを検索"
       :items="['California', 'Colorado', 'Florida', 'Georgia', 'Texas', 'Wyoming']"
       v-model="keyword"
     />
-
-    <Menu :items="menuItems" />
 
     <ThreadTable title="" :items="newsItems" moreLink="/news" :maxItems="5" />
   </div>

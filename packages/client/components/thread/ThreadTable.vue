@@ -16,7 +16,7 @@
           </div>
           <div class="flex-grow-1">
             <p class="item-title">
-              <strong>{{ truncateTitle(item.title) }}</strong>
+              {{ truncateTitle(item.title) }}
             </p>
           </div>
           <div class="text-right mr-2">
@@ -67,7 +67,6 @@ const headers = [
 
 .section-title h2 {
   color: orange;
-  font-weight: bold;
 }
 
 .alternate {
@@ -84,5 +83,10 @@ const headers = [
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.item-row {
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
 }
 </style>

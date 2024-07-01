@@ -29,8 +29,6 @@ type Thread struct {
 	Description string `json:"description,omitempty"`
 	// ThumbnailUrl holds the value of the "thumbnailUrl" field.
 	ThumbnailUrl string `json:"thumbnailUrl,omitempty"`
-	// コメントされた時に通知するかどうかのフラグ
-	IsNotifyOnComment bool `json:"isNotifyOnComment,omitempty"`
 	// スレッド作成者のIPアドレス
 	IPAddress string `json:"ip_address,omitempty"`
 	// 0: Open, 1: Pending, 2: Archived
@@ -160,8 +158,6 @@ func (*Thread) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case thread.FieldIsNotifyOnComment:
-			values[i] = new(sql.NullBool)
 		case thread.FieldID, thread.FieldBoardId, thread.FieldUserId, thread.FieldStatus:
 			values[i] = new(sql.NullInt64)
 		case thread.FieldTitle, thread.FieldDescription, thread.FieldThumbnailUrl, thread.FieldIPAddress:
@@ -218,12 +214,6 @@ func (t *Thread) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field thumbnailUrl", values[i])
 			} else if value.Valid {
 				t.ThumbnailUrl = value.String
-			}
-		case thread.FieldIsNotifyOnComment:
-			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field isNotifyOnComment", values[i])
-			} else if value.Valid {
-				t.IsNotifyOnComment = value.Bool
 			}
 		case thread.FieldIPAddress:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -344,9 +334,6 @@ func (t *Thread) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("thumbnailUrl=")
 	builder.WriteString(t.ThumbnailUrl)
-	builder.WriteString(", ")
-	builder.WriteString("isNotifyOnComment=")
-	builder.WriteString(fmt.Sprintf("%v", t.IsNotifyOnComment))
 	builder.WriteString(", ")
 	builder.WriteString("ip_address=")
 	builder.WriteString(t.IPAddress)

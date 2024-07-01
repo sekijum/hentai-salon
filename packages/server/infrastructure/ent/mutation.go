@@ -1590,7 +1590,6 @@ type ThreadMutation struct {
 	title                   *string
 	description             *string
 	thumbnailUrl            *string
-	isNotifyOnComment       *bool
 	ip_address              *string
 	status                  *int
 	addstatus               *int
@@ -1926,42 +1925,6 @@ func (m *ThreadMutation) ThumbnailUrlCleared() bool {
 func (m *ThreadMutation) ResetThumbnailUrl() {
 	m.thumbnailUrl = nil
 	delete(m.clearedFields, thread.FieldThumbnailUrl)
-}
-
-// SetIsNotifyOnComment sets the "isNotifyOnComment" field.
-func (m *ThreadMutation) SetIsNotifyOnComment(b bool) {
-	m.isNotifyOnComment = &b
-}
-
-// IsNotifyOnComment returns the value of the "isNotifyOnComment" field in the mutation.
-func (m *ThreadMutation) IsNotifyOnComment() (r bool, exists bool) {
-	v := m.isNotifyOnComment
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldIsNotifyOnComment returns the old "isNotifyOnComment" field's value of the Thread entity.
-// If the Thread object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ThreadMutation) OldIsNotifyOnComment(ctx context.Context) (v bool, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldIsNotifyOnComment is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldIsNotifyOnComment requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldIsNotifyOnComment: %w", err)
-	}
-	return oldValue.IsNotifyOnComment, nil
-}
-
-// ResetIsNotifyOnComment resets all changes to the "isNotifyOnComment" field.
-func (m *ThreadMutation) ResetIsNotifyOnComment() {
-	m.isNotifyOnComment = nil
 }
 
 // SetIPAddress sets the "ip_address" field.
@@ -2458,7 +2421,7 @@ func (m *ThreadMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ThreadMutation) Fields() []string {
-	fields := make([]string, 0, 10)
+	fields := make([]string, 0, 9)
 	if m.board != nil {
 		fields = append(fields, thread.FieldBoardId)
 	}
@@ -2473,9 +2436,6 @@ func (m *ThreadMutation) Fields() []string {
 	}
 	if m.thumbnailUrl != nil {
 		fields = append(fields, thread.FieldThumbnailUrl)
-	}
-	if m.isNotifyOnComment != nil {
-		fields = append(fields, thread.FieldIsNotifyOnComment)
 	}
 	if m.ip_address != nil {
 		fields = append(fields, thread.FieldIPAddress)
@@ -2507,8 +2467,6 @@ func (m *ThreadMutation) Field(name string) (ent.Value, bool) {
 		return m.Description()
 	case thread.FieldThumbnailUrl:
 		return m.ThumbnailUrl()
-	case thread.FieldIsNotifyOnComment:
-		return m.IsNotifyOnComment()
 	case thread.FieldIPAddress:
 		return m.IPAddress()
 	case thread.FieldStatus:
@@ -2536,8 +2494,6 @@ func (m *ThreadMutation) OldField(ctx context.Context, name string) (ent.Value, 
 		return m.OldDescription(ctx)
 	case thread.FieldThumbnailUrl:
 		return m.OldThumbnailUrl(ctx)
-	case thread.FieldIsNotifyOnComment:
-		return m.OldIsNotifyOnComment(ctx)
 	case thread.FieldIPAddress:
 		return m.OldIPAddress(ctx)
 	case thread.FieldStatus:
@@ -2589,13 +2545,6 @@ func (m *ThreadMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetThumbnailUrl(v)
-		return nil
-	case thread.FieldIsNotifyOnComment:
-		v, ok := value.(bool)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetIsNotifyOnComment(v)
 		return nil
 	case thread.FieldIPAddress:
 		v, ok := value.(string)
@@ -2718,9 +2667,6 @@ func (m *ThreadMutation) ResetField(name string) error {
 		return nil
 	case thread.FieldThumbnailUrl:
 		m.ResetThumbnailUrl()
-		return nil
-	case thread.FieldIsNotifyOnComment:
-		m.ResetIsNotifyOnComment()
 		return nil
 	case thread.FieldIPAddress:
 		m.ResetIPAddress()

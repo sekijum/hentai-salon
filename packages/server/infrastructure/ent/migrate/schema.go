@@ -65,7 +65,6 @@ var (
 		{Name: "title", Type: field.TypeString, Unique: true, Size: 50},
 		{Name: "description", Type: field.TypeString, Nullable: true, Size: 255},
 		{Name: "thumbnail_url", Type: field.TypeString, Nullable: true},
-		{Name: "is_notify_on_comment", Type: field.TypeBool, Default: true},
 		{Name: "ip_address", Type: field.TypeString, Size: 64},
 		{Name: "status", Type: field.TypeInt, Default: 0},
 		{Name: "created_at", Type: field.TypeTime},
@@ -81,13 +80,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "threads_boards_threads",
-				Columns:    []*schema.Column{ThreadsColumns[9]},
+				Columns:    []*schema.Column{ThreadsColumns[8]},
 				RefColumns: []*schema.Column{BoardsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "threads_users_threads",
-				Columns:    []*schema.Column{ThreadsColumns[10]},
+				Columns:    []*schema.Column{ThreadsColumns[9]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},

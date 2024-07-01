@@ -21,7 +21,6 @@ func (Thread) Fields() []ent.Field {
 		field.String("title").Unique().MaxLen(50),
 		field.String("description").Optional().MaxLen(255),
 		field.String("thumbnailUrl").Optional().StorageKey("thumbnail_url"),
-		field.Bool("isNotifyOnComment").Default(true).StorageKey("is_notify_on_comment").Comment("コメントされた時に通知するかどうかのフラグ"),
 		field.String("ip_address").MaxLen(64).Comment("スレッド作成者のIPアドレス"),
 		field.Int("status").Default(0).Comment("0: Open, 1: Pending, 2: Archived"),
 		field.Time("createdAt").Default(time.Now).StorageKey("created_at"),
