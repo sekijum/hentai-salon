@@ -2,7 +2,7 @@
   <h1 class="page-title">{{ title }}</h1>
 </template>
 
-<script setup>
+<script setup lang="ts">
 defineProps({
   title: String,
 });

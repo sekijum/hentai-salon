@@ -16,45 +16,47 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import Header from '~/components/Header.vue';
-import ThreadTable from '~/components//thread/ThreadTable.vue';
-import Menu from '~/components//Menu.vue';
+import ThreadTable from '~/components/thread/ThreadTable.vue';
+import Menu from '~/components/Menu.vue';
 import PageTitle from '~/components/PageTitle.vue';
 
 const route = useRoute();
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 const keyword = ref(route.query.keyword ?? '');
 
 const menuItems = [
   {
     title: '関連順',
-    to: '',
+    navigate: () => router('/'),
     icon: 'mdi-format-list-bulleted',
   },
   {
     title: '人気',
-    to: '',
+    navigate: () => router('/'),
     icon: 'mdi-fire',
   },
   {
     title: '閲覧履歴',
-    to: '',
+    navigate: () => router('/'),
     icon: 'mdi-update',
   },
   {
     title: '閲覧順',
-    to: '',
+    navigate: () => router('/'),
     icon: 'mdi-earth',
   },
   {
     title: '新着順',
-    to: '',
+    navigate: () => router('/'),
     icon: 'mdi-new-box',
   },
   {
     title: 'コメント数',
-    to: '',
+    navigate: () => router('/'),
     icon: 'mdi-cog',
   },
 ];

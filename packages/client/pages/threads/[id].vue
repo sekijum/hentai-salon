@@ -28,9 +28,10 @@
 
     <Menu :items="menuItems" />
 
-    <br />
-
-    <template v-if="tab === 'comments'">
+    <template v-if="route.query.tab === 'media'">
+      <MediaGallery />
+    </template>
+    <template v-else>
       <CommentForm />
 
       <br />
@@ -57,14 +58,10 @@
         <v-icon>mdi-arrow-down</v-icon>
       </v-btn>
     </template>
-    <template v-else-if="tab === 'media'">
-      <MediaGallery />
-    </template>
   </div>
 </template>
 
-<script setup>
-import { useRoute } from 'vue-router';
+<script setup lang="ts">
 import Header from '~/components/Header.vue';
 import ThreadTable from '~/components/thread/ThreadTable.vue';
 import CommentList from '~/components/comment/CommentList.vue';
@@ -73,7 +70,9 @@ import Menu from '~/components/Menu.vue';
 import PageTitle from '~/components/PageTitle.vue';
 import Pagination from '~/components/Pagination.vue';
 import MediaGallery from '~/components/MediaGallery.vue';
+import { useRouter, useRoute } from 'vue-router';
 
+const router = useRouter();
 const route = useRoute();
 const keyword = ref(route.query.keyword ?? '');
 const tab = ref(route.query.tab ?? 'comments');
@@ -81,12 +80,12 @@ const tab = ref(route.query.tab ?? 'comments');
 const menuItems = [
   {
     title: 'コメント一覧',
-    to: '?tab=comments',
+    navigate: () => router.replace({ query: {} }),
     icon: 'mdi-fire',
   },
   {
     title: 'メディア',
-    to: '?tab=media',
+    navigate: () => router.replace({ query: { tab: 'media' } }),
     icon: 'mdi-update',
   },
 ];

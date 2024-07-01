@@ -3,17 +3,8 @@
     <p class="form-title">{{ formTitle }}</p>
     <v-form @submit.prevent="submitForm" class="form">
       <v-row dense class="no-gutters">
-        <v-col cols="6">
+        <v-col cols="12">
           <v-text-field v-model="name" label="名前(省略可)" variant="outlined" dense hide-details></v-text-field>
-        </v-col>
-        <v-col cols="6">
-          <v-text-field
-            v-model="email"
-            label="メールアドレス(省略可)"
-            variant="outlined"
-            dense
-            hide-details
-          ></v-text-field>
         </v-col>
       </v-row>
       <v-textarea v-model="comment" label="コメント" rows="4" variant="outlined" dense hide-details></v-textarea>
@@ -31,11 +22,9 @@
         hide-details
       >
         <template v-slot:selection="{ fileNames }">
-          <template v-for="fileName in fileNames" :key="fileName">
-            <v-chip class="me-2" color="primary" size="small" label>
-              {{ fileName }}
-            </v-chip>
-          </template>
+          <v-chip v-for="fileName in fileNames" :key="fileName" class="me-2" color="primary" size="small" label>
+            {{ fileName }}
+          </v-chip>
         </template>
       </v-file-input>
 
@@ -46,7 +35,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, defineEmits, defineProps } from 'vue';
 
 const emit = defineEmits(['submit', 'clear']);
@@ -59,14 +48,12 @@ const props = defineProps({
 });
 
 const name = ref('');
-const email = ref('');
 const comment = ref('');
 const files = ref([]);
 const fileInput = ref(null);
 
 const submitForm = () => {
   console.log('名前:', name.value);
-  console.log('E-mail:', email.value);
   console.log('コメント:', comment.value);
   console.log('ファイル:', files.value);
   emit('submit');
@@ -78,7 +65,6 @@ const triggerFileInput = () => {
 
 const clearForm = () => {
   name.value = '';
-  email.value = '';
   comment.value = '';
   files.value = [];
   emit('clear');

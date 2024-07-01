@@ -21,7 +21,7 @@
   </v-dialog>
 </template>
 
-<script setup>
+<script setup lang="ts">
 const props = defineProps({
   dialog: Boolean,
   mediaItems: Array,

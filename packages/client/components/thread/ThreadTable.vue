@@ -5,10 +5,10 @@
     </div>
 
     <v-data-table :headers="headers" :items="items" hide-default-footer hide-default-header class="thread-section">
-      <template v-slot:item="{ item, index }">
+      <template v-slot:item="{ item, idx }">
         <div
-          :class="{ alternate: index % 2 === 0 }"
-          @click="navigateTo(item.id)"
+          :class="{ alternate: idx % 2 === 0 }"
+          @click="() => router.push(`/threads/${item.id}`)"
           class="d-flex align-center p-2 item-row"
         >
           <div class="fixed-image mr-1">
@@ -39,7 +39,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { useRouter } from 'vue-router';
 
 defineProps({
@@ -48,10 +48,6 @@ defineProps({
 });
 
 const router = useRouter();
-
-const navigateTo = id => {
-  router.push(`/threads/${id}`);
-};
 
 const truncateTitle = title => {
   return title.length > 50 ? title.slice(0, 50) + '...' : title;

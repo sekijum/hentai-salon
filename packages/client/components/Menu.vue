@@ -2,7 +2,7 @@
   <v-sheet>
     <v-row align="center" justify="center" class="m-0">
       <v-col v-for="(item, idx) in items" :key="idx" :cols="columnWidth" class="p-0">
-        <v-sheet class="menu-item" @click="navigateTo(item.to)">
+        <v-sheet class="menu-item" @click="item.navigate">
           <v-icon class="menu-icon">{{ item.icon }}</v-icon>
           <span class="menu-title">{{ item.title }}</span>
         </v-sheet>
@@ -11,13 +11,13 @@
   </v-sheet>
 </template>
 
-<script setup>
-const props = defineProps({
-  items: [{ title: '', to: '', icon: '' }],
-});
-
+<script setup lang="ts">
 import { computed } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
+
+const props = defineProps({
+  items: [{ title: '', navigate: () => {}, icon: '' }],
+});
 
 const router = useRouter();
 

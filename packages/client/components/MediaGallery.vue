@@ -7,6 +7,7 @@
         aspect-ratio="1"
         class="bg-grey-lighten-2"
         cover
+        @click="router.push('/comments/1')"
       >
         <template v-slot:placeholder>
           <v-row align="center" class="fill-height ma-0" justify="center">
@@ -18,8 +19,15 @@
   </v-row>
 </template>
 
+<script setup lang="ts">
+import { useRouter, useRoute } from 'vue-router';
+
+const router = useRouter();
+</script>
+
 <style scoped>
 .v-col {
   padding: 2px !important; /* 画像同士の間隔を狭める */
+  cursor: pointer; /* マウスオーバー時にカーソルをポインターに変更 */
 }
 </style>

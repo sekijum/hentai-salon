@@ -48,7 +48,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue';
 import ModalMedia from '~/components/ModalMedia.vue';
 import CommentForm from '~/components/comment/CommentForm.vue';

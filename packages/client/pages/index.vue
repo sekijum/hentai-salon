@@ -8,19 +8,21 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import Menu from '~/components/Menu.vue';
 import Header from '~/components/Header.vue';
 import ThreadTable from '~/components/thread/ThreadTable.vue';
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 const menuItems = [
-  { title: '人気', to: '', icon: 'mdi-fire' },
-  { title: '閲覧履歴', to: '', icon: 'mdi-update' },
-  { title: '閲覧順', to: '', icon: 'mdi-earth' },
-  { title: 'スレ一覧', to: 'threads', icon: 'mdi-new-box' },
-  { title: '板一覧', to: 'boards', icon: 'mdi-format-list-bulleted' },
-  { title: '設定', to: 'setting', icon: 'mdi-cog' },
+  { title: '人気', navigate: () => router.push('/'), icon: 'mdi-fire' },
+  { title: '閲覧履歴', navigate: () => router.push('/'), icon: 'mdi-update' },
+  { title: '閲覧順', navigate: () => router.push('/'), icon: 'mdi-earth' },
+  { title: 'スレ一覧', navigate: () => router.push('/threads'), icon: 'mdi-new-box' },
+  { title: '板一覧', navigate: () => router.push('/boards'), icon: 'mdi-format-list-bulleted' },
+  { title: '設定', navigate: () => router.push('/setting'), icon: 'mdi-cog' },
 ];
 const newsItems = ref([
   {

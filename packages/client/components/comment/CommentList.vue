@@ -4,7 +4,7 @@
   </v-list>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue';
 import CommentItem from '~/components/comment/CommentItem.vue';
 
