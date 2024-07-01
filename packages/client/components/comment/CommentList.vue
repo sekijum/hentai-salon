@@ -37,7 +37,11 @@ const comments = ref([
     commentCount: '11',
     media: [
       { type: 'image', url: 'https://via.placeholder.com/300' },
-      { type: 'video/mp4', url: 'https://www.w3schools.com/html/mov_bbb.mp4', thumbnail: 'https://via.placeholder.com/300' },
+      {
+        type: 'video/mp4',
+        url: 'https://www.w3schools.com/html/mov_bbb.mp4',
+        thumbnail: 'https://via.placeholder.com/300',
+      },
     ],
   },
   {
@@ -66,7 +70,11 @@ const comments = ref([
       { type: 'image', url: 'https://via.placeholder.com/300' },
       { type: 'image', url: 'https://via.placeholder.com/300' },
       { type: 'image', url: 'https://via.placeholder.com/300' },
-      { type: 'video/mp4', url: 'https://www.w3schools.com/html/mov_bbb.mp4', thumbnail: 'https://via.placeholder.com/300' },
+      {
+        type: 'video/mp4',
+        url: 'https://www.w3schools.com/html/mov_bbb.mp4',
+        thumbnail: 'https://via.placeholder.com/300',
+      },
     ],
   },
 ]);

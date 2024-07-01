@@ -4,10 +4,19 @@
 
     <v-divider></v-divider>
 
-    <v-autocomplete label="板名で検索" :items="['California', 'Colorado', 'Florida', 'Georgia', 'Texas', 'Wyoming']"></v-autocomplete>
+    <v-autocomplete
+      label="板名で検索"
+      :items="['California', 'Colorado', 'Florida', 'Georgia', 'Texas', 'Wyoming']"
+    ></v-autocomplete>
 
     <v-row>
-      <v-col v-for="(board, index) in filteredBoards" :key="index" cols="12" class="board-item" style="flex: 0 0 33.3333%; max-width: 33.3333%">
+      <v-col
+        v-for="(board, index) in filteredBoards"
+        :key="index"
+        cols="12"
+        class="board-item"
+        style="flex: 0 0 33.3333%; max-width: 33.3333%"
+      >
         <v-card @click="navigateToBoard(board.link)" class="board-card">
           <v-img :src="board.image" aspect-ratio="1" class="board-image"></v-img>
           <v-card-title class="board-title">{{ board.title }}</v-card-title>

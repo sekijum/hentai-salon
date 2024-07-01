@@ -4,7 +4,8 @@
       <v-list-item-content class="comment-list-item-content">
         <div class="comment-header">
           <div class="comment-header-text">
-            {{ idx }} <router-link :to="'/user/' + comment.username" class="username-link">{{ comment.username }}</router-link
+            {{ idx }}
+            <router-link :to="'/user/' + comment.username" class="username-link">{{ comment.username }}</router-link
             >[Lv.{{ comment.level }}]{{ comment.rank }} {{ comment.date }} {{ comment.time }}
           </div>
         </div>

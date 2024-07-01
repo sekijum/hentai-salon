@@ -32,8 +32,22 @@ const newsItems = ref([
     comments: 12,
     board: 'ニュース',
   },
-  { id: 1, title: '都知事選', subtitle: '蓮舫氏、神谷外務次官の是非問う', link: '/news/2', comments: 8, board: 'ニュース' },
-  { id: 1, title: 'ニコニコ動画', subtitle: '流出情報「ダウンロードや拡散はお控えください」', link: '/news/3', comments: 5, board: 'ニュース' },
+  {
+    id: 1,
+    title: '都知事選',
+    subtitle: '蓮舫氏、神谷外務次官の是非問う',
+    link: '/news/2',
+    comments: 8,
+    board: 'ニュース',
+  },
+  {
+    id: 1,
+    title: 'ニコニコ動画',
+    subtitle: '流出情報「ダウンロードや拡散はお控えください」',
+    link: '/news/3',
+    comments: 5,
+    board: 'ニュース',
+  },
 ]);
 
 const popularItems = ref([

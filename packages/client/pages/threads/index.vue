@@ -4,7 +4,11 @@
 
     <v-divider></v-divider>
 
-    <v-autocomplete label="スレを検索" :items="['California', 'Colorado', 'Florida', 'Georgia', 'Texas', 'Wyoming']" v-model="keyword" />
+    <v-autocomplete
+      label="スレを検索"
+      :items="['California', 'Colorado', 'Florida', 'Georgia', 'Texas', 'Wyoming']"
+      v-model="keyword"
+    />
 
     <MenuSection :items="menuItems" />
 
@@ -65,6 +69,12 @@ const newsItems = ref([
     board: 'ニュース',
   },
   { title: '都知事選', subtitle: '蓮舫氏、神谷外務次官の是非問う', link: '/news/2', comments: 8, board: 'ニュース' },
-  { title: 'ニコニコ動画', subtitle: '流出情報「ダウンロードや拡散はお控えください」', link: '/news/3', comments: 5, board: 'ニュース' },
+  {
+    title: 'ニコニコ動画',
+    subtitle: '流出情報「ダウンロードや拡散はお控えください」',
+    link: '/news/3',
+    comments: 5,
+    board: 'ニュース',
+  },
 ]);
 </script>

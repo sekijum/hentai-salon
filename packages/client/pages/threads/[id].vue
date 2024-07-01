@@ -5,7 +5,21 @@
     <v-divider></v-divider>
 
     <v-chip-group active-class="primary--text" column>
-      <v-chip small v-for="tag in ['Work', 'Home Improvement', 'Vacation', 'Food', 'Drawers', 'Shopping', 'Art', 'Tech', 'Creative Writing']" :key="tag">
+      <v-chip
+        small
+        v-for="tag in [
+          'Work',
+          'Home Improvement',
+          'Vacation',
+          'Food',
+          'Drawers',
+          'Shopping',
+          'Art',
+          'Tech',
+          'Creative Writing',
+        ]"
+        :key="tag"
+      >
         {{ tag }}
       </v-chip>
     </v-chip-group>
