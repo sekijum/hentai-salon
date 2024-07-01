@@ -17,6 +17,9 @@
         </v-sheet>
       </v-col>
     </v-row>
+    <div class="d-flex justify-center">
+      <span class="subtitle">変態サロンへようこそ！ここは趣味の楽園、どんな変態も大歓迎！</span>
+    </div>
     <v-divider></v-divider>
   </div>
 </template>
@@ -43,5 +46,9 @@ const router = useRouter();
 
 .header-title {
   cursor: pointer;
+}
+
+.subtitle {
+  font-size: 12px;
 }
 </style>
