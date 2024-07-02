@@ -18,7 +18,7 @@ import { useRouter } from 'vue-router';
 const router = useRouter();
 const menuItems = [
   { title: '人気', navigate: () => router.push('/'), icon: 'mdi-fire' },
-  { title: '閲覧履歴', navigate: () => router.push('/'), icon: 'mdi-update' },
+  { title: 'お知らせ', navigate: () => router.push('/'), icon: 'mdi-update' },
   { title: '閲覧順', navigate: () => router.push('/'), icon: 'mdi-earth' },
   { title: 'スレ一覧', navigate: () => router.push('/threads'), icon: 'mdi-new-box' },
   { title: '板一覧', navigate: () => router.push('/boards'), icon: 'mdi-format-list-bulleted' },
