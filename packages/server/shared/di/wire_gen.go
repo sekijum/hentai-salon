@@ -35,11 +35,15 @@ func InitializeControllers() (*ControllersSet, func(), error) {
 	userController := controller.NewUserController(userApplicationService)
 	threadApplicationService := service.NewThreadApplicationService(threadDatasource, threadDomainService)
 	threadController := controller.NewThreadController(threadApplicationService)
+	threadCommentDatasource := datasource.NewThreadCommentDatasource(client)
+	threadCommentApplicationService := service.NewThreadCommentApplicationService(threadCommentDatasource)
+	threadCommentController := controller.NewThreadCommentController(threadCommentApplicationService)
 	controllersSet := &ControllersSet{
-		BoardController:      boardController,
-		BoardAdminController: boardAdminController,
-		UserController:       userController,
-		ThreadController:     threadController,
+		BoardController:         boardController,
+		BoardAdminController:    boardAdminController,
+		UserController:          userController,
+		ThreadController:        threadController,
+		ThreadCommentController: threadCommentController,
 	}
 	return controllersSet, func() {
 		cleanup()
@@ -48,19 +52,20 @@ func InitializeControllers() (*ControllersSet, func(), error) {
 
 // wire.go:
 
-var controllerSet = wire.NewSet(controller.NewBoardAdminController, controller.NewBoardController, controller.NewUserController, controller.NewThreadController)
+var controllerSet = wire.NewSet(controller.NewBoardAdminController, controller.NewBoardController, controller.NewUserController, controller.NewThreadController, controller.NewThreadCommentController)
 
-var applicationServiceSet = wire.NewSet(service.NewBoardAdminApplicationService, service.NewBoardApplicationService, service.NewUserApplicationService, service.NewThreadApplicationService)
+var applicationServiceSet = wire.NewSet(service.NewBoardAdminApplicationService, service.NewBoardApplicationService, service.NewUserApplicationService, service.NewThreadApplicationService, service.NewThreadCommentApplicationService)
 
 var domainServiceSet = wire.NewSet(service2.NewBoardDomainService, service2.NewUserDomainService, service2.NewThreadDomainService)
 
 var entSet = wire.NewSet(ent.ProvideClient)
 
-var datasourceSet = wire.NewSet(datasource.NewBoardDatasource, datasource.NewUserDatasource, datasource.NewThreadDatasource)
+var datasourceSet = wire.NewSet(datasource.NewBoardDatasource, datasource.NewUserDatasource, datasource.NewThreadDatasource, datasource.NewThreadCommentDatasource)
 
 type ControllersSet struct {
-	BoardController      *controller.BoardController
-	BoardAdminController *controller.BoardAdminController
-	UserController       *controller.UserController
-	ThreadController     *controller.ThreadController
+	BoardController         *controller.BoardController
+	BoardAdminController    *controller.BoardAdminController
+	UserController          *controller.UserController
+	ThreadController        *controller.ThreadController
+	ThreadCommentController *controller.ThreadCommentController
 }

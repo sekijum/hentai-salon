@@ -18,18 +18,25 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 	r.GET("/boards", controllers.BoardController.FindAll)
 	r.GET("/threads", controllers.ThreadController.FindAll)
 
+	commentGroup := r.Group("/comments")
+	commentGroup.GET("/comments", controllers.ThreadCommentController.FindAll)
+	commentGroup.GET("/:id", controllers.ThreadCommentController.FindById)
+	commentGroup.POST("/comments", controllers.ThreadCommentController.Create)
+	commentGroup.POST("/reply", controllers.ThreadCommentController.Reply)
+
 	// 以下認証必須ルート
 	authMiddleware := middleware.AuthMiddleware()
+	paginationDefaultsMiddleware := middleware.PaginationDefaultsMiddleware()
 
 	authGroup := r.Group("/")
-	authGroup.Use(authMiddleware)
+	authGroup.Use(authMiddleware, paginationDefaultsMiddleware)
 	{
 		authGroup.POST("/threads", controllers.ThreadController.Create)
 		authGroup.GET("/users/me", controllers.UserController.FindAuthenticatedUser)
 	}
 
 	adminGroup := r.Group("/admin")
-	adminGroup.Use(authMiddleware)
+	adminGroup.Use(authMiddleware, paginationDefaultsMiddleware)
 	{
 		adminGroup.POST("/boards", controllers.BoardAdminController.Create)
 	}

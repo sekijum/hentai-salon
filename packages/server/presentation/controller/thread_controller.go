@@ -18,7 +18,14 @@ func NewThreadController(threadApplicationService *service.ThreadApplicationServ
 }
 
 func (ctrl *ThreadController) FindAll(c *gin.Context) {
-	threads, err := ctrl.threadApplicationService.FindAll(context.Background())
+	var qs request.ThreadFindAllRequest
+
+	if err := c.ShouldBindQuery(&qs); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	threads, err := ctrl.threadApplicationService.FindAll(context.Background(), qs)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "スレッドの取得に失敗しました: " + err.Error()})
 		return

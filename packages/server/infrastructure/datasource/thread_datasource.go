@@ -3,6 +3,7 @@ package datasource
 import (
 	"context"
 	"server/domain/model"
+	pagination "server/domain/type"
 	"server/infrastructure/ent"
 
 	"server/infrastructure/ent/thread"
@@ -18,8 +19,14 @@ func NewThreadDatasource(client *ent.Client) *ThreadDatasource {
 	return &ThreadDatasource{client: client}
 }
 
-func (ds *ThreadDatasource) FindAll(ctx context.Context) ([]*model.Thread, error) {
-	threads, err := ds.client.Thread.Query().All(ctx)
+func (ds *ThreadDatasource) FindAll(
+	ctx context.Context,
+	pagination pagination.Pagination,
+) ([]*model.Thread, error) {
+	threads, err := ds.client.Thread.Query().
+		Limit(pagination.Limit).
+		Offset(pagination.Offset).
+		All(ctx)
 	if err != nil {
 		return nil, err
 	}

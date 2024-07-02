@@ -5,9 +5,10 @@ import (
 	"server/domain/model"
 	domainService "server/domain/service"
 	"server/infrastructure/datasource"
+	request "server/presentation/request/thread"
 
 	"errors"
-	request "server/presentation/request/thread"
+	resource "server/presentation/resource/thread"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -28,8 +29,21 @@ func NewThreadApplicationService(
 	}
 }
 
-func (svc *ThreadApplicationService) FindAll(ctx context.Context) ([]*model.Thread, error) {
-	return svc.threadDatasource.FindAll(ctx)
+func (svc *ThreadApplicationService) FindAll(
+	ctx context.Context,
+	qs request.ThreadFindAllRequest,
+) ([]*resource.ThreadResource, error) {
+	threads, err := svc.threadDatasource.FindAll(ctx, qs.Pagination)
+	if err != nil {
+		return nil, err
+	}
+
+	var threadResources []*resource.ThreadResource
+	for _, thread := range threads {
+		threadResources = append(threadResources, resource.NewThreadResource(thread))
+	}
+
+	return threadResources, nil
 }
 
 func (svc *ThreadApplicationService) Create(
