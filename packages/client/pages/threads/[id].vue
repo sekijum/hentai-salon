@@ -6,7 +6,7 @@
 
     <v-chip-group active-class="primary--text" column>
       <v-chip
-        small
+        size="x-small"
         v-for="tag in [
           'Work',
           'Home Improvement',

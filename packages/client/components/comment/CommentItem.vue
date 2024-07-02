@@ -71,6 +71,8 @@ const toggleReplyForm = () => {
 const submitReply = () => {
   // 返信フォームの送信処理
   console.log('返信を送信');
+  // 投稿が完了したら下を実行
+  alert('返信しました。');
   toggleReplyForm();
 };
 

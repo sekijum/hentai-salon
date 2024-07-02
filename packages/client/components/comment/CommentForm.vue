@@ -2,12 +2,32 @@
   <div>
     <p class="form-title">{{ formTitle }}</p>
     <v-form @submit.prevent="submitForm" class="form">
-      <v-row dense class="no-gutters">
-        <v-col cols="12">
-          <v-text-field v-model="name" label="名前(省略可)" variant="outlined" dense hide-details></v-text-field>
-        </v-col>
-      </v-row>
-      <v-textarea v-model="comment" label="コメント" rows="4" variant="outlined" dense hide-details></v-textarea>
+      <v-text-field
+        size="x-small"
+        v-model="name"
+        label="名前(省略可)"
+        variant="outlined"
+        hide-details
+        counter
+        single-line
+        clearable
+        dense
+        density="compact"
+      ></v-text-field>
+
+      <v-textarea
+        v-model="comment"
+        label="コメント"
+        rows="3"
+        variant="outlined"
+        hide-details
+        counter
+        dense
+        single-line
+        clearable
+        density="compact"
+      ></v-textarea>
+
       <input type="file" multiple @change="handleFileChange" style="display: none" ref="fileInput" />
 
       <v-file-input
@@ -18,13 +38,24 @@
         truncate-length="25"
         prepend-icon=""
         variant="outlined"
-        dense
         hide-details
+        counter
+        single-line
+        density="compact"
       >
         <template v-slot:selection="{ fileNames }">
           <v-chip v-for="fileName in fileNames" :key="fileName" class="me-2" color="primary" size="small" label>
             {{ fileName }}
           </v-chip>
+        </template>
+        <template v-slot:loader>
+          <v-progress-linear
+            :active="custom"
+            :color="color"
+            :model-value="progress"
+            height="2"
+            indeterminate
+          ></v-progress-linear>
         </template>
       </v-file-input>
 
@@ -47,12 +78,19 @@ const props = defineProps({
   },
 });
 
+const value = ref('');
+const custom = ref(false);
+
+const progress = computed(() => Math.min(100, value.value.length * 10));
+const color = computed(() => ['error', 'warning', 'success'][Math.floor(progress.value / 40)]);
+
 const name = ref('');
 const comment = ref('');
 const files = ref([]);
 const fileInput = ref(null);
 
 const submitForm = () => {
+  custom.value = !custom.value;
   console.log('名前:', name.value);
   console.log('コメント:', comment.value);
   console.log('ファイル:', files.value);
@@ -81,16 +119,6 @@ const handleFileChange = event => {
   font-size: 1.2em;
 }
 
-.v-row.no-gutters {
-  margin-left: 0;
-  margin-right: 0;
-}
-
-.v-row.no-gutters > .v-col {
-  padding-left: 0;
-  padding-right: 0;
-}
-
 .v-text-field,
 .v-textarea,
 .v-file-input {
@@ -114,7 +142,8 @@ const handleFileChange = event => {
 .clear-button {
   background-color: #f0f0f0;
   color: black;
-  margin-bottom: 8px;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .submit-button {
