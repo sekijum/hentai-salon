@@ -16,6 +16,7 @@
             </v-row>
           </template>
           <v-icon v-if="item.type === 'video/mp4'" size="60" class="play-icon">mdi-play-circle</v-icon>
+          <div v-if="item.type === 'video/mp4'" class="time-label">{{ formatTime(item.duration) }}</div>
         </v-img>
       </v-col>
     </v-row>
@@ -38,6 +39,7 @@ const items = ref([
     lazySrc: 'https://picsum.photos/10/6?image=1000',
     src: 'https://picsum.photos/500/300?image=1000',
     videoSrc: 'https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4',
+    duration: 120, // 動画の時間を秒単位で指定
   },
 ]);
 
@@ -53,6 +55,7 @@ async function api() {
           ...((v + items.value.at(-1).id + 1) % 5 === 0 && {
             thumbnail: 'https://picsum.photos/500/300?image=1000',
             videoSrc: 'https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4',
+            duration: 150, // 動画の時間を秒単位で指定
           }),
         })),
       );
@@ -70,6 +73,12 @@ function navigateToExternalPath(path: string) {
   const domain = window.location.origin;
   window.open(`${domain}${path}`, '_blank');
 }
+
+function formatTime(seconds: number): string {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+}
 </script>
 
 <style scoped>
@@ -85,5 +94,16 @@ function navigateToExternalPath(path: string) {
   transform: translate(-50%, -50%);
   color: white;
   font-size: 60px;
+}
+
+.time-label {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-size: 14px;
 }
 </style>
