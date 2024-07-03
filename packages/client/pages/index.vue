@@ -17,9 +17,7 @@ import { useRouter } from 'vue-router';
 
 const router = useRouter();
 const menuItems = [
-  { title: '人気', navigate: () => router.push('/'), icon: 'mdi-fire' },
   { title: 'お知らせ', navigate: () => router.push('/'), icon: 'mdi-update' },
-  { title: '閲覧順', navigate: () => router.push('/'), icon: 'mdi-earth' },
   { title: 'スレ一覧', navigate: () => router.push('/threads'), icon: 'mdi-new-box' },
   { title: '板一覧', navigate: () => router.push('/boards'), icon: 'mdi-format-list-bulleted' },
   { title: '設定', navigate: () => router.push('/setting'), icon: 'mdi-cog' },
@@ -27,6 +25,7 @@ const menuItems = [
   { title: 'サインアップ', navigate: () => router.push('/signup'), icon: 'mdi-account-plus' },
   { title: 'スレ作成', navigate: () => router.push('/threads/new'), icon: 'mdi-forum' },
   { title: '板作成', navigate: () => router.push('/boards/new'), icon: 'mdi-forum' },
+  { title: '管理画面', navigate: () => router.push('/admin'), icon: 'mdi-forum' },
 ];
 const newsItems = ref([
   {
