@@ -1,5 +1,5 @@
 <template>
-  <div class="comment-item">
+  <div class="comment-item" :id="'comments-' + idx">
     <v-list-item class="comment-list-item">
       <v-list-item-content class="comment-list-item-content">
         <div class="comment-header">
@@ -9,7 +9,12 @@
             >[Lv.{{ comment.level }}]{{ comment.rank }} {{ comment.date }} {{ comment.time }}
           </div>
         </div>
-        <v-list-item-title class="comment-content">{{ comment.content }}</v-list-item-title>
+        <div v-if="comment.replyTo" class="reply-indication">
+          <router-link :to="'/comments/' + comment.replyTo" class="reply-link">>>{{ comment.replyTo }}</router-link>
+        </div>
+        <v-list-item-title class="comment-content">
+          <a :href="'#comment-' + comment.id" class="comment-anchor">{{ comment.content }}</a>
+        </v-list-item-title>
         <template v-if="comment.media && comment.media.length">
           <v-row dense>
             <v-col cols="3" v-for="(media, index) in comment.media" :key="index" class="media-col">
@@ -111,6 +116,28 @@ const closeDialog = () => {
 
 .username-link {
   color: blue;
+  text-decoration: underline;
+}
+
+.reply-indication {
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  display: inline-block;
+  padding: 2px 6px;
+}
+
+.reply-link {
+  text-decoration: none;
+  color: #333;
+}
+
+.comment-anchor {
+  color: inherit;
+  text-decoration: none;
+}
+
+.comment-anchor:hover {
   text-decoration: underline;
 }
 

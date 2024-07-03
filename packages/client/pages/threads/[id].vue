@@ -103,76 +103,52 @@ const item = ref({
   board: 'ニュース',
 });
 
-const comments = ref([
-  {
-    id: 1,
-    username: '警備員',
-    level: 6,
-    rank: '新芽',
-    date: '2024/06/30',
-    time: '14:25',
-    content: '俺も恋人じゃないけど触らせてもらおう',
-    board: '垢版',
-    type: '大砲',
-    idCode: '+Q6HhT800',
-    commentCount: '11',
-    media: [{ type: 'image', url: 'https://via.placeholder.com/300' }],
-  },
-  {
-    id: 2,
-    username: '警備員',
-    level: 17,
-    rank: '新芽',
-    date: '2024/06/30',
-    time: '14:26',
-    content: 'もう結婚するしか逃げ道はない',
-    board: '垢版',
-    type: '大砲',
-    idCode: 'X+z5zrq00',
-    commentCount: '11',
-    media: [
-      { type: 'image', url: 'https://drive.google.com/thumbnail?id=1atuQlT_wuPT73fwo4x1fZsGc2_ErVNqs&sz=w670' },
-      {
-        type: 'video/mp4',
-        url: 'https://www.w3schools.com/html/mov_bbb.mp4',
-        thumbnail: 'https://via.placeholder.com/300',
-      },
-    ],
-  },
-  {
-    id: 3,
-    username: '名無しさん@恐縮です',
-    date: '2024/06/30',
-    time: '14:28',
-    content: 'もう飽きたこの話題',
-    board: '垢版',
-    type: '大砲',
-    idCode: '6C/Ty2sa0',
-    commentCount: '11',
-    media: [],
-  },
-  {
-    id: 4,
-    username: '名無しさん@恐縮です',
-    date: '2024/06/30',
-    time: '14:28',
-    content: '歌舞伎俳優も未成年の舞妓と疑惑があっても伝統芸能の嗜みでOKのナゾのルールがあったみたいなものかw',
-    board: '垢版',
-    type: '大砲',
-    idCode: 'mswGlHt',
-    commentCount: '11',
-    media: [
-      { type: 'image', url: 'https://via.placeholder.com/300' },
-      { type: 'image', url: 'https://via.placeholder.com/300' },
-      { type: 'image', url: 'https://via.placeholder.com/300' },
-      {
-        type: 'video/mp4',
-        url: 'https://www.w3schools.com/html/mov_bbb.mp4',
-        thumbnail: 'https://via.placeholder.com/300',
-      },
-    ],
-  },
-]);
+const comments = ref([]);
+
+const usernames = ['警備員', '名無しさん@恐縮です', '住民A', '住民B', '観察者'];
+const contents = [
+  '俺も恋人じゃないけど触らせてもらおう',
+  'もう結婚するしか逃げ道はない',
+  'もう飽きたこの話題',
+  '歌舞伎俳優も未成年の舞妓と疑惑があっても伝統芸能の嗜みでOKのナゾのルールがあったみたいなものかw',
+  'この話はもうやめよう',
+];
+const boards = ['垢版', 'ニュース', 'スポーツ', 'エンタメ', '一般'];
+const types = ['大砲', '小銃', '拳銃'];
+const idCodes = ['+Q6HhT800', 'X+z5zrq00', '6C/Ty2sa0', 'mswGlHt', '3H4JrKd9'];
+const mediaUrls = [
+  'https://via.placeholder.com/300',
+  'https://drive.google.com/thumbnail?id=1atuQlT_wuPT73fwo4x1fZsGc2_ErVNqs&sz=w670',
+  'https://www.w3schools.com/html/mov_bbb.mp4',
+];
+
+for (let i = 1; i <= 300; i++) {
+  comments.value.push({
+    id: i,
+    username: usernames[i % usernames.length],
+    level: Math.floor(Math.random() * 20) + 1,
+    rank: ['新芽', '成長', '熟成', '老舗'][i % 4],
+    date: `2024/06/${String((i % 30) + 1).padStart(2, '0')}`,
+    time: `${String(Math.floor(Math.random() * 24)).padStart(2, '0')}:${String(Math.floor(Math.random() * 60)).padStart(
+      2,
+      '0',
+    )}`,
+    content: contents[i % contents.length],
+    board: boards[i % boards.length],
+    type: types[i % types.length],
+    idCode: idCodes[i % idCodes.length],
+    commentCount: String(Math.floor(Math.random() * 20)),
+    media:
+      i % 3 === 0
+        ? [
+            { type: 'image', url: mediaUrls[0] },
+            { type: 'video/mp4', url: mediaUrls[2], thumbnail: mediaUrls[0] },
+          ]
+        : i % 3 === 1
+        ? [{ type: 'image', url: mediaUrls[1] }]
+        : [],
+  });
+}
 
 const scrollToMediaTop = () => {
   const mediaTop = document.getElementById('media-top');
