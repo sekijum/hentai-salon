@@ -1,6 +1,6 @@
 <template>
   <div class="mx-2">
-    <PageTitle title="スレ作成" />
+    <PageTitle title="板作成" />
 
     <v-divider></v-divider>
 
@@ -8,17 +8,6 @@
       <v-text-field v-model="form.title" label="タイトル" required></v-text-field>
 
       <v-textarea v-model="form.description" label="説明" required></v-textarea>
-
-      <v-autocomplete
-        v-model="form.tags"
-        :items="tagItems"
-        outlined
-        dense
-        chips
-        small-chips
-        label="タグ"
-        multiple
-      ></v-autocomplete>
 
       <v-file-input
         v-model="form.thumbnailFile"

@@ -26,6 +26,7 @@ const menuItems = [
   { title: 'サインイン', navigate: () => router.push('/signin'), icon: 'mdi-login' },
   { title: 'サインアップ', navigate: () => router.push('/signup'), icon: 'mdi-account-plus' },
   { title: 'スレ作成', navigate: () => router.push('/threads/new'), icon: 'mdi-forum' },
+  { title: '板作成', navigate: () => router.push('/boards/new'), icon: 'mdi-forum' },
 ];
 const newsItems = ref([
   {
