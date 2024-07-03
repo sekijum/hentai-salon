@@ -13,11 +13,15 @@
         <template v-if="comment.media && comment.media.length">
           <v-row dense>
             <v-col cols="3" v-for="(media, index) in comment.media" :key="index" class="media-col">
-              <div v-if="media.type === 'video/mp4'" class="media-item video-thumbnail" @click="() => (dialog = true)">
+              <div
+                v-if="media.type === 'video/mp4'"
+                class="media-item video-thumbnail"
+                @click="() => openDialog(media)"
+              >
                 <v-img :src="media.thumbnail" class="media-item"></v-img>
                 <v-icon size="40" class="play-icon">mdi-play-circle</v-icon>
               </div>
-              <v-img v-else :src="media.url" class="media-item" @click="() => (dialog = true)"></v-img>
+              <v-img v-else :src="media.url" class="media-item" @click="() => openDialog(media)"></v-img>
             </v-col>
           </v-row>
         </template>
@@ -44,7 +48,7 @@
     </v-list-item>
     <v-divider></v-divider>
 
-    <ModalMedia :dialog="dialog" :mediaItems="comment.media" @close="() => (dialog = false)" />
+    <ModalMedia :dialog="dialog" :mediaItem="selectedMedia" @close="closeDialog" @update:dialog="dialog = $event" />
   </div>
 </template>
 
@@ -59,6 +63,7 @@ defineProps({
 });
 
 const dialog = ref(false);
+const selectedMedia = ref(null);
 const showReplyForm = ref(false);
 
 const toggleReplyForm = () => {
@@ -69,16 +74,22 @@ const toggleReplyForm = () => {
 };
 
 const submitReply = () => {
-  // 返信フォームの送信処理
   console.log('返信を送信');
-  // 投稿が完了したら下を実行
   alert('返信しました。');
   toggleReplyForm();
 };
 
 const clearReplyForm = () => {
-  // 返信フォームのクリア処理
   console.log('返信フォームをクリア');
+};
+
+const openDialog = media => {
+  selectedMedia.value = media;
+  dialog.value = true;
+};
+
+const closeDialog = () => {
+  dialog.value = false;
 };
 </script>
 
@@ -112,11 +123,11 @@ const clearReplyForm = () => {
   display: flex;
   align-items: center;
   text-decoration: none;
-  color: grey; /* 色をグレーに設定 */
+  color: grey;
 }
 
 .interaction-text {
-  color: grey; /* 色をグレーに設定 */
+  color: grey;
 }
 
 .interaction-right {
@@ -125,7 +136,7 @@ const clearReplyForm = () => {
 }
 
 .id-link {
-  margin-left: 20px; /* コメント数とIDの間に間隔を追加 */
+  margin-left: 20px;
 }
 
 .comment-content {
@@ -153,12 +164,6 @@ const clearReplyForm = () => {
   transform: translate(-50%, -50%);
   color: white;
   font-size: 40px;
-}
-
-.modal-media {
-  width: 100%;
-  margin: auto;
-  object-fit: contain;
 }
 
 .reply-form {
