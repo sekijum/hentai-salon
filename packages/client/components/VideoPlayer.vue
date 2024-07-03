@@ -1,5 +1,5 @@
 <template>
-  <video ref="video" class="video-js"></video>
+  <video ref="video" class="video-js vjs-default-skin"></video>
 </template>
 
 <script setup>
@@ -43,6 +43,13 @@ onMounted(() => {
       console.log('Player is ready!');
     },
   );
+
+  // Prevent fullscreen on mobile
+  player.on('fullscreenchange', () => {
+    if (player.isFullscreen()) {
+      player.exitFullscreen();
+    }
+  });
 });
 
 watch(
@@ -63,3 +70,17 @@ onBeforeUnmount(() => {
   }
 });
 </script>
+
+<style>
+/* Prevent zoom on mobile */
+.video-js {
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+.video-js.vjs-default-skin {
+  touch-action: manipulation;
+}
+</style>
