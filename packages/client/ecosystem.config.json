@@ -1,0 +1,13 @@
+{
+  "apps": [
+    {
+      "name": "prod",
+      "cwd": "/client",
+      "script": "./build/index.js",
+      "instances": "max",
+      "exec_mode": "cluster",
+      "log_date_format": "YYYY-MM-DD HH:mm Z",
+      "env": {}
+    }
+  ]
+}
