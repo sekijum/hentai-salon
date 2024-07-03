@@ -36,6 +36,12 @@
           @click="navigate('/admin/boards')"
           value="board-management"
         ></v-list-item>
+        <v-list-item
+          prepend-icon="mdi-arrow-right-bold"
+          title="クライアント画面へ"
+          @click="navigate('/')"
+          value="board-management"
+        ></v-list-item>
       </v-list>
     </v-navigation-drawer>
 

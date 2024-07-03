@@ -23,6 +23,7 @@ const menuItems = [
   { title: '設定', navigate: () => router.push('/setting'), icon: 'mdi-cog' },
   { title: 'サインイン', navigate: () => router.push('/signin'), icon: 'mdi-login' },
   { title: 'サインアップ', navigate: () => router.push('/signup'), icon: 'mdi-account-plus' },
+  { title: 'サインアウト', navigate: () => router.push('/signup'), icon: 'mdi-logout' },
   { title: 'スレ作成', navigate: () => router.push('/threads/new'), icon: 'mdi-forum' },
   { title: '板作成', navigate: () => router.push('/boards/new'), icon: 'mdi-forum' },
   { title: '管理画面', navigate: () => router.push('/admin'), icon: 'mdi-forum' },
