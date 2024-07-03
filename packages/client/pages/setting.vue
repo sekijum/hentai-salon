@@ -4,20 +4,23 @@
 
     <v-divider></v-divider>
 
-    <v-data-table :items="menuItems" hide-default-footer hide-default-header>
-      <template v-slot:item="{ item }">
-        <tr :class="{ highlight: item.type === 'header' }">
-          <td>{{ item.name }}</td>
-          <td>
-            <div v-if="item.key">
-              <v-btn v-if="item.key === 'board-history-delete'" small>削除</v-btn>
-              <v-btn v-else-if="item.key === 'thread-history-delete'" small>削除</v-btn>
-              <v-switch v-else-if="item.key === 'display-latest-50-replies-only'" flat small></v-switch>
-            </div>
-          </td>
-        </tr>
-      </template>
-    </v-data-table>
+    <div v-for="item in menuItems" :key="item.name" :class="{ highlight: item.type === 'header' }" class="bordered-row">
+      <v-row class="align-center">
+        <v-col cols="6" class="d-flex justify-center align-center">{{ item.name }}</v-col>
+        <v-col cols="6" class="d-flex justify-center align-center">
+          <div v-if="item.key" class="d-flex justify-center align-center">
+            <v-btn v-if="item.key === 'board-history-delete'" small class="spaced-button">削除</v-btn>
+            <v-btn v-else-if="item.key === 'thread-history-delete'" small class="spaced-button">削除</v-btn>
+            <v-switch
+              v-else-if="item.key === 'display-latest-50-replies-only'"
+              flat
+              small
+              class="centered-switch"
+            ></v-switch>
+          </div>
+        </v-col>
+      </v-row>
+    </div>
   </div>
 </template>
 
@@ -39,5 +42,22 @@ const menuItems = [
 <style scoped>
 .highlight {
   background-color: #f0f0f0;
+}
+.bordered-row {
+  border-top: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+}
+.align-center {
+  align-items: center;
+}
+.centered-switch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+.spaced-button {
+  margin-top: 8px;
+  margin-bottom: 8px;
 }
 </style>
