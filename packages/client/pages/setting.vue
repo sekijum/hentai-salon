@@ -17,6 +17,13 @@
               small
               class="centered-switch"
             ></v-switch>
+            <v-switch
+              v-else-if="item.key === 'dark-mode'"
+              flat
+              small
+              class="centered-switch"
+              @change="toggleTheme"
+            ></v-switch>
           </div>
         </v-col>
       </v-row>
@@ -27,8 +34,15 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import PageTitle from '~/components/PageTitle.vue';
+import { useNuxtApp } from '#app';
+const { $toggleTheme } = useNuxtApp();
 
+const toggleTheme = () => {
+  $toggleTheme();
+};
 const menuItems = [
+  { name: '表示', type: 'header' },
+  { name: 'ダークモード', key: 'dark-mode' },
   { name: '板', type: 'header' },
   { name: '閲覧履歴', key: 'board-history-delete' },
   { name: 'スレッド', type: 'header' },
