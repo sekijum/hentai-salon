@@ -1,17 +1,12 @@
 <template>
-  <v-dialog
-    :model-value="dialog"
-    fullscreen
-    hide-overlay
-    transition="dialog-bottom-transition"
-    @update:model-value="updateDialog"
-  >
+  <v-bottom-sheet :model-value="dialog" @update:model-value="updateDialog" max-height="100%">
     <v-card class="media-card">
-      <v-toolbar dense>
+      <v-toolbar dense class="toolbar">
+        <v-toolbar-title>Media</v-toolbar-title>
+        <v-spacer></v-spacer>
         <v-btn icon @click="closeDialog">
           <v-icon>mdi-close</v-icon>
         </v-btn>
-        <v-toolbar-title>Media</v-toolbar-title>
       </v-toolbar>
       <div class="media-container">
         <template v-if="mediaItem.type === 'video/mp4'">
@@ -22,7 +17,7 @@
         </template>
       </div>
     </v-card>
-  </v-dialog>
+  </v-bottom-sheet>
 </template>
 
 <script setup lang="ts">
@@ -50,10 +45,19 @@ const updateDialog = value => {
 .media-card {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start; /* Ensure content starts from the top */
   align-items: center;
-  height: 100vh; /* Full height to ensure it doesn't cut off */
+  height: 100%;
   margin: 0;
+  overflow: hidden; /* Prevent overflow issues */
+}
+
+.toolbar {
+  width: 100%; /* Ensure toolbar takes full width */
+  position: sticky;
+  top: 0;
+  z-index: 1; /* Ensure it stays on top */
+  background-color: white; /* Ensure it has a background */
 }
 
 .media-container {
@@ -61,7 +65,7 @@ const updateDialog = value => {
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: calc(100vh - 64px); /* Adjust height minus toolbar height */
+  height: 100%; /* Full height to ensure it doesn't cut off */
 }
 
 .media-image {
