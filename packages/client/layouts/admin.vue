@@ -19,16 +19,21 @@
           value="member-management"
         ></v-list-item>
         <v-list-item
+          prepend-icon="mdi-tag"
+          title="タグ管理"
+          @click="navigate('/admin/tags')"
+          value="tag-management"
+        ></v-list-item>
+        <v-list-item
           prepend-icon="mdi-forum"
           title="スレッド管理"
-          @click="closeDrawer"
+          @click="navigate('/admin/threads')"
           value="thread-management"
         ></v-list-item>
-        <v-list-item prepend-icon="mdi-tag" title="タグ管理" @click="closeDrawer" value="tag-management"></v-list-item>
         <v-list-item
           prepend-icon="mdi-view-dashboard"
-          title="ボード管理"
-          @click="closeDrawer"
+          title="板管理"
+          @click="navigate('/admin/boards')"
           value="board-management"
         ></v-list-item>
       </v-list>

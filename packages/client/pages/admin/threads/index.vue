@@ -1,17 +1,17 @@
 <template>
   <v-container fluid>
-    <v-breadcrumbs :items="['HOME', 'ユーザー']"></v-breadcrumbs>
+    <v-breadcrumbs :items="['HOME', 'スレッド']"></v-breadcrumbs>
     <v-data-table
       :headers="headers"
       :items="desserts"
       :sort-by="[{ key: 'calories', order: 'asc' }]"
       :hover="true"
-      height="500"
+      height="600"
       density="compact"
     >
       <template #top>
         <v-toolbar flat>
-          <v-toolbar-title>ユーザー一覧</v-toolbar-title>
+          <v-toolbar-title>スレッド一覧</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
           <v-spacer></v-spacer>
           <v-dialog v-model="dialog" max-width="500px">
