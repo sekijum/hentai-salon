@@ -146,8 +146,8 @@ const closeDialog = () => {
 }
 
 .media-item {
-  width: 100%;
-  height: auto;
+  width: 100px; /* Fixed width */
+  height: 100px; /* Fixed height */
   object-fit: cover;
   cursor: pointer;
   position: relative;
