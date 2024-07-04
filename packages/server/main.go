@@ -28,7 +28,7 @@ func main() {
 	config := cors.Config{
 		AllowOrigins:     []string{"http://localhost:3000", "http://192.168.10.30:3000"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowHeaders: []string{
+		AllowHeaders:     []string{
 			"Access-Control-Allow-Credentials",
 			"Access-Control-Allow-Headers",
 			"Content-Type",
@@ -36,9 +36,9 @@ func main() {
 			"Accept-Encoding",
 			"Authorization",
 		},
-		ExposeHeaders: []string{"Content-Length"},
+		ExposeHeaders:    []string{"Content-Length", "Authorization"},
 		AllowCredentials: true,
-		MaxAge: 24 * time.Hour,
+		MaxAge:           24 * time.Hour,
 	}
 
 	r.Use(cors.New(config))

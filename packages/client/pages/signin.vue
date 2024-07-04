@@ -34,12 +34,16 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue';
+import { useRouter, useNuxtApp } from '#app';
 import PageTitle from '~/components/PageTitle.vue';
 import Menu from '~/components/Menu.vue';
 import Storage from '~/utils/storage';
-import api from '~/utils/api';
 
 const router = useRouter();
+const nuxtApp = useNuxtApp();
+const api = nuxtApp.$api;
+
 const menuItems = [
   { title: 'サインイン', navigate: () => router.push('/signin'), icon: 'mdi-login' },
   { title: 'サインアップ', navigate: () => router.push('/signup'), icon: 'mdi-account-plus' },
@@ -63,12 +67,26 @@ async function signin() {
       const credentials = { email: form.value.email, password: form.value.password };
       const response = await api.post('/signin', credentials);
 
-      const token = response.headers['authorization'].split(' ')[1];
-      console.log(token);
+      const authHeader = response.headers.authorization;
+      if (authHeader) {
+        const token = authHeader.split(' ')[1];
 
-      Storage.setItem('access_token', token);
+        Storage.setItem('access_token', token);
 
-      router.push('/');
+        const response = await api.get('/whoami', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const user = response.data;
+
+        Storage.setItem('user', JSON.stringify(user));
+
+        router.push('/');
+      } else {
+        console.error('Authorizationヘッダーがありません');
+      }
     } catch (error) {
       console.error('ログイン中にエラーが発生しました:', error);
     }

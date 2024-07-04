@@ -27,12 +27,12 @@ func (ctrl *UserController) Signup(ginCtx *gin.Context) {
 
 	token, err := ctrl.userApplicationService.Signup(context.Background(), body)
 	if err != nil {
-		ginCtx.JSON(http.StatusInternalServerError, gin.H{"error": "ユーザー登録に失敗しました: " + err.Error()})
+		ginCtx.JSON(http.StatusInternalServerError, gin.H{"error": "サインアップに失敗しました: " + err.Error()})
 		return
 	}
 
 	ginCtx.Header("Authorization", "Bearer "+token)
-	ginCtx.JSON(http.StatusOK, gin.H{"message": "ユーザー登録が成功しました"})
+	ginCtx.JSON(http.StatusOK, gin.H{"message": "サインアップが成功しました"})
 }
 
 func (ctrl *UserController) Signin(ginCtx *gin.Context) {
@@ -49,7 +49,7 @@ func (ctrl *UserController) Signin(ginCtx *gin.Context) {
 	}
 
 	ginCtx.Header("Authorization", "Bearer "+token)
-	ginCtx.JSON(http.StatusOK, gin.H{"message": "ログインが成功しました"})
+	ginCtx.JSON(http.StatusOK, gin.H{"message": "サインインが成功しました"})
 }
 
 func (ctrl *UserController) FindAuthenticatedUser(ginCtx *gin.Context) {
