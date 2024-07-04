@@ -3,7 +3,6 @@
     <p class="form-title">{{ formTitle }}</p>
     <v-form @submit.prevent="submitForm" class="form">
       <v-text-field
-        size="x-small"
         v-model="name"
         label="名前(省略可)"
         variant="outlined"
@@ -34,7 +33,6 @@
         v-model="files"
         label="ファイルを選択"
         multiple
-        show-size
         truncate-length="25"
         prepend-icon=""
         variant="outlined"
@@ -44,7 +42,7 @@
         density="compact"
       >
         <template v-slot:selection="{ fileNames }">
-          <v-chip v-for="fileName in fileNames" :key="fileName" class="me-2" color="primary" size="small" label>
+          <v-chip v-for="fileName in fileNames" :key="fileName" class="me-2" color="primary" label>
             {{ fileName }}
           </v-chip>
         </template>

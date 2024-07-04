@@ -117,7 +117,7 @@ const boards = ['垢版', 'ニュース', 'スポーツ', 'エンタメ', '一�
 const types = ['大砲', '小銃', '拳銃'];
 const idCodes = ['+Q6HhT800', 'X+z5zrq00', '6C/Ty2sa0', 'mswGlHt', '3H4JrKd9'];
 const mediaUrls = [
-  'https://via.placeholder.com/300',
+  'https://placehold.jp/300x300.png',
   'https://drive.google.com/thumbnail?id=1atuQlT_wuPT73fwo4x1fZsGc2_ErVNqs&sz=w670',
   'https://www.w3schools.com/html/mov_bbb.mp4',
 ];
