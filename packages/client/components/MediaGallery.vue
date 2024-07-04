@@ -24,8 +24,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-
 const items = ref([
   ...Array.from({ length: 20 }, (k, v) => ({
     id: v + 1,

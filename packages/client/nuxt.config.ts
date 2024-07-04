@@ -4,6 +4,11 @@ export default defineNuxtConfig({
   build: {
     transpile: ['vuetify'],
   },
+  runtimeConfig: {
+    public: {
+      apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL,
+    },
+  },
   css: ['vuetify/styles', '@mdi/font/css/materialdesignicons.css'],
   modules: [
     (_options, nuxt) => {

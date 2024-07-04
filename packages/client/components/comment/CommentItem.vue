@@ -9,7 +9,7 @@
         </div>
       </div>
       <div v-if="comment.replyTo" class="reply-indication">
-        <router-link :to="'/comments/' + comment.replyTo" class="reply-link">>>{{ comment.replyTo }}</router-link>
+        <router-link :to="'#comments-' + comment.replyTo" class="reply-link">>>{{ comment.replyTo }}</router-link>
       </div>
       <v-list-item-title class="comment-content">
         <a :href="'#comment-' + comment.id" class="comment-anchor">{{ comment.content }}</a>

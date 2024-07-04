@@ -21,7 +21,6 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits } from 'vue';
 import VideoPlayer from '~/components/VideoPlayer.vue';
 
 const props = defineProps({

@@ -122,7 +122,7 @@ const mediaUrls = [
   'https://www.w3schools.com/html/mov_bbb.mp4',
 ];
 
-for (let i = 1; i <= 300; i++) {
+for (let i = 1; i <= 100; i++) {
   comments.value.push({
     id: i,
     username: usernames[i % usernames.length],
@@ -138,6 +138,7 @@ for (let i = 1; i <= 300; i++) {
     type: types[i % types.length],
     idCode: idCodes[i % idCodes.length],
     commentCount: String(Math.floor(Math.random() * 20)),
+    replyTo: 20,
     media:
       i % 3 === 0
         ? [

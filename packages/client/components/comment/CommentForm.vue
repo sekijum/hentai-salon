@@ -65,8 +65,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineEmits, defineProps } from 'vue';
-
 const emit = defineEmits(['submit', 'clear']);
 
 const props = defineProps({
