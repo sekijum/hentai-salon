@@ -60,6 +60,7 @@ services:
 
   minio:
     image: minio/minio:latest
+    container_name: hentai-salon-minio
     ports:
       - 9000:9000
       - 9001:9001
