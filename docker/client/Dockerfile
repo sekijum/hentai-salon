@@ -12,5 +12,3 @@ WORKDIR $ROOTPATH
 RUN npm install prettier -g
 
 EXPOSE 3000
-
-ENTRYPOINT ["npm", "run", "dev"]
