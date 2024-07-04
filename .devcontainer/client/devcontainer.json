@@ -1,0 +1,25 @@
+{
+  "name": "hentai-salon-client",
+  "dockerComposeFile": ["../../docker-compose.yaml"],
+  "service": "client",
+  "workspaceFolder": "/client",
+  "shutdownAction": "stopCompose",
+  "remoteUser": "root",
+  "settings": {
+    "terminal.integrated.defaultProfile.linux": "bash",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": true,
+      "source.organizeImports": true
+    },
+    "typescript.tsdk": "node_modules/typescript/lib"
+  },
+  "extensions": [
+    "vue.volar",
+    "esbenp.prettier-vscode",
+    "streetsidesoftware.code-spell-checker",
+    "ms-vscode.vscode-typescript-tslint-plugin",
+    "eg2.vscode-npm-script"
+  ],
+  "postCreateCommand": "npm ci"
+}
