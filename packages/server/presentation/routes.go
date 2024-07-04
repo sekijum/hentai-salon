@@ -32,7 +32,7 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 	authGroup.Use(authMiddleware, paginationDefaultsMiddleware)
 	{
 		authGroup.POST("/threads", controllers.ThreadController.Create)
-		authGroup.GET("/users/me", controllers.UserController.FindAuthenticatedUser)
+		authGroup.GET("/whoami", controllers.UserController.FindAuthenticatedUser)
 	}
 
 	adminGroup := r.Group("/admin")

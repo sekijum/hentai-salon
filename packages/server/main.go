@@ -1,13 +1,15 @@
 package main
 
 import (
+	"time"
 	"log"
 	"os"
 
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
+
 	presentation "server/presentation"
 	"server/shared/di"
-
-	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -22,6 +24,24 @@ func main() {
 	}
 
 	r := gin.Default()
+
+	config := cors.Config{
+		AllowOrigins:     []string{"http://localhost:3000", "http://192.168.10.30:3000"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders: []string{
+			"Access-Control-Allow-Credentials",
+			"Access-Control-Allow-Headers",
+			"Content-Type",
+			"Content-Length",
+			"Accept-Encoding",
+			"Authorization",
+		},
+		ExposeHeaders: []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge: 24 * time.Hour,
+	}
+
+	r.Use(cors.New(config))
 
 	r.SetTrustedProxies([]string{"127.0.0.1"})
 
