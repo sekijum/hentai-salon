@@ -33,7 +33,7 @@ func (svc *ThreadApplicationService) FindAll(
 	ctx context.Context,
 	qs request.ThreadFindAllRequest,
 ) ([]*resource.ThreadResource, error) {
-	threads, err := svc.threadDatasource.FindAll(ctx, qs.Pagination)
+	threads, err := svc.threadDatasource.FindAll(ctx, qs.Limit, qs.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -62,8 +62,10 @@ func (svc *ThreadApplicationService) Create(
 		}
 		return errors.New("スレタイが重複しています")
 	}
+	
 	thread := &model.Thread{
 		Title:             body.Title,
+		BoardId: body.BoardId,
 		Description:       body.Description,
 		UserId:            userId.(int),
 		ThumbnailUrl:      body.ThumbnailUrl,
@@ -77,7 +79,7 @@ func (svc *ThreadApplicationService) Create(
 		return err
 	}
 
-	_, err := svc.threadDatasource.Create(ctx, thread)
+	_, err := svc.threadDatasource.Create(ctx, thread, body.TagNameList)
 	if err != nil {
 		return err
 	}

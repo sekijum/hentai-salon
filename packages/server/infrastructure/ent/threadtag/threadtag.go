@@ -10,10 +10,10 @@ import (
 const (
 	// Label holds the string label denoting the threadtag type in the database.
 	Label = "thread_tag"
-	// FieldThreadId holds the string denoting the threadid field in the database.
-	FieldThreadId = "thread_id"
-	// FieldTagId holds the string denoting the tagid field in the database.
-	FieldTagId = "tag_id"
+	// FieldThreadID holds the string denoting the thread_id field in the database.
+	FieldThreadID = "thread_id"
+	// FieldTagID holds the string denoting the tag_id field in the database.
+	FieldTagID = "tag_id"
 	// EdgeThread holds the string denoting the thread edge name in mutations.
 	EdgeThread = "thread"
 	// EdgeTag holds the string denoting the tag edge name in mutations.
@@ -42,8 +42,8 @@ const (
 
 // Columns holds all SQL columns for threadtag fields.
 var Columns = []string{
-	FieldThreadId,
-	FieldTagId,
+	FieldThreadID,
+	FieldTagID,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -59,14 +59,14 @@ func ValidColumn(column string) bool {
 // OrderOption defines the ordering options for the ThreadTag queries.
 type OrderOption func(*sql.Selector)
 
-// ByThreadId orders the results by the threadId field.
-func ByThreadId(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldThreadId, opts...).ToFunc()
+// ByThreadID orders the results by the thread_id field.
+func ByThreadID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldThreadID, opts...).ToFunc()
 }
 
-// ByTagId orders the results by the tagId field.
-func ByTagId(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldTagId, opts...).ToFunc()
+// ByTagID orders the results by the tag_id field.
+func ByTagID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTagID, opts...).ToFunc()
 }
 
 // ByThreadField orders the results by thread field.

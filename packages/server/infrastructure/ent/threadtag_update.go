@@ -29,49 +29,37 @@ func (ttu *ThreadTagUpdate) Where(ps ...predicate.ThreadTag) *ThreadTagUpdate {
 	return ttu
 }
 
-// SetThreadId sets the "threadId" field.
-func (ttu *ThreadTagUpdate) SetThreadId(i int) *ThreadTagUpdate {
-	ttu.mutation.SetThreadId(i)
+// SetThreadID sets the "thread_id" field.
+func (ttu *ThreadTagUpdate) SetThreadID(i int) *ThreadTagUpdate {
+	ttu.mutation.SetThreadID(i)
 	return ttu
 }
 
-// SetNillableThreadId sets the "threadId" field if the given value is not nil.
-func (ttu *ThreadTagUpdate) SetNillableThreadId(i *int) *ThreadTagUpdate {
+// SetNillableThreadID sets the "thread_id" field if the given value is not nil.
+func (ttu *ThreadTagUpdate) SetNillableThreadID(i *int) *ThreadTagUpdate {
 	if i != nil {
-		ttu.SetThreadId(*i)
+		ttu.SetThreadID(*i)
 	}
 	return ttu
 }
 
-// SetTagId sets the "tagId" field.
-func (ttu *ThreadTagUpdate) SetTagId(i int) *ThreadTagUpdate {
-	ttu.mutation.SetTagId(i)
+// SetTagID sets the "tag_id" field.
+func (ttu *ThreadTagUpdate) SetTagID(i int) *ThreadTagUpdate {
+	ttu.mutation.SetTagID(i)
 	return ttu
 }
 
-// SetNillableTagId sets the "tagId" field if the given value is not nil.
-func (ttu *ThreadTagUpdate) SetNillableTagId(i *int) *ThreadTagUpdate {
+// SetNillableTagID sets the "tag_id" field if the given value is not nil.
+func (ttu *ThreadTagUpdate) SetNillableTagID(i *int) *ThreadTagUpdate {
 	if i != nil {
-		ttu.SetTagId(*i)
+		ttu.SetTagID(*i)
 	}
-	return ttu
-}
-
-// SetThreadID sets the "thread" edge to the Thread entity by ID.
-func (ttu *ThreadTagUpdate) SetThreadID(id int) *ThreadTagUpdate {
-	ttu.mutation.SetThreadID(id)
 	return ttu
 }
 
 // SetThread sets the "thread" edge to the Thread entity.
 func (ttu *ThreadTagUpdate) SetThread(t *Thread) *ThreadTagUpdate {
 	return ttu.SetThreadID(t.ID)
-}
-
-// SetTagID sets the "tag" edge to the Tag entity by ID.
-func (ttu *ThreadTagUpdate) SetTagID(id int) *ThreadTagUpdate {
-	ttu.mutation.SetTagID(id)
-	return ttu
 }
 
 // SetTag sets the "tag" edge to the Tag entity.
@@ -138,7 +126,7 @@ func (ttu *ThreadTagUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if err := ttu.check(); err != nil {
 		return n, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(threadtag.Table, threadtag.Columns, sqlgraph.NewFieldSpec(threadtag.FieldThreadId, field.TypeInt), sqlgraph.NewFieldSpec(threadtag.FieldTagId, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(threadtag.Table, threadtag.Columns, sqlgraph.NewFieldSpec(threadtag.FieldThreadID, field.TypeInt), sqlgraph.NewFieldSpec(threadtag.FieldTagID, field.TypeInt))
 	if ps := ttu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -224,49 +212,37 @@ type ThreadTagUpdateOne struct {
 	mutation *ThreadTagMutation
 }
 
-// SetThreadId sets the "threadId" field.
-func (ttuo *ThreadTagUpdateOne) SetThreadId(i int) *ThreadTagUpdateOne {
-	ttuo.mutation.SetThreadId(i)
+// SetThreadID sets the "thread_id" field.
+func (ttuo *ThreadTagUpdateOne) SetThreadID(i int) *ThreadTagUpdateOne {
+	ttuo.mutation.SetThreadID(i)
 	return ttuo
 }
 
-// SetNillableThreadId sets the "threadId" field if the given value is not nil.
-func (ttuo *ThreadTagUpdateOne) SetNillableThreadId(i *int) *ThreadTagUpdateOne {
+// SetNillableThreadID sets the "thread_id" field if the given value is not nil.
+func (ttuo *ThreadTagUpdateOne) SetNillableThreadID(i *int) *ThreadTagUpdateOne {
 	if i != nil {
-		ttuo.SetThreadId(*i)
+		ttuo.SetThreadID(*i)
 	}
 	return ttuo
 }
 
-// SetTagId sets the "tagId" field.
-func (ttuo *ThreadTagUpdateOne) SetTagId(i int) *ThreadTagUpdateOne {
-	ttuo.mutation.SetTagId(i)
+// SetTagID sets the "tag_id" field.
+func (ttuo *ThreadTagUpdateOne) SetTagID(i int) *ThreadTagUpdateOne {
+	ttuo.mutation.SetTagID(i)
 	return ttuo
 }
 
-// SetNillableTagId sets the "tagId" field if the given value is not nil.
-func (ttuo *ThreadTagUpdateOne) SetNillableTagId(i *int) *ThreadTagUpdateOne {
+// SetNillableTagID sets the "tag_id" field if the given value is not nil.
+func (ttuo *ThreadTagUpdateOne) SetNillableTagID(i *int) *ThreadTagUpdateOne {
 	if i != nil {
-		ttuo.SetTagId(*i)
+		ttuo.SetTagID(*i)
 	}
-	return ttuo
-}
-
-// SetThreadID sets the "thread" edge to the Thread entity by ID.
-func (ttuo *ThreadTagUpdateOne) SetThreadID(id int) *ThreadTagUpdateOne {
-	ttuo.mutation.SetThreadID(id)
 	return ttuo
 }
 
 // SetThread sets the "thread" edge to the Thread entity.
 func (ttuo *ThreadTagUpdateOne) SetThread(t *Thread) *ThreadTagUpdateOne {
 	return ttuo.SetThreadID(t.ID)
-}
-
-// SetTagID sets the "tag" edge to the Tag entity by ID.
-func (ttuo *ThreadTagUpdateOne) SetTagID(id int) *ThreadTagUpdateOne {
-	ttuo.mutation.SetTagID(id)
-	return ttuo
 }
 
 // SetTag sets the "tag" edge to the Tag entity.
@@ -346,14 +322,14 @@ func (ttuo *ThreadTagUpdateOne) sqlSave(ctx context.Context) (_node *ThreadTag, 
 	if err := ttuo.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(threadtag.Table, threadtag.Columns, sqlgraph.NewFieldSpec(threadtag.FieldThreadId, field.TypeInt), sqlgraph.NewFieldSpec(threadtag.FieldTagId, field.TypeInt))
-	if id, ok := ttuo.mutation.ThreadId(); !ok {
-		return nil, &ValidationError{Name: "threadId", err: errors.New(`ent: missing "ThreadTag.threadId" for update`)}
+	_spec := sqlgraph.NewUpdateSpec(threadtag.Table, threadtag.Columns, sqlgraph.NewFieldSpec(threadtag.FieldThreadID, field.TypeInt), sqlgraph.NewFieldSpec(threadtag.FieldTagID, field.TypeInt))
+	if id, ok := ttuo.mutation.ThreadID(); !ok {
+		return nil, &ValidationError{Name: "thread_id", err: errors.New(`ent: missing "ThreadTag.thread_id" for update`)}
 	} else {
 		_spec.Node.CompositeID[0].Value = id
 	}
-	if id, ok := ttuo.mutation.TagId(); !ok {
-		return nil, &ValidationError{Name: "tagId", err: errors.New(`ent: missing "ThreadTag.tagId" for update`)}
+	if id, ok := ttuo.mutation.TagID(); !ok {
+		return nil, &ValidationError{Name: "tag_id", err: errors.New(`ent: missing "ThreadTag.tag_id" for update`)}
 	} else {
 		_spec.Node.CompositeID[1].Value = id
 	}

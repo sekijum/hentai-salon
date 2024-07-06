@@ -1,9 +1,6 @@
 package request
 
-import (
-	pagination "server/domain/type"
-)
-
 type ThreadFindAllRequest struct {
-	Pagination pagination.Pagination `form:"pagination"`
+	Limit  int `form:"limit" binding:"min=1,max=100"`
+	Offset int `form:"offset" binding:"min=0"`
 }

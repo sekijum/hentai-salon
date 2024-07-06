@@ -128,7 +128,7 @@ var Columns = []string{
 var (
 	// TagsPrimaryKey and TagsColumn2 are the table columns denoting the
 	// primary key for the tags relation (M2M).
-	TagsPrimaryKey = []string{"threadId", "tagId"}
+	TagsPrimaryKey = []string{"thread_id", "tag_id"}
 	// LikedUsersPrimaryKey and LikedUsersColumn2 are the table columns denoting the
 	// primary key for the liked_users relation (M2M).
 	LikedUsersPrimaryKey = []string{"userId", "threadId"}

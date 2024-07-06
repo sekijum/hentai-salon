@@ -21,33 +21,21 @@ type ThreadTagCreate struct {
 	hooks    []Hook
 }
 
-// SetThreadId sets the "threadId" field.
-func (ttc *ThreadTagCreate) SetThreadId(i int) *ThreadTagCreate {
-	ttc.mutation.SetThreadId(i)
+// SetThreadID sets the "thread_id" field.
+func (ttc *ThreadTagCreate) SetThreadID(i int) *ThreadTagCreate {
+	ttc.mutation.SetThreadID(i)
 	return ttc
 }
 
-// SetTagId sets the "tagId" field.
-func (ttc *ThreadTagCreate) SetTagId(i int) *ThreadTagCreate {
-	ttc.mutation.SetTagId(i)
-	return ttc
-}
-
-// SetThreadID sets the "thread" edge to the Thread entity by ID.
-func (ttc *ThreadTagCreate) SetThreadID(id int) *ThreadTagCreate {
-	ttc.mutation.SetThreadID(id)
+// SetTagID sets the "tag_id" field.
+func (ttc *ThreadTagCreate) SetTagID(i int) *ThreadTagCreate {
+	ttc.mutation.SetTagID(i)
 	return ttc
 }
 
 // SetThread sets the "thread" edge to the Thread entity.
 func (ttc *ThreadTagCreate) SetThread(t *Thread) *ThreadTagCreate {
 	return ttc.SetThreadID(t.ID)
-}
-
-// SetTagID sets the "tag" edge to the Tag entity by ID.
-func (ttc *ThreadTagCreate) SetTagID(id int) *ThreadTagCreate {
-	ttc.mutation.SetTagID(id)
-	return ttc
 }
 
 // SetTag sets the "tag" edge to the Tag entity.
@@ -89,11 +77,11 @@ func (ttc *ThreadTagCreate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (ttc *ThreadTagCreate) check() error {
-	if _, ok := ttc.mutation.ThreadId(); !ok {
-		return &ValidationError{Name: "threadId", err: errors.New(`ent: missing required field "ThreadTag.threadId"`)}
+	if _, ok := ttc.mutation.ThreadID(); !ok {
+		return &ValidationError{Name: "thread_id", err: errors.New(`ent: missing required field "ThreadTag.thread_id"`)}
 	}
-	if _, ok := ttc.mutation.TagId(); !ok {
-		return &ValidationError{Name: "tagId", err: errors.New(`ent: missing required field "ThreadTag.tagId"`)}
+	if _, ok := ttc.mutation.TagID(); !ok {
+		return &ValidationError{Name: "tag_id", err: errors.New(`ent: missing required field "ThreadTag.tag_id"`)}
 	}
 	if _, ok := ttc.mutation.ThreadID(); !ok {
 		return &ValidationError{Name: "thread", err: errors.New(`ent: missing required edge "ThreadTag.thread"`)}
@@ -137,7 +125,7 @@ func (ttc *ThreadTagCreate) createSpec() (*ThreadTag, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.ThreadId = nodes[0]
+		_node.ThreadID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := ttc.mutation.TagIDs(); len(nodes) > 0 {
@@ -154,7 +142,7 @@ func (ttc *ThreadTagCreate) createSpec() (*ThreadTag, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.TagId = nodes[0]
+		_node.TagID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

@@ -1462,8 +1462,8 @@ func (c *ThreadTagClient) Update() *ThreadTagUpdate {
 // UpdateOne returns an update builder for the given entity.
 func (c *ThreadTagClient) UpdateOne(tt *ThreadTag) *ThreadTagUpdateOne {
 	mutation := newThreadTagMutation(c.config, OpUpdateOne)
-	mutation.thread = &tt.ThreadId
-	mutation.tag = &tt.TagId
+	mutation.thread = &tt.ThreadID
+	mutation.tag = &tt.TagID
 	return &ThreadTagUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
@@ -1485,14 +1485,14 @@ func (c *ThreadTagClient) Query() *ThreadTagQuery {
 // QueryThread queries the thread edge of a ThreadTag.
 func (c *ThreadTagClient) QueryThread(tt *ThreadTag) *ThreadQuery {
 	return c.Query().
-		Where(threadtag.ThreadId(tt.ThreadId), threadtag.TagId(tt.TagId)).
+		Where(threadtag.ThreadID(tt.ThreadID), threadtag.TagID(tt.TagID)).
 		QueryThread()
 }
 
 // QueryTag queries the tag edge of a ThreadTag.
 func (c *ThreadTagClient) QueryTag(tt *ThreadTag) *TagQuery {
 	return c.Query().
-		Where(threadtag.ThreadId(tt.ThreadId), threadtag.TagId(tt.TagId)).
+		Where(threadtag.ThreadID(tt.ThreadID), threadtag.TagID(tt.TagID)).
 		QueryTag()
 }
 

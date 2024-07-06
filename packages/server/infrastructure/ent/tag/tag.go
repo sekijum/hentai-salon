@@ -48,7 +48,7 @@ var Columns = []string{
 var (
 	// ThreadsPrimaryKey and ThreadsColumn2 are the table columns denoting the
 	// primary key for the threads relation (M2M).
-	ThreadsPrimaryKey = []string{"threadId", "tagId"}
+	ThreadsPrimaryKey = []string{"thread_id", "tag_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).

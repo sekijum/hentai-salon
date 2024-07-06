@@ -518,7 +518,7 @@ func (tq *TagQuery) loadThreadTags(ctx context.Context, query *ThreadTagQuery, n
 		}
 	}
 	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(threadtag.FieldTagId)
+		query.ctx.AppendFieldOnce(threadtag.FieldTagID)
 	}
 	query.Where(predicate.ThreadTag(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(tag.ThreadTagsColumn), fks...))
@@ -528,10 +528,10 @@ func (tq *TagQuery) loadThreadTags(ctx context.Context, query *ThreadTagQuery, n
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.TagId
+		fk := n.TagID
 		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "tagId" returned %v for node %v`, fk, n)
+			return fmt.Errorf(`unexpected referenced foreign-key "tag_id" returned %v for node %v`, fk, n)
 		}
 		assign(node, n)
 	}

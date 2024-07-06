@@ -10,25 +10,25 @@ import (
 )
 
 type Tag struct {
-    ent.Schema
+	ent.Schema
 }
 
 func (Tag) Fields() []ent.Field {
-    return []ent.Field{
-        field.Int("id").Unique().Immutable(),
-        field.String("name").Unique().MaxLen(20),
-        field.Time("createdAt").Default(time.Now).StorageKey("created_at"),
-    }
+	return []ent.Field{
+		field.Int("id").Unique().Immutable(),
+		field.String("name").Unique().MaxLen(20),
+		field.Time("createdAt").Default(time.Now).StorageKey("created_at"),
+	}
 }
 
 func (Tag) Edges() []ent.Edge {
-    return []ent.Edge{
+	return []ent.Edge{
         edge.From("threads", Thread.Type).Ref("tags").Through("thread_tags", ThreadTag.Type),
-    }
+	}
 }
 
 func (Tag) Indexes() []ent.Index {
-    return []ent.Index{
-        index.Fields("name").Unique(),
-    }
+	return []ent.Index{
+		index.Fields("name").Unique(),
+	}
 }

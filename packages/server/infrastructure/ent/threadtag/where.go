@@ -9,54 +9,54 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
-// ThreadId applies equality check predicate on the "threadId" field. It's identical to ThreadIdEQ.
-func ThreadId(v int) predicate.ThreadTag {
-	return predicate.ThreadTag(sql.FieldEQ(FieldThreadId, v))
+// ThreadID applies equality check predicate on the "thread_id" field. It's identical to ThreadIDEQ.
+func ThreadID(v int) predicate.ThreadTag {
+	return predicate.ThreadTag(sql.FieldEQ(FieldThreadID, v))
 }
 
-// TagId applies equality check predicate on the "tagId" field. It's identical to TagIdEQ.
-func TagId(v int) predicate.ThreadTag {
-	return predicate.ThreadTag(sql.FieldEQ(FieldTagId, v))
+// TagID applies equality check predicate on the "tag_id" field. It's identical to TagIDEQ.
+func TagID(v int) predicate.ThreadTag {
+	return predicate.ThreadTag(sql.FieldEQ(FieldTagID, v))
 }
 
-// ThreadIdEQ applies the EQ predicate on the "threadId" field.
-func ThreadIdEQ(v int) predicate.ThreadTag {
-	return predicate.ThreadTag(sql.FieldEQ(FieldThreadId, v))
+// ThreadIDEQ applies the EQ predicate on the "thread_id" field.
+func ThreadIDEQ(v int) predicate.ThreadTag {
+	return predicate.ThreadTag(sql.FieldEQ(FieldThreadID, v))
 }
 
-// ThreadIdNEQ applies the NEQ predicate on the "threadId" field.
-func ThreadIdNEQ(v int) predicate.ThreadTag {
-	return predicate.ThreadTag(sql.FieldNEQ(FieldThreadId, v))
+// ThreadIDNEQ applies the NEQ predicate on the "thread_id" field.
+func ThreadIDNEQ(v int) predicate.ThreadTag {
+	return predicate.ThreadTag(sql.FieldNEQ(FieldThreadID, v))
 }
 
-// ThreadIdIn applies the In predicate on the "threadId" field.
-func ThreadIdIn(vs ...int) predicate.ThreadTag {
-	return predicate.ThreadTag(sql.FieldIn(FieldThreadId, vs...))
+// ThreadIDIn applies the In predicate on the "thread_id" field.
+func ThreadIDIn(vs ...int) predicate.ThreadTag {
+	return predicate.ThreadTag(sql.FieldIn(FieldThreadID, vs...))
 }
 
-// ThreadIdNotIn applies the NotIn predicate on the "threadId" field.
-func ThreadIdNotIn(vs ...int) predicate.ThreadTag {
-	return predicate.ThreadTag(sql.FieldNotIn(FieldThreadId, vs...))
+// ThreadIDNotIn applies the NotIn predicate on the "thread_id" field.
+func ThreadIDNotIn(vs ...int) predicate.ThreadTag {
+	return predicate.ThreadTag(sql.FieldNotIn(FieldThreadID, vs...))
 }
 
-// TagIdEQ applies the EQ predicate on the "tagId" field.
-func TagIdEQ(v int) predicate.ThreadTag {
-	return predicate.ThreadTag(sql.FieldEQ(FieldTagId, v))
+// TagIDEQ applies the EQ predicate on the "tag_id" field.
+func TagIDEQ(v int) predicate.ThreadTag {
+	return predicate.ThreadTag(sql.FieldEQ(FieldTagID, v))
 }
 
-// TagIdNEQ applies the NEQ predicate on the "tagId" field.
-func TagIdNEQ(v int) predicate.ThreadTag {
-	return predicate.ThreadTag(sql.FieldNEQ(FieldTagId, v))
+// TagIDNEQ applies the NEQ predicate on the "tag_id" field.
+func TagIDNEQ(v int) predicate.ThreadTag {
+	return predicate.ThreadTag(sql.FieldNEQ(FieldTagID, v))
 }
 
-// TagIdIn applies the In predicate on the "tagId" field.
-func TagIdIn(vs ...int) predicate.ThreadTag {
-	return predicate.ThreadTag(sql.FieldIn(FieldTagId, vs...))
+// TagIDIn applies the In predicate on the "tag_id" field.
+func TagIDIn(vs ...int) predicate.ThreadTag {
+	return predicate.ThreadTag(sql.FieldIn(FieldTagID, vs...))
 }
 
-// TagIdNotIn applies the NotIn predicate on the "tagId" field.
-func TagIdNotIn(vs ...int) predicate.ThreadTag {
-	return predicate.ThreadTag(sql.FieldNotIn(FieldTagId, vs...))
+// TagIDNotIn applies the NotIn predicate on the "tag_id" field.
+func TagIDNotIn(vs ...int) predicate.ThreadTag {
+	return predicate.ThreadTag(sql.FieldNotIn(FieldTagID, vs...))
 }
 
 // HasThread applies the HasEdge predicate on the "thread" edge.

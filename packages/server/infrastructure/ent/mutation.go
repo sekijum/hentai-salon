@@ -4998,13 +4998,13 @@ func (m ThreadTagMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
-// SetThreadId sets the "threadId" field.
-func (m *ThreadTagMutation) SetThreadId(i int) {
+// SetThreadID sets the "thread_id" field.
+func (m *ThreadTagMutation) SetThreadID(i int) {
 	m.thread = &i
 }
 
-// ThreadId returns the value of the "threadId" field in the mutation.
-func (m *ThreadTagMutation) ThreadId() (r int, exists bool) {
+// ThreadID returns the value of the "thread_id" field in the mutation.
+func (m *ThreadTagMutation) ThreadID() (r int, exists bool) {
 	v := m.thread
 	if v == nil {
 		return
@@ -5012,18 +5012,18 @@ func (m *ThreadTagMutation) ThreadId() (r int, exists bool) {
 	return *v, true
 }
 
-// ResetThreadId resets all changes to the "threadId" field.
-func (m *ThreadTagMutation) ResetThreadId() {
+// ResetThreadID resets all changes to the "thread_id" field.
+func (m *ThreadTagMutation) ResetThreadID() {
 	m.thread = nil
 }
 
-// SetTagId sets the "tagId" field.
-func (m *ThreadTagMutation) SetTagId(i int) {
+// SetTagID sets the "tag_id" field.
+func (m *ThreadTagMutation) SetTagID(i int) {
 	m.tag = &i
 }
 
-// TagId returns the value of the "tagId" field in the mutation.
-func (m *ThreadTagMutation) TagId() (r int, exists bool) {
+// TagID returns the value of the "tag_id" field in the mutation.
+func (m *ThreadTagMutation) TagID() (r int, exists bool) {
 	v := m.tag
 	if v == nil {
 		return
@@ -5031,33 +5031,20 @@ func (m *ThreadTagMutation) TagId() (r int, exists bool) {
 	return *v, true
 }
 
-// ResetTagId resets all changes to the "tagId" field.
-func (m *ThreadTagMutation) ResetTagId() {
+// ResetTagID resets all changes to the "tag_id" field.
+func (m *ThreadTagMutation) ResetTagID() {
 	m.tag = nil
-}
-
-// SetThreadID sets the "thread" edge to the Thread entity by id.
-func (m *ThreadTagMutation) SetThreadID(id int) {
-	m.thread = &id
 }
 
 // ClearThread clears the "thread" edge to the Thread entity.
 func (m *ThreadTagMutation) ClearThread() {
 	m.clearedthread = true
-	m.clearedFields[threadtag.FieldThreadId] = struct{}{}
+	m.clearedFields[threadtag.FieldThreadID] = struct{}{}
 }
 
 // ThreadCleared reports if the "thread" edge to the Thread entity was cleared.
 func (m *ThreadTagMutation) ThreadCleared() bool {
 	return m.clearedthread
-}
-
-// ThreadID returns the "thread" edge ID in the mutation.
-func (m *ThreadTagMutation) ThreadID() (id int, exists bool) {
-	if m.thread != nil {
-		return *m.thread, true
-	}
-	return
 }
 
 // ThreadIDs returns the "thread" edge IDs in the mutation.
@@ -5076,28 +5063,15 @@ func (m *ThreadTagMutation) ResetThread() {
 	m.clearedthread = false
 }
 
-// SetTagID sets the "tag" edge to the Tag entity by id.
-func (m *ThreadTagMutation) SetTagID(id int) {
-	m.tag = &id
-}
-
 // ClearTag clears the "tag" edge to the Tag entity.
 func (m *ThreadTagMutation) ClearTag() {
 	m.clearedtag = true
-	m.clearedFields[threadtag.FieldTagId] = struct{}{}
+	m.clearedFields[threadtag.FieldTagID] = struct{}{}
 }
 
 // TagCleared reports if the "tag" edge to the Tag entity was cleared.
 func (m *ThreadTagMutation) TagCleared() bool {
 	return m.clearedtag
-}
-
-// TagID returns the "tag" edge ID in the mutation.
-func (m *ThreadTagMutation) TagID() (id int, exists bool) {
-	if m.tag != nil {
-		return *m.tag, true
-	}
-	return
 }
 
 // TagIDs returns the "tag" edge IDs in the mutation.
@@ -5152,10 +5126,10 @@ func (m *ThreadTagMutation) Type() string {
 func (m *ThreadTagMutation) Fields() []string {
 	fields := make([]string, 0, 2)
 	if m.thread != nil {
-		fields = append(fields, threadtag.FieldThreadId)
+		fields = append(fields, threadtag.FieldThreadID)
 	}
 	if m.tag != nil {
-		fields = append(fields, threadtag.FieldTagId)
+		fields = append(fields, threadtag.FieldTagID)
 	}
 	return fields
 }
@@ -5165,10 +5139,10 @@ func (m *ThreadTagMutation) Fields() []string {
 // schema.
 func (m *ThreadTagMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case threadtag.FieldThreadId:
-		return m.ThreadId()
-	case threadtag.FieldTagId:
-		return m.TagId()
+	case threadtag.FieldThreadID:
+		return m.ThreadID()
+	case threadtag.FieldTagID:
+		return m.TagID()
 	}
 	return nil, false
 }
@@ -5185,19 +5159,19 @@ func (m *ThreadTagMutation) OldField(ctx context.Context, name string) (ent.Valu
 // type.
 func (m *ThreadTagMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case threadtag.FieldThreadId:
+	case threadtag.FieldThreadID:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetThreadId(v)
+		m.SetThreadID(v)
 		return nil
-	case threadtag.FieldTagId:
+	case threadtag.FieldTagID:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetTagId(v)
+		m.SetTagID(v)
 		return nil
 	}
 	return fmt.Errorf("unknown ThreadTag field %s", name)
@@ -5251,11 +5225,11 @@ func (m *ThreadTagMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *ThreadTagMutation) ResetField(name string) error {
 	switch name {
-	case threadtag.FieldThreadId:
-		m.ResetThreadId()
+	case threadtag.FieldThreadID:
+		m.ResetThreadID()
 		return nil
-	case threadtag.FieldTagId:
-		m.ResetTagId()
+	case threadtag.FieldTagID:
+		m.ResetTagID()
 		return nil
 	}
 	return fmt.Errorf("unknown ThreadTag field %s", name)

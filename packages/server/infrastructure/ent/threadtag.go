@@ -16,10 +16,10 @@ import (
 // ThreadTag is the model entity for the ThreadTag schema.
 type ThreadTag struct {
 	config `json:"-"`
-	// ThreadId holds the value of the "threadId" field.
-	ThreadId int `json:"threadId,omitempty"`
-	// TagId holds the value of the "tagId" field.
-	TagId int `json:"tagId,omitempty"`
+	// ThreadID holds the value of the "thread_id" field.
+	ThreadID int `json:"thread_id,omitempty"`
+	// TagID holds the value of the "tag_id" field.
+	TagID int `json:"tag_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ThreadTagQuery when eager-loading is set.
 	Edges        ThreadTagEdges `json:"edges"`
@@ -64,7 +64,7 @@ func (*ThreadTag) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case threadtag.FieldThreadId, threadtag.FieldTagId:
+		case threadtag.FieldThreadID, threadtag.FieldTagID:
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -81,17 +81,17 @@ func (tt *ThreadTag) assignValues(columns []string, values []any) error {
 	}
 	for i := range columns {
 		switch columns[i] {
-		case threadtag.FieldThreadId:
+		case threadtag.FieldThreadID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field threadId", values[i])
+				return fmt.Errorf("unexpected type %T for field thread_id", values[i])
 			} else if value.Valid {
-				tt.ThreadId = int(value.Int64)
+				tt.ThreadID = int(value.Int64)
 			}
-		case threadtag.FieldTagId:
+		case threadtag.FieldTagID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field tagId", values[i])
+				return fmt.Errorf("unexpected type %T for field tag_id", values[i])
 			} else if value.Valid {
-				tt.TagId = int(value.Int64)
+				tt.TagID = int(value.Int64)
 			}
 		default:
 			tt.selectValues.Set(columns[i], values[i])
@@ -138,11 +138,11 @@ func (tt *ThreadTag) Unwrap() *ThreadTag {
 func (tt *ThreadTag) String() string {
 	var builder strings.Builder
 	builder.WriteString("ThreadTag(")
-	builder.WriteString("threadId=")
-	builder.WriteString(fmt.Sprintf("%v", tt.ThreadId))
+	builder.WriteString("thread_id=")
+	builder.WriteString(fmt.Sprintf("%v", tt.ThreadID))
 	builder.WriteString(", ")
-	builder.WriteString("tagId=")
-	builder.WriteString(fmt.Sprintf("%v", tt.TagId))
+	builder.WriteString("tag_id=")
+	builder.WriteString(fmt.Sprintf("%v", tt.TagID))
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -1,21 +1,21 @@
 package resource
 
 import (
-	"time"
-
 	"server/domain/model"
+	"time"
 )
 
 type ThreadResource struct {
-	Id           int    `json:"id"`
-	BoardId      int    `json:"boardId"`
-	UserId       int    `json:"userId"`
-	Title        string `json:"title"`
-	Description  string `json:"description"`
-	ThumbnailUrl string `json:"thumbnailUrl"`
-	Status       string `json:"status"`
-	CreatedAt    string `json:"created_at"`
-	UpdatedAt    string `json:"updated_at"`
+	Id           int       `json:"id"`
+	BoardId      int       `json:"boardId"`
+	UserId       int       `json:"userId"`
+	Title        string    `json:"title"`
+	Description  string    `json:"description"`
+	ThumbnailUrl string    `json:"thumbnailUrl"`
+	Status       string    `json:"status"`
+	Tags         []string  `json:"tags"`
+	CreatedAt    string    `json:"created_at"`
+	UpdatedAt    string    `json:"updated_at"`
 }
 
 func NewThreadResource(t *model.Thread) *ThreadResource {
@@ -29,6 +29,11 @@ func NewThreadResource(t *model.Thread) *ThreadResource {
 		thumbnailUrl = *t.ThumbnailUrl
 	}
 
+	var tagNames []string
+	for _, tag := range t.Tags {
+		tagNames = append(tagNames, tag.Name)
+	}
+
 	return &ThreadResource{
 		Id:           t.Id,
 		BoardId:      t.BoardId,
@@ -37,7 +42,7 @@ func NewThreadResource(t *model.Thread) *ThreadResource {
 		Description:  description,
 		ThumbnailUrl: thumbnailUrl,
 		Status:       t.Status.String(),
+		Tags:         tagNames,
 		CreatedAt:    t.CreatedAt.Format(time.RFC3339),
-		UpdatedAt:    t.UpdatedAt.Format(time.RFC3339),
 	}
 }

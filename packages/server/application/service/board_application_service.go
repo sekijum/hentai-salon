@@ -2,8 +2,8 @@ package service
 
 import (
 	"context"
-	"server/domain/model"
 	"server/infrastructure/datasource"
+	resource "server/presentation/resource/board"
 )
 
 type BoardApplicationService struct {
@@ -18,6 +18,16 @@ func NewBoardApplicationService(
 	}
 }
 
-func (svc *BoardApplicationService) FindAll(ctx context.Context) ([]*model.Board, error) {
-	return svc.boardDatasource.FindAll(ctx)
+func (svc *BoardApplicationService) FindAll(ctx context.Context) ([]*resource.BoardResource, error) {
+	boards, err := svc.boardDatasource.FindAll(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var boardResources []*resource.BoardResource
+	for _, board := range boards {
+		boardResources = append(boardResources, resource.NewBoardResource(board))
+	}
+
+	return boardResources, nil
 }

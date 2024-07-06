@@ -260,12 +260,12 @@ func (ttq *ThreadTagQuery) WithTag(opts ...func(*TagQuery)) *ThreadTagQuery {
 // Example:
 //
 //	var v []struct {
-//		ThreadId int `json:"threadId,omitempty"`
+//		ThreadID int `json:"thread_id,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.ThreadTag.Query().
-//		GroupBy(threadtag.FieldThreadId).
+//		GroupBy(threadtag.FieldThreadID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (ttq *ThreadTagQuery) GroupBy(field string, fields ...string) *ThreadTagGroupBy {
@@ -283,11 +283,11 @@ func (ttq *ThreadTagQuery) GroupBy(field string, fields ...string) *ThreadTagGro
 // Example:
 //
 //	var v []struct {
-//		ThreadId int `json:"threadId,omitempty"`
+//		ThreadID int `json:"thread_id,omitempty"`
 //	}
 //
 //	client.ThreadTag.Query().
-//		Select(threadtag.FieldThreadId).
+//		Select(threadtag.FieldThreadID).
 //		Scan(ctx, &v)
 func (ttq *ThreadTagQuery) Select(fields ...string) *ThreadTagSelect {
 	ttq.ctx.Fields = append(ttq.ctx.Fields, fields...)
@@ -374,7 +374,7 @@ func (ttq *ThreadTagQuery) loadThread(ctx context.Context, query *ThreadQuery, n
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*ThreadTag)
 	for i := range nodes {
-		fk := nodes[i].ThreadId
+		fk := nodes[i].ThreadID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -391,7 +391,7 @@ func (ttq *ThreadTagQuery) loadThread(ctx context.Context, query *ThreadQuery, n
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "threadId" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "thread_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -403,7 +403,7 @@ func (ttq *ThreadTagQuery) loadTag(ctx context.Context, query *TagQuery, nodes [
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*ThreadTag)
 	for i := range nodes {
-		fk := nodes[i].TagId
+		fk := nodes[i].TagID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -420,7 +420,7 @@ func (ttq *ThreadTagQuery) loadTag(ctx context.Context, query *TagQuery, nodes [
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "tagId" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "tag_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -450,10 +450,10 @@ func (ttq *ThreadTagQuery) querySpec() *sqlgraph.QuerySpec {
 			_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 		}
 		if ttq.withThread != nil {
-			_spec.Node.AddColumnOnce(threadtag.FieldThreadId)
+			_spec.Node.AddColumnOnce(threadtag.FieldThreadID)
 		}
 		if ttq.withTag != nil {
-			_spec.Node.AddColumnOnce(threadtag.FieldTagId)
+			_spec.Node.AddColumnOnce(threadtag.FieldTagID)
 		}
 	}
 	if ps := ttq.predicates; len(ps) > 0 {

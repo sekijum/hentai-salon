@@ -22,6 +22,7 @@ type Thread struct {
 
 	User  *User
 	Board *Board
+	Tags              []*Tag
 }
 
 func (t *Thread) Validate() error {
