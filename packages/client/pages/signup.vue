@@ -56,7 +56,7 @@
           <v-text-field
             v-bind="field"
             label="パスワード確認"
-            type="text"
+            type="password"
             variant="outlined"
             density="compact"
             :error-messages="errorMessage ? [errorMessage] : []"
@@ -124,6 +124,9 @@ async function submit() {
   try {
     const response = await api.post('/signup', form.value);
 
+    const authHeader = response.headers.authorization;
+    const token = authHeader.split(' ')[1];
+    Storage.setItem('access_token', token);
     router.push('/');
   } catch (error) {
     console.error('通信中にエラーが発生しました:', error);

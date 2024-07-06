@@ -8,17 +8,18 @@ import (
 	"server/domain/model"
 	"server/infrastructure/datasource"
 	"server/presentation/request"
+	"server/presentation/resource"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
 )
 
 type UserApplicationService struct {
-	userDatasource datasource.UserDatasource
+	userDatasource *datasource.UserDatasource
 }
 
 func NewUserApplicationService(userDatasource *datasource.UserDatasource) *UserApplicationService {
-	return &UserApplicationService{userDatasource: *userDatasource}
+	return &UserApplicationService{userDatasource: userDatasource}
 }
 
 func (svc *UserApplicationService) Signup(ctx context.Context, body request.UserSignupRequest) (string, error) {
@@ -32,8 +33,14 @@ func (svc *UserApplicationService) Signup(ctx context.Context, body request.User
 		Email:       body.Email,
 		Password:    hashedPassword,
 		AvatarUrl:   body.AvatarUrl,
-		Status:      0, // Active
-		Role:        0, // Member
+		Status:      model.UserRoleActive, // Active
+		Role:        model.UserRoleMember, // Member
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+	}
+
+	if err := user.Validate(); err != nil {
+		return "", err
 	}
 
 	_, err = svc.userDatasource.Create(ctx, user)
@@ -73,7 +80,7 @@ func (svc *UserApplicationService) Signin(ctx context.Context, email, password s
 	return tokenString, nil
 }
 
-func (svc *UserApplicationService) GetAuthenticatedUser(ctx context.Context, tokenString string) (*model.User, error) {
+func (svc *UserApplicationService) GetAuthenticatedUser(ctx context.Context, tokenString string) (*resource.UserResource, error) {
 	secretKey := os.Getenv("JWT_SECRET_KEY")
 	if secretKey == "" {
 		return nil, errors.New("秘密鍵が設定されていません")
@@ -96,7 +103,7 @@ func (svc *UserApplicationService) GetAuthenticatedUser(ctx context.Context, tok
 		if err != nil {
 			return nil, errors.New("ユーザーの取得に失敗しました")
 		}
-		return user, nil
+		return resource.NewUserResource(user), nil
 	} else {
 		return nil, errors.New("トークンが無効です")
 	}

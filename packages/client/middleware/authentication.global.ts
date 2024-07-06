@@ -13,9 +13,11 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
       const authenticatedUser = response.data;
       nuxtApp.payload.user = authenticatedUser;
       nuxtApp.payload.isLoggedIn = true;
+      nuxtApp.payload.isAdmin = authenticatedUser.role === 'Admin';
+      nuxtApp.payload.isMember = authenticatedUser.role === 'Member';
     } catch (error) {
       console.error('Error fetching user info:', error);
-      Storage.removeItem('access_token');
+      // Storage.removeItem('access_token');
     }
   } else {
     nuxtApp.payload.user = null;

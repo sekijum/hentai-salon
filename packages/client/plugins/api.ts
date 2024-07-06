@@ -32,7 +32,7 @@ export default defineNuxtPlugin(nuxtApp => {
     },
     error => {
       if (error.response && error.response.status === 401) {
-        Storage.removeItem('access_token');
+        // Storage.removeItem('access_token');
         window.location.href = '/signin';
       }
       return Promise.reject(error);

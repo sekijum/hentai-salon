@@ -12,6 +12,7 @@
       <div class="field">
         <Field name="email" v-slot="{ field, errorMessage }">
           <v-text-field
+            v-model="form.email"
             v-bind="field"
             label="メールアドレス"
             type="email"
@@ -25,6 +26,7 @@
       <div class="field">
         <Field name="password" v-slot="{ field, errorMessage }">
           <v-text-field
+            v-model="form.password"
             v-bind="field"
             label="パスワード"
             type="password"
@@ -72,13 +74,9 @@ async function submit() {
     const response = await api.post('/signin', credentials);
 
     const authHeader = response.headers.authorization;
-    if (authHeader) {
-      const token = authHeader.split(' ')[1];
-      Storage.setItem('access_token', token);
-      router.push('/');
-    } else {
-      console.error('Authorizationヘッダーがありません');
-    }
+    const token = authHeader.split(' ')[1];
+    Storage.setItem('access_token', token);
+    router.push('/');
   } catch (error) {
     console.error('通信中にエラーが発生しました:', error);
   }
