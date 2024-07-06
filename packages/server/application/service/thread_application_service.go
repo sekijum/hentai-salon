@@ -5,10 +5,10 @@ import (
 	"server/domain/model"
 	domainService "server/domain/service"
 	"server/infrastructure/datasource"
-	request "server/presentation/request/thread"
 
 	"errors"
-	resource "server/presentation/resource/thread"
+	request "server/presentation/request"
+	resource "server/presentation/resource"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -79,7 +79,7 @@ func (svc *ThreadApplicationService) Create(
 		return err
 	}
 
-	_, err := svc.threadDatasource.Create(ctx, thread, body.TagNameList)
+	_, err := svc.threadDatasource.Create(ctx, thread, body.TagNames)
 	if err != nil {
 		return err
 	}

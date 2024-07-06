@@ -8,8 +8,25 @@
 
     <Form @submit="submit" :validation-schema="schema" v-slot="{ meta, errors }">
       <div class="field">
+        <Field name="boardId" v-slot="{ field, errorMessage }">
+          <v-select
+            v-model="form.boardId"
+            v-bind="field"
+            label="板"
+            item-value="id"
+            item-text="title"
+            :items="boardSuggestions"
+            variant="outlined"
+            density="compact"
+            :error-messages="errorMessage ? [errorMessage] : []"
+          />
+        </Field>
+      </div>
+
+      <div class="field">
         <Field name="title" v-slot="{ field, errorMessage }">
           <v-text-field
+            v-model="form.title"
             v-bind="field"
             label="タイトル"
             variant="outlined"
@@ -22,6 +39,7 @@
       <div class="field">
         <Field name="description" v-slot="{ field, errorMessage }">
           <v-textarea
+            v-model="form.description"
             v-bind="field"
             label="説明"
             variant="outlined"
@@ -33,7 +51,7 @@
 
       <div class="field">
         <v-combobox
-          v-model="form.tags"
+          v-model="form.tagNames"
           chips
           small-chips
           label="タグ"
@@ -41,7 +59,7 @@
           density="compact"
           clearable
           multiple
-          :items="['California', 'Colorado', 'Florida', 'Georgia', 'Texas', 'Wyoming']"
+          :items="tagSuggestions"
         />
       </div>
 
@@ -62,10 +80,10 @@
           />
         </Field>
       </div>
-    </Form>
 
-    <v-btn type="submit" color="primary" block :disabled="!meta?.valid" class="mt-5">作成</v-btn>
-    <p class="note">＊反映には時間が掛かる場合があります＊</p>
+      <v-btn type="submit" color="primary" block :disabled="!meta?.valid" class="mt-5">作成</v-btn>
+      <p class="note">＊反映には時間が掛かる場合があります＊</p>
+    </Form>
   </div>
 </template>
 
@@ -75,27 +93,58 @@ import * as yup from 'yup';
 import PageTitle from '~/components/PageTitle.vue';
 
 const router = useRouter();
+const route = useRoute();
 const nuxtApp = useNuxtApp();
 const api = nuxtApp.$api;
+const tagSuggestions = ref([]);
+const boardSuggestions = ref([]);
 
 const thumbnailFile = new FormData();
 
 const form = ref({
+  boardId: route.query.board_id,
   title: '',
   description: '',
   thumbnailUrl: null,
-  tags: [],
+  tagNames: [],
+});
+
+onMounted(async () => {
+  tagSuggestions.value = await fetchTagSuggestions();
+  boardSuggestions.value = await fetchBoardSuggestions();
 });
 
 const schema = yup.object({
   title: yup.string().required('必須項目です'),
-  description: yup.string().required('必須項目です'),
+  boardId: yup.string().required('必須項目です'),
 });
+
+async function fetchTagSuggestions() {
+  try {
+    const response = await api.get('/tags/names');
+    return response.data;
+  } catch (error) {
+    console.error('通信中にエラーが発生しました:', error);
+  }
+}
+
+async function fetchBoardSuggestions() {
+  try {
+    const response = await api.get('/boards');
+
+    return response.data.map(board => ({
+      id: board.id,
+      title: board.title,
+    }));
+  } catch (error) {
+    console.error('通信中にエラーが発生しました:', error);
+  }
+}
 
 async function submit() {
   try {
+    console.log(form.value);
     const response = await api.post('/threads', form.value);
-
     router.push('/');
   } catch (error) {
     console.error('通信中にエラーが発生しました:', error);

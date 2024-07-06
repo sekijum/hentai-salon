@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"server/infrastructure/datasource"
-	resource "server/presentation/resource/board"
+	resource "server/presentation/resource"
 )
 
 type BoardApplicationService struct {

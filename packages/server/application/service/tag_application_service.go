@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"server/infrastructure/datasource"
-	resource "server/presentation/resource/tag"
+	resource "server/presentation/resource"
 )
 
 type TagApplicationService struct {
@@ -14,11 +14,12 @@ func NewTagApplicationService(tagDatasource *datasource.TagDatasource) *TagAppli
 	return &TagApplicationService{tagDatasource: tagDatasource}
 }
 
-func (svc *TagApplicationService) FindAll(ctx context.Context) ([]*resource.TagResource, error) {
+func (svc *TagApplicationService) FindAllName(ctx context.Context) ([]string, error) {
 	tags, err := svc.tagDatasource.FindAll(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	return resource.NewTagResourceList(tags), nil
+	tagNames := resource.GetTagNames(tags)
+	return tagNames, nil
 }

@@ -19,7 +19,7 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 	r.POST("/signup", controllers.UserController.Signup)
 	r.POST("/signin", controllers.UserController.Signin)
 
-	r.GET("/tags", controllers.TagController.FindAll)
+	r.GET("/tags/names", controllers.TagController.FindAllName)
 	r.GET("/boards", controllers.BoardController.FindAll)
 	r.GET("/threads", controllers.ThreadController.FindAll)
 

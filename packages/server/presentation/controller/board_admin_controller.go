@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 	applicationService "server/application/service"
-	request "server/presentation/request/board"
+	request "server/presentation/request"
 
 	"github.com/gin-gonic/gin"
 )

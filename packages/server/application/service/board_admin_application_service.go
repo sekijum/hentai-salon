@@ -6,7 +6,7 @@ import (
 	"server/domain/model"
 	domainService "server/domain/service"
 	"server/infrastructure/datasource"
-	request "server/presentation/request/board"
+	request "server/presentation/request"
 	"time"
 
 	"github.com/gin-gonic/gin"

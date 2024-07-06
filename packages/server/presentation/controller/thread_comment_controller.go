@@ -5,7 +5,7 @@ import (
 	"errors"
 	"net/http"
 	"server/application/service"
-	request "server/presentation/request/thread"
+	request "server/presentation/request"
 
 	"strconv"
 

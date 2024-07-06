@@ -4,7 +4,7 @@ import (
 	"context"
 	"server/domain/model"
 	"server/infrastructure/datasource"
-	request "server/presentation/request/thread"
+	request "server/presentation/request"
 
 	"time"
 

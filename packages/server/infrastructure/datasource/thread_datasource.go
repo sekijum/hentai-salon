@@ -65,7 +65,7 @@ func (ds *ThreadDatasource) FindByTitle(ctx context.Context, title string) ([]*m
 	return modelThreads, nil
 }
 
-func (ds *ThreadDatasource) Create(ctx context.Context, t *model.Thread, tagNameList []string) (*model.Thread, error) {
+func (ds *ThreadDatasource) Create(ctx context.Context, t *model.Thread, tagNames []string) (*model.Thread, error) {
 	tx, err := ds.client.Tx(ctx)
 	if err != nil {
 		return nil, err
@@ -73,7 +73,7 @@ func (ds *ThreadDatasource) Create(ctx context.Context, t *model.Thread, tagName
 	defer tx.Rollback()
 
 	var tags []*ent.Tag
-	for _, tagName := range tagNameList {
+	for _, tagName := range tagNames {
 		tag, err := tx.Tag.Query().Where(tag.NameEQ(tagName)).Only(ctx)
 		if err != nil {
 			tag, err = tx.Tag.Create().SetName(tagName).Save(ctx)
