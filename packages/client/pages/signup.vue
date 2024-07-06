@@ -85,15 +85,14 @@
 </template>
 
 <script setup lang="ts">
-import { Form, Field, ErrorMessage } from 'vee-validate';
+import { Form, Field } from 'vee-validate';
 import * as yup from 'yup';
 import PageTitle from '~/components/PageTitle.vue';
 import Menu from '~/components/Menu.vue';
-import Storage from '~/utils/storage';
 
 const router = useRouter();
 const nuxtApp = useNuxtApp();
-const api = nuxtApp.$api;
+const { $storage, $api } = nuxtApp;
 
 const avatarFile = new FormData();
 
@@ -122,11 +121,12 @@ const schema = yup.object({
 
 async function submit() {
   try {
-    const response = await api.post('/signup', form.value);
+    const response = await $api.post('/signup', form.value);
 
     const authHeader = response.headers.authorization;
     const token = authHeader.split(' ')[1];
-    Storage.setItem('access_token', token);
+    $storage.setItem('access_token', token);
+    alert('サインアップしました。');
     router.push('/');
   } catch (error) {
     console.error('通信中にエラーが発生しました:', error);

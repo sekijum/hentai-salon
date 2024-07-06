@@ -14,12 +14,11 @@ import Header from '~/components/Header.vue';
 import ThreadTable from '~/components/thread/ThreadTable.vue';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { useNuxtApp } from '#app';
 
 const router = useRouter();
 const nuxtApp = useNuxtApp();
-const user = nuxtApp.payload.user;
-console.log('ユーザー情報:', nuxtApp.payload);
+const { payload } = nuxtApp;
+console.log('ユーザー情報:', payload.user);
 
 const menuItems = [
   { title: 'お知らせ', navigate: () => router.push('/'), icon: 'mdi-update' },

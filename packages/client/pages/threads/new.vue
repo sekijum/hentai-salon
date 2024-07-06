@@ -50,20 +50,6 @@
       </div>
 
       <div class="field">
-        <v-combobox
-          v-model="form.tagNames"
-          chips
-          small-chips
-          label="タグ"
-          variant="outlined"
-          density="compact"
-          clearable
-          multiple
-          :items="tagSuggestions"
-        />
-      </div>
-
-      <div class="field">
         <Field name="thumbnail" v-slot="{ field, errorMessage }">
           <v-file-input
             v-bind="field"
@@ -81,6 +67,20 @@
         </Field>
       </div>
 
+      <div class="field">
+        <v-combobox
+          v-model="form.tagNames"
+          chips
+          small-chips
+          label="タグ"
+          variant="outlined"
+          density="compact"
+          clearable
+          multiple
+          :items="tagSuggestions"
+        />
+      </div>
+
       <v-btn type="submit" color="primary" block :disabled="!meta?.valid" class="mt-5">作成</v-btn>
       <p class="note">＊反映には時間が掛かる場合があります＊</p>
     </Form>
@@ -95,7 +95,8 @@ import PageTitle from '~/components/PageTitle.vue';
 const router = useRouter();
 const route = useRoute();
 const nuxtApp = useNuxtApp();
-const api = nuxtApp.$api;
+const { $api } = nuxtApp;
+
 const tagSuggestions = ref([]);
 const boardSuggestions = ref([]);
 
@@ -111,6 +112,7 @@ const form = ref({
 
 onMounted(async () => {
   tagSuggestions.value = await fetchTagSuggestions();
+  tagSuggestions.value.push();
   boardSuggestions.value = await fetchBoardSuggestions();
 });
 
@@ -121,7 +123,7 @@ const schema = yup.object({
 
 async function fetchTagSuggestions() {
   try {
-    const response = await api.get('/tags/names');
+    const response = await $api.get('/tags/names');
     return response.data;
   } catch (error) {
     console.error('通信中にエラーが発生しました:', error);
@@ -130,7 +132,7 @@ async function fetchTagSuggestions() {
 
 async function fetchBoardSuggestions() {
   try {
-    const response = await api.get('/boards');
+    const response = await $api.get('/boards');
 
     return response.data.map(board => ({
       id: board.id,
@@ -144,7 +146,8 @@ async function fetchBoardSuggestions() {
 async function submit() {
   try {
     console.log(form.value);
-    const response = await api.post('/threads', form.value);
+    const response = await $api.post('/threads', form.value);
+    alert('スレッドが正常に作成されました。');
     router.push('/');
   } catch (error) {
     console.error('通信中にエラーが発生しました:', error);

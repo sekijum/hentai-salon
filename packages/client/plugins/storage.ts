@@ -34,4 +34,6 @@ class Storage {
   }
 }
 
-export default Storage;
+export default defineNuxtPlugin(nuxtApp => {
+  nuxtApp.provide('storage', Storage);
+});

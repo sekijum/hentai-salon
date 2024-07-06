@@ -1,15 +1,14 @@
-import { defineNuxtRouteMiddleware, navigateTo, useNuxtApp } from '#app';
-import Storage from '@/utils/storage';
+import { defineNuxtRouteMiddleware } from '#app';
 
 export default defineNuxtRouteMiddleware(async (to, from) => {
   const nuxtApp = useNuxtApp();
-  const api = nuxtApp.$api;
+  const { $api, $storage } = nuxtApp;
 
-  const token = Storage.getItem('access_token');
+  const token = $storage.getItem('access_token');
 
   if (token) {
     try {
-      const response = await api.get('/whoami');
+      const response = await $api.get('/whoami');
       const authenticatedUser = response.data;
       nuxtApp.payload.user = authenticatedUser;
       nuxtApp.payload.isLoggedIn = true;
@@ -17,10 +16,12 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
       nuxtApp.payload.isMember = authenticatedUser.role === 'Member';
     } catch (error) {
       console.error('Error fetching user info:', error);
-      // Storage.removeItem('access_token');
+      // $storage.removeItem('access_token');
     }
   } else {
     nuxtApp.payload.user = null;
     nuxtApp.payload.isLoggedIn = false;
+    nuxtApp.payload.isAdmin = false;
+    nuxtApp.payload.isMember = false;
   }
 });

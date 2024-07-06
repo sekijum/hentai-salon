@@ -34,8 +34,9 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import PageTitle from '~/components/PageTitle.vue';
-import { useNuxtApp } from '#app';
-const { $toggleTheme } = useNuxtApp();
+
+const nuxtApp = useNuxtApp();
+const { $toggleTheme } = nuxtApp;
 
 const toggleTheme = () => {
   $toggleTheme();

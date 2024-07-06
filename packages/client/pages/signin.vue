@@ -47,11 +47,10 @@ import { Form, Field, ErrorMessage } from 'vee-validate';
 import * as yup from 'yup';
 import PageTitle from '~/components/PageTitle.vue';
 import Menu from '~/components/Menu.vue';
-import Storage from '~/utils/storage';
 
-const router = useRouter();
 const nuxtApp = useNuxtApp();
-const api = nuxtApp.$api;
+const { $storage, $api } = nuxtApp;
+const router = useRouter();
 
 const form = ref({
   email: '',
@@ -71,11 +70,12 @@ const schema = yup.object({
 async function submit() {
   try {
     const credentials = { email: form.value.email, password: form.value.password };
-    const response = await api.post('/signin', credentials);
+    const response = await $api.post('/signin', credentials);
 
     const authHeader = response.headers.authorization;
     const token = authHeader.split(' ')[1];
-    Storage.setItem('access_token', token);
+    $storage.setItem('access_token', token);
+    alert('サインインしました。');
     router.push('/');
   } catch (error) {
     console.error('通信中にエラーが発生しました:', error);

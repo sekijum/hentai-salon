@@ -1,11 +1,12 @@
 import { defineNuxtPlugin, useRuntimeConfig } from '#app';
-import axios from 'axios';
-import Storage from '@/utils/storage';
+import axios, { type AxiosInstance } from 'axios';
 
 export default defineNuxtPlugin(nuxtApp => {
   const config = useRuntimeConfig();
+  const { $storage, $api } = nuxtApp;
+  console.log(nuxtApp);
 
-  const api = axios.create({
+  const api: AxiosInstance = axios.create({
     baseURL: config.public.apiBaseUrl,
     timeout: 10000,
     headers: {
@@ -15,7 +16,7 @@ export default defineNuxtPlugin(nuxtApp => {
 
   api.interceptors.request.use(
     config => {
-      const token = Storage.getItem<string>('access_token');
+      const token = $storage.getItem<string>('access_token');
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
@@ -32,7 +33,7 @@ export default defineNuxtPlugin(nuxtApp => {
     },
     error => {
       if (error.response && error.response.status === 401) {
-        // Storage.removeItem('access_token');
+        $storage.removeItem('access_token');
         window.location.href = '/signin';
       }
       return Promise.reject(error);
