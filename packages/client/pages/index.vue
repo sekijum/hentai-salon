@@ -19,7 +19,9 @@ import { useNuxtApp } from '#app';
 const router = useRouter();
 const nuxtApp = useNuxtApp();
 const user = nuxtApp.payload.user;
+const isLoggedIn = nuxtApp.payload.isLoggedIn;
 console.log('ユーザー情報:', user);
+console.log('ユーザー情報:', isLoggedIn);
 
 const menuItems = [
   { title: 'お知らせ', navigate: () => router.push('/'), icon: 'mdi-update' },

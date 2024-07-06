@@ -1,41 +1,48 @@
 <template>
   <div>
     <PageTitle title="サインイン" />
-    <v-divider></v-divider>
+
+    <v-divider />
 
     <Menu :items="menuItems" />
 
     <br />
 
-    <v-form @submit.prevent="signin" ref="formRef" class="mx-2">
-      <v-text-field
-        label="メールアドレス"
-        v-model="form.email"
-        type="email"
-        :rules="[rules.required, rules.email]"
-        required
-        density="compact"
-        variant="outlined"
-      ></v-text-field>
+    <Form @submit="submit" :validation-schema="schema" class="mx-2 mb-2" v-slot="{ meta, errors }">
+      <div class="field">
+        <Field name="email" v-slot="{ field, errorMessage }">
+          <v-text-field
+            v-bind="field"
+            label="メールアドレス"
+            type="email"
+            variant="outlined"
+            density="compact"
+            :error-messages="errorMessage ? [errorMessage] : []"
+          />
+        </Field>
+      </div>
 
-      <v-text-field
-        label="パスワード"
-        v-model="form.password"
-        type="password"
-        :rules="[rules.required, rules.min(6)]"
-        required
-        density="compact"
-        variant="outlined"
-      ></v-text-field>
+      <div class="field">
+        <Field name="password" v-slot="{ field, errorMessage }">
+          <v-text-field
+            v-bind="field"
+            label="パスワード"
+            type="password"
+            variant="outlined"
+            density="compact"
+            :error-messages="errorMessage ? [errorMessage] : []"
+          />
+        </Field>
+      </div>
 
-      <v-btn type="submit" color="primary" block>サインイン</v-btn>
-    </v-form>
+      <v-btn type="submit" color="primary" block :disabled="!meta.valid" class="mt-5">サインイン</v-btn>
+    </Form>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useRouter, useNuxtApp } from '#app';
+import { Form, Field, ErrorMessage } from 'vee-validate';
+import * as yup from 'yup';
 import PageTitle from '~/components/PageTitle.vue';
 import Menu from '~/components/Menu.vue';
 import Storage from '~/utils/storage';
@@ -44,54 +51,36 @@ const router = useRouter();
 const nuxtApp = useNuxtApp();
 const api = nuxtApp.$api;
 
+const form = ref({
+  email: '',
+  password: '',
+});
+
 const menuItems = [
   { title: 'サインイン', navigate: () => router.push('/signin'), icon: 'mdi-login' },
   { title: 'サインアップ', navigate: () => router.push('/signup'), icon: 'mdi-account-plus' },
 ];
 
-const form = ref({
-  email: '',
-  password: '',
+const schema = yup.object({
+  email: yup.string().email('有効なメールアドレスを入力してください').required('必須項目です'),
+  password: yup.string().min(6, '6文字以上で入力してください').required('必須項目です'),
 });
-const formRef = ref();
 
-const rules = {
-  required: (value: string) => !!value || '必須項目です',
-  email: (value: string) => /.+@.+\..+/.test(value) || '有効なメールアドレスを入力してください',
-  min: (length: number) => (value: string) => value.length >= length || `${length}文字以上で入力してください`,
-};
+async function submit() {
+  try {
+    const credentials = { email: form.value.email, password: form.value.password };
+    const response = await api.post('/signin', credentials);
 
-async function signin() {
-  if (formRef.value.validate()) {
-    try {
-      const credentials = { email: form.value.email, password: form.value.password };
-      const response = await api.post('/signin', credentials);
-
-      const authHeader = response.headers.authorization;
-      if (authHeader) {
-        const token = authHeader.split(' ')[1];
-
-        Storage.setItem('access_token', token);
-
-        const response = await api.get('/whoami', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        const user = response.data;
-
-        Storage.setItem('user', JSON.stringify(user));
-
-        router.push('/');
-      } else {
-        console.error('Authorizationヘッダーがありません');
-      }
-    } catch (error) {
-      console.error('ログイン中にエラーが発生しました:', error);
+    const authHeader = response.headers.authorization;
+    if (authHeader) {
+      const token = authHeader.split(' ')[1];
+      Storage.setItem('access_token', token);
+      router.push('/');
+    } else {
+      console.error('Authorizationヘッダーがありません');
     }
+  } catch (error) {
+    console.error('通信中にエラーが発生しました:', error);
   }
 }
 </script>
-
-<style scoped></style>

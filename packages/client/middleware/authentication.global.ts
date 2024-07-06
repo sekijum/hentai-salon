@@ -12,11 +12,13 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
       const response = await api.get('/whoami');
       const authenticatedUser = response.data;
       nuxtApp.payload.user = authenticatedUser;
+      nuxtApp.payload.isLoggedIn = true;
     } catch (error) {
       console.error('Error fetching user info:', error);
       Storage.removeItem('access_token');
     }
   } else {
     nuxtApp.payload.user = null;
+    nuxtApp.payload.isLoggedIn = false;
   }
 });
