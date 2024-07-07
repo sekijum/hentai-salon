@@ -1,6 +1,6 @@
 {
   "name": "hentai-salon-server",
-  "dockerComposeFile": ["../../docker-compose.yaml"],
+  "dockerComposeFile": ["../../compose.yaml"],
   "service": "server",
   "workspaceFolder": "/server",
   "shutdownAction": "stopCompose",
