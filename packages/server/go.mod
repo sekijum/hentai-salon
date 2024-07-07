@@ -10,7 +10,6 @@ require (
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/google/wire v0.6.0
 	github.com/joho/godotenv v1.4.0
-	github.com/mitchellh/mapstructure v1.5.0
 	golang.org/x/crypto v0.22.0
 )
 
