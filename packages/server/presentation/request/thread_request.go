@@ -1,9 +1,10 @@
 package request
 
+
 type ThreadFindAllRequest struct {
 	Limit     int      `form:"limit"`
 	Offset    int      `form:"offset"`
-	Orders    []string `form:"orders"`
+	Orders    []string `form:"orders[]"`
 	ThreadIds []int    `form:"threadIds" binding:"omitempty,dive,min=1"`
 }
 

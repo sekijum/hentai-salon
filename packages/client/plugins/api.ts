@@ -1,10 +1,8 @@
-import { defineNuxtPlugin, useRuntimeConfig } from '#app';
 import axios, { type AxiosInstance } from 'axios';
 
-export default defineNuxtPlugin(nuxtApp => {
+function API(): AxiosInstance {
   const config = useRuntimeConfig();
-  const { $storage, $api } = nuxtApp;
-  console.log(nuxtApp);
+  const { $storage } = useNuxtApp();
 
   const api: AxiosInstance = axios.create({
     baseURL: config.public.apiBaseUrl,
@@ -16,7 +14,7 @@ export default defineNuxtPlugin(nuxtApp => {
 
   api.interceptors.request.use(
     config => {
-      const token = $storage.getItem<string>('access_token');
+      const token = $storage.getItem('access_token');
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
@@ -40,5 +38,9 @@ export default defineNuxtPlugin(nuxtApp => {
     },
   );
 
-  nuxtApp.provide('api', api);
+  return api;
+}
+
+export default defineNuxtPlugin(nuxtApp => {
+  nuxtApp.provide('api', API());
 });

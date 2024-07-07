@@ -5,14 +5,14 @@
     </div>
 
     <v-data-table :headers="headers" :items="items" hide-default-footer hide-default-header class="thread-section">
-      <template v-slot:item="{ item, idx }">
+      <template v-slot:item="{ item, index }">
         <div
-          :class="{ alternate: idx % 2 === 0 }"
+          :class="{ alternate: index % 2 === 0 }"
           @click="() => router.push(`/threads/${item.id}`)"
           class="d-flex align-center p-2 item-row"
         >
           <div class="fixed-image mr-1">
-            <v-img :src="item.image || 'https://via.placeholder.com/80'" class="image"></v-img>
+            <v-img :src="getImageSrc(item.thumbnailUrl)" class="image"></v-img>
           </div>
           <div class="flex-grow-1">
             <p class="item-title">
@@ -21,14 +21,14 @@
           </div>
           <div class="text-right mr-2">
             <small>
-              2024/01/09
+              {{ $formatDate(item.createdAt) }}
               <br />
-              {{ item.board }}
+              {{ item.board?.title }}
               <br />
               話題度
-              <v-icon small>mdi-comment</v-icon>
+              {{ item.popularity }}
               <br />
-              {{ item.comments }}
+              {{ item.commentCount }}
               <v-icon small>mdi-comment</v-icon>
               <br />
             </small>
@@ -37,21 +37,25 @@
       </template>
     </v-data-table>
 
-    <div v-if="link && items.length > 0" class="more-link" @click="() => router.push(link)">
+    <div v-if="moreLink && items.length > 0" class="more-link" @click="() => router.push(moreLink)">
       {{ title }}をもっと見る <v-icon down>mdi-chevron-down</v-icon>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-defineProps({
-  title: String,
-  items: Array,
-  link: {
-    type: String,
-    default: null,
-  },
-});
+import { useRouter } from 'vue-router';
+import type { TThread, TThreadList } from '~/types/thread';
+
+const nuxtApp = useNuxtApp();
+const { $formatDate } = nuxtApp;
+
+defineProps<{
+  title: String;
+  items: TThread[];
+  moreLink: string;
+  maxItems: number;
+}>();
 
 const router = useRouter();
 
@@ -64,6 +68,10 @@ const headers = [
   { text: 'Title', value: 'title', width: '70%' },
   { text: 'Comments/Board', value: 'commentsBoard', width: '10%' },
 ];
+
+const getImageSrc = (thumbnailUrl: string) => {
+  return thumbnailUrl ? thumbnailUrl : '/no-image.jpg';
+};
 </script>
 
 <style scoped>

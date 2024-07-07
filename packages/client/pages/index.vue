@@ -2,23 +2,24 @@
   <div>
     <Menu :items="menuItems" />
 
-    <ThreadTable title="閲覧履歴" :items="historyItems" moreLink="/history" link="/hoge" :maxItems="3" />
-    <ThreadTable title="人気" :items="newsItems" moreLink="/news" :maxItems="5" />
-    <ThreadTable title="新着" :items="popularItems" moreLink="/popular" :maxItems="3" />
+    <!-- <ThreadTable title="閲覧履歴" :items="historyItems" moreLink="/history" link="/hoge" :maxItems="3" /> -->
+    <ThreadTable title="人気" :items="threadsByPopular" moreLink="/news" :maxItems="5" />
+    <ThreadTable title="新着" :items="threadsByNewest" moreLink="/popular" :maxItems="3" />
   </div>
 </template>
 
 <script setup lang="ts">
 import Menu from '~/components/Menu.vue';
-import Header from '~/components/Header.vue';
 import ThreadTable from '~/components/thread/ThreadTable.vue';
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import type { TThread, TThreadList } from '~/types/thread';
 
 const router = useRouter();
 const nuxtApp = useNuxtApp();
-const { payload } = nuxtApp;
+const { payload, $api } = nuxtApp;
 console.log('ユーザー情報:', payload.user);
+
+const threadsByPopular = ref<TThread[]>([]);
+const threadsByNewest = ref<TThread[]>([]);
 
 const menuItems = [
   { title: 'お知らせ', navigate: () => router.push('/'), icon: 'mdi-update' },
@@ -73,4 +74,18 @@ const historyItems = ref([
   { id: 1, title: 'スレッドB', comments: 4, board: '閲覧履歴' },
   { id: 2, title: 'スレッドC', comments: 2, board: '閲覧履歴' },
 ]);
+
+onMounted(async () => {
+  await fetchThreads();
+});
+
+async function fetchThreads() {
+  const response = await $api.get<TThreadList>('/threads', {
+    params: {
+      orders: ['popularity', 'newest'],
+    },
+  });
+  threadsByPopular.value = response.data.threadsByPopular;
+  threadsByNewest.value = response.data.threadsByNewest;
+}
 </script>
