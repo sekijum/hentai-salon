@@ -1,4 +1,4 @@
-type ThreadCommentResource = {
+export type TThreadComment = {
   id: number;
   userId?: number;
   guestName?: string;
@@ -8,11 +8,11 @@ type ThreadCommentResource = {
   parentCommentID: number;
   createdAt: string;
   updatedAt: string;
-  attachments: ThreadCommentAttachmentResource[];
+  attachments: TThreadCommentAttachment[];
   totalReplies: number;
 };
 
-type ThreadCommentAttachmentResource = {
+type TThreadCommentAttachment = {
   url: string;
   displayOrder: number;
   type: string;
@@ -33,7 +33,7 @@ export type TThread = {
   createdAt: string;
   commentCount: number;
   popularity: string;
-  comments: ThreadCommentResource;
+  comments: TThreadComment[];
 };
 
 export type TThreadList = {

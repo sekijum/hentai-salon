@@ -4,28 +4,31 @@
       <div class="comment-header">
         <div class="comment-header-text">
           {{ idx }}
-          <router-link to="/" class="username-link">{{ comment.username }}</router-link
-          >[Lv.{{ comment.level }}]{{ comment.rank }} {{ comment.date }} {{ comment.time }}
+          <router-link to="/" class="username-link">{{
+            comment?.guestName || '名無し' || 'ログインユーザー名表示'
+          }}</router-link>
         </div>
       </div>
-      <div v-if="comment.replyTo" class="reply-indication">
-        <router-link :to="'#comments-' + comment.replyTo" class="reply-link">>>{{ comment.replyTo }}</router-link>
+      <div v-if="comment.parentCommentID" class="reply-indication">
+        <router-link :to="'#comments-' + comment.parentCommentID" class="reply-link">
+          >>{{ comment.parentCommentID }}
+        </router-link>
       </div>
       <v-list-item-title class="comment-content">
         <a :href="'#comment-' + comment.id" class="comment-anchor">{{ comment.content }}</a>
       </v-list-item-title>
-      <template v-if="comment.media && comment.media.length">
+      <template v-if="comment.attachments && comment.attachments.length">
         <v-row dense>
-          <v-col cols="3" v-for="(media, index) in comment.media" :key="index" class="media-col">
-            <div class="media-item-wrapper" @click="() => openDialog(media)">
-              <v-img :src="media.type === 'video/mp4' ? media.thumbnail : media.url" class="media-item">
+          <v-col cols="3" v-for="(attachment, index) in comment.attachments" :key="index" class="media-col">
+            <div class="media-item-wrapper" @click="() => openDialog(attachment)">
+              <v-img :src="attachment.type === 'Video' ? attachment.url : attachment.url" class="media-item">
                 <template v-slot:placeholder>
                   <v-row align="center" class="fill-height ma-0" justify="center">
                     <v-progress-circular color="grey-lighten-5" indeterminate></v-progress-circular>
                   </v-row>
                 </template>
               </v-img>
-              <v-icon v-if="media.type === 'video/mp4'" size="40" class="play-icon">mdi-play-circle</v-icon>
+              <v-icon v-if="attachment.type === 'Video'" size="40" class="play-icon">mdi-play-circle</v-icon>
             </div>
           </v-col>
         </v-row>
@@ -38,7 +41,7 @@
           <v-col cols="6" class="interaction-right">
             <router-link :to="'/comments/' + comment.id + '/replies'" class="interaction-link">
               <v-icon small>mdi-comment</v-icon>
-              <span class="interaction-text">{{ comment.commentCount }}</span>
+              <span class="interaction-text">{{ comment.totalReplies }}</span>
             </router-link>
             <router-link :to="'/comments/' + comment.id" class="interaction-link id-link">
               <span class="interaction-text">ID: {{ comment.id }}</span>
@@ -57,14 +60,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
 import ModalMedia from '~/components/ModalMedia.vue';
 import CommentForm from '~/components/comment/CommentForm.vue';
+import type { TThreadComment } from '~/types/thread';
 
-defineProps({
-  idx: Number,
-  comment: Object,
-});
+defineProps<{ idx: number; comment: TThreadComment }>();
 
 const dialog = ref(false);
 const selectedMedia = ref(null);
@@ -87,8 +87,8 @@ const clearReplyForm = () => {
   console.log('返信フォームをクリア');
 };
 
-const openDialog = media => {
-  selectedMedia.value = media;
+const openDialog = attachment => {
+  selectedMedia.value = attachment;
   dialog.value = true;
 };
 

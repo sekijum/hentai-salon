@@ -5,12 +5,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import type { TThreadComment } from '~/types/thread';
 import CommentItem from '~/components/comment/CommentItem.vue';
 
-defineProps({
-  comments: Array,
-});
+defineProps<{ comments: TThreadComment[] }>();
 </script>
 
 <style scoped>
