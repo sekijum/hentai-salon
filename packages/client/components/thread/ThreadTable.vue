@@ -1,10 +1,10 @@
 <template>
-  <div>
+  <div v-if="items.length">
     <div v-if="title" class="section-title">
       <h2 class="font-weight-regular">{{ title }}</h2>
     </div>
 
-    <v-data-table :headers="headers" :items="items" hide-default-footer hide-default-header class="thread-section">
+    <v-data-table :items="items" hide-default-footer hide-default-header class="thread-section">
       <template v-slot:item="{ item, index }">
         <div
           :class="{ alternate: index % 2 === 0 }"
@@ -54,24 +54,17 @@ defineProps<{
   title: String;
   items: TThread[];
   moreLink: string;
-  maxItems: number;
 }>();
 
 const router = useRouter();
 
-const truncateTitle = (title: string) => {
+function truncateTitle(title: string) {
   return title.length > 50 ? title.slice(0, 50) + '...' : title;
-};
+}
 
-const headers = [
-  { text: '', value: 'image', width: '20%' },
-  { text: 'Title', value: 'title', width: '70%' },
-  { text: 'Comments/Board', value: 'commentsBoard', width: '10%' },
-];
-
-const getImageSrc = (thumbnailUrl: string) => {
+function getImageSrc(thumbnailUrl: string) {
   return thumbnailUrl ? thumbnailUrl : '/no-image.jpg';
-};
+}
 </script>
 
 <style scoped>

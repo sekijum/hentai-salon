@@ -3,8 +3,8 @@
     <Menu :items="menuItems" />
 
     <!-- <ThreadTable title="閲覧履歴" :items="historyItems" moreLink="/history" link="/hoge" :maxItems="3" /> -->
-    <ThreadTable title="人気" :items="threadsByPopular" moreLink="/news" :maxItems="5" />
-    <ThreadTable title="新着" :items="threadsByNewest" moreLink="/popular" :maxItems="3" />
+    <ThreadTable title="人気" :items="threadsByPopular" moreLink="/news" />
+    <ThreadTable title="新着" :items="threadsByNewest" moreLink="/popular" />
   </div>
 </template>
 
@@ -42,6 +42,7 @@ async function fetchThreads() {
   const response = await $api.get<TThreadList>('/threads', {
     params: {
       orders: ['popularity', 'newest'],
+      limit: 10,
     },
   });
   threadsByPopular.value = response.data.threadsByPopular;

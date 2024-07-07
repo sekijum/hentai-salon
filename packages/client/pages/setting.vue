@@ -32,7 +32,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
 import PageTitle from '~/components/PageTitle.vue';
 
 const nuxtApp = useNuxtApp();

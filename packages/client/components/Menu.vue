@@ -1,5 +1,5 @@
 <template>
-  <v-sheet class="outer-border">
+  <v-sheet class="outer-border" v-if="rows.length">
     <v-row align="center" justify="center" class="m-0" v-for="(row, rowIndex) in rows" :key="rowIndex">
       <v-col
         v-for="(item, idx) in row"
@@ -11,7 +11,7 @@
           'no-bottom-border': rowIndex === rows.length - 1,
         }"
       >
-        <v-sheet class="menu-item" @click="() => navigateTo(item.link)">
+        <v-sheet class="menu-item" @click="item.navigate">
           <v-icon class="menu-icon">{{ item.icon }}</v-icon>
           <span class="menu-title">{{ item.title }}</span>
         </v-sheet>
@@ -21,12 +21,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import { useRouter } from 'vue-router';
-
-const props = defineProps({
-  items: { type: Array, required: true, default: () => [] },
-});
+const props = defineProps<{ items: [] }>();
 
 const router = useRouter();
 
