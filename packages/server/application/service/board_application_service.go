@@ -71,7 +71,6 @@ func (svc *BoardApplicationService) Create(
 		},
 	}
 
-	// ThumbnailUrlがnilでない場合のみセットする
 	if body.ThumbnailUrl != nil {
 		board.EntBoard.ThumbnailURL = *body.ThumbnailUrl
 	}

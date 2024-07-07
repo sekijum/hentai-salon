@@ -41,11 +41,11 @@ func (ctrl *ThreadController) Create(ginCtx *gin.Context) {
 		return
 	}
 
-	err := ctrl.threadApplicationService.Create(context.Background(), ginCtx, body)
+	threads, err := ctrl.threadApplicationService.Create(context.Background(), ginCtx, body)
 	if err != nil {
 		ginCtx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	ginCtx.JSON(http.StatusOK, nil)
+	ginCtx.JSON(http.StatusOK, threads)
 }

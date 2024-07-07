@@ -86,29 +86,28 @@ func (svc *ThreadApplicationService) Create(
 	ctx context.Context,
 	ginCtx *gin.Context,
 	body request.ThreadCreateRequest,
-) error {
+) (*resource.ThreadResource, error) {
 	userId, exists := ginCtx.Get("user_id")
 	if !exists {
-		return errors.New("ユーザーIDがコンテキストに存在しません")
+		return nil, errors.New("ユーザーIDがコンテキストに存在しません")
 	}
 
 	if duplicated, err := svc.threadDomainService.IsTitleDuplicated(ctx, body.Title); err != nil || duplicated {
 		if err != nil {
-			return err
+			return nil, err
 		}
-		return errors.New("スレタイが重複しています")
+		return nil, errors.New("スレタイが重複しています")
 	}
 
 	tx, err := svc.client.Tx(ctx)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer tx.Rollback()
 
-	// タグの作成
 	modelTags, err := svc.tagDatasource.CreateManyTx(ctx, tx, body.TagNames)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	tagIDs := make([]int, len(modelTags))
@@ -116,7 +115,6 @@ func (svc *ThreadApplicationService) Create(
 		tagIDs[i] = tag.EntTag.ID
 	}
 
-	// Optional fields
 	description := ""
 	if body.Description != nil {
 		description = *body.Description
@@ -141,15 +139,15 @@ func (svc *ThreadApplicationService) Create(
 		},
 	}
 
-	_, err = svc.threadDatasource.CreateTx(ctx, tx, thread, tagIDs)
+	savedThread, err := svc.threadDatasource.CreateTx(ctx, tx, thread, tagIDs)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	err = tx.Commit()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return resource.NewThreadResource(savedThread), nil
 }
