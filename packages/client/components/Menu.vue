@@ -1,8 +1,17 @@
 <template>
-  <v-sheet>
-    <v-row align="center" justify="center" class="m-0">
-      <v-col v-for="(item, idx) in items" :key="idx" :cols="columnWidth" class="p-0">
-        <v-sheet class="menu-item" @click="item.navigate">
+  <v-sheet class="outer-border">
+    <v-row align="center" justify="center" class="m-0" v-for="(row, rowIndex) in rows" :key="rowIndex">
+      <v-col
+        v-for="(item, idx) in row"
+        :key="idx"
+        :cols="columnWidth(row.length)"
+        class="p-0"
+        :class="{
+          'no-right-border': shouldRemoveRightBorder(idx, row.length),
+          'no-bottom-border': rowIndex === rows.length - 1,
+        }"
+      >
+        <v-sheet class="menu-item" @click="() => navigateTo(item.link)">
           <v-icon class="menu-icon">{{ item.icon }}</v-icon>
           <span class="menu-title">{{ item.title }}</span>
         </v-sheet>
@@ -13,10 +22,10 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
+import { useRouter } from 'vue-router';
 
 const props = defineProps({
-  items: [{ title: '', navigate: () => {}, icon: '' }],
+  items: { type: Array, required: true, default: () => [] },
 });
 
 const router = useRouter();
@@ -25,42 +34,73 @@ const navigateTo = link => {
   router.push(link);
 };
 
-const columnWidth = computed(() => {
-  return props.items.length <= 3 ? 12 / props.items.length : 4;
+const rows = computed(() => {
+  const result = [];
+  for (let i = 0; i < props.items.length; i += 3) {
+    result.push(props.items.slice(i, i + 3));
+  }
+  return result;
 });
+
+const columnWidth = itemsPerRow => {
+  if (itemsPerRow === 1) return 12;
+  if (itemsPerRow === 2) return 6;
+  return 4; // default for 3 items
+};
+
+const shouldRemoveRightBorder = (idx, itemsPerRow) => {
+  return (idx + 1) % itemsPerRow === 0;
+};
 </script>
 
 <style scoped>
+.outer-border {
+  border: 1px solid #ccc; /* Outer border */
+}
+
 .menu-item {
   align-items: center;
-  border: 1px solid #ccc; /* ボーダーを追加 */
   box-shadow: none;
-  width: 100%; /* カラムと同じ幅に設定 */
-  margin: 0; /* マージンを0に設定 */
-  padding: 16px; /* 適切なパディングを追加 */
+  width: 100%;
+  margin: 0;
+  padding: 16px;
   display: flex;
   justify-content: center;
   cursor: pointer;
-  text-align: center; /* テキストを中央揃えにする */
+  text-align: center;
 }
 
 .menu-icon {
-  margin-right: 8px; /* アイコンとテキストの間にスペースを追加 */
+  margin-right: 8px;
 }
 
 .menu-title {
-  font-size: 12px; /* 文字サイズを小さくする */
-  max-width: calc(100% - 32px); /* タイトルの最大幅をアイコンの幅に合わせて固定 */
-  overflow: hidden; /* オーバーフローを隠す */
-  text-overflow: ellipsis; /* テキストが溢れた場合に省略記号を表示 */
-  white-space: nowrap; /* テキストを一行にする */
+  font-size: 12px;
+  max-width: calc(100% - 32px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .v-col {
-  padding: 0 !important; /* v-colのパディングを強制的に0に設定 */
+  padding: 0 !important;
+  border-bottom: 1px solid #ccc; /* Add bottom border to each column */
+  border-right: 1px solid #ccc; /* Add right border to each column */
+}
+
+.v-col.no-right-border {
+  border-right: none; /* Remove right border for specific columns */
+}
+
+.v-col.no-bottom-border {
+  border-bottom: none; /* Remove bottom border for the last row */
 }
 
 .v-row {
-  margin: 0 !important; /* v-rowのマージンを強制的に0に設定 */
+  margin: 0 !important;
+}
+
+.v-row:last-child .v-col {
+  border-bottom: none; /* Remove bottom border for columns in the last row */
 }
 </style>

@@ -17,21 +17,16 @@
       <template v-if="comment.media && comment.media.length">
         <v-row dense>
           <v-col cols="3" v-for="(media, index) in comment.media" :key="index" class="media-col">
-            <div v-if="media.type === 'video/mp4'" class="media-item video-thumbnail" @click="() => openDialog(media)">
-              <v-img :src="media.thumbnail" class="media-item">
+            <div class="media-item-wrapper" @click="() => openDialog(media)">
+              <v-img :src="media.type === 'video/mp4' ? media.thumbnail : media.url" class="media-item">
                 <template v-slot:placeholder>
                   <v-row align="center" class="fill-height ma-0" justify="center">
                     <v-progress-circular color="grey-lighten-5" indeterminate></v-progress-circular>
-                  </v-row> </template
-              ></v-img>
-              <v-icon size="40" class="play-icon">mdi-play-circle</v-icon>
+                  </v-row>
+                </template>
+              </v-img>
+              <v-icon v-if="media.type === 'video/mp4'" size="40" class="play-icon">mdi-play-circle</v-icon>
             </div>
-            <v-img v-else :src="media.url" class="media-item" @click="() => openDialog(media)">
-              <template v-slot:placeholder>
-                <v-row align="center" class="fill-height ma-0" justify="center">
-                  <v-progress-circular color="grey-lighten-5" indeterminate></v-progress-circular>
-                </v-row> </template
-            ></v-img>
           </v-col>
         </v-row>
       </template>
@@ -176,16 +171,15 @@ const closeDialog = () => {
   word-wrap: break-word;
 }
 
-.media-item {
-  width: 100px; /* Fixed width */
-  height: 100px; /* Fixed height */
-  object-fit: cover;
-  cursor: pointer;
+.media-item-wrapper {
   position: relative;
 }
 
-.video-thumbnail {
-  position: relative;
+.media-item {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  cursor: pointer;
 }
 
 .play-icon {
