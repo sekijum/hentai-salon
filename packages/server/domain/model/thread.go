@@ -7,8 +7,9 @@ import (
 )
 
 type Thread struct {
-	EntThread  *ent.Thread
-	Popularity int
+	EntThread     *ent.Thread
+	Popularity    int
+	TotalComments int
 }
 
 type ThreadStatus int

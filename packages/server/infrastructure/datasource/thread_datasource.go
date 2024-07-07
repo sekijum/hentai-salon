@@ -5,6 +5,8 @@ import (
 	"server/domain/model"
 	"server/infrastructure/ent"
 	"server/infrastructure/ent/thread"
+	"server/infrastructure/ent/threadcomment"
+	"server/infrastructure/ent/threadcommentattachment"
 )
 
 type ThreadDatasource struct {
@@ -79,6 +81,43 @@ func (ds *ThreadDatasource) FindByHistories(ctx context.Context, threadIds []int
 	}
 
 	return modelThreads, nil
+}
+
+func (ds *ThreadDatasource) FindById(ctx context.Context, id int, limit, offset int) (*model.Thread, error) {
+	totalComments, err := ds.client.ThreadComment.Query().
+		Where(threadcomment.HasThreadWith(thread.IDEQ(id))).
+		Count(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	entThread, err := ds.client.Thread.Query().
+		Where(thread.IDEQ(id)).
+		WithTags().
+		WithComments(func(q *ent.ThreadCommentQuery) {
+			q.Order(ent.Desc(threadcomment.FieldCreatedAt)).
+				Limit(limit).
+				Offset(offset).
+				WithAuthor().
+				WithAttachments(func(aq *ent.ThreadCommentAttachmentQuery) {
+					aq.Order(ent.Asc(threadcommentattachment.FieldDisplayOrder))
+				}).
+				WithReplies(func(rq *ent.ThreadCommentQuery) {
+					rq.Order(ent.Desc(threadcomment.FieldCreatedAt))
+				})
+		}).
+		WithBoard().
+		Only(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	modelThread := &model.Thread{
+		EntThread:     entThread,
+		TotalComments: totalComments,
+	}
+
+	return modelThread, nil
 }
 
 func (ds *ThreadDatasource) FindByTitle(ctx context.Context, title string) ([]*model.Thread, error) {

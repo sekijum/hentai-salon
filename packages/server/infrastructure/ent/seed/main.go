@@ -1,4 +1,3 @@
-// cmd/seed/main.go
 package main
 
 import (
@@ -31,6 +30,10 @@ func randomImageURL(index int) string {
 	height := rand.Intn(500) + 200 // 200から700のランダムな高さ
 	url := fmt.Sprintf("https://picsum.photos/seed/%d/%d/%d.webp", index, width, height)
 	return url
+}
+
+func videoURL() string {
+	return "https://www.w3schools.com/html/mov_bbb.mp4"
 }
 
 func seed(ctx context.Context, client *ent.Client) error {
@@ -143,12 +146,17 @@ func seed(ctx context.Context, client *ent.Client) error {
 	}
 
 	// Create Thread Comment Attachments
-	for i := 0; i < 100; i++ {
-		attachmentURL := randomImageURL(i)
+	for i := 0; i < 300000; i++ {
+		var attachmentURL string
+		if i%2 == 0 {
+			attachmentURL = randomImageURL(i)
+		} else {
+			attachmentURL = videoURL()
+		}
 		tx.ThreadCommentAttachment.Create().
 			SetURL(attachmentURL).
 			SetDisplayOrder(int(rand.Int63n(100))).
-			SetType(0).
+			SetType(i % 2). // typeを0か1に設定
 			SetCreatedAt(time.Now()).
 			SetCommentID(comments[rand.Intn(100000)].ID).
 			SaveX(ctx)

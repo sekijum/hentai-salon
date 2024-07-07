@@ -1,4 +1,24 @@
-export type TThreadBoard = {
+type ThreadCommentResource = {
+  id: number;
+  userId?: number;
+  guestName?: string;
+  content: string;
+  ipAddress: string;
+  status: number;
+  parentCommentID: number;
+  createdAt: string;
+  updatedAt: string;
+  attachments: ThreadCommentAttachmentResource[];
+  totalReplies: number;
+};
+
+type ThreadCommentAttachmentResource = {
+  url: string;
+  displayOrder: number;
+  type: string;
+};
+
+type TThreadBoard = {
   id: number;
   title: string;
 };
@@ -13,6 +33,7 @@ export type TThread = {
   createdAt: string;
   commentCount: number;
   popularity: string;
+  comments: ThreadCommentResource;
 };
 
 export type TThreadList = {

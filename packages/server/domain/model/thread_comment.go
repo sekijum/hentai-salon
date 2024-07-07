@@ -36,3 +36,7 @@ func (m *ThreadComment) ThreadCommentToLabel() string {
 		return "不明なステータス"
 	}
 }
+
+func (m *ThreadComment) TotalReplies() int {
+	return len(m.EntThreadComment.Edges.Replies)
+}

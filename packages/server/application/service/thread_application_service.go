@@ -35,10 +35,7 @@ func NewThreadApplicationService(
 	}
 }
 
-func (svc *ThreadApplicationService) FindAll(
-	ctx context.Context,
-	qs request.ThreadFindAllRequest,
-) (map[string][]*resource.ThreadResource, error) {
+func (svc *ThreadApplicationService) FindAll(ctx context.Context, qs request.ThreadFindAllRequest) (map[string][]*resource.ThreadResource, error) {
 	threadsByOrders := make(map[string][]*model.Thread)
 
 	for _, order := range qs.Orders {
@@ -82,11 +79,15 @@ func (svc *ThreadApplicationService) FindAll(
 	return threadResources, nil
 }
 
-func (svc *ThreadApplicationService) Create(
-	ctx context.Context,
-	ginCtx *gin.Context,
-	body request.ThreadCreateRequest,
-) (*resource.ThreadResource, error) {
+func (svc *ThreadApplicationService) FindById(ctx context.Context, id int, qs request.ThreadFindByIdRequest) (*resource.ThreadResource, error) {
+	thread, err := svc.threadDatasource.FindById(ctx, id, qs.Limit, qs.Offset)
+	if err != nil {
+		return nil, err
+	}
+	return resource.NewThreadResource(thread), nil
+}
+
+func (svc *ThreadApplicationService) Create(ctx context.Context, ginCtx *gin.Context, body request.ThreadCreateRequest) (*resource.ThreadResource, error) {
 	userId, exists := ginCtx.Get("user_id")
 	if !exists {
 		return nil, errors.New("ユーザーIDがコンテキストに存在しません")

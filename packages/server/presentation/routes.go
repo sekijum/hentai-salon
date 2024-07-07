@@ -22,6 +22,7 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 	r.GET("/tags/names", controllers.TagController.FindAllName)
 	r.GET("/boards", controllers.BoardController.FindAll)
 	r.GET("/threads", controllers.ThreadController.FindAll)
+	r.GET("/threads/:id", controllers.ThreadController.FindById)
 
 	commentGroup := r.Group("/comments")
 	commentGroup.

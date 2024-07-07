@@ -67,8 +67,6 @@
 </template>
 
 <script setup lang="ts">
-import Header from '~/components/Header.vue';
-import ThreadTable from '~/components/thread/ThreadTable.vue';
 import CommentList from '~/components/comment/CommentList.vue';
 import CommentForm from '~/components/comment/CommentForm.vue';
 import Menu from '~/components/Menu.vue';
@@ -76,11 +74,12 @@ import PageTitle from '~/components/PageTitle.vue';
 import Pagination from '~/components/Pagination.vue';
 import MediaGallery from '~/components/MediaGallery.vue';
 import { useRouter, useRoute } from 'vue-router';
+import type { TThread } from '~/types/thread';
 
 const router = useRouter();
 const route = useRoute();
-const keyword = ref(route.query.keyword ?? '');
-const tab = ref(route.query.tab ?? 'comments');
+const nuxtApp = useNuxtApp();
+const { $api } = nuxtApp;
 
 const menuItems = [
   {
@@ -94,6 +93,8 @@ const menuItems = [
     icon: 'mdi-update',
   },
 ];
+
+const threads = ref<TThread>();
 
 const item = ref({
   title: 'ラーメン店主異例の訴え',
@@ -146,8 +147,8 @@ for (let i = 1; i <= 100; i++) {
             { type: 'video/mp4', url: mediaUrls[2], thumbnail: mediaUrls[0] },
           ]
         : i % 3 === 1
-          ? [{ type: 'image', url: mediaUrls[1] }]
-          : [],
+        ? [{ type: 'image', url: mediaUrls[1] }]
+        : [],
   });
 }
 
@@ -171,6 +172,17 @@ const scrollToCommentBottom = () => {
     commentBottom.scrollIntoView({ behavior: 'smooth' });
   }
 };
+
+onMounted(async () => {
+  await fetchThreads();
+});
+
+async function fetchThreads() {
+  const threadId = route.params.id;
+  const response = await $api.get<TThread>(`/threads/${threadId}`);
+  threads.value = response.data;
+  console.log(threads.value);
+}
 </script>
 
 <style scoped>

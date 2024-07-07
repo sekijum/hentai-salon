@@ -27,14 +27,12 @@
 import PageTitle from '~/components/PageTitle.vue';
 import type { TBoard } from '~/types/board';
 
+const router = useRouter();
 const nuxtApp = useNuxtApp();
 const { $api } = nuxtApp;
 
 const boards = ref<TBoard[]>([]);
-
 const search = ref('');
-
-const router = useRouter();
 
 const filteredBoards = computed(() => {
   return boards.value.filter(board => board.title.includes(search.value));

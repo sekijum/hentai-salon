@@ -1,5 +1,9 @@
 package request
 
+type ThreadFindByIdRequest struct {
+	Limit  int `form:"limit"`
+	Offset int `form:"offset"`
+}
 
 type ThreadFindAllRequest struct {
 	Limit     int      `form:"limit"`

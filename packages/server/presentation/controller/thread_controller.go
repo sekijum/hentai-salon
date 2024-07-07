@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"server/application/service"
 	request "server/presentation/request"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -32,6 +33,29 @@ func (ctrl *ThreadController) FindAll(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, threads)
+}
+
+func (ctrl *ThreadController) FindById(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "無効なIDです"})
+		return
+	}
+
+	var qs request.ThreadFindByIdRequest
+
+	if err := c.ShouldBindQuery(&qs); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	thread, err := ctrl.threadApplicationService.FindById(context.Background(), id, qs)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "スレッドの取得に失敗しました: " + err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, thread)
 }
 
 func (ctrl *ThreadController) Create(ginCtx *gin.Context) {
