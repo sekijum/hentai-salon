@@ -23,47 +23,47 @@ type ThreadCommentCreate struct {
 	hooks    []Hook
 }
 
-// SetThreadId sets the "threadId" field.
-func (tcc *ThreadCommentCreate) SetThreadId(i int) *ThreadCommentCreate {
-	tcc.mutation.SetThreadId(i)
+// SetThreadID sets the "thread_id" field.
+func (tcc *ThreadCommentCreate) SetThreadID(i int) *ThreadCommentCreate {
+	tcc.mutation.SetThreadID(i)
 	return tcc
 }
 
-// SetParentCommentId sets the "parentCommentId" field.
-func (tcc *ThreadCommentCreate) SetParentCommentId(i int) *ThreadCommentCreate {
-	tcc.mutation.SetParentCommentId(i)
+// SetParentCommentID sets the "parent_comment_id" field.
+func (tcc *ThreadCommentCreate) SetParentCommentID(i int) *ThreadCommentCreate {
+	tcc.mutation.SetParentCommentID(i)
 	return tcc
 }
 
-// SetNillableParentCommentId sets the "parentCommentId" field if the given value is not nil.
-func (tcc *ThreadCommentCreate) SetNillableParentCommentId(i *int) *ThreadCommentCreate {
+// SetNillableParentCommentID sets the "parent_comment_id" field if the given value is not nil.
+func (tcc *ThreadCommentCreate) SetNillableParentCommentID(i *int) *ThreadCommentCreate {
 	if i != nil {
-		tcc.SetParentCommentId(*i)
+		tcc.SetParentCommentID(*i)
 	}
 	return tcc
 }
 
-// SetUserId sets the "userId" field.
-func (tcc *ThreadCommentCreate) SetUserId(i int) *ThreadCommentCreate {
-	tcc.mutation.SetUserId(i)
+// SetUserID sets the "user_id" field.
+func (tcc *ThreadCommentCreate) SetUserID(i int) *ThreadCommentCreate {
+	tcc.mutation.SetUserID(i)
 	return tcc
 }
 
-// SetNillableUserId sets the "userId" field if the given value is not nil.
-func (tcc *ThreadCommentCreate) SetNillableUserId(i *int) *ThreadCommentCreate {
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (tcc *ThreadCommentCreate) SetNillableUserID(i *int) *ThreadCommentCreate {
 	if i != nil {
-		tcc.SetUserId(*i)
+		tcc.SetUserID(*i)
 	}
 	return tcc
 }
 
-// SetGuestName sets the "guestName" field.
+// SetGuestName sets the "guest_name" field.
 func (tcc *ThreadCommentCreate) SetGuestName(s string) *ThreadCommentCreate {
 	tcc.mutation.SetGuestName(s)
 	return tcc
 }
 
-// SetNillableGuestName sets the "guestName" field if the given value is not nil.
+// SetNillableGuestName sets the "guest_name" field if the given value is not nil.
 func (tcc *ThreadCommentCreate) SetNillableGuestName(s *string) *ThreadCommentCreate {
 	if s != nil {
 		tcc.SetGuestName(*s)
@@ -97,13 +97,13 @@ func (tcc *ThreadCommentCreate) SetNillableStatus(i *int) *ThreadCommentCreate {
 	return tcc
 }
 
-// SetCreatedAt sets the "createdAt" field.
+// SetCreatedAt sets the "created_at" field.
 func (tcc *ThreadCommentCreate) SetCreatedAt(t time.Time) *ThreadCommentCreate {
 	tcc.mutation.SetCreatedAt(t)
 	return tcc
 }
 
-// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
 func (tcc *ThreadCommentCreate) SetNillableCreatedAt(t *time.Time) *ThreadCommentCreate {
 	if t != nil {
 		tcc.SetCreatedAt(*t)
@@ -111,13 +111,13 @@ func (tcc *ThreadCommentCreate) SetNillableCreatedAt(t *time.Time) *ThreadCommen
 	return tcc
 }
 
-// SetUpdatedAt sets the "updatedAt" field.
+// SetUpdatedAt sets the "updated_at" field.
 func (tcc *ThreadCommentCreate) SetUpdatedAt(t time.Time) *ThreadCommentCreate {
 	tcc.mutation.SetUpdatedAt(t)
 	return tcc
 }
 
-// SetNillableUpdatedAt sets the "updatedAt" field if the given value is not nil.
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
 func (tcc *ThreadCommentCreate) SetNillableUpdatedAt(t *time.Time) *ThreadCommentCreate {
 	if t != nil {
 		tcc.SetUpdatedAt(*t)
@@ -128,12 +128,6 @@ func (tcc *ThreadCommentCreate) SetNillableUpdatedAt(t *time.Time) *ThreadCommen
 // SetID sets the "id" field.
 func (tcc *ThreadCommentCreate) SetID(i int) *ThreadCommentCreate {
 	tcc.mutation.SetID(i)
-	return tcc
-}
-
-// SetThreadID sets the "thread" edge to the Thread entity by ID.
-func (tcc *ThreadCommentCreate) SetThreadID(id int) *ThreadCommentCreate {
-	tcc.mutation.SetThreadID(id)
 	return tcc
 }
 
@@ -159,20 +153,6 @@ func (tcc *ThreadCommentCreate) SetNillableAuthorID(id *int) *ThreadCommentCreat
 // SetAuthor sets the "author" edge to the User entity.
 func (tcc *ThreadCommentCreate) SetAuthor(u *User) *ThreadCommentCreate {
 	return tcc.SetAuthorID(u.ID)
-}
-
-// SetParentCommentID sets the "parent_comment" edge to the ThreadComment entity by ID.
-func (tcc *ThreadCommentCreate) SetParentCommentID(id int) *ThreadCommentCreate {
-	tcc.mutation.SetParentCommentID(id)
-	return tcc
-}
-
-// SetNillableParentCommentID sets the "parent_comment" edge to the ThreadComment entity by ID if the given value is not nil.
-func (tcc *ThreadCommentCreate) SetNillableParentCommentID(id *int) *ThreadCommentCreate {
-	if id != nil {
-		tcc = tcc.SetParentCommentID(*id)
-	}
-	return tcc
 }
 
 // SetParentComment sets the "parent_comment" edge to the ThreadComment entity.
@@ -291,12 +271,12 @@ func (tcc *ThreadCommentCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (tcc *ThreadCommentCreate) check() error {
-	if _, ok := tcc.mutation.ThreadId(); !ok {
-		return &ValidationError{Name: "threadId", err: errors.New(`ent: missing required field "ThreadComment.threadId"`)}
+	if _, ok := tcc.mutation.ThreadID(); !ok {
+		return &ValidationError{Name: "thread_id", err: errors.New(`ent: missing required field "ThreadComment.thread_id"`)}
 	}
 	if v, ok := tcc.mutation.GuestName(); ok {
 		if err := threadcomment.GuestNameValidator(v); err != nil {
-			return &ValidationError{Name: "guestName", err: fmt.Errorf(`ent: validator failed for field "ThreadComment.guestName": %w`, err)}
+			return &ValidationError{Name: "guest_name", err: fmt.Errorf(`ent: validator failed for field "ThreadComment.guest_name": %w`, err)}
 		}
 	}
 	if _, ok := tcc.mutation.Content(); !ok {
@@ -314,10 +294,10 @@ func (tcc *ThreadCommentCreate) check() error {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "ThreadComment.status"`)}
 	}
 	if _, ok := tcc.mutation.CreatedAt(); !ok {
-		return &ValidationError{Name: "createdAt", err: errors.New(`ent: missing required field "ThreadComment.createdAt"`)}
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "ThreadComment.created_at"`)}
 	}
 	if _, ok := tcc.mutation.UpdatedAt(); !ok {
-		return &ValidationError{Name: "updatedAt", err: errors.New(`ent: missing required field "ThreadComment.updatedAt"`)}
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "ThreadComment.updated_at"`)}
 	}
 	if _, ok := tcc.mutation.ThreadID(); !ok {
 		return &ValidationError{Name: "thread", err: errors.New(`ent: missing required edge "ThreadComment.thread"`)}
@@ -356,7 +336,7 @@ func (tcc *ThreadCommentCreate) createSpec() (*ThreadComment, *sqlgraph.CreateSp
 	}
 	if value, ok := tcc.mutation.GuestName(); ok {
 		_spec.SetField(threadcomment.FieldGuestName, field.TypeString, value)
-		_node.GuestName = value
+		_node.GuestName = &value
 	}
 	if value, ok := tcc.mutation.Content(); ok {
 		_spec.SetField(threadcomment.FieldContent, field.TypeString, value)
@@ -392,7 +372,7 @@ func (tcc *ThreadCommentCreate) createSpec() (*ThreadComment, *sqlgraph.CreateSp
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.ThreadId = nodes[0]
+		_node.ThreadID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := tcc.mutation.AuthorIDs(); len(nodes) > 0 {
@@ -409,7 +389,7 @@ func (tcc *ThreadCommentCreate) createSpec() (*ThreadComment, *sqlgraph.CreateSp
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.UserId = nodes[0]
+		_node.UserID = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := tcc.mutation.ParentCommentIDs(); len(nodes) > 0 {
@@ -426,7 +406,7 @@ func (tcc *ThreadCommentCreate) createSpec() (*ThreadComment, *sqlgraph.CreateSp
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.ParentCommentId = nodes[0]
+		_node.ParentCommentID = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := tcc.mutation.RepliesIDs(); len(nodes) > 0 {

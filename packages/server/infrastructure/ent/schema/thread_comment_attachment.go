@@ -15,16 +15,16 @@ type ThreadCommentAttachment struct {
 func (ThreadCommentAttachment) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("id").Unique().Immutable(),
-		field.Int("commentId").StorageKey("comment_id"),
+		field.Int("comment_id"),
 		field.String("url"),
 		field.Int("display_order").Default(0),
 		field.Int("type").Default(0).Comment("0: image, 1: video"),
-		field.Time("createdAt").Default(time.Now).StorageKey("created_at"),
+		field.Time("created_at").Default(time.Now),
 	}
 }
 
 func (ThreadCommentAttachment) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("comment", ThreadComment.Type).Ref("attachments").Unique().Field("commentId").Required(),
+		edge.From("comment", ThreadComment.Type).Ref("attachments").Unique().Field("comment_id").Required(),
 	}
 }

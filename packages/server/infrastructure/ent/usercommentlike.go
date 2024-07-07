@@ -17,12 +17,12 @@ import (
 // UserCommentLike is the model entity for the UserCommentLike schema.
 type UserCommentLike struct {
 	config `json:"-"`
-	// UserId holds the value of the "userId" field.
-	UserId int `json:"userId,omitempty"`
-	// CommentId holds the value of the "commentId" field.
-	CommentId int `json:"commentId,omitempty"`
-	// LikedAt holds the value of the "likedAt" field.
-	LikedAt time.Time `json:"likedAt,omitempty"`
+	// UserID holds the value of the "user_id" field.
+	UserID int `json:"user_id,omitempty"`
+	// CommentID holds the value of the "comment_id" field.
+	CommentID int `json:"comment_id,omitempty"`
+	// LikedAt holds the value of the "liked_at" field.
+	LikedAt time.Time `json:"liked_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the UserCommentLikeQuery when eager-loading is set.
 	Edges        UserCommentLikeEdges `json:"edges"`
@@ -67,7 +67,7 @@ func (*UserCommentLike) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case usercommentlike.FieldUserId, usercommentlike.FieldCommentId:
+		case usercommentlike.FieldUserID, usercommentlike.FieldCommentID:
 			values[i] = new(sql.NullInt64)
 		case usercommentlike.FieldLikedAt:
 			values[i] = new(sql.NullTime)
@@ -86,21 +86,21 @@ func (ucl *UserCommentLike) assignValues(columns []string, values []any) error {
 	}
 	for i := range columns {
 		switch columns[i] {
-		case usercommentlike.FieldUserId:
+		case usercommentlike.FieldUserID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field userId", values[i])
+				return fmt.Errorf("unexpected type %T for field user_id", values[i])
 			} else if value.Valid {
-				ucl.UserId = int(value.Int64)
+				ucl.UserID = int(value.Int64)
 			}
-		case usercommentlike.FieldCommentId:
+		case usercommentlike.FieldCommentID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field commentId", values[i])
+				return fmt.Errorf("unexpected type %T for field comment_id", values[i])
 			} else if value.Valid {
-				ucl.CommentId = int(value.Int64)
+				ucl.CommentID = int(value.Int64)
 			}
 		case usercommentlike.FieldLikedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field likedAt", values[i])
+				return fmt.Errorf("unexpected type %T for field liked_at", values[i])
 			} else if value.Valid {
 				ucl.LikedAt = value.Time
 			}
@@ -149,13 +149,13 @@ func (ucl *UserCommentLike) Unwrap() *UserCommentLike {
 func (ucl *UserCommentLike) String() string {
 	var builder strings.Builder
 	builder.WriteString("UserCommentLike(")
-	builder.WriteString("userId=")
-	builder.WriteString(fmt.Sprintf("%v", ucl.UserId))
+	builder.WriteString("user_id=")
+	builder.WriteString(fmt.Sprintf("%v", ucl.UserID))
 	builder.WriteString(", ")
-	builder.WriteString("commentId=")
-	builder.WriteString(fmt.Sprintf("%v", ucl.CommentId))
+	builder.WriteString("comment_id=")
+	builder.WriteString(fmt.Sprintf("%v", ucl.CommentID))
 	builder.WriteString(", ")
-	builder.WriteString("likedAt=")
+	builder.WriteString("liked_at=")
 	builder.WriteString(ucl.LikedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()

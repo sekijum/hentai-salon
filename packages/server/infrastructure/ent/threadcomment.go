@@ -19,24 +19,24 @@ type ThreadComment struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// ThreadId holds the value of the "threadId" field.
-	ThreadId int `json:"threadId,omitempty"`
+	// ThreadID holds the value of the "thread_id" field.
+	ThreadID int `json:"thread_id,omitempty"`
 	// 親コメントID（リプライの場合）
-	ParentCommentId int `json:"parentCommentId,omitempty"`
+	ParentCommentID *int `json:"parent_comment_id,omitempty"`
 	// ログインユーザーの場合
-	UserId int `json:"userId,omitempty"`
+	UserID *int `json:"user_id,omitempty"`
 	// ゲストユーザーの場合
-	GuestName string `json:"guestName,omitempty"`
+	GuestName *string `json:"guest_name,omitempty"`
 	// Content holds the value of the "content" field.
 	Content string `json:"content,omitempty"`
 	// コメント者のIPアドレス
 	IPAddress string `json:"ip_address,omitempty"`
 	// 0: Visible, 1: Deleted
 	Status int `json:"status,omitempty"`
-	// CreatedAt holds the value of the "createdAt" field.
-	CreatedAt time.Time `json:"createdAt,omitempty"`
-	// UpdatedAt holds the value of the "updatedAt" field.
-	UpdatedAt time.Time `json:"updatedAt,omitempty"`
+	// CreatedAt holds the value of the "created_at" field.
+	CreatedAt time.Time `json:"created_at,omitempty"`
+	// UpdatedAt holds the value of the "updated_at" field.
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ThreadCommentQuery when eager-loading is set.
 	Edges        ThreadCommentEdges `json:"edges"`
@@ -160,7 +160,7 @@ func (*ThreadComment) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case threadcomment.FieldID, threadcomment.FieldThreadId, threadcomment.FieldParentCommentId, threadcomment.FieldUserId, threadcomment.FieldStatus:
+		case threadcomment.FieldID, threadcomment.FieldThreadID, threadcomment.FieldParentCommentID, threadcomment.FieldUserID, threadcomment.FieldStatus:
 			values[i] = new(sql.NullInt64)
 		case threadcomment.FieldGuestName, threadcomment.FieldContent, threadcomment.FieldIPAddress:
 			values[i] = new(sql.NullString)
@@ -187,29 +187,32 @@ func (tc *ThreadComment) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			tc.ID = int(value.Int64)
-		case threadcomment.FieldThreadId:
+		case threadcomment.FieldThreadID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field threadId", values[i])
+				return fmt.Errorf("unexpected type %T for field thread_id", values[i])
 			} else if value.Valid {
-				tc.ThreadId = int(value.Int64)
+				tc.ThreadID = int(value.Int64)
 			}
-		case threadcomment.FieldParentCommentId:
+		case threadcomment.FieldParentCommentID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field parentCommentId", values[i])
+				return fmt.Errorf("unexpected type %T for field parent_comment_id", values[i])
 			} else if value.Valid {
-				tc.ParentCommentId = int(value.Int64)
+				tc.ParentCommentID = new(int)
+				*tc.ParentCommentID = int(value.Int64)
 			}
-		case threadcomment.FieldUserId:
+		case threadcomment.FieldUserID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field userId", values[i])
+				return fmt.Errorf("unexpected type %T for field user_id", values[i])
 			} else if value.Valid {
-				tc.UserId = int(value.Int64)
+				tc.UserID = new(int)
+				*tc.UserID = int(value.Int64)
 			}
 		case threadcomment.FieldGuestName:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field guestName", values[i])
+				return fmt.Errorf("unexpected type %T for field guest_name", values[i])
 			} else if value.Valid {
-				tc.GuestName = value.String
+				tc.GuestName = new(string)
+				*tc.GuestName = value.String
 			}
 		case threadcomment.FieldContent:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -231,13 +234,13 @@ func (tc *ThreadComment) assignValues(columns []string, values []any) error {
 			}
 		case threadcomment.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field createdAt", values[i])
+				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
 				tc.CreatedAt = value.Time
 			}
 		case threadcomment.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field updatedAt", values[i])
+				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
 				tc.UpdatedAt = value.Time
 			}
@@ -322,17 +325,23 @@ func (tc *ThreadComment) String() string {
 	var builder strings.Builder
 	builder.WriteString("ThreadComment(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", tc.ID))
-	builder.WriteString("threadId=")
-	builder.WriteString(fmt.Sprintf("%v", tc.ThreadId))
+	builder.WriteString("thread_id=")
+	builder.WriteString(fmt.Sprintf("%v", tc.ThreadID))
 	builder.WriteString(", ")
-	builder.WriteString("parentCommentId=")
-	builder.WriteString(fmt.Sprintf("%v", tc.ParentCommentId))
+	if v := tc.ParentCommentID; v != nil {
+		builder.WriteString("parent_comment_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteString(", ")
-	builder.WriteString("userId=")
-	builder.WriteString(fmt.Sprintf("%v", tc.UserId))
+	if v := tc.UserID; v != nil {
+		builder.WriteString("user_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteString(", ")
-	builder.WriteString("guestName=")
-	builder.WriteString(tc.GuestName)
+	if v := tc.GuestName; v != nil {
+		builder.WriteString("guest_name=")
+		builder.WriteString(*v)
+	}
 	builder.WriteString(", ")
 	builder.WriteString("content=")
 	builder.WriteString(tc.Content)
@@ -343,10 +352,10 @@ func (tc *ThreadComment) String() string {
 	builder.WriteString("status=")
 	builder.WriteString(fmt.Sprintf("%v", tc.Status))
 	builder.WriteString(", ")
-	builder.WriteString("createdAt=")
+	builder.WriteString("created_at=")
 	builder.WriteString(tc.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
-	builder.WriteString("updatedAt=")
+	builder.WriteString("updated_at=")
 	builder.WriteString(tc.UpdatedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()

@@ -7,6 +7,7 @@ import (
 	"server/domain/lib/util"
 	"server/domain/model"
 	"server/infrastructure/datasource"
+	"server/infrastructure/ent"
 	"server/presentation/request"
 	"server/presentation/resource"
 	"time"
@@ -29,18 +30,16 @@ func (svc *UserApplicationService) Signup(ctx context.Context, body request.User
 	}
 
 	user := &model.User{
-		Name:        body.Name,
-		Email:       body.Email,
-		Password:    hashedPassword,
-		AvatarUrl:   body.AvatarUrl,
-		Status:      model.UserRoleActive, // Active
-		Role:        model.UserRoleMember, // Member
-		CreatedAt:   time.Now(),
-		UpdatedAt:   time.Now(),
-	}
-
-	if err := user.Validate(); err != nil {
-		return "", err
+		EntUser: &ent.User{
+			Name:      body.Name,
+			Email:     body.Email,
+			Password:  hashedPassword,
+			AvatarURL: body.AvatarUrl,
+			Status:    int(model.UserStatusActive),
+			Role:      int(model.UserRoleMember),
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		},
 	}
 
 	_, err = svc.userDatasource.Create(ctx, user)
@@ -57,7 +56,7 @@ func (svc *UserApplicationService) Signin(ctx context.Context, email, password s
 		return "", err
 	}
 
-	err = util.ComparePassword(user.Password, password)
+	err = util.ComparePassword(user.EntUser.Password, password)
 	if err != nil {
 		return "", errors.New("認証情報が無効です")
 	}
@@ -68,7 +67,7 @@ func (svc *UserApplicationService) Signin(ctx context.Context, email, password s
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user_id": user.Id,
+		"user_id": user.EntUser.ID,
 		"exp":     time.Now().Add(time.Hour * 72).Unix(),
 	})
 

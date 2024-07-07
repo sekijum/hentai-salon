@@ -92,30 +92,6 @@ func (f UserFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error)
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UserMutation", m)
 }
 
-// The UserBoardLikeFunc type is an adapter to allow the use of ordinary
-// function as UserBoardLike mutator.
-type UserBoardLikeFunc func(context.Context, *ent.UserBoardLikeMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f UserBoardLikeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.UserBoardLikeMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UserBoardLikeMutation", m)
-}
-
-// The UserBoardSubscriptionFunc type is an adapter to allow the use of ordinary
-// function as UserBoardSubscription mutator.
-type UserBoardSubscriptionFunc func(context.Context, *ent.UserBoardSubscriptionMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f UserBoardSubscriptionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.UserBoardSubscriptionMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UserBoardSubscriptionMutation", m)
-}
-
 // The UserCommentLikeFunc type is an adapter to allow the use of ordinary
 // function as UserCommentLike mutator.
 type UserCommentLikeFunc func(context.Context, *ent.UserCommentLikeMutation) (ent.Value, error)

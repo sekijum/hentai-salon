@@ -10,127 +10,127 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
-// UserId applies equality check predicate on the "userId" field. It's identical to UserIdEQ.
-func UserId(v int) predicate.UserCommentSubscription {
-	return predicate.UserCommentSubscription(sql.FieldEQ(FieldUserId, v))
+// UserID applies equality check predicate on the "user_id" field. It's identical to UserIDEQ.
+func UserID(v int) predicate.UserCommentSubscription {
+	return predicate.UserCommentSubscription(sql.FieldEQ(FieldUserID, v))
 }
 
-// CommentId applies equality check predicate on the "commentId" field. It's identical to CommentIdEQ.
-func CommentId(v int) predicate.UserCommentSubscription {
-	return predicate.UserCommentSubscription(sql.FieldEQ(FieldCommentId, v))
+// CommentID applies equality check predicate on the "comment_id" field. It's identical to CommentIDEQ.
+func CommentID(v int) predicate.UserCommentSubscription {
+	return predicate.UserCommentSubscription(sql.FieldEQ(FieldCommentID, v))
 }
 
-// IsNotified applies equality check predicate on the "isNotified" field. It's identical to IsNotifiedEQ.
+// IsNotified applies equality check predicate on the "is_notified" field. It's identical to IsNotifiedEQ.
 func IsNotified(v bool) predicate.UserCommentSubscription {
 	return predicate.UserCommentSubscription(sql.FieldEQ(FieldIsNotified, v))
 }
 
-// IsChecked applies equality check predicate on the "isChecked" field. It's identical to IsCheckedEQ.
+// IsChecked applies equality check predicate on the "is_checked" field. It's identical to IsCheckedEQ.
 func IsChecked(v bool) predicate.UserCommentSubscription {
 	return predicate.UserCommentSubscription(sql.FieldEQ(FieldIsChecked, v))
 }
 
-// SubscribedAt applies equality check predicate on the "subscribedAt" field. It's identical to SubscribedAtEQ.
+// SubscribedAt applies equality check predicate on the "subscribed_at" field. It's identical to SubscribedAtEQ.
 func SubscribedAt(v time.Time) predicate.UserCommentSubscription {
 	return predicate.UserCommentSubscription(sql.FieldEQ(FieldSubscribedAt, v))
 }
 
-// UserIdEQ applies the EQ predicate on the "userId" field.
-func UserIdEQ(v int) predicate.UserCommentSubscription {
-	return predicate.UserCommentSubscription(sql.FieldEQ(FieldUserId, v))
+// UserIDEQ applies the EQ predicate on the "user_id" field.
+func UserIDEQ(v int) predicate.UserCommentSubscription {
+	return predicate.UserCommentSubscription(sql.FieldEQ(FieldUserID, v))
 }
 
-// UserIdNEQ applies the NEQ predicate on the "userId" field.
-func UserIdNEQ(v int) predicate.UserCommentSubscription {
-	return predicate.UserCommentSubscription(sql.FieldNEQ(FieldUserId, v))
+// UserIDNEQ applies the NEQ predicate on the "user_id" field.
+func UserIDNEQ(v int) predicate.UserCommentSubscription {
+	return predicate.UserCommentSubscription(sql.FieldNEQ(FieldUserID, v))
 }
 
-// UserIdIn applies the In predicate on the "userId" field.
-func UserIdIn(vs ...int) predicate.UserCommentSubscription {
-	return predicate.UserCommentSubscription(sql.FieldIn(FieldUserId, vs...))
+// UserIDIn applies the In predicate on the "user_id" field.
+func UserIDIn(vs ...int) predicate.UserCommentSubscription {
+	return predicate.UserCommentSubscription(sql.FieldIn(FieldUserID, vs...))
 }
 
-// UserIdNotIn applies the NotIn predicate on the "userId" field.
-func UserIdNotIn(vs ...int) predicate.UserCommentSubscription {
-	return predicate.UserCommentSubscription(sql.FieldNotIn(FieldUserId, vs...))
+// UserIDNotIn applies the NotIn predicate on the "user_id" field.
+func UserIDNotIn(vs ...int) predicate.UserCommentSubscription {
+	return predicate.UserCommentSubscription(sql.FieldNotIn(FieldUserID, vs...))
 }
 
-// CommentIdEQ applies the EQ predicate on the "commentId" field.
-func CommentIdEQ(v int) predicate.UserCommentSubscription {
-	return predicate.UserCommentSubscription(sql.FieldEQ(FieldCommentId, v))
+// CommentIDEQ applies the EQ predicate on the "comment_id" field.
+func CommentIDEQ(v int) predicate.UserCommentSubscription {
+	return predicate.UserCommentSubscription(sql.FieldEQ(FieldCommentID, v))
 }
 
-// CommentIdNEQ applies the NEQ predicate on the "commentId" field.
-func CommentIdNEQ(v int) predicate.UserCommentSubscription {
-	return predicate.UserCommentSubscription(sql.FieldNEQ(FieldCommentId, v))
+// CommentIDNEQ applies the NEQ predicate on the "comment_id" field.
+func CommentIDNEQ(v int) predicate.UserCommentSubscription {
+	return predicate.UserCommentSubscription(sql.FieldNEQ(FieldCommentID, v))
 }
 
-// CommentIdIn applies the In predicate on the "commentId" field.
-func CommentIdIn(vs ...int) predicate.UserCommentSubscription {
-	return predicate.UserCommentSubscription(sql.FieldIn(FieldCommentId, vs...))
+// CommentIDIn applies the In predicate on the "comment_id" field.
+func CommentIDIn(vs ...int) predicate.UserCommentSubscription {
+	return predicate.UserCommentSubscription(sql.FieldIn(FieldCommentID, vs...))
 }
 
-// CommentIdNotIn applies the NotIn predicate on the "commentId" field.
-func CommentIdNotIn(vs ...int) predicate.UserCommentSubscription {
-	return predicate.UserCommentSubscription(sql.FieldNotIn(FieldCommentId, vs...))
+// CommentIDNotIn applies the NotIn predicate on the "comment_id" field.
+func CommentIDNotIn(vs ...int) predicate.UserCommentSubscription {
+	return predicate.UserCommentSubscription(sql.FieldNotIn(FieldCommentID, vs...))
 }
 
-// IsNotifiedEQ applies the EQ predicate on the "isNotified" field.
+// IsNotifiedEQ applies the EQ predicate on the "is_notified" field.
 func IsNotifiedEQ(v bool) predicate.UserCommentSubscription {
 	return predicate.UserCommentSubscription(sql.FieldEQ(FieldIsNotified, v))
 }
 
-// IsNotifiedNEQ applies the NEQ predicate on the "isNotified" field.
+// IsNotifiedNEQ applies the NEQ predicate on the "is_notified" field.
 func IsNotifiedNEQ(v bool) predicate.UserCommentSubscription {
 	return predicate.UserCommentSubscription(sql.FieldNEQ(FieldIsNotified, v))
 }
 
-// IsCheckedEQ applies the EQ predicate on the "isChecked" field.
+// IsCheckedEQ applies the EQ predicate on the "is_checked" field.
 func IsCheckedEQ(v bool) predicate.UserCommentSubscription {
 	return predicate.UserCommentSubscription(sql.FieldEQ(FieldIsChecked, v))
 }
 
-// IsCheckedNEQ applies the NEQ predicate on the "isChecked" field.
+// IsCheckedNEQ applies the NEQ predicate on the "is_checked" field.
 func IsCheckedNEQ(v bool) predicate.UserCommentSubscription {
 	return predicate.UserCommentSubscription(sql.FieldNEQ(FieldIsChecked, v))
 }
 
-// SubscribedAtEQ applies the EQ predicate on the "subscribedAt" field.
+// SubscribedAtEQ applies the EQ predicate on the "subscribed_at" field.
 func SubscribedAtEQ(v time.Time) predicate.UserCommentSubscription {
 	return predicate.UserCommentSubscription(sql.FieldEQ(FieldSubscribedAt, v))
 }
 
-// SubscribedAtNEQ applies the NEQ predicate on the "subscribedAt" field.
+// SubscribedAtNEQ applies the NEQ predicate on the "subscribed_at" field.
 func SubscribedAtNEQ(v time.Time) predicate.UserCommentSubscription {
 	return predicate.UserCommentSubscription(sql.FieldNEQ(FieldSubscribedAt, v))
 }
 
-// SubscribedAtIn applies the In predicate on the "subscribedAt" field.
+// SubscribedAtIn applies the In predicate on the "subscribed_at" field.
 func SubscribedAtIn(vs ...time.Time) predicate.UserCommentSubscription {
 	return predicate.UserCommentSubscription(sql.FieldIn(FieldSubscribedAt, vs...))
 }
 
-// SubscribedAtNotIn applies the NotIn predicate on the "subscribedAt" field.
+// SubscribedAtNotIn applies the NotIn predicate on the "subscribed_at" field.
 func SubscribedAtNotIn(vs ...time.Time) predicate.UserCommentSubscription {
 	return predicate.UserCommentSubscription(sql.FieldNotIn(FieldSubscribedAt, vs...))
 }
 
-// SubscribedAtGT applies the GT predicate on the "subscribedAt" field.
+// SubscribedAtGT applies the GT predicate on the "subscribed_at" field.
 func SubscribedAtGT(v time.Time) predicate.UserCommentSubscription {
 	return predicate.UserCommentSubscription(sql.FieldGT(FieldSubscribedAt, v))
 }
 
-// SubscribedAtGTE applies the GTE predicate on the "subscribedAt" field.
+// SubscribedAtGTE applies the GTE predicate on the "subscribed_at" field.
 func SubscribedAtGTE(v time.Time) predicate.UserCommentSubscription {
 	return predicate.UserCommentSubscription(sql.FieldGTE(FieldSubscribedAt, v))
 }
 
-// SubscribedAtLT applies the LT predicate on the "subscribedAt" field.
+// SubscribedAtLT applies the LT predicate on the "subscribed_at" field.
 func SubscribedAtLT(v time.Time) predicate.UserCommentSubscription {
 	return predicate.UserCommentSubscription(sql.FieldLT(FieldSubscribedAt, v))
 }
 
-// SubscribedAtLTE applies the LTE predicate on the "subscribedAt" field.
+// SubscribedAtLTE applies the LTE predicate on the "subscribed_at" field.
 func SubscribedAtLTE(v time.Time) predicate.UserCommentSubscription {
 	return predicate.UserCommentSubscription(sql.FieldLTE(FieldSubscribedAt, v))
 }

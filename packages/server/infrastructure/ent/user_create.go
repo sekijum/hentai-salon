@@ -41,16 +41,16 @@ func (uc *UserCreate) SetPassword(s string) *UserCreate {
 	return uc
 }
 
-// SetAvatarUrl sets the "avatarUrl" field.
-func (uc *UserCreate) SetAvatarUrl(s string) *UserCreate {
-	uc.mutation.SetAvatarUrl(s)
+// SetAvatarURL sets the "avatar_url" field.
+func (uc *UserCreate) SetAvatarURL(s string) *UserCreate {
+	uc.mutation.SetAvatarURL(s)
 	return uc
 }
 
-// SetNillableAvatarUrl sets the "avatarUrl" field if the given value is not nil.
-func (uc *UserCreate) SetNillableAvatarUrl(s *string) *UserCreate {
+// SetNillableAvatarURL sets the "avatar_url" field if the given value is not nil.
+func (uc *UserCreate) SetNillableAvatarURL(s *string) *UserCreate {
 	if s != nil {
-		uc.SetAvatarUrl(*s)
+		uc.SetAvatarURL(*s)
 	}
 	return uc
 }
@@ -83,13 +83,13 @@ func (uc *UserCreate) SetNillableRole(i *int) *UserCreate {
 	return uc
 }
 
-// SetCreatedAt sets the "createdAt" field.
+// SetCreatedAt sets the "created_at" field.
 func (uc *UserCreate) SetCreatedAt(t time.Time) *UserCreate {
 	uc.mutation.SetCreatedAt(t)
 	return uc
 }
 
-// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
 func (uc *UserCreate) SetNillableCreatedAt(t *time.Time) *UserCreate {
 	if t != nil {
 		uc.SetCreatedAt(*t)
@@ -97,13 +97,13 @@ func (uc *UserCreate) SetNillableCreatedAt(t *time.Time) *UserCreate {
 	return uc
 }
 
-// SetUpdatedAt sets the "updatedAt" field.
+// SetUpdatedAt sets the "updated_at" field.
 func (uc *UserCreate) SetUpdatedAt(t time.Time) *UserCreate {
 	uc.mutation.SetUpdatedAt(t)
 	return uc
 }
 
-// SetNillableUpdatedAt sets the "updatedAt" field if the given value is not nil.
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
 func (uc *UserCreate) SetNillableUpdatedAt(t *time.Time) *UserCreate {
 	if t != nil {
 		uc.SetUpdatedAt(*t)
@@ -162,21 +162,6 @@ func (uc *UserCreate) AddComments(t ...*ThreadComment) *UserCreate {
 	return uc.AddCommentIDs(ids...)
 }
 
-// AddLikedBoardIDs adds the "liked_boards" edge to the Board entity by IDs.
-func (uc *UserCreate) AddLikedBoardIDs(ids ...int) *UserCreate {
-	uc.mutation.AddLikedBoardIDs(ids...)
-	return uc
-}
-
-// AddLikedBoards adds the "liked_boards" edges to the Board entity.
-func (uc *UserCreate) AddLikedBoards(b ...*Board) *UserCreate {
-	ids := make([]int, len(b))
-	for i := range b {
-		ids[i] = b[i].ID
-	}
-	return uc.AddLikedBoardIDs(ids...)
-}
-
 // AddLikedThreadIDs adds the "liked_threads" edge to the Thread entity by IDs.
 func (uc *UserCreate) AddLikedThreadIDs(ids ...int) *UserCreate {
 	uc.mutation.AddLikedThreadIDs(ids...)
@@ -205,21 +190,6 @@ func (uc *UserCreate) AddLikedComments(t ...*ThreadComment) *UserCreate {
 		ids[i] = t[i].ID
 	}
 	return uc.AddLikedCommentIDs(ids...)
-}
-
-// AddSubscribedBoardIDs adds the "subscribed_boards" edge to the Board entity by IDs.
-func (uc *UserCreate) AddSubscribedBoardIDs(ids ...int) *UserCreate {
-	uc.mutation.AddSubscribedBoardIDs(ids...)
-	return uc
-}
-
-// AddSubscribedBoards adds the "subscribed_boards" edges to the Board entity.
-func (uc *UserCreate) AddSubscribedBoards(b ...*Board) *UserCreate {
-	ids := make([]int, len(b))
-	for i := range b {
-		ids[i] = b[i].ID
-	}
-	return uc.AddSubscribedBoardIDs(ids...)
 }
 
 // AddSubscribedThreadIDs adds the "subscribed_threads" edge to the Thread entity by IDs.
@@ -333,10 +303,10 @@ func (uc *UserCreate) check() error {
 		return &ValidationError{Name: "role", err: errors.New(`ent: missing required field "User.role"`)}
 	}
 	if _, ok := uc.mutation.CreatedAt(); !ok {
-		return &ValidationError{Name: "createdAt", err: errors.New(`ent: missing required field "User.createdAt"`)}
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "User.created_at"`)}
 	}
 	if _, ok := uc.mutation.UpdatedAt(); !ok {
-		return &ValidationError{Name: "updatedAt", err: errors.New(`ent: missing required field "User.updatedAt"`)}
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "User.updated_at"`)}
 	}
 	return nil
 }
@@ -382,9 +352,9 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_spec.SetField(user.FieldPassword, field.TypeString, value)
 		_node.Password = value
 	}
-	if value, ok := uc.mutation.AvatarUrl(); ok {
-		_spec.SetField(user.FieldAvatarUrl, field.TypeString, value)
-		_node.AvatarUrl = value
+	if value, ok := uc.mutation.AvatarURL(); ok {
+		_spec.SetField(user.FieldAvatarURL, field.TypeString, value)
+		_node.AvatarURL = &value
 	}
 	if value, ok := uc.mutation.Status(); ok {
 		_spec.SetField(user.FieldStatus, field.TypeInt, value)
@@ -450,26 +420,6 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := uc.mutation.LikedBoardsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   user.LikedBoardsTable,
-			Columns: user.LikedBoardsPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(board.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		createE := &UserBoardLikeCreate{config: uc.config, mutation: newUserBoardLikeMutation(uc.config, OpCreate)}
-		createE.defaults()
-		_, specE := createE.createSpec()
-		edge.Target.Fields = specE.Fields
-		_spec.Edges = append(_spec.Edges, edge)
-	}
 	if nodes := uc.mutation.LikedThreadsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -505,26 +455,6 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		createE := &UserCommentLikeCreate{config: uc.config, mutation: newUserCommentLikeMutation(uc.config, OpCreate)}
-		createE.defaults()
-		_, specE := createE.createSpec()
-		edge.Target.Fields = specE.Fields
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := uc.mutation.SubscribedBoardsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   user.SubscribedBoardsTable,
-			Columns: user.SubscribedBoardsPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(board.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		createE := &UserBoardSubscriptionCreate{config: uc.config, mutation: newUserBoardSubscriptionMutation(uc.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields

@@ -297,12 +297,12 @@ func (tcaq *ThreadCommentAttachmentQuery) WithComment(opts ...func(*ThreadCommen
 // Example:
 //
 //	var v []struct {
-//		CommentId int `json:"commentId,omitempty"`
+//		CommentID int `json:"comment_id,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.ThreadCommentAttachment.Query().
-//		GroupBy(threadcommentattachment.FieldCommentId).
+//		GroupBy(threadcommentattachment.FieldCommentID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (tcaq *ThreadCommentAttachmentQuery) GroupBy(field string, fields ...string) *ThreadCommentAttachmentGroupBy {
@@ -320,11 +320,11 @@ func (tcaq *ThreadCommentAttachmentQuery) GroupBy(field string, fields ...string
 // Example:
 //
 //	var v []struct {
-//		CommentId int `json:"commentId,omitempty"`
+//		CommentID int `json:"comment_id,omitempty"`
 //	}
 //
 //	client.ThreadCommentAttachment.Query().
-//		Select(threadcommentattachment.FieldCommentId).
+//		Select(threadcommentattachment.FieldCommentID).
 //		Scan(ctx, &v)
 func (tcaq *ThreadCommentAttachmentQuery) Select(fields ...string) *ThreadCommentAttachmentSelect {
 	tcaq.ctx.Fields = append(tcaq.ctx.Fields, fields...)
@@ -404,7 +404,7 @@ func (tcaq *ThreadCommentAttachmentQuery) loadComment(ctx context.Context, query
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*ThreadCommentAttachment)
 	for i := range nodes {
-		fk := nodes[i].CommentId
+		fk := nodes[i].CommentID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -421,7 +421,7 @@ func (tcaq *ThreadCommentAttachmentQuery) loadComment(ctx context.Context, query
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "commentId" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "comment_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -456,7 +456,7 @@ func (tcaq *ThreadCommentAttachmentQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 		if tcaq.withComment != nil {
-			_spec.Node.AddColumnOnce(threadcommentattachment.FieldCommentId)
+			_spec.Node.AddColumnOnce(threadcommentattachment.FieldCommentID)
 		}
 	}
 	if ps := tcaq.predicates; len(ps) > 0 {

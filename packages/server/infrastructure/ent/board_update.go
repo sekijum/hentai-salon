@@ -30,16 +30,16 @@ func (bu *BoardUpdate) Where(ps ...predicate.Board) *BoardUpdate {
 	return bu
 }
 
-// SetUserId sets the "userId" field.
-func (bu *BoardUpdate) SetUserId(i int) *BoardUpdate {
-	bu.mutation.SetUserId(i)
+// SetUserID sets the "user_id" field.
+func (bu *BoardUpdate) SetUserID(i int) *BoardUpdate {
+	bu.mutation.SetUserID(i)
 	return bu
 }
 
-// SetNillableUserId sets the "userId" field if the given value is not nil.
-func (bu *BoardUpdate) SetNillableUserId(i *int) *BoardUpdate {
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (bu *BoardUpdate) SetNillableUserID(i *int) *BoardUpdate {
 	if i != nil {
-		bu.SetUserId(*i)
+		bu.SetUserID(*i)
 	}
 	return bu
 }
@@ -78,23 +78,23 @@ func (bu *BoardUpdate) ClearDescription() *BoardUpdate {
 	return bu
 }
 
-// SetThumbnailUrl sets the "thumbnailUrl" field.
-func (bu *BoardUpdate) SetThumbnailUrl(s string) *BoardUpdate {
-	bu.mutation.SetThumbnailUrl(s)
+// SetThumbnailURL sets the "thumbnail_url" field.
+func (bu *BoardUpdate) SetThumbnailURL(s string) *BoardUpdate {
+	bu.mutation.SetThumbnailURL(s)
 	return bu
 }
 
-// SetNillableThumbnailUrl sets the "thumbnailUrl" field if the given value is not nil.
-func (bu *BoardUpdate) SetNillableThumbnailUrl(s *string) *BoardUpdate {
+// SetNillableThumbnailURL sets the "thumbnail_url" field if the given value is not nil.
+func (bu *BoardUpdate) SetNillableThumbnailURL(s *string) *BoardUpdate {
 	if s != nil {
-		bu.SetThumbnailUrl(*s)
+		bu.SetThumbnailURL(*s)
 	}
 	return bu
 }
 
-// ClearThumbnailUrl clears the value of the "thumbnailUrl" field.
-func (bu *BoardUpdate) ClearThumbnailUrl() *BoardUpdate {
-	bu.mutation.ClearThumbnailUrl()
+// ClearThumbnailURL clears the value of the "thumbnail_url" field.
+func (bu *BoardUpdate) ClearThumbnailURL() *BoardUpdate {
+	bu.mutation.ClearThumbnailURL()
 	return bu
 }
 
@@ -119,13 +119,13 @@ func (bu *BoardUpdate) AddStatus(i int) *BoardUpdate {
 	return bu
 }
 
-// SetCreatedAt sets the "createdAt" field.
+// SetCreatedAt sets the "created_at" field.
 func (bu *BoardUpdate) SetCreatedAt(t time.Time) *BoardUpdate {
 	bu.mutation.SetCreatedAt(t)
 	return bu
 }
 
-// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
 func (bu *BoardUpdate) SetNillableCreatedAt(t *time.Time) *BoardUpdate {
 	if t != nil {
 		bu.SetCreatedAt(*t)
@@ -133,40 +133,10 @@ func (bu *BoardUpdate) SetNillableCreatedAt(t *time.Time) *BoardUpdate {
 	return bu
 }
 
-// SetUpdatedAt sets the "updatedAt" field.
+// SetUpdatedAt sets the "updated_at" field.
 func (bu *BoardUpdate) SetUpdatedAt(t time.Time) *BoardUpdate {
 	bu.mutation.SetUpdatedAt(t)
 	return bu
-}
-
-// AddLikedUserIDs adds the "liked_users" edge to the User entity by IDs.
-func (bu *BoardUpdate) AddLikedUserIDs(ids ...int) *BoardUpdate {
-	bu.mutation.AddLikedUserIDs(ids...)
-	return bu
-}
-
-// AddLikedUsers adds the "liked_users" edges to the User entity.
-func (bu *BoardUpdate) AddLikedUsers(u ...*User) *BoardUpdate {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
-	}
-	return bu.AddLikedUserIDs(ids...)
-}
-
-// AddSubscribedUserIDs adds the "subscribed_users" edge to the User entity by IDs.
-func (bu *BoardUpdate) AddSubscribedUserIDs(ids ...int) *BoardUpdate {
-	bu.mutation.AddSubscribedUserIDs(ids...)
-	return bu
-}
-
-// AddSubscribedUsers adds the "subscribed_users" edges to the User entity.
-func (bu *BoardUpdate) AddSubscribedUsers(u ...*User) *BoardUpdate {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
-	}
-	return bu.AddSubscribedUserIDs(ids...)
 }
 
 // SetOwnerID sets the "owner" edge to the User entity by ID.
@@ -198,48 +168,6 @@ func (bu *BoardUpdate) AddThreads(t ...*Thread) *BoardUpdate {
 // Mutation returns the BoardMutation object of the builder.
 func (bu *BoardUpdate) Mutation() *BoardMutation {
 	return bu.mutation
-}
-
-// ClearLikedUsers clears all "liked_users" edges to the User entity.
-func (bu *BoardUpdate) ClearLikedUsers() *BoardUpdate {
-	bu.mutation.ClearLikedUsers()
-	return bu
-}
-
-// RemoveLikedUserIDs removes the "liked_users" edge to User entities by IDs.
-func (bu *BoardUpdate) RemoveLikedUserIDs(ids ...int) *BoardUpdate {
-	bu.mutation.RemoveLikedUserIDs(ids...)
-	return bu
-}
-
-// RemoveLikedUsers removes "liked_users" edges to User entities.
-func (bu *BoardUpdate) RemoveLikedUsers(u ...*User) *BoardUpdate {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
-	}
-	return bu.RemoveLikedUserIDs(ids...)
-}
-
-// ClearSubscribedUsers clears all "subscribed_users" edges to the User entity.
-func (bu *BoardUpdate) ClearSubscribedUsers() *BoardUpdate {
-	bu.mutation.ClearSubscribedUsers()
-	return bu
-}
-
-// RemoveSubscribedUserIDs removes the "subscribed_users" edge to User entities by IDs.
-func (bu *BoardUpdate) RemoveSubscribedUserIDs(ids ...int) *BoardUpdate {
-	bu.mutation.RemoveSubscribedUserIDs(ids...)
-	return bu
-}
-
-// RemoveSubscribedUsers removes "subscribed_users" edges to User entities.
-func (bu *BoardUpdate) RemoveSubscribedUsers(u ...*User) *BoardUpdate {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
-	}
-	return bu.RemoveSubscribedUserIDs(ids...)
 }
 
 // ClearOwner clears the "owner" edge to the User entity.
@@ -344,11 +272,11 @@ func (bu *BoardUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if bu.mutation.DescriptionCleared() {
 		_spec.ClearField(board.FieldDescription, field.TypeString)
 	}
-	if value, ok := bu.mutation.ThumbnailUrl(); ok {
-		_spec.SetField(board.FieldThumbnailUrl, field.TypeString, value)
+	if value, ok := bu.mutation.ThumbnailURL(); ok {
+		_spec.SetField(board.FieldThumbnailURL, field.TypeString, value)
 	}
-	if bu.mutation.ThumbnailUrlCleared() {
-		_spec.ClearField(board.FieldThumbnailUrl, field.TypeString)
+	if bu.mutation.ThumbnailURLCleared() {
+		_spec.ClearField(board.FieldThumbnailURL, field.TypeString)
 	}
 	if value, ok := bu.mutation.Status(); ok {
 		_spec.SetField(board.FieldStatus, field.TypeInt, value)
@@ -361,120 +289,6 @@ func (bu *BoardUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := bu.mutation.UpdatedAt(); ok {
 		_spec.SetField(board.FieldUpdatedAt, field.TypeTime, value)
-	}
-	if bu.mutation.LikedUsersCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   board.LikedUsersTable,
-			Columns: board.LikedUsersPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
-			},
-		}
-		createE := &UserBoardSubscriptionCreate{config: bu.config, mutation: newUserBoardSubscriptionMutation(bu.config, OpCreate)}
-		createE.defaults()
-		_, specE := createE.createSpec()
-		edge.Target.Fields = specE.Fields
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := bu.mutation.RemovedLikedUsersIDs(); len(nodes) > 0 && !bu.mutation.LikedUsersCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   board.LikedUsersTable,
-			Columns: board.LikedUsersPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		createE := &UserBoardSubscriptionCreate{config: bu.config, mutation: newUserBoardSubscriptionMutation(bu.config, OpCreate)}
-		createE.defaults()
-		_, specE := createE.createSpec()
-		edge.Target.Fields = specE.Fields
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := bu.mutation.LikedUsersIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   board.LikedUsersTable,
-			Columns: board.LikedUsersPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		createE := &UserBoardSubscriptionCreate{config: bu.config, mutation: newUserBoardSubscriptionMutation(bu.config, OpCreate)}
-		createE.defaults()
-		_, specE := createE.createSpec()
-		edge.Target.Fields = specE.Fields
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if bu.mutation.SubscribedUsersCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   board.SubscribedUsersTable,
-			Columns: board.SubscribedUsersPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
-			},
-		}
-		createE := &UserBoardLikeCreate{config: bu.config, mutation: newUserBoardLikeMutation(bu.config, OpCreate)}
-		createE.defaults()
-		_, specE := createE.createSpec()
-		edge.Target.Fields = specE.Fields
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := bu.mutation.RemovedSubscribedUsersIDs(); len(nodes) > 0 && !bu.mutation.SubscribedUsersCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   board.SubscribedUsersTable,
-			Columns: board.SubscribedUsersPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		createE := &UserBoardLikeCreate{config: bu.config, mutation: newUserBoardLikeMutation(bu.config, OpCreate)}
-		createE.defaults()
-		_, specE := createE.createSpec()
-		edge.Target.Fields = specE.Fields
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := bu.mutation.SubscribedUsersIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   board.SubscribedUsersTable,
-			Columns: board.SubscribedUsersPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		createE := &UserBoardLikeCreate{config: bu.config, mutation: newUserBoardLikeMutation(bu.config, OpCreate)}
-		createE.defaults()
-		_, specE := createE.createSpec()
-		edge.Target.Fields = specE.Fields
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if bu.mutation.OwnerCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -570,16 +384,16 @@ type BoardUpdateOne struct {
 	mutation *BoardMutation
 }
 
-// SetUserId sets the "userId" field.
-func (buo *BoardUpdateOne) SetUserId(i int) *BoardUpdateOne {
-	buo.mutation.SetUserId(i)
+// SetUserID sets the "user_id" field.
+func (buo *BoardUpdateOne) SetUserID(i int) *BoardUpdateOne {
+	buo.mutation.SetUserID(i)
 	return buo
 }
 
-// SetNillableUserId sets the "userId" field if the given value is not nil.
-func (buo *BoardUpdateOne) SetNillableUserId(i *int) *BoardUpdateOne {
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (buo *BoardUpdateOne) SetNillableUserID(i *int) *BoardUpdateOne {
 	if i != nil {
-		buo.SetUserId(*i)
+		buo.SetUserID(*i)
 	}
 	return buo
 }
@@ -618,23 +432,23 @@ func (buo *BoardUpdateOne) ClearDescription() *BoardUpdateOne {
 	return buo
 }
 
-// SetThumbnailUrl sets the "thumbnailUrl" field.
-func (buo *BoardUpdateOne) SetThumbnailUrl(s string) *BoardUpdateOne {
-	buo.mutation.SetThumbnailUrl(s)
+// SetThumbnailURL sets the "thumbnail_url" field.
+func (buo *BoardUpdateOne) SetThumbnailURL(s string) *BoardUpdateOne {
+	buo.mutation.SetThumbnailURL(s)
 	return buo
 }
 
-// SetNillableThumbnailUrl sets the "thumbnailUrl" field if the given value is not nil.
-func (buo *BoardUpdateOne) SetNillableThumbnailUrl(s *string) *BoardUpdateOne {
+// SetNillableThumbnailURL sets the "thumbnail_url" field if the given value is not nil.
+func (buo *BoardUpdateOne) SetNillableThumbnailURL(s *string) *BoardUpdateOne {
 	if s != nil {
-		buo.SetThumbnailUrl(*s)
+		buo.SetThumbnailURL(*s)
 	}
 	return buo
 }
 
-// ClearThumbnailUrl clears the value of the "thumbnailUrl" field.
-func (buo *BoardUpdateOne) ClearThumbnailUrl() *BoardUpdateOne {
-	buo.mutation.ClearThumbnailUrl()
+// ClearThumbnailURL clears the value of the "thumbnail_url" field.
+func (buo *BoardUpdateOne) ClearThumbnailURL() *BoardUpdateOne {
+	buo.mutation.ClearThumbnailURL()
 	return buo
 }
 
@@ -659,13 +473,13 @@ func (buo *BoardUpdateOne) AddStatus(i int) *BoardUpdateOne {
 	return buo
 }
 
-// SetCreatedAt sets the "createdAt" field.
+// SetCreatedAt sets the "created_at" field.
 func (buo *BoardUpdateOne) SetCreatedAt(t time.Time) *BoardUpdateOne {
 	buo.mutation.SetCreatedAt(t)
 	return buo
 }
 
-// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
 func (buo *BoardUpdateOne) SetNillableCreatedAt(t *time.Time) *BoardUpdateOne {
 	if t != nil {
 		buo.SetCreatedAt(*t)
@@ -673,40 +487,10 @@ func (buo *BoardUpdateOne) SetNillableCreatedAt(t *time.Time) *BoardUpdateOne {
 	return buo
 }
 
-// SetUpdatedAt sets the "updatedAt" field.
+// SetUpdatedAt sets the "updated_at" field.
 func (buo *BoardUpdateOne) SetUpdatedAt(t time.Time) *BoardUpdateOne {
 	buo.mutation.SetUpdatedAt(t)
 	return buo
-}
-
-// AddLikedUserIDs adds the "liked_users" edge to the User entity by IDs.
-func (buo *BoardUpdateOne) AddLikedUserIDs(ids ...int) *BoardUpdateOne {
-	buo.mutation.AddLikedUserIDs(ids...)
-	return buo
-}
-
-// AddLikedUsers adds the "liked_users" edges to the User entity.
-func (buo *BoardUpdateOne) AddLikedUsers(u ...*User) *BoardUpdateOne {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
-	}
-	return buo.AddLikedUserIDs(ids...)
-}
-
-// AddSubscribedUserIDs adds the "subscribed_users" edge to the User entity by IDs.
-func (buo *BoardUpdateOne) AddSubscribedUserIDs(ids ...int) *BoardUpdateOne {
-	buo.mutation.AddSubscribedUserIDs(ids...)
-	return buo
-}
-
-// AddSubscribedUsers adds the "subscribed_users" edges to the User entity.
-func (buo *BoardUpdateOne) AddSubscribedUsers(u ...*User) *BoardUpdateOne {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
-	}
-	return buo.AddSubscribedUserIDs(ids...)
 }
 
 // SetOwnerID sets the "owner" edge to the User entity by ID.
@@ -738,48 +522,6 @@ func (buo *BoardUpdateOne) AddThreads(t ...*Thread) *BoardUpdateOne {
 // Mutation returns the BoardMutation object of the builder.
 func (buo *BoardUpdateOne) Mutation() *BoardMutation {
 	return buo.mutation
-}
-
-// ClearLikedUsers clears all "liked_users" edges to the User entity.
-func (buo *BoardUpdateOne) ClearLikedUsers() *BoardUpdateOne {
-	buo.mutation.ClearLikedUsers()
-	return buo
-}
-
-// RemoveLikedUserIDs removes the "liked_users" edge to User entities by IDs.
-func (buo *BoardUpdateOne) RemoveLikedUserIDs(ids ...int) *BoardUpdateOne {
-	buo.mutation.RemoveLikedUserIDs(ids...)
-	return buo
-}
-
-// RemoveLikedUsers removes "liked_users" edges to User entities.
-func (buo *BoardUpdateOne) RemoveLikedUsers(u ...*User) *BoardUpdateOne {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
-	}
-	return buo.RemoveLikedUserIDs(ids...)
-}
-
-// ClearSubscribedUsers clears all "subscribed_users" edges to the User entity.
-func (buo *BoardUpdateOne) ClearSubscribedUsers() *BoardUpdateOne {
-	buo.mutation.ClearSubscribedUsers()
-	return buo
-}
-
-// RemoveSubscribedUserIDs removes the "subscribed_users" edge to User entities by IDs.
-func (buo *BoardUpdateOne) RemoveSubscribedUserIDs(ids ...int) *BoardUpdateOne {
-	buo.mutation.RemoveSubscribedUserIDs(ids...)
-	return buo
-}
-
-// RemoveSubscribedUsers removes "subscribed_users" edges to User entities.
-func (buo *BoardUpdateOne) RemoveSubscribedUsers(u ...*User) *BoardUpdateOne {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
-	}
-	return buo.RemoveSubscribedUserIDs(ids...)
 }
 
 // ClearOwner clears the "owner" edge to the User entity.
@@ -914,11 +656,11 @@ func (buo *BoardUpdateOne) sqlSave(ctx context.Context) (_node *Board, err error
 	if buo.mutation.DescriptionCleared() {
 		_spec.ClearField(board.FieldDescription, field.TypeString)
 	}
-	if value, ok := buo.mutation.ThumbnailUrl(); ok {
-		_spec.SetField(board.FieldThumbnailUrl, field.TypeString, value)
+	if value, ok := buo.mutation.ThumbnailURL(); ok {
+		_spec.SetField(board.FieldThumbnailURL, field.TypeString, value)
 	}
-	if buo.mutation.ThumbnailUrlCleared() {
-		_spec.ClearField(board.FieldThumbnailUrl, field.TypeString)
+	if buo.mutation.ThumbnailURLCleared() {
+		_spec.ClearField(board.FieldThumbnailURL, field.TypeString)
 	}
 	if value, ok := buo.mutation.Status(); ok {
 		_spec.SetField(board.FieldStatus, field.TypeInt, value)
@@ -931,120 +673,6 @@ func (buo *BoardUpdateOne) sqlSave(ctx context.Context) (_node *Board, err error
 	}
 	if value, ok := buo.mutation.UpdatedAt(); ok {
 		_spec.SetField(board.FieldUpdatedAt, field.TypeTime, value)
-	}
-	if buo.mutation.LikedUsersCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   board.LikedUsersTable,
-			Columns: board.LikedUsersPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
-			},
-		}
-		createE := &UserBoardSubscriptionCreate{config: buo.config, mutation: newUserBoardSubscriptionMutation(buo.config, OpCreate)}
-		createE.defaults()
-		_, specE := createE.createSpec()
-		edge.Target.Fields = specE.Fields
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := buo.mutation.RemovedLikedUsersIDs(); len(nodes) > 0 && !buo.mutation.LikedUsersCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   board.LikedUsersTable,
-			Columns: board.LikedUsersPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		createE := &UserBoardSubscriptionCreate{config: buo.config, mutation: newUserBoardSubscriptionMutation(buo.config, OpCreate)}
-		createE.defaults()
-		_, specE := createE.createSpec()
-		edge.Target.Fields = specE.Fields
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := buo.mutation.LikedUsersIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   board.LikedUsersTable,
-			Columns: board.LikedUsersPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		createE := &UserBoardSubscriptionCreate{config: buo.config, mutation: newUserBoardSubscriptionMutation(buo.config, OpCreate)}
-		createE.defaults()
-		_, specE := createE.createSpec()
-		edge.Target.Fields = specE.Fields
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if buo.mutation.SubscribedUsersCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   board.SubscribedUsersTable,
-			Columns: board.SubscribedUsersPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
-			},
-		}
-		createE := &UserBoardLikeCreate{config: buo.config, mutation: newUserBoardLikeMutation(buo.config, OpCreate)}
-		createE.defaults()
-		_, specE := createE.createSpec()
-		edge.Target.Fields = specE.Fields
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := buo.mutation.RemovedSubscribedUsersIDs(); len(nodes) > 0 && !buo.mutation.SubscribedUsersCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   board.SubscribedUsersTable,
-			Columns: board.SubscribedUsersPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		createE := &UserBoardLikeCreate{config: buo.config, mutation: newUserBoardLikeMutation(buo.config, OpCreate)}
-		createE.defaults()
-		_, specE := createE.createSpec()
-		edge.Target.Fields = specE.Fields
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := buo.mutation.SubscribedUsersIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   board.SubscribedUsersTable,
-			Columns: board.SubscribedUsersPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		createE := &UserBoardLikeCreate{config: buo.config, mutation: newUserBoardLikeMutation(buo.config, OpCreate)}
-		createE.defaults()
-		_, specE := createE.createSpec()
-		edge.Target.Fields = specE.Fields
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if buo.mutation.OwnerCleared() {
 		edge := &sqlgraph.EdgeSpec{

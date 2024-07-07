@@ -11,8 +11,6 @@ import (
 	"server/infrastructure/ent/predicate"
 	"server/infrastructure/ent/thread"
 	"server/infrastructure/ent/user"
-	"server/infrastructure/ent/userboardlike"
-	"server/infrastructure/ent/userboardsubscription"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -22,16 +20,12 @@ import (
 // BoardQuery is the builder for querying Board entities.
 type BoardQuery struct {
 	config
-	ctx                       *QueryContext
-	order                     []board.OrderOption
-	inters                    []Interceptor
-	predicates                []predicate.Board
-	withLikedUsers            *UserQuery
-	withSubscribedUsers       *UserQuery
-	withOwner                 *UserQuery
-	withThreads               *ThreadQuery
-	withUserBoardLike         *UserBoardSubscriptionQuery
-	withUserBoardSubscription *UserBoardLikeQuery
+	ctx         *QueryContext
+	order       []board.OrderOption
+	inters      []Interceptor
+	predicates  []predicate.Board
+	withOwner   *UserQuery
+	withThreads *ThreadQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -66,50 +60,6 @@ func (bq *BoardQuery) Unique(unique bool) *BoardQuery {
 func (bq *BoardQuery) Order(o ...board.OrderOption) *BoardQuery {
 	bq.order = append(bq.order, o...)
 	return bq
-}
-
-// QueryLikedUsers chains the current query on the "liked_users" edge.
-func (bq *BoardQuery) QueryLikedUsers() *UserQuery {
-	query := (&UserClient{config: bq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := bq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := bq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(board.Table, board.FieldID, selector),
-			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, board.LikedUsersTable, board.LikedUsersPrimaryKey...),
-		)
-		fromU = sqlgraph.SetNeighbors(bq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QuerySubscribedUsers chains the current query on the "subscribed_users" edge.
-func (bq *BoardQuery) QuerySubscribedUsers() *UserQuery {
-	query := (&UserClient{config: bq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := bq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := bq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(board.Table, board.FieldID, selector),
-			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, board.SubscribedUsersTable, board.SubscribedUsersPrimaryKey...),
-		)
-		fromU = sqlgraph.SetNeighbors(bq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
 }
 
 // QueryOwner chains the current query on the "owner" edge.
@@ -149,50 +99,6 @@ func (bq *BoardQuery) QueryThreads() *ThreadQuery {
 			sqlgraph.From(board.Table, board.FieldID, selector),
 			sqlgraph.To(thread.Table, thread.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, board.ThreadsTable, board.ThreadsColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(bq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryUserBoardLike chains the current query on the "user_board_like" edge.
-func (bq *BoardQuery) QueryUserBoardLike() *UserBoardSubscriptionQuery {
-	query := (&UserBoardSubscriptionClient{config: bq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := bq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := bq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(board.Table, board.FieldID, selector),
-			sqlgraph.To(userboardsubscription.Table, userboardsubscription.BoardColumn),
-			sqlgraph.Edge(sqlgraph.O2M, true, board.UserBoardLikeTable, board.UserBoardLikeColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(bq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryUserBoardSubscription chains the current query on the "user_board_subscription" edge.
-func (bq *BoardQuery) QueryUserBoardSubscription() *UserBoardLikeQuery {
-	query := (&UserBoardLikeClient{config: bq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := bq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := bq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(board.Table, board.FieldID, selector),
-			sqlgraph.To(userboardlike.Table, userboardlike.BoardColumn),
-			sqlgraph.Edge(sqlgraph.O2M, true, board.UserBoardSubscriptionTable, board.UserBoardSubscriptionColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(bq.driver.Dialect(), step)
 		return fromU, nil
@@ -387,43 +293,17 @@ func (bq *BoardQuery) Clone() *BoardQuery {
 		return nil
 	}
 	return &BoardQuery{
-		config:                    bq.config,
-		ctx:                       bq.ctx.Clone(),
-		order:                     append([]board.OrderOption{}, bq.order...),
-		inters:                    append([]Interceptor{}, bq.inters...),
-		predicates:                append([]predicate.Board{}, bq.predicates...),
-		withLikedUsers:            bq.withLikedUsers.Clone(),
-		withSubscribedUsers:       bq.withSubscribedUsers.Clone(),
-		withOwner:                 bq.withOwner.Clone(),
-		withThreads:               bq.withThreads.Clone(),
-		withUserBoardLike:         bq.withUserBoardLike.Clone(),
-		withUserBoardSubscription: bq.withUserBoardSubscription.Clone(),
+		config:      bq.config,
+		ctx:         bq.ctx.Clone(),
+		order:       append([]board.OrderOption{}, bq.order...),
+		inters:      append([]Interceptor{}, bq.inters...),
+		predicates:  append([]predicate.Board{}, bq.predicates...),
+		withOwner:   bq.withOwner.Clone(),
+		withThreads: bq.withThreads.Clone(),
 		// clone intermediate query.
 		sql:  bq.sql.Clone(),
 		path: bq.path,
 	}
-}
-
-// WithLikedUsers tells the query-builder to eager-load the nodes that are connected to
-// the "liked_users" edge. The optional arguments are used to configure the query builder of the edge.
-func (bq *BoardQuery) WithLikedUsers(opts ...func(*UserQuery)) *BoardQuery {
-	query := (&UserClient{config: bq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	bq.withLikedUsers = query
-	return bq
-}
-
-// WithSubscribedUsers tells the query-builder to eager-load the nodes that are connected to
-// the "subscribed_users" edge. The optional arguments are used to configure the query builder of the edge.
-func (bq *BoardQuery) WithSubscribedUsers(opts ...func(*UserQuery)) *BoardQuery {
-	query := (&UserClient{config: bq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	bq.withSubscribedUsers = query
-	return bq
 }
 
 // WithOwner tells the query-builder to eager-load the nodes that are connected to
@@ -448,40 +328,18 @@ func (bq *BoardQuery) WithThreads(opts ...func(*ThreadQuery)) *BoardQuery {
 	return bq
 }
 
-// WithUserBoardLike tells the query-builder to eager-load the nodes that are connected to
-// the "user_board_like" edge. The optional arguments are used to configure the query builder of the edge.
-func (bq *BoardQuery) WithUserBoardLike(opts ...func(*UserBoardSubscriptionQuery)) *BoardQuery {
-	query := (&UserBoardSubscriptionClient{config: bq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	bq.withUserBoardLike = query
-	return bq
-}
-
-// WithUserBoardSubscription tells the query-builder to eager-load the nodes that are connected to
-// the "user_board_subscription" edge. The optional arguments are used to configure the query builder of the edge.
-func (bq *BoardQuery) WithUserBoardSubscription(opts ...func(*UserBoardLikeQuery)) *BoardQuery {
-	query := (&UserBoardLikeClient{config: bq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	bq.withUserBoardSubscription = query
-	return bq
-}
-
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
 //
 // Example:
 //
 //	var v []struct {
-//		UserId int `json:"userId,omitempty"`
+//		UserID int `json:"user_id,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Board.Query().
-//		GroupBy(board.FieldUserId).
+//		GroupBy(board.FieldUserID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (bq *BoardQuery) GroupBy(field string, fields ...string) *BoardGroupBy {
@@ -499,11 +357,11 @@ func (bq *BoardQuery) GroupBy(field string, fields ...string) *BoardGroupBy {
 // Example:
 //
 //	var v []struct {
-//		UserId int `json:"userId,omitempty"`
+//		UserID int `json:"user_id,omitempty"`
 //	}
 //
 //	client.Board.Query().
-//		Select(board.FieldUserId).
+//		Select(board.FieldUserID).
 //		Scan(ctx, &v)
 func (bq *BoardQuery) Select(fields ...string) *BoardSelect {
 	bq.ctx.Fields = append(bq.ctx.Fields, fields...)
@@ -548,13 +406,9 @@ func (bq *BoardQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Board,
 	var (
 		nodes       = []*Board{}
 		_spec       = bq.querySpec()
-		loadedTypes = [6]bool{
-			bq.withLikedUsers != nil,
-			bq.withSubscribedUsers != nil,
+		loadedTypes = [2]bool{
 			bq.withOwner != nil,
 			bq.withThreads != nil,
-			bq.withUserBoardLike != nil,
-			bq.withUserBoardSubscription != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -575,20 +429,6 @@ func (bq *BoardQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Board,
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := bq.withLikedUsers; query != nil {
-		if err := bq.loadLikedUsers(ctx, query, nodes,
-			func(n *Board) { n.Edges.LikedUsers = []*User{} },
-			func(n *Board, e *User) { n.Edges.LikedUsers = append(n.Edges.LikedUsers, e) }); err != nil {
-			return nil, err
-		}
-	}
-	if query := bq.withSubscribedUsers; query != nil {
-		if err := bq.loadSubscribedUsers(ctx, query, nodes,
-			func(n *Board) { n.Edges.SubscribedUsers = []*User{} },
-			func(n *Board, e *User) { n.Edges.SubscribedUsers = append(n.Edges.SubscribedUsers, e) }); err != nil {
-			return nil, err
-		}
-	}
 	if query := bq.withOwner; query != nil {
 		if err := bq.loadOwner(ctx, query, nodes, nil,
 			func(n *Board, e *User) { n.Edges.Owner = e }); err != nil {
@@ -602,152 +442,14 @@ func (bq *BoardQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Board,
 			return nil, err
 		}
 	}
-	if query := bq.withUserBoardLike; query != nil {
-		if err := bq.loadUserBoardLike(ctx, query, nodes,
-			func(n *Board) { n.Edges.UserBoardLike = []*UserBoardSubscription{} },
-			func(n *Board, e *UserBoardSubscription) { n.Edges.UserBoardLike = append(n.Edges.UserBoardLike, e) }); err != nil {
-			return nil, err
-		}
-	}
-	if query := bq.withUserBoardSubscription; query != nil {
-		if err := bq.loadUserBoardSubscription(ctx, query, nodes,
-			func(n *Board) { n.Edges.UserBoardSubscription = []*UserBoardLike{} },
-			func(n *Board, e *UserBoardLike) {
-				n.Edges.UserBoardSubscription = append(n.Edges.UserBoardSubscription, e)
-			}); err != nil {
-			return nil, err
-		}
-	}
 	return nodes, nil
 }
 
-func (bq *BoardQuery) loadLikedUsers(ctx context.Context, query *UserQuery, nodes []*Board, init func(*Board), assign func(*Board, *User)) error {
-	edgeIDs := make([]driver.Value, len(nodes))
-	byID := make(map[int]*Board)
-	nids := make(map[int]map[*Board]struct{})
-	for i, node := range nodes {
-		edgeIDs[i] = node.ID
-		byID[node.ID] = node
-		if init != nil {
-			init(node)
-		}
-	}
-	query.Where(func(s *sql.Selector) {
-		joinT := sql.Table(board.LikedUsersTable)
-		s.Join(joinT).On(s.C(user.FieldID), joinT.C(board.LikedUsersPrimaryKey[0]))
-		s.Where(sql.InValues(joinT.C(board.LikedUsersPrimaryKey[1]), edgeIDs...))
-		columns := s.SelectedColumns()
-		s.Select(joinT.C(board.LikedUsersPrimaryKey[1]))
-		s.AppendSelect(columns...)
-		s.SetDistinct(false)
-	})
-	if err := query.prepareQuery(ctx); err != nil {
-		return err
-	}
-	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
-		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
-			assign := spec.Assign
-			values := spec.ScanValues
-			spec.ScanValues = func(columns []string) ([]any, error) {
-				values, err := values(columns[1:])
-				if err != nil {
-					return nil, err
-				}
-				return append([]any{new(sql.NullInt64)}, values...), nil
-			}
-			spec.Assign = func(columns []string, values []any) error {
-				outValue := int(values[0].(*sql.NullInt64).Int64)
-				inValue := int(values[1].(*sql.NullInt64).Int64)
-				if nids[inValue] == nil {
-					nids[inValue] = map[*Board]struct{}{byID[outValue]: {}}
-					return assign(columns[1:], values[1:])
-				}
-				nids[inValue][byID[outValue]] = struct{}{}
-				return nil
-			}
-		})
-	})
-	neighbors, err := withInterceptors[[]*User](ctx, query, qr, query.inters)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected "liked_users" node returned %v`, n.ID)
-		}
-		for kn := range nodes {
-			assign(kn, n)
-		}
-	}
-	return nil
-}
-func (bq *BoardQuery) loadSubscribedUsers(ctx context.Context, query *UserQuery, nodes []*Board, init func(*Board), assign func(*Board, *User)) error {
-	edgeIDs := make([]driver.Value, len(nodes))
-	byID := make(map[int]*Board)
-	nids := make(map[int]map[*Board]struct{})
-	for i, node := range nodes {
-		edgeIDs[i] = node.ID
-		byID[node.ID] = node
-		if init != nil {
-			init(node)
-		}
-	}
-	query.Where(func(s *sql.Selector) {
-		joinT := sql.Table(board.SubscribedUsersTable)
-		s.Join(joinT).On(s.C(user.FieldID), joinT.C(board.SubscribedUsersPrimaryKey[0]))
-		s.Where(sql.InValues(joinT.C(board.SubscribedUsersPrimaryKey[1]), edgeIDs...))
-		columns := s.SelectedColumns()
-		s.Select(joinT.C(board.SubscribedUsersPrimaryKey[1]))
-		s.AppendSelect(columns...)
-		s.SetDistinct(false)
-	})
-	if err := query.prepareQuery(ctx); err != nil {
-		return err
-	}
-	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
-		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
-			assign := spec.Assign
-			values := spec.ScanValues
-			spec.ScanValues = func(columns []string) ([]any, error) {
-				values, err := values(columns[1:])
-				if err != nil {
-					return nil, err
-				}
-				return append([]any{new(sql.NullInt64)}, values...), nil
-			}
-			spec.Assign = func(columns []string, values []any) error {
-				outValue := int(values[0].(*sql.NullInt64).Int64)
-				inValue := int(values[1].(*sql.NullInt64).Int64)
-				if nids[inValue] == nil {
-					nids[inValue] = map[*Board]struct{}{byID[outValue]: {}}
-					return assign(columns[1:], values[1:])
-				}
-				nids[inValue][byID[outValue]] = struct{}{}
-				return nil
-			}
-		})
-	})
-	neighbors, err := withInterceptors[[]*User](ctx, query, qr, query.inters)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected "subscribed_users" node returned %v`, n.ID)
-		}
-		for kn := range nodes {
-			assign(kn, n)
-		}
-	}
-	return nil
-}
 func (bq *BoardQuery) loadOwner(ctx context.Context, query *UserQuery, nodes []*Board, init func(*Board), assign func(*Board, *User)) error {
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Board)
 	for i := range nodes {
-		fk := nodes[i].UserId
+		fk := nodes[i].UserID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -764,7 +466,7 @@ func (bq *BoardQuery) loadOwner(ctx context.Context, query *UserQuery, nodes []*
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "userId" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "user_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -783,7 +485,7 @@ func (bq *BoardQuery) loadThreads(ctx context.Context, query *ThreadQuery, nodes
 		}
 	}
 	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(thread.FieldBoardId)
+		query.ctx.AppendFieldOnce(thread.FieldBoardID)
 	}
 	query.Where(predicate.Thread(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(board.ThreadsColumn), fks...))
@@ -793,70 +495,10 @@ func (bq *BoardQuery) loadThreads(ctx context.Context, query *ThreadQuery, nodes
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.BoardId
+		fk := n.BoardID
 		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "boardId" returned %v for node %v`, fk, n.ID)
-		}
-		assign(node, n)
-	}
-	return nil
-}
-func (bq *BoardQuery) loadUserBoardLike(ctx context.Context, query *UserBoardSubscriptionQuery, nodes []*Board, init func(*Board), assign func(*Board, *UserBoardSubscription)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*Board)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
-		}
-	}
-	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(userboardsubscription.FieldBoardId)
-	}
-	query.Where(predicate.UserBoardSubscription(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(board.UserBoardLikeColumn), fks...))
-	}))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		fk := n.BoardId
-		node, ok := nodeids[fk]
-		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "boardId" returned %v for node %v`, fk, n)
-		}
-		assign(node, n)
-	}
-	return nil
-}
-func (bq *BoardQuery) loadUserBoardSubscription(ctx context.Context, query *UserBoardLikeQuery, nodes []*Board, init func(*Board), assign func(*Board, *UserBoardLike)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*Board)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
-		}
-	}
-	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(userboardlike.FieldBoardId)
-	}
-	query.Where(predicate.UserBoardLike(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(board.UserBoardSubscriptionColumn), fks...))
-	}))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		fk := n.BoardId
-		node, ok := nodeids[fk]
-		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "boardId" returned %v for node %v`, fk, n)
+			return fmt.Errorf(`unexpected referenced foreign-key "board_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -889,7 +531,7 @@ func (bq *BoardQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 		if bq.withOwner != nil {
-			_spec.Node.AddColumnOnce(board.FieldUserId)
+			_spec.Node.AddColumnOnce(board.FieldUserID)
 		}
 	}
 	if ps := bq.predicates; len(ps) > 0 {

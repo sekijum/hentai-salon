@@ -14,44 +14,26 @@ const (
 	Label = "board"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldUserId holds the string denoting the userid field in the database.
-	FieldUserId = "user_id"
+	// FieldUserID holds the string denoting the user_id field in the database.
+	FieldUserID = "user_id"
 	// FieldTitle holds the string denoting the title field in the database.
 	FieldTitle = "title"
 	// FieldDescription holds the string denoting the description field in the database.
 	FieldDescription = "description"
-	// FieldThumbnailUrl holds the string denoting the thumbnailurl field in the database.
-	FieldThumbnailUrl = "thumbnail_url"
+	// FieldThumbnailURL holds the string denoting the thumbnail_url field in the database.
+	FieldThumbnailURL = "thumbnail_url"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
-	// FieldCreatedAt holds the string denoting the createdat field in the database.
+	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
-	// FieldUpdatedAt holds the string denoting the updatedat field in the database.
+	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
-	// EdgeLikedUsers holds the string denoting the liked_users edge name in mutations.
-	EdgeLikedUsers = "liked_users"
-	// EdgeSubscribedUsers holds the string denoting the subscribed_users edge name in mutations.
-	EdgeSubscribedUsers = "subscribed_users"
 	// EdgeOwner holds the string denoting the owner edge name in mutations.
 	EdgeOwner = "owner"
 	// EdgeThreads holds the string denoting the threads edge name in mutations.
 	EdgeThreads = "threads"
-	// EdgeUserBoardLike holds the string denoting the user_board_like edge name in mutations.
-	EdgeUserBoardLike = "user_board_like"
-	// EdgeUserBoardSubscription holds the string denoting the user_board_subscription edge name in mutations.
-	EdgeUserBoardSubscription = "user_board_subscription"
 	// Table holds the table name of the board in the database.
 	Table = "boards"
-	// LikedUsersTable is the table that holds the liked_users relation/edge. The primary key declared below.
-	LikedUsersTable = "user_board_subscriptions"
-	// LikedUsersInverseTable is the table name for the User entity.
-	// It exists in this package in order to avoid circular dependency with the "user" package.
-	LikedUsersInverseTable = "users"
-	// SubscribedUsersTable is the table that holds the subscribed_users relation/edge. The primary key declared below.
-	SubscribedUsersTable = "user_board_likes"
-	// SubscribedUsersInverseTable is the table name for the User entity.
-	// It exists in this package in order to avoid circular dependency with the "user" package.
-	SubscribedUsersInverseTable = "users"
 	// OwnerTable is the table that holds the owner relation/edge.
 	OwnerTable = "boards"
 	// OwnerInverseTable is the table name for the User entity.
@@ -66,42 +48,19 @@ const (
 	ThreadsInverseTable = "threads"
 	// ThreadsColumn is the table column denoting the threads relation/edge.
 	ThreadsColumn = "board_id"
-	// UserBoardLikeTable is the table that holds the user_board_like relation/edge.
-	UserBoardLikeTable = "user_board_subscriptions"
-	// UserBoardLikeInverseTable is the table name for the UserBoardSubscription entity.
-	// It exists in this package in order to avoid circular dependency with the "userboardsubscription" package.
-	UserBoardLikeInverseTable = "user_board_subscriptions"
-	// UserBoardLikeColumn is the table column denoting the user_board_like relation/edge.
-	UserBoardLikeColumn = "board_id"
-	// UserBoardSubscriptionTable is the table that holds the user_board_subscription relation/edge.
-	UserBoardSubscriptionTable = "user_board_likes"
-	// UserBoardSubscriptionInverseTable is the table name for the UserBoardLike entity.
-	// It exists in this package in order to avoid circular dependency with the "userboardlike" package.
-	UserBoardSubscriptionInverseTable = "user_board_likes"
-	// UserBoardSubscriptionColumn is the table column denoting the user_board_subscription relation/edge.
-	UserBoardSubscriptionColumn = "board_id"
 )
 
 // Columns holds all SQL columns for board fields.
 var Columns = []string{
 	FieldID,
-	FieldUserId,
+	FieldUserID,
 	FieldTitle,
 	FieldDescription,
-	FieldThumbnailUrl,
+	FieldThumbnailURL,
 	FieldStatus,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
-
-var (
-	// LikedUsersPrimaryKey and LikedUsersColumn2 are the table columns denoting the
-	// primary key for the liked_users relation (M2M).
-	LikedUsersPrimaryKey = []string{"userId", "boardId"}
-	// SubscribedUsersPrimaryKey and SubscribedUsersColumn2 are the table columns denoting the
-	// primary key for the subscribed_users relation (M2M).
-	SubscribedUsersPrimaryKey = []string{"userId", "boardId"}
-)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -120,11 +79,11 @@ var (
 	DescriptionValidator func(string) error
 	// DefaultStatus holds the default value on creation for the "status" field.
 	DefaultStatus int
-	// DefaultCreatedAt holds the default value on creation for the "createdAt" field.
+	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
-	// DefaultUpdatedAt holds the default value on creation for the "updatedAt" field.
+	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
 	DefaultUpdatedAt func() time.Time
-	// UpdateDefaultUpdatedAt holds the default value on update for the "updatedAt" field.
+	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
 	UpdateDefaultUpdatedAt func() time.Time
 )
 
@@ -136,9 +95,9 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// ByUserId orders the results by the userId field.
-func ByUserId(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUserId, opts...).ToFunc()
+// ByUserID orders the results by the user_id field.
+func ByUserID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUserID, opts...).ToFunc()
 }
 
 // ByTitle orders the results by the title field.
@@ -151,9 +110,9 @@ func ByDescription(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDescription, opts...).ToFunc()
 }
 
-// ByThumbnailUrl orders the results by the thumbnailUrl field.
-func ByThumbnailUrl(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldThumbnailUrl, opts...).ToFunc()
+// ByThumbnailURL orders the results by the thumbnail_url field.
+func ByThumbnailURL(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldThumbnailURL, opts...).ToFunc()
 }
 
 // ByStatus orders the results by the status field.
@@ -161,42 +120,14 @@ func ByStatus(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStatus, opts...).ToFunc()
 }
 
-// ByCreatedAt orders the results by the createdAt field.
+// ByCreatedAt orders the results by the created_at field.
 func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
 }
 
-// ByUpdatedAt orders the results by the updatedAt field.
+// ByUpdatedAt orders the results by the updated_at field.
 func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
-}
-
-// ByLikedUsersCount orders the results by liked_users count.
-func ByLikedUsersCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newLikedUsersStep(), opts...)
-	}
-}
-
-// ByLikedUsers orders the results by liked_users terms.
-func ByLikedUsers(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newLikedUsersStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
-// BySubscribedUsersCount orders the results by subscribed_users count.
-func BySubscribedUsersCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newSubscribedUsersStep(), opts...)
-	}
-}
-
-// BySubscribedUsers orders the results by subscribed_users terms.
-func BySubscribedUsers(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newSubscribedUsersStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
 }
 
 // ByOwnerField orders the results by owner field.
@@ -219,48 +150,6 @@ func ByThreads(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newThreadsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
-
-// ByUserBoardLikeCount orders the results by user_board_like count.
-func ByUserBoardLikeCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newUserBoardLikeStep(), opts...)
-	}
-}
-
-// ByUserBoardLike orders the results by user_board_like terms.
-func ByUserBoardLike(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newUserBoardLikeStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
-// ByUserBoardSubscriptionCount orders the results by user_board_subscription count.
-func ByUserBoardSubscriptionCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newUserBoardSubscriptionStep(), opts...)
-	}
-}
-
-// ByUserBoardSubscription orders the results by user_board_subscription terms.
-func ByUserBoardSubscription(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newUserBoardSubscriptionStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-func newLikedUsersStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(LikedUsersInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, true, LikedUsersTable, LikedUsersPrimaryKey...),
-	)
-}
-func newSubscribedUsersStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(SubscribedUsersInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, true, SubscribedUsersTable, SubscribedUsersPrimaryKey...),
-	)
-}
 func newOwnerStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -273,19 +162,5 @@ func newThreadsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ThreadsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, ThreadsTable, ThreadsColumn),
-	)
-}
-func newUserBoardLikeStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(UserBoardLikeInverseTable, UserBoardLikeColumn),
-		sqlgraph.Edge(sqlgraph.O2M, true, UserBoardLikeTable, UserBoardLikeColumn),
-	)
-}
-func newUserBoardSubscriptionStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(UserBoardSubscriptionInverseTable, UserBoardSubscriptionColumn),
-		sqlgraph.Edge(sqlgraph.O2M, true, UserBoardSubscriptionTable, UserBoardSubscriptionColumn),
 	)
 }

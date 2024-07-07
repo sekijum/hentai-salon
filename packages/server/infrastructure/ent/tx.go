@@ -26,10 +26,6 @@ type Tx struct {
 	ThreadTag *ThreadTagClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
-	// UserBoardLike is the client for interacting with the UserBoardLike builders.
-	UserBoardLike *UserBoardLikeClient
-	// UserBoardSubscription is the client for interacting with the UserBoardSubscription builders.
-	UserBoardSubscription *UserBoardSubscriptionClient
 	// UserCommentLike is the client for interacting with the UserCommentLike builders.
 	UserCommentLike *UserCommentLikeClient
 	// UserCommentSubscription is the client for interacting with the UserCommentSubscription builders.
@@ -176,8 +172,6 @@ func (tx *Tx) init() {
 	tx.ThreadCommentAttachment = NewThreadCommentAttachmentClient(tx.config)
 	tx.ThreadTag = NewThreadTagClient(tx.config)
 	tx.User = NewUserClient(tx.config)
-	tx.UserBoardLike = NewUserBoardLikeClient(tx.config)
-	tx.UserBoardSubscription = NewUserBoardSubscriptionClient(tx.config)
 	tx.UserCommentLike = NewUserCommentLikeClient(tx.config)
 	tx.UserCommentSubscription = NewUserCommentSubscriptionClient(tx.config)
 	tx.UserThreadLike = NewUserThreadLikeClient(tx.config)

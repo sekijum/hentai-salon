@@ -55,9 +55,9 @@ func IDLTE(id int) predicate.ThreadCommentAttachment {
 	return predicate.ThreadCommentAttachment(sql.FieldLTE(FieldID, id))
 }
 
-// CommentId applies equality check predicate on the "commentId" field. It's identical to CommentIdEQ.
-func CommentId(v int) predicate.ThreadCommentAttachment {
-	return predicate.ThreadCommentAttachment(sql.FieldEQ(FieldCommentId, v))
+// CommentID applies equality check predicate on the "comment_id" field. It's identical to CommentIDEQ.
+func CommentID(v int) predicate.ThreadCommentAttachment {
+	return predicate.ThreadCommentAttachment(sql.FieldEQ(FieldCommentID, v))
 }
 
 // URL applies equality check predicate on the "url" field. It's identical to URLEQ.
@@ -75,29 +75,29 @@ func Type(v int) predicate.ThreadCommentAttachment {
 	return predicate.ThreadCommentAttachment(sql.FieldEQ(FieldType, v))
 }
 
-// CreatedAt applies equality check predicate on the "createdAt" field. It's identical to CreatedAtEQ.
+// CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.ThreadCommentAttachment {
 	return predicate.ThreadCommentAttachment(sql.FieldEQ(FieldCreatedAt, v))
 }
 
-// CommentIdEQ applies the EQ predicate on the "commentId" field.
-func CommentIdEQ(v int) predicate.ThreadCommentAttachment {
-	return predicate.ThreadCommentAttachment(sql.FieldEQ(FieldCommentId, v))
+// CommentIDEQ applies the EQ predicate on the "comment_id" field.
+func CommentIDEQ(v int) predicate.ThreadCommentAttachment {
+	return predicate.ThreadCommentAttachment(sql.FieldEQ(FieldCommentID, v))
 }
 
-// CommentIdNEQ applies the NEQ predicate on the "commentId" field.
-func CommentIdNEQ(v int) predicate.ThreadCommentAttachment {
-	return predicate.ThreadCommentAttachment(sql.FieldNEQ(FieldCommentId, v))
+// CommentIDNEQ applies the NEQ predicate on the "comment_id" field.
+func CommentIDNEQ(v int) predicate.ThreadCommentAttachment {
+	return predicate.ThreadCommentAttachment(sql.FieldNEQ(FieldCommentID, v))
 }
 
-// CommentIdIn applies the In predicate on the "commentId" field.
-func CommentIdIn(vs ...int) predicate.ThreadCommentAttachment {
-	return predicate.ThreadCommentAttachment(sql.FieldIn(FieldCommentId, vs...))
+// CommentIDIn applies the In predicate on the "comment_id" field.
+func CommentIDIn(vs ...int) predicate.ThreadCommentAttachment {
+	return predicate.ThreadCommentAttachment(sql.FieldIn(FieldCommentID, vs...))
 }
 
-// CommentIdNotIn applies the NotIn predicate on the "commentId" field.
-func CommentIdNotIn(vs ...int) predicate.ThreadCommentAttachment {
-	return predicate.ThreadCommentAttachment(sql.FieldNotIn(FieldCommentId, vs...))
+// CommentIDNotIn applies the NotIn predicate on the "comment_id" field.
+func CommentIDNotIn(vs ...int) predicate.ThreadCommentAttachment {
+	return predicate.ThreadCommentAttachment(sql.FieldNotIn(FieldCommentID, vs...))
 }
 
 // URLEQ applies the EQ predicate on the "url" field.
@@ -245,42 +245,42 @@ func TypeLTE(v int) predicate.ThreadCommentAttachment {
 	return predicate.ThreadCommentAttachment(sql.FieldLTE(FieldType, v))
 }
 
-// CreatedAtEQ applies the EQ predicate on the "createdAt" field.
+// CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.ThreadCommentAttachment {
 	return predicate.ThreadCommentAttachment(sql.FieldEQ(FieldCreatedAt, v))
 }
 
-// CreatedAtNEQ applies the NEQ predicate on the "createdAt" field.
+// CreatedAtNEQ applies the NEQ predicate on the "created_at" field.
 func CreatedAtNEQ(v time.Time) predicate.ThreadCommentAttachment {
 	return predicate.ThreadCommentAttachment(sql.FieldNEQ(FieldCreatedAt, v))
 }
 
-// CreatedAtIn applies the In predicate on the "createdAt" field.
+// CreatedAtIn applies the In predicate on the "created_at" field.
 func CreatedAtIn(vs ...time.Time) predicate.ThreadCommentAttachment {
 	return predicate.ThreadCommentAttachment(sql.FieldIn(FieldCreatedAt, vs...))
 }
 
-// CreatedAtNotIn applies the NotIn predicate on the "createdAt" field.
+// CreatedAtNotIn applies the NotIn predicate on the "created_at" field.
 func CreatedAtNotIn(vs ...time.Time) predicate.ThreadCommentAttachment {
 	return predicate.ThreadCommentAttachment(sql.FieldNotIn(FieldCreatedAt, vs...))
 }
 
-// CreatedAtGT applies the GT predicate on the "createdAt" field.
+// CreatedAtGT applies the GT predicate on the "created_at" field.
 func CreatedAtGT(v time.Time) predicate.ThreadCommentAttachment {
 	return predicate.ThreadCommentAttachment(sql.FieldGT(FieldCreatedAt, v))
 }
 
-// CreatedAtGTE applies the GTE predicate on the "createdAt" field.
+// CreatedAtGTE applies the GTE predicate on the "created_at" field.
 func CreatedAtGTE(v time.Time) predicate.ThreadCommentAttachment {
 	return predicate.ThreadCommentAttachment(sql.FieldGTE(FieldCreatedAt, v))
 }
 
-// CreatedAtLT applies the LT predicate on the "createdAt" field.
+// CreatedAtLT applies the LT predicate on the "created_at" field.
 func CreatedAtLT(v time.Time) predicate.ThreadCommentAttachment {
 	return predicate.ThreadCommentAttachment(sql.FieldLT(FieldCreatedAt, v))
 }
 
-// CreatedAtLTE applies the LTE predicate on the "createdAt" field.
+// CreatedAtLTE applies the LTE predicate on the "created_at" field.
 func CreatedAtLTE(v time.Time) predicate.ThreadCommentAttachment {
 	return predicate.ThreadCommentAttachment(sql.FieldLTE(FieldCreatedAt, v))
 }

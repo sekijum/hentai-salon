@@ -29,16 +29,16 @@ func (tcau *ThreadCommentAttachmentUpdate) Where(ps ...predicate.ThreadCommentAt
 	return tcau
 }
 
-// SetCommentId sets the "commentId" field.
-func (tcau *ThreadCommentAttachmentUpdate) SetCommentId(i int) *ThreadCommentAttachmentUpdate {
-	tcau.mutation.SetCommentId(i)
+// SetCommentID sets the "comment_id" field.
+func (tcau *ThreadCommentAttachmentUpdate) SetCommentID(i int) *ThreadCommentAttachmentUpdate {
+	tcau.mutation.SetCommentID(i)
 	return tcau
 }
 
-// SetNillableCommentId sets the "commentId" field if the given value is not nil.
-func (tcau *ThreadCommentAttachmentUpdate) SetNillableCommentId(i *int) *ThreadCommentAttachmentUpdate {
+// SetNillableCommentID sets the "comment_id" field if the given value is not nil.
+func (tcau *ThreadCommentAttachmentUpdate) SetNillableCommentID(i *int) *ThreadCommentAttachmentUpdate {
 	if i != nil {
-		tcau.SetCommentId(*i)
+		tcau.SetCommentID(*i)
 	}
 	return tcau
 }
@@ -99,23 +99,17 @@ func (tcau *ThreadCommentAttachmentUpdate) AddType(i int) *ThreadCommentAttachme
 	return tcau
 }
 
-// SetCreatedAt sets the "createdAt" field.
+// SetCreatedAt sets the "created_at" field.
 func (tcau *ThreadCommentAttachmentUpdate) SetCreatedAt(t time.Time) *ThreadCommentAttachmentUpdate {
 	tcau.mutation.SetCreatedAt(t)
 	return tcau
 }
 
-// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
 func (tcau *ThreadCommentAttachmentUpdate) SetNillableCreatedAt(t *time.Time) *ThreadCommentAttachmentUpdate {
 	if t != nil {
 		tcau.SetCreatedAt(*t)
 	}
-	return tcau
-}
-
-// SetCommentID sets the "comment" edge to the ThreadComment entity by ID.
-func (tcau *ThreadCommentAttachmentUpdate) SetCommentID(id int) *ThreadCommentAttachmentUpdate {
-	tcau.mutation.SetCommentID(id)
 	return tcau
 }
 
@@ -249,16 +243,16 @@ type ThreadCommentAttachmentUpdateOne struct {
 	mutation *ThreadCommentAttachmentMutation
 }
 
-// SetCommentId sets the "commentId" field.
-func (tcauo *ThreadCommentAttachmentUpdateOne) SetCommentId(i int) *ThreadCommentAttachmentUpdateOne {
-	tcauo.mutation.SetCommentId(i)
+// SetCommentID sets the "comment_id" field.
+func (tcauo *ThreadCommentAttachmentUpdateOne) SetCommentID(i int) *ThreadCommentAttachmentUpdateOne {
+	tcauo.mutation.SetCommentID(i)
 	return tcauo
 }
 
-// SetNillableCommentId sets the "commentId" field if the given value is not nil.
-func (tcauo *ThreadCommentAttachmentUpdateOne) SetNillableCommentId(i *int) *ThreadCommentAttachmentUpdateOne {
+// SetNillableCommentID sets the "comment_id" field if the given value is not nil.
+func (tcauo *ThreadCommentAttachmentUpdateOne) SetNillableCommentID(i *int) *ThreadCommentAttachmentUpdateOne {
 	if i != nil {
-		tcauo.SetCommentId(*i)
+		tcauo.SetCommentID(*i)
 	}
 	return tcauo
 }
@@ -319,23 +313,17 @@ func (tcauo *ThreadCommentAttachmentUpdateOne) AddType(i int) *ThreadCommentAtta
 	return tcauo
 }
 
-// SetCreatedAt sets the "createdAt" field.
+// SetCreatedAt sets the "created_at" field.
 func (tcauo *ThreadCommentAttachmentUpdateOne) SetCreatedAt(t time.Time) *ThreadCommentAttachmentUpdateOne {
 	tcauo.mutation.SetCreatedAt(t)
 	return tcauo
 }
 
-// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
 func (tcauo *ThreadCommentAttachmentUpdateOne) SetNillableCreatedAt(t *time.Time) *ThreadCommentAttachmentUpdateOne {
 	if t != nil {
 		tcauo.SetCreatedAt(*t)
 	}
-	return tcauo
-}
-
-// SetCommentID sets the "comment" edge to the ThreadComment entity by ID.
-func (tcauo *ThreadCommentAttachmentUpdateOne) SetCommentID(id int) *ThreadCommentAttachmentUpdateOne {
-	tcauo.mutation.SetCommentID(id)
 	return tcauo
 }
 

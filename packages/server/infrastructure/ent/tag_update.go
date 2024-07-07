@@ -43,13 +43,13 @@ func (tu *TagUpdate) SetNillableName(s *string) *TagUpdate {
 	return tu
 }
 
-// SetCreatedAt sets the "createdAt" field.
+// SetCreatedAt sets the "created_at" field.
 func (tu *TagUpdate) SetCreatedAt(t time.Time) *TagUpdate {
 	tu.mutation.SetCreatedAt(t)
 	return tu
 }
 
-// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
 func (tu *TagUpdate) SetNillableCreatedAt(t *time.Time) *TagUpdate {
 	if t != nil {
 		tu.SetCreatedAt(*t)
@@ -232,13 +232,13 @@ func (tuo *TagUpdateOne) SetNillableName(s *string) *TagUpdateOne {
 	return tuo
 }
 
-// SetCreatedAt sets the "createdAt" field.
+// SetCreatedAt sets the "created_at" field.
 func (tuo *TagUpdateOne) SetCreatedAt(t time.Time) *TagUpdateOne {
 	tuo.mutation.SetCreatedAt(t)
 	return tuo
 }
 
-// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
 func (tuo *TagUpdateOne) SetNillableCreatedAt(t *time.Time) *TagUpdateOne {
 	if t != nil {
 		tuo.SetCreatedAt(*t)

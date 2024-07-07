@@ -12,11 +12,11 @@ import (
 const (
 	// Label holds the string label denoting the userthreadlike type in the database.
 	Label = "user_thread_like"
-	// FieldUserId holds the string denoting the userid field in the database.
-	FieldUserId = "user_id"
-	// FieldThreadId holds the string denoting the threadid field in the database.
-	FieldThreadId = "thread_id"
-	// FieldLikedAt holds the string denoting the likedat field in the database.
+	// FieldUserID holds the string denoting the user_id field in the database.
+	FieldUserID = "user_id"
+	// FieldThreadID holds the string denoting the thread_id field in the database.
+	FieldThreadID = "thread_id"
+	// FieldLikedAt holds the string denoting the liked_at field in the database.
 	FieldLikedAt = "liked_at"
 	// EdgeUser holds the string denoting the user edge name in mutations.
 	EdgeUser = "user"
@@ -46,8 +46,8 @@ const (
 
 // Columns holds all SQL columns for userthreadlike fields.
 var Columns = []string{
-	FieldUserId,
-	FieldThreadId,
+	FieldUserID,
+	FieldThreadID,
 	FieldLikedAt,
 }
 
@@ -62,24 +62,24 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// DefaultLikedAt holds the default value on creation for the "likedAt" field.
+	// DefaultLikedAt holds the default value on creation for the "liked_at" field.
 	DefaultLikedAt func() time.Time
 )
 
 // OrderOption defines the ordering options for the UserThreadLike queries.
 type OrderOption func(*sql.Selector)
 
-// ByUserId orders the results by the userId field.
-func ByUserId(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUserId, opts...).ToFunc()
+// ByUserID orders the results by the user_id field.
+func ByUserID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUserID, opts...).ToFunc()
 }
 
-// ByThreadId orders the results by the threadId field.
-func ByThreadId(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldThreadId, opts...).ToFunc()
+// ByThreadID orders the results by the thread_id field.
+func ByThreadID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldThreadID, opts...).ToFunc()
 }
 
-// ByLikedAt orders the results by the likedAt field.
+// ByLikedAt orders the results by the liked_at field.
 func ByLikedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldLikedAt, opts...).ToFunc()
 }

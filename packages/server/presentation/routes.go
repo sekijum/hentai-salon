@@ -24,10 +24,10 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 	r.GET("/threads", controllers.ThreadController.FindAll)
 
 	commentGroup := r.Group("/comments")
-		commentGroup.
-		GET("/comments", controllers.ThreadCommentController.FindAll).
+	commentGroup.
+		GET("/", controllers.ThreadCommentController.FindAll).
 		GET("/:id", controllers.ThreadCommentController.FindById).
-		POST("/comments", controllers.ThreadCommentController.Create).
+		POST("/", controllers.ThreadCommentController.Create).
 		POST("/reply", controllers.ThreadCommentController.Reply)
 
 	// 以下認証必須ルート
@@ -39,8 +39,8 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 		authGroup.GET("/whoami", controllers.UserController.FindAuthenticatedUser)
 	}
 
-	adminGroup := r.Group("/admin")
+	adminGroup := r.Group("/admin").Use(authMiddleware)
+	adminGroup.POST("/boards", controllers.BoardController.Create)
 	{
-		adminGroup.POST("/boards", controllers.BoardAdminController.Create)
 	}
 }

@@ -5,8 +5,6 @@ import (
 	"server/domain/model"
 	"server/infrastructure/ent"
 	"server/infrastructure/ent/user"
-
-	"github.com/mitchellh/mapstructure"
 )
 
 type UserDatasource struct {
@@ -23,9 +21,8 @@ func (ds *UserDatasource) FindByID(ctx context.Context, id int) (*model.User, er
 		return nil, err
 	}
 
-	modelUser, err := entUserToModelUser(entUser)
-	if err != nil {
-		return nil, err
+	modelUser := &model.User{
+		EntUser: entUser,
 	}
 
 	return modelUser, nil
@@ -37,23 +34,23 @@ func (ds *UserDatasource) FindByEmail(ctx context.Context, email string) (*model
 		return nil, err
 	}
 
-	modelUser, err := entUserToModelUser(entUser)
-	if err != nil {
-		return nil, err
+	modelUser := &model.User{
+		EntUser: entUser,
 	}
 
 	return modelUser, nil
 }
 
-func (ds *UserDatasource) Create(ctx context.Context, u *model.User) (*model.User, error) {
+func (ds *UserDatasource) Create(ctx context.Context, m *model.User) (*model.User, error) {
 	userBuilder := ds.client.User.Create().
-		SetName(u.Name).
-		SetEmail(u.Email).
-		SetPassword(u.Password).
-		SetStatus(u.Status.ToInt()).
-		SetRole(u.Role.ToInt())
-	if u.AvatarUrl != nil {
-		userBuilder.SetAvatarUrl(*u.AvatarUrl)
+		SetName(m.EntUser.Name).
+		SetEmail(m.EntUser.Email).
+		SetPassword(m.EntUser.Password).
+		SetStatus(m.EntUser.Status).
+		SetRole(m.EntUser.Role)
+
+	if m.EntUser.AvatarURL != nil {
+		userBuilder.SetAvatarURL(*m.EntUser.AvatarURL)
 	}
 
 	savedUser, err := userBuilder.Save(ctx)
@@ -61,19 +58,9 @@ func (ds *UserDatasource) Create(ctx context.Context, u *model.User) (*model.Use
 		return nil, err
 	}
 
-	modelUser, err := entUserToModelUser(savedUser)
-	if err != nil {
-		return nil, err
+	modelUser := &model.User{
+		EntUser: savedUser,
 	}
 
 	return modelUser, nil
-}
-
-func entUserToModelUser(entUser *ent.User) (*model.User, error) {
-	var modelUser model.User
-	err := mapstructure.Decode(entUser, &modelUser)
-	if err != nil {
-		return nil, err
-	}
-	return &modelUser, nil
 }

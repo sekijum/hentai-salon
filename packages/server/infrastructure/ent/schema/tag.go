@@ -17,13 +17,13 @@ func (Tag) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("id").Unique().Immutable(),
 		field.String("name").Unique().MaxLen(20),
-		field.Time("createdAt").Default(time.Now).StorageKey("created_at"),
+		field.Time("created_at").Default(time.Now),
 	}
 }
 
 func (Tag) Edges() []ent.Edge {
 	return []ent.Edge{
-        edge.From("threads", Thread.Type).Ref("tags").Through("thread_tags", ThreadTag.Type),
+		edge.From("threads", Thread.Type).Ref("tags").Through("thread_tags", ThreadTag.Type),
 	}
 }
 

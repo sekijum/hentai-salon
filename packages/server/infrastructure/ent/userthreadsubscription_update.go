@@ -30,41 +30,41 @@ func (utsu *UserThreadSubscriptionUpdate) Where(ps ...predicate.UserThreadSubscr
 	return utsu
 }
 
-// SetUserId sets the "userId" field.
-func (utsu *UserThreadSubscriptionUpdate) SetUserId(i int) *UserThreadSubscriptionUpdate {
-	utsu.mutation.SetUserId(i)
+// SetUserID sets the "user_id" field.
+func (utsu *UserThreadSubscriptionUpdate) SetUserID(i int) *UserThreadSubscriptionUpdate {
+	utsu.mutation.SetUserID(i)
 	return utsu
 }
 
-// SetNillableUserId sets the "userId" field if the given value is not nil.
-func (utsu *UserThreadSubscriptionUpdate) SetNillableUserId(i *int) *UserThreadSubscriptionUpdate {
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (utsu *UserThreadSubscriptionUpdate) SetNillableUserID(i *int) *UserThreadSubscriptionUpdate {
 	if i != nil {
-		utsu.SetUserId(*i)
+		utsu.SetUserID(*i)
 	}
 	return utsu
 }
 
-// SetThreadId sets the "threadId" field.
-func (utsu *UserThreadSubscriptionUpdate) SetThreadId(i int) *UserThreadSubscriptionUpdate {
-	utsu.mutation.SetThreadId(i)
+// SetThreadID sets the "thread_id" field.
+func (utsu *UserThreadSubscriptionUpdate) SetThreadID(i int) *UserThreadSubscriptionUpdate {
+	utsu.mutation.SetThreadID(i)
 	return utsu
 }
 
-// SetNillableThreadId sets the "threadId" field if the given value is not nil.
-func (utsu *UserThreadSubscriptionUpdate) SetNillableThreadId(i *int) *UserThreadSubscriptionUpdate {
+// SetNillableThreadID sets the "thread_id" field if the given value is not nil.
+func (utsu *UserThreadSubscriptionUpdate) SetNillableThreadID(i *int) *UserThreadSubscriptionUpdate {
 	if i != nil {
-		utsu.SetThreadId(*i)
+		utsu.SetThreadID(*i)
 	}
 	return utsu
 }
 
-// SetIsNotified sets the "isNotified" field.
+// SetIsNotified sets the "is_notified" field.
 func (utsu *UserThreadSubscriptionUpdate) SetIsNotified(b bool) *UserThreadSubscriptionUpdate {
 	utsu.mutation.SetIsNotified(b)
 	return utsu
 }
 
-// SetNillableIsNotified sets the "isNotified" field if the given value is not nil.
+// SetNillableIsNotified sets the "is_notified" field if the given value is not nil.
 func (utsu *UserThreadSubscriptionUpdate) SetNillableIsNotified(b *bool) *UserThreadSubscriptionUpdate {
 	if b != nil {
 		utsu.SetIsNotified(*b)
@@ -72,13 +72,13 @@ func (utsu *UserThreadSubscriptionUpdate) SetNillableIsNotified(b *bool) *UserTh
 	return utsu
 }
 
-// SetIsChecked sets the "isChecked" field.
+// SetIsChecked sets the "is_checked" field.
 func (utsu *UserThreadSubscriptionUpdate) SetIsChecked(b bool) *UserThreadSubscriptionUpdate {
 	utsu.mutation.SetIsChecked(b)
 	return utsu
 }
 
-// SetNillableIsChecked sets the "isChecked" field if the given value is not nil.
+// SetNillableIsChecked sets the "is_checked" field if the given value is not nil.
 func (utsu *UserThreadSubscriptionUpdate) SetNillableIsChecked(b *bool) *UserThreadSubscriptionUpdate {
 	if b != nil {
 		utsu.SetIsChecked(*b)
@@ -86,13 +86,13 @@ func (utsu *UserThreadSubscriptionUpdate) SetNillableIsChecked(b *bool) *UserThr
 	return utsu
 }
 
-// SetSubscribedAt sets the "subscribedAt" field.
+// SetSubscribedAt sets the "subscribed_at" field.
 func (utsu *UserThreadSubscriptionUpdate) SetSubscribedAt(t time.Time) *UserThreadSubscriptionUpdate {
 	utsu.mutation.SetSubscribedAt(t)
 	return utsu
 }
 
-// SetNillableSubscribedAt sets the "subscribedAt" field if the given value is not nil.
+// SetNillableSubscribedAt sets the "subscribed_at" field if the given value is not nil.
 func (utsu *UserThreadSubscriptionUpdate) SetNillableSubscribedAt(t *time.Time) *UserThreadSubscriptionUpdate {
 	if t != nil {
 		utsu.SetSubscribedAt(*t)
@@ -100,21 +100,9 @@ func (utsu *UserThreadSubscriptionUpdate) SetNillableSubscribedAt(t *time.Time) 
 	return utsu
 }
 
-// SetUserID sets the "user" edge to the User entity by ID.
-func (utsu *UserThreadSubscriptionUpdate) SetUserID(id int) *UserThreadSubscriptionUpdate {
-	utsu.mutation.SetUserID(id)
-	return utsu
-}
-
 // SetUser sets the "user" edge to the User entity.
 func (utsu *UserThreadSubscriptionUpdate) SetUser(u *User) *UserThreadSubscriptionUpdate {
 	return utsu.SetUserID(u.ID)
-}
-
-// SetThreadID sets the "thread" edge to the Thread entity by ID.
-func (utsu *UserThreadSubscriptionUpdate) SetThreadID(id int) *UserThreadSubscriptionUpdate {
-	utsu.mutation.SetThreadID(id)
-	return utsu
 }
 
 // SetThread sets the "thread" edge to the Thread entity.
@@ -181,7 +169,7 @@ func (utsu *UserThreadSubscriptionUpdate) sqlSave(ctx context.Context) (n int, e
 	if err := utsu.check(); err != nil {
 		return n, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(userthreadsubscription.Table, userthreadsubscription.Columns, sqlgraph.NewFieldSpec(userthreadsubscription.FieldUserId, field.TypeInt), sqlgraph.NewFieldSpec(userthreadsubscription.FieldThreadId, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(userthreadsubscription.Table, userthreadsubscription.Columns, sqlgraph.NewFieldSpec(userthreadsubscription.FieldUserID, field.TypeInt), sqlgraph.NewFieldSpec(userthreadsubscription.FieldThreadID, field.TypeInt))
 	if ps := utsu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -276,41 +264,41 @@ type UserThreadSubscriptionUpdateOne struct {
 	mutation *UserThreadSubscriptionMutation
 }
 
-// SetUserId sets the "userId" field.
-func (utsuo *UserThreadSubscriptionUpdateOne) SetUserId(i int) *UserThreadSubscriptionUpdateOne {
-	utsuo.mutation.SetUserId(i)
+// SetUserID sets the "user_id" field.
+func (utsuo *UserThreadSubscriptionUpdateOne) SetUserID(i int) *UserThreadSubscriptionUpdateOne {
+	utsuo.mutation.SetUserID(i)
 	return utsuo
 }
 
-// SetNillableUserId sets the "userId" field if the given value is not nil.
-func (utsuo *UserThreadSubscriptionUpdateOne) SetNillableUserId(i *int) *UserThreadSubscriptionUpdateOne {
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (utsuo *UserThreadSubscriptionUpdateOne) SetNillableUserID(i *int) *UserThreadSubscriptionUpdateOne {
 	if i != nil {
-		utsuo.SetUserId(*i)
+		utsuo.SetUserID(*i)
 	}
 	return utsuo
 }
 
-// SetThreadId sets the "threadId" field.
-func (utsuo *UserThreadSubscriptionUpdateOne) SetThreadId(i int) *UserThreadSubscriptionUpdateOne {
-	utsuo.mutation.SetThreadId(i)
+// SetThreadID sets the "thread_id" field.
+func (utsuo *UserThreadSubscriptionUpdateOne) SetThreadID(i int) *UserThreadSubscriptionUpdateOne {
+	utsuo.mutation.SetThreadID(i)
 	return utsuo
 }
 
-// SetNillableThreadId sets the "threadId" field if the given value is not nil.
-func (utsuo *UserThreadSubscriptionUpdateOne) SetNillableThreadId(i *int) *UserThreadSubscriptionUpdateOne {
+// SetNillableThreadID sets the "thread_id" field if the given value is not nil.
+func (utsuo *UserThreadSubscriptionUpdateOne) SetNillableThreadID(i *int) *UserThreadSubscriptionUpdateOne {
 	if i != nil {
-		utsuo.SetThreadId(*i)
+		utsuo.SetThreadID(*i)
 	}
 	return utsuo
 }
 
-// SetIsNotified sets the "isNotified" field.
+// SetIsNotified sets the "is_notified" field.
 func (utsuo *UserThreadSubscriptionUpdateOne) SetIsNotified(b bool) *UserThreadSubscriptionUpdateOne {
 	utsuo.mutation.SetIsNotified(b)
 	return utsuo
 }
 
-// SetNillableIsNotified sets the "isNotified" field if the given value is not nil.
+// SetNillableIsNotified sets the "is_notified" field if the given value is not nil.
 func (utsuo *UserThreadSubscriptionUpdateOne) SetNillableIsNotified(b *bool) *UserThreadSubscriptionUpdateOne {
 	if b != nil {
 		utsuo.SetIsNotified(*b)
@@ -318,13 +306,13 @@ func (utsuo *UserThreadSubscriptionUpdateOne) SetNillableIsNotified(b *bool) *Us
 	return utsuo
 }
 
-// SetIsChecked sets the "isChecked" field.
+// SetIsChecked sets the "is_checked" field.
 func (utsuo *UserThreadSubscriptionUpdateOne) SetIsChecked(b bool) *UserThreadSubscriptionUpdateOne {
 	utsuo.mutation.SetIsChecked(b)
 	return utsuo
 }
 
-// SetNillableIsChecked sets the "isChecked" field if the given value is not nil.
+// SetNillableIsChecked sets the "is_checked" field if the given value is not nil.
 func (utsuo *UserThreadSubscriptionUpdateOne) SetNillableIsChecked(b *bool) *UserThreadSubscriptionUpdateOne {
 	if b != nil {
 		utsuo.SetIsChecked(*b)
@@ -332,13 +320,13 @@ func (utsuo *UserThreadSubscriptionUpdateOne) SetNillableIsChecked(b *bool) *Use
 	return utsuo
 }
 
-// SetSubscribedAt sets the "subscribedAt" field.
+// SetSubscribedAt sets the "subscribed_at" field.
 func (utsuo *UserThreadSubscriptionUpdateOne) SetSubscribedAt(t time.Time) *UserThreadSubscriptionUpdateOne {
 	utsuo.mutation.SetSubscribedAt(t)
 	return utsuo
 }
 
-// SetNillableSubscribedAt sets the "subscribedAt" field if the given value is not nil.
+// SetNillableSubscribedAt sets the "subscribed_at" field if the given value is not nil.
 func (utsuo *UserThreadSubscriptionUpdateOne) SetNillableSubscribedAt(t *time.Time) *UserThreadSubscriptionUpdateOne {
 	if t != nil {
 		utsuo.SetSubscribedAt(*t)
@@ -346,21 +334,9 @@ func (utsuo *UserThreadSubscriptionUpdateOne) SetNillableSubscribedAt(t *time.Ti
 	return utsuo
 }
 
-// SetUserID sets the "user" edge to the User entity by ID.
-func (utsuo *UserThreadSubscriptionUpdateOne) SetUserID(id int) *UserThreadSubscriptionUpdateOne {
-	utsuo.mutation.SetUserID(id)
-	return utsuo
-}
-
 // SetUser sets the "user" edge to the User entity.
 func (utsuo *UserThreadSubscriptionUpdateOne) SetUser(u *User) *UserThreadSubscriptionUpdateOne {
 	return utsuo.SetUserID(u.ID)
-}
-
-// SetThreadID sets the "thread" edge to the Thread entity by ID.
-func (utsuo *UserThreadSubscriptionUpdateOne) SetThreadID(id int) *UserThreadSubscriptionUpdateOne {
-	utsuo.mutation.SetThreadID(id)
-	return utsuo
 }
 
 // SetThread sets the "thread" edge to the Thread entity.
@@ -440,14 +416,14 @@ func (utsuo *UserThreadSubscriptionUpdateOne) sqlSave(ctx context.Context) (_nod
 	if err := utsuo.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(userthreadsubscription.Table, userthreadsubscription.Columns, sqlgraph.NewFieldSpec(userthreadsubscription.FieldUserId, field.TypeInt), sqlgraph.NewFieldSpec(userthreadsubscription.FieldThreadId, field.TypeInt))
-	if id, ok := utsuo.mutation.UserId(); !ok {
-		return nil, &ValidationError{Name: "userId", err: errors.New(`ent: missing "UserThreadSubscription.userId" for update`)}
+	_spec := sqlgraph.NewUpdateSpec(userthreadsubscription.Table, userthreadsubscription.Columns, sqlgraph.NewFieldSpec(userthreadsubscription.FieldUserID, field.TypeInt), sqlgraph.NewFieldSpec(userthreadsubscription.FieldThreadID, field.TypeInt))
+	if id, ok := utsuo.mutation.UserID(); !ok {
+		return nil, &ValidationError{Name: "user_id", err: errors.New(`ent: missing "UserThreadSubscription.user_id" for update`)}
 	} else {
 		_spec.Node.CompositeID[0].Value = id
 	}
-	if id, ok := utsuo.mutation.ThreadId(); !ok {
-		return nil, &ValidationError{Name: "threadId", err: errors.New(`ent: missing "UserThreadSubscription.threadId" for update`)}
+	if id, ok := utsuo.mutation.ThreadID(); !ok {
+		return nil, &ValidationError{Name: "thread_id", err: errors.New(`ent: missing "UserThreadSubscription.thread_id" for update`)}
 	} else {
 		_spec.Node.CompositeID[1].Value = id
 	}

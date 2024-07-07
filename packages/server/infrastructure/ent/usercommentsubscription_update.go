@@ -30,41 +30,41 @@ func (ucsu *UserCommentSubscriptionUpdate) Where(ps ...predicate.UserCommentSubs
 	return ucsu
 }
 
-// SetUserId sets the "userId" field.
-func (ucsu *UserCommentSubscriptionUpdate) SetUserId(i int) *UserCommentSubscriptionUpdate {
-	ucsu.mutation.SetUserId(i)
+// SetUserID sets the "user_id" field.
+func (ucsu *UserCommentSubscriptionUpdate) SetUserID(i int) *UserCommentSubscriptionUpdate {
+	ucsu.mutation.SetUserID(i)
 	return ucsu
 }
 
-// SetNillableUserId sets the "userId" field if the given value is not nil.
-func (ucsu *UserCommentSubscriptionUpdate) SetNillableUserId(i *int) *UserCommentSubscriptionUpdate {
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (ucsu *UserCommentSubscriptionUpdate) SetNillableUserID(i *int) *UserCommentSubscriptionUpdate {
 	if i != nil {
-		ucsu.SetUserId(*i)
+		ucsu.SetUserID(*i)
 	}
 	return ucsu
 }
 
-// SetCommentId sets the "commentId" field.
-func (ucsu *UserCommentSubscriptionUpdate) SetCommentId(i int) *UserCommentSubscriptionUpdate {
-	ucsu.mutation.SetCommentId(i)
+// SetCommentID sets the "comment_id" field.
+func (ucsu *UserCommentSubscriptionUpdate) SetCommentID(i int) *UserCommentSubscriptionUpdate {
+	ucsu.mutation.SetCommentID(i)
 	return ucsu
 }
 
-// SetNillableCommentId sets the "commentId" field if the given value is not nil.
-func (ucsu *UserCommentSubscriptionUpdate) SetNillableCommentId(i *int) *UserCommentSubscriptionUpdate {
+// SetNillableCommentID sets the "comment_id" field if the given value is not nil.
+func (ucsu *UserCommentSubscriptionUpdate) SetNillableCommentID(i *int) *UserCommentSubscriptionUpdate {
 	if i != nil {
-		ucsu.SetCommentId(*i)
+		ucsu.SetCommentID(*i)
 	}
 	return ucsu
 }
 
-// SetIsNotified sets the "isNotified" field.
+// SetIsNotified sets the "is_notified" field.
 func (ucsu *UserCommentSubscriptionUpdate) SetIsNotified(b bool) *UserCommentSubscriptionUpdate {
 	ucsu.mutation.SetIsNotified(b)
 	return ucsu
 }
 
-// SetNillableIsNotified sets the "isNotified" field if the given value is not nil.
+// SetNillableIsNotified sets the "is_notified" field if the given value is not nil.
 func (ucsu *UserCommentSubscriptionUpdate) SetNillableIsNotified(b *bool) *UserCommentSubscriptionUpdate {
 	if b != nil {
 		ucsu.SetIsNotified(*b)
@@ -72,13 +72,13 @@ func (ucsu *UserCommentSubscriptionUpdate) SetNillableIsNotified(b *bool) *UserC
 	return ucsu
 }
 
-// SetIsChecked sets the "isChecked" field.
+// SetIsChecked sets the "is_checked" field.
 func (ucsu *UserCommentSubscriptionUpdate) SetIsChecked(b bool) *UserCommentSubscriptionUpdate {
 	ucsu.mutation.SetIsChecked(b)
 	return ucsu
 }
 
-// SetNillableIsChecked sets the "isChecked" field if the given value is not nil.
+// SetNillableIsChecked sets the "is_checked" field if the given value is not nil.
 func (ucsu *UserCommentSubscriptionUpdate) SetNillableIsChecked(b *bool) *UserCommentSubscriptionUpdate {
 	if b != nil {
 		ucsu.SetIsChecked(*b)
@@ -86,13 +86,13 @@ func (ucsu *UserCommentSubscriptionUpdate) SetNillableIsChecked(b *bool) *UserCo
 	return ucsu
 }
 
-// SetSubscribedAt sets the "subscribedAt" field.
+// SetSubscribedAt sets the "subscribed_at" field.
 func (ucsu *UserCommentSubscriptionUpdate) SetSubscribedAt(t time.Time) *UserCommentSubscriptionUpdate {
 	ucsu.mutation.SetSubscribedAt(t)
 	return ucsu
 }
 
-// SetNillableSubscribedAt sets the "subscribedAt" field if the given value is not nil.
+// SetNillableSubscribedAt sets the "subscribed_at" field if the given value is not nil.
 func (ucsu *UserCommentSubscriptionUpdate) SetNillableSubscribedAt(t *time.Time) *UserCommentSubscriptionUpdate {
 	if t != nil {
 		ucsu.SetSubscribedAt(*t)
@@ -100,21 +100,9 @@ func (ucsu *UserCommentSubscriptionUpdate) SetNillableSubscribedAt(t *time.Time)
 	return ucsu
 }
 
-// SetUserID sets the "user" edge to the User entity by ID.
-func (ucsu *UserCommentSubscriptionUpdate) SetUserID(id int) *UserCommentSubscriptionUpdate {
-	ucsu.mutation.SetUserID(id)
-	return ucsu
-}
-
 // SetUser sets the "user" edge to the User entity.
 func (ucsu *UserCommentSubscriptionUpdate) SetUser(u *User) *UserCommentSubscriptionUpdate {
 	return ucsu.SetUserID(u.ID)
-}
-
-// SetCommentID sets the "comment" edge to the ThreadComment entity by ID.
-func (ucsu *UserCommentSubscriptionUpdate) SetCommentID(id int) *UserCommentSubscriptionUpdate {
-	ucsu.mutation.SetCommentID(id)
-	return ucsu
 }
 
 // SetComment sets the "comment" edge to the ThreadComment entity.
@@ -181,7 +169,7 @@ func (ucsu *UserCommentSubscriptionUpdate) sqlSave(ctx context.Context) (n int, 
 	if err := ucsu.check(); err != nil {
 		return n, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(usercommentsubscription.Table, usercommentsubscription.Columns, sqlgraph.NewFieldSpec(usercommentsubscription.FieldUserId, field.TypeInt), sqlgraph.NewFieldSpec(usercommentsubscription.FieldCommentId, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(usercommentsubscription.Table, usercommentsubscription.Columns, sqlgraph.NewFieldSpec(usercommentsubscription.FieldUserID, field.TypeInt), sqlgraph.NewFieldSpec(usercommentsubscription.FieldCommentID, field.TypeInt))
 	if ps := ucsu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -276,41 +264,41 @@ type UserCommentSubscriptionUpdateOne struct {
 	mutation *UserCommentSubscriptionMutation
 }
 
-// SetUserId sets the "userId" field.
-func (ucsuo *UserCommentSubscriptionUpdateOne) SetUserId(i int) *UserCommentSubscriptionUpdateOne {
-	ucsuo.mutation.SetUserId(i)
+// SetUserID sets the "user_id" field.
+func (ucsuo *UserCommentSubscriptionUpdateOne) SetUserID(i int) *UserCommentSubscriptionUpdateOne {
+	ucsuo.mutation.SetUserID(i)
 	return ucsuo
 }
 
-// SetNillableUserId sets the "userId" field if the given value is not nil.
-func (ucsuo *UserCommentSubscriptionUpdateOne) SetNillableUserId(i *int) *UserCommentSubscriptionUpdateOne {
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (ucsuo *UserCommentSubscriptionUpdateOne) SetNillableUserID(i *int) *UserCommentSubscriptionUpdateOne {
 	if i != nil {
-		ucsuo.SetUserId(*i)
+		ucsuo.SetUserID(*i)
 	}
 	return ucsuo
 }
 
-// SetCommentId sets the "commentId" field.
-func (ucsuo *UserCommentSubscriptionUpdateOne) SetCommentId(i int) *UserCommentSubscriptionUpdateOne {
-	ucsuo.mutation.SetCommentId(i)
+// SetCommentID sets the "comment_id" field.
+func (ucsuo *UserCommentSubscriptionUpdateOne) SetCommentID(i int) *UserCommentSubscriptionUpdateOne {
+	ucsuo.mutation.SetCommentID(i)
 	return ucsuo
 }
 
-// SetNillableCommentId sets the "commentId" field if the given value is not nil.
-func (ucsuo *UserCommentSubscriptionUpdateOne) SetNillableCommentId(i *int) *UserCommentSubscriptionUpdateOne {
+// SetNillableCommentID sets the "comment_id" field if the given value is not nil.
+func (ucsuo *UserCommentSubscriptionUpdateOne) SetNillableCommentID(i *int) *UserCommentSubscriptionUpdateOne {
 	if i != nil {
-		ucsuo.SetCommentId(*i)
+		ucsuo.SetCommentID(*i)
 	}
 	return ucsuo
 }
 
-// SetIsNotified sets the "isNotified" field.
+// SetIsNotified sets the "is_notified" field.
 func (ucsuo *UserCommentSubscriptionUpdateOne) SetIsNotified(b bool) *UserCommentSubscriptionUpdateOne {
 	ucsuo.mutation.SetIsNotified(b)
 	return ucsuo
 }
 
-// SetNillableIsNotified sets the "isNotified" field if the given value is not nil.
+// SetNillableIsNotified sets the "is_notified" field if the given value is not nil.
 func (ucsuo *UserCommentSubscriptionUpdateOne) SetNillableIsNotified(b *bool) *UserCommentSubscriptionUpdateOne {
 	if b != nil {
 		ucsuo.SetIsNotified(*b)
@@ -318,13 +306,13 @@ func (ucsuo *UserCommentSubscriptionUpdateOne) SetNillableIsNotified(b *bool) *U
 	return ucsuo
 }
 
-// SetIsChecked sets the "isChecked" field.
+// SetIsChecked sets the "is_checked" field.
 func (ucsuo *UserCommentSubscriptionUpdateOne) SetIsChecked(b bool) *UserCommentSubscriptionUpdateOne {
 	ucsuo.mutation.SetIsChecked(b)
 	return ucsuo
 }
 
-// SetNillableIsChecked sets the "isChecked" field if the given value is not nil.
+// SetNillableIsChecked sets the "is_checked" field if the given value is not nil.
 func (ucsuo *UserCommentSubscriptionUpdateOne) SetNillableIsChecked(b *bool) *UserCommentSubscriptionUpdateOne {
 	if b != nil {
 		ucsuo.SetIsChecked(*b)
@@ -332,13 +320,13 @@ func (ucsuo *UserCommentSubscriptionUpdateOne) SetNillableIsChecked(b *bool) *Us
 	return ucsuo
 }
 
-// SetSubscribedAt sets the "subscribedAt" field.
+// SetSubscribedAt sets the "subscribed_at" field.
 func (ucsuo *UserCommentSubscriptionUpdateOne) SetSubscribedAt(t time.Time) *UserCommentSubscriptionUpdateOne {
 	ucsuo.mutation.SetSubscribedAt(t)
 	return ucsuo
 }
 
-// SetNillableSubscribedAt sets the "subscribedAt" field if the given value is not nil.
+// SetNillableSubscribedAt sets the "subscribed_at" field if the given value is not nil.
 func (ucsuo *UserCommentSubscriptionUpdateOne) SetNillableSubscribedAt(t *time.Time) *UserCommentSubscriptionUpdateOne {
 	if t != nil {
 		ucsuo.SetSubscribedAt(*t)
@@ -346,21 +334,9 @@ func (ucsuo *UserCommentSubscriptionUpdateOne) SetNillableSubscribedAt(t *time.T
 	return ucsuo
 }
 
-// SetUserID sets the "user" edge to the User entity by ID.
-func (ucsuo *UserCommentSubscriptionUpdateOne) SetUserID(id int) *UserCommentSubscriptionUpdateOne {
-	ucsuo.mutation.SetUserID(id)
-	return ucsuo
-}
-
 // SetUser sets the "user" edge to the User entity.
 func (ucsuo *UserCommentSubscriptionUpdateOne) SetUser(u *User) *UserCommentSubscriptionUpdateOne {
 	return ucsuo.SetUserID(u.ID)
-}
-
-// SetCommentID sets the "comment" edge to the ThreadComment entity by ID.
-func (ucsuo *UserCommentSubscriptionUpdateOne) SetCommentID(id int) *UserCommentSubscriptionUpdateOne {
-	ucsuo.mutation.SetCommentID(id)
-	return ucsuo
 }
 
 // SetComment sets the "comment" edge to the ThreadComment entity.
@@ -440,14 +416,14 @@ func (ucsuo *UserCommentSubscriptionUpdateOne) sqlSave(ctx context.Context) (_no
 	if err := ucsuo.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(usercommentsubscription.Table, usercommentsubscription.Columns, sqlgraph.NewFieldSpec(usercommentsubscription.FieldUserId, field.TypeInt), sqlgraph.NewFieldSpec(usercommentsubscription.FieldCommentId, field.TypeInt))
-	if id, ok := ucsuo.mutation.UserId(); !ok {
-		return nil, &ValidationError{Name: "userId", err: errors.New(`ent: missing "UserCommentSubscription.userId" for update`)}
+	_spec := sqlgraph.NewUpdateSpec(usercommentsubscription.Table, usercommentsubscription.Columns, sqlgraph.NewFieldSpec(usercommentsubscription.FieldUserID, field.TypeInt), sqlgraph.NewFieldSpec(usercommentsubscription.FieldCommentID, field.TypeInt))
+	if id, ok := ucsuo.mutation.UserID(); !ok {
+		return nil, &ValidationError{Name: "user_id", err: errors.New(`ent: missing "UserCommentSubscription.user_id" for update`)}
 	} else {
 		_spec.Node.CompositeID[0].Value = id
 	}
-	if id, ok := ucsuo.mutation.CommentId(); !ok {
-		return nil, &ValidationError{Name: "commentId", err: errors.New(`ent: missing "UserCommentSubscription.commentId" for update`)}
+	if id, ok := ucsuo.mutation.CommentID(); !ok {
+		return nil, &ValidationError{Name: "comment_id", err: errors.New(`ent: missing "UserCommentSubscription.comment_id" for update`)}
 	} else {
 		_spec.Node.CompositeID[1].Value = id
 	}

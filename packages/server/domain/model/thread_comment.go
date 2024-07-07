@@ -1,9 +1,12 @@
 package model
 
 import (
-	"errors"
-	"time"
+	"server/infrastructure/ent"
 )
+
+type ThreadComment struct {
+	EntThreadComment *ent.ThreadComment
+}
 
 type ThreadCommentStatus int
 
@@ -12,8 +15,8 @@ const (
 	ThreadCommentStatusDeleted
 )
 
-func (s ThreadCommentStatus) String() string {
-	switch s {
+func (m *ThreadComment) StatusToString() string {
+	switch ThreadCommentStatus(m.EntThreadComment.Status) {
 	case ThreadCommentStatusVisible:
 		return "Visible"
 	case ThreadCommentStatusDeleted:
@@ -23,66 +26,13 @@ func (s ThreadCommentStatus) String() string {
 	}
 }
 
-func (s ThreadCommentStatus) Validate() error {
-	switch s {
-	case ThreadCommentStatusVisible, ThreadCommentStatusDeleted:
-		return nil
-	default:
-		return errors.New("無効なコメントステータスです")
-	}
-}
-
-func (s ThreadCommentStatus) ToInt() int {
-	ThreadCommentStatusToInt := map[ThreadCommentStatus]int{
-		ThreadCommentStatusVisible: 0,
-		ThreadCommentStatusDeleted: 1,
-	}
-	return ThreadCommentStatusToInt[s]
-}
-
-func (s ThreadCommentStatus) Label() string {
-	switch s {
+func (m *ThreadComment) ThreadCommentToLabel() string {
+	switch ThreadCommentStatus(m.EntThreadComment.Status) {
 	case ThreadCommentStatusVisible:
-		return "Visible"
+		return "可視"
 	case ThreadCommentStatusDeleted:
-		return "Deleted"
+		return "削除"
 	default:
-		return "Unknown"
+		return "不明なステータス"
 	}
-}
-
-type ThreadComment struct {
-	Id             int
-	ThreadId       int
-	ParentCommentId *int
-	UserId         *int
-	GuestName      *string
-	Content        string
-	IpAddress      string
-	Status         ThreadCommentStatus
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
-
-	ParentComment *ThreadComment
-	Replies      []*ThreadComment
-	Attachments  []*ThreadCommentAttachment
-}
-
-func (c *ThreadComment) Validate() error {
-	if c.ThreadId == 0 {
-		return errors.New("スレッドIDは必須です")
-	}
-	if c.Content == "" {
-		return errors.New("コンテンツは必須です")
-	}
-	if len(c.Content) > 1000 {
-		return errors.New("コンテンツは1000文字以内で入力してください")
-	}
-	if err := c.Status.Validate(); err != nil {
-		return err
-	}
-	if len(c.IpAddress) > 64 {
-		return errors.New("IPアドレスは64文字以内で入力してください")
-	}
-	return nil
 }

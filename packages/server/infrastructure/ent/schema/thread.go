@@ -16,22 +16,22 @@ type Thread struct {
 func (Thread) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("id").Unique().Immutable(),
-		field.Int("boardId").StorageKey("board_id"),
-		field.Int("userId").StorageKey("user_id"),
+		field.Int("board_id"),
+		field.Int("user_id"),
 		field.String("title").Unique().MaxLen(50),
 		field.String("description").Optional().MaxLen(255),
-		field.String("thumbnailUrl").Optional().StorageKey("thumbnail_url"),
+		field.String("thumbnail_url").Optional(),
 		field.String("ip_address").MaxLen(64).Comment("スレッド作成者のIPアドレス"),
 		field.Int("status").Default(0).Comment("0: Open, 1: Pending, 2: Archived"),
-		field.Time("createdAt").Default(time.Now).StorageKey("created_at"),
-		field.Time("updatedAt").Default(time.Now).UpdateDefault(time.Now).StorageKey("updated_at"),
+		field.Time("created_at").Default(time.Now),
+		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),
 	}
 }
 
 func (Thread) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("board", Board.Type).Ref("threads").Unique().Field("boardId").Required(),
-		edge.From("owner", User.Type).Ref("threads").Unique().Field("userId").Required(),
+		edge.From("board", Board.Type).Ref("threads").Unique().Field("board_id").Required(),
+		edge.From("owner", User.Type).Ref("threads").Unique().Field("user_id").Required(),
 		edge.To("comments", ThreadComment.Type),
 		edge.To("tags", Tag.Type).Through("thread_tags", ThreadTag.Type),
 		edge.From("liked_users", User.Type).Ref("liked_threads").Through("user_thread_like", UserThreadLike.Type),

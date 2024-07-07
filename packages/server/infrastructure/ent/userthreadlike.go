@@ -17,12 +17,12 @@ import (
 // UserThreadLike is the model entity for the UserThreadLike schema.
 type UserThreadLike struct {
 	config `json:"-"`
-	// UserId holds the value of the "userId" field.
-	UserId int `json:"userId,omitempty"`
-	// ThreadId holds the value of the "threadId" field.
-	ThreadId int `json:"threadId,omitempty"`
-	// LikedAt holds the value of the "likedAt" field.
-	LikedAt time.Time `json:"likedAt,omitempty"`
+	// UserID holds the value of the "user_id" field.
+	UserID int `json:"user_id,omitempty"`
+	// ThreadID holds the value of the "thread_id" field.
+	ThreadID int `json:"thread_id,omitempty"`
+	// LikedAt holds the value of the "liked_at" field.
+	LikedAt time.Time `json:"liked_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the UserThreadLikeQuery when eager-loading is set.
 	Edges        UserThreadLikeEdges `json:"edges"`
@@ -67,7 +67,7 @@ func (*UserThreadLike) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case userthreadlike.FieldUserId, userthreadlike.FieldThreadId:
+		case userthreadlike.FieldUserID, userthreadlike.FieldThreadID:
 			values[i] = new(sql.NullInt64)
 		case userthreadlike.FieldLikedAt:
 			values[i] = new(sql.NullTime)
@@ -86,21 +86,21 @@ func (utl *UserThreadLike) assignValues(columns []string, values []any) error {
 	}
 	for i := range columns {
 		switch columns[i] {
-		case userthreadlike.FieldUserId:
+		case userthreadlike.FieldUserID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field userId", values[i])
+				return fmt.Errorf("unexpected type %T for field user_id", values[i])
 			} else if value.Valid {
-				utl.UserId = int(value.Int64)
+				utl.UserID = int(value.Int64)
 			}
-		case userthreadlike.FieldThreadId:
+		case userthreadlike.FieldThreadID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field threadId", values[i])
+				return fmt.Errorf("unexpected type %T for field thread_id", values[i])
 			} else if value.Valid {
-				utl.ThreadId = int(value.Int64)
+				utl.ThreadID = int(value.Int64)
 			}
 		case userthreadlike.FieldLikedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field likedAt", values[i])
+				return fmt.Errorf("unexpected type %T for field liked_at", values[i])
 			} else if value.Valid {
 				utl.LikedAt = value.Time
 			}
@@ -149,13 +149,13 @@ func (utl *UserThreadLike) Unwrap() *UserThreadLike {
 func (utl *UserThreadLike) String() string {
 	var builder strings.Builder
 	builder.WriteString("UserThreadLike(")
-	builder.WriteString("userId=")
-	builder.WriteString(fmt.Sprintf("%v", utl.UserId))
+	builder.WriteString("user_id=")
+	builder.WriteString(fmt.Sprintf("%v", utl.UserID))
 	builder.WriteString(", ")
-	builder.WriteString("threadId=")
-	builder.WriteString(fmt.Sprintf("%v", utl.ThreadId))
+	builder.WriteString("thread_id=")
+	builder.WriteString(fmt.Sprintf("%v", utl.ThreadID))
 	builder.WriteString(", ")
-	builder.WriteString("likedAt=")
+	builder.WriteString("liked_at=")
 	builder.WriteString(utl.LikedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()

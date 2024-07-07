@@ -27,12 +27,6 @@ type ThreadTag func(*sql.Selector)
 // User is the predicate function for user builders.
 type User func(*sql.Selector)
 
-// UserBoardLike is the predicate function for userboardlike builders.
-type UserBoardLike func(*sql.Selector)
-
-// UserBoardSubscription is the predicate function for userboardsubscription builders.
-type UserBoardSubscription func(*sql.Selector)
-
 // UserCommentLike is the predicate function for usercommentlike builders.
 type UserCommentLike func(*sql.Selector)
 

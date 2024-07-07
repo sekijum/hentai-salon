@@ -14,13 +14,13 @@ const (
 	Label = "thread_comment"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldThreadId holds the string denoting the threadid field in the database.
-	FieldThreadId = "thread_id"
-	// FieldParentCommentId holds the string denoting the parentcommentid field in the database.
-	FieldParentCommentId = "parent_comment_id"
-	// FieldUserId holds the string denoting the userid field in the database.
-	FieldUserId = "user_id"
-	// FieldGuestName holds the string denoting the guestname field in the database.
+	// FieldThreadID holds the string denoting the thread_id field in the database.
+	FieldThreadID = "thread_id"
+	// FieldParentCommentID holds the string denoting the parent_comment_id field in the database.
+	FieldParentCommentID = "parent_comment_id"
+	// FieldUserID holds the string denoting the user_id field in the database.
+	FieldUserID = "user_id"
+	// FieldGuestName holds the string denoting the guest_name field in the database.
 	FieldGuestName = "guest_name"
 	// FieldContent holds the string denoting the content field in the database.
 	FieldContent = "content"
@@ -28,9 +28,9 @@ const (
 	FieldIPAddress = "ip_address"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
-	// FieldCreatedAt holds the string denoting the createdat field in the database.
+	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
-	// FieldUpdatedAt holds the string denoting the updatedat field in the database.
+	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
 	// EdgeThread holds the string denoting the thread edge name in mutations.
 	EdgeThread = "thread"
@@ -110,9 +110,9 @@ const (
 // Columns holds all SQL columns for threadcomment fields.
 var Columns = []string{
 	FieldID,
-	FieldThreadId,
-	FieldParentCommentId,
-	FieldUserId,
+	FieldThreadID,
+	FieldParentCommentID,
+	FieldUserID,
 	FieldGuestName,
 	FieldContent,
 	FieldIPAddress,
@@ -124,10 +124,10 @@ var Columns = []string{
 var (
 	// LikedUsersPrimaryKey and LikedUsersColumn2 are the table columns denoting the
 	// primary key for the liked_users relation (M2M).
-	LikedUsersPrimaryKey = []string{"userId", "commentId"}
+	LikedUsersPrimaryKey = []string{"user_id", "comment_id"}
 	// SubscribedUsersPrimaryKey and SubscribedUsersColumn2 are the table columns denoting the
 	// primary key for the subscribed_users relation (M2M).
-	SubscribedUsersPrimaryKey = []string{"userId", "commentId"}
+	SubscribedUsersPrimaryKey = []string{"user_id", "comment_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -141,17 +141,17 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// GuestNameValidator is a validator for the "guestName" field. It is called by the builders before save.
+	// GuestNameValidator is a validator for the "guest_name" field. It is called by the builders before save.
 	GuestNameValidator func(string) error
 	// IPAddressValidator is a validator for the "ip_address" field. It is called by the builders before save.
 	IPAddressValidator func(string) error
 	// DefaultStatus holds the default value on creation for the "status" field.
 	DefaultStatus int
-	// DefaultCreatedAt holds the default value on creation for the "createdAt" field.
+	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
-	// DefaultUpdatedAt holds the default value on creation for the "updatedAt" field.
+	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
 	DefaultUpdatedAt func() time.Time
-	// UpdateDefaultUpdatedAt holds the default value on update for the "updatedAt" field.
+	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
 	UpdateDefaultUpdatedAt func() time.Time
 )
 
@@ -163,22 +163,22 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// ByThreadId orders the results by the threadId field.
-func ByThreadId(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldThreadId, opts...).ToFunc()
+// ByThreadID orders the results by the thread_id field.
+func ByThreadID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldThreadID, opts...).ToFunc()
 }
 
-// ByParentCommentId orders the results by the parentCommentId field.
-func ByParentCommentId(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldParentCommentId, opts...).ToFunc()
+// ByParentCommentID orders the results by the parent_comment_id field.
+func ByParentCommentID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldParentCommentID, opts...).ToFunc()
 }
 
-// ByUserId orders the results by the userId field.
-func ByUserId(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUserId, opts...).ToFunc()
+// ByUserID orders the results by the user_id field.
+func ByUserID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUserID, opts...).ToFunc()
 }
 
-// ByGuestName orders the results by the guestName field.
+// ByGuestName orders the results by the guest_name field.
 func ByGuestName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldGuestName, opts...).ToFunc()
 }
@@ -198,12 +198,12 @@ func ByStatus(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStatus, opts...).ToFunc()
 }
 
-// ByCreatedAt orders the results by the createdAt field.
+// ByCreatedAt orders the results by the created_at field.
 func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
 }
 
-// ByUpdatedAt orders the results by the updatedAt field.
+// ByUpdatedAt orders the results by the updated_at field.
 func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
 }

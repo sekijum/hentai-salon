@@ -260,12 +260,12 @@ func (utsq *UserThreadSubscriptionQuery) WithThread(opts ...func(*ThreadQuery)) 
 // Example:
 //
 //	var v []struct {
-//		UserId int `json:"userId,omitempty"`
+//		UserID int `json:"user_id,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.UserThreadSubscription.Query().
-//		GroupBy(userthreadsubscription.FieldUserId).
+//		GroupBy(userthreadsubscription.FieldUserID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (utsq *UserThreadSubscriptionQuery) GroupBy(field string, fields ...string) *UserThreadSubscriptionGroupBy {
@@ -283,11 +283,11 @@ func (utsq *UserThreadSubscriptionQuery) GroupBy(field string, fields ...string)
 // Example:
 //
 //	var v []struct {
-//		UserId int `json:"userId,omitempty"`
+//		UserID int `json:"user_id,omitempty"`
 //	}
 //
 //	client.UserThreadSubscription.Query().
-//		Select(userthreadsubscription.FieldUserId).
+//		Select(userthreadsubscription.FieldUserID).
 //		Scan(ctx, &v)
 func (utsq *UserThreadSubscriptionQuery) Select(fields ...string) *UserThreadSubscriptionSelect {
 	utsq.ctx.Fields = append(utsq.ctx.Fields, fields...)
@@ -374,7 +374,7 @@ func (utsq *UserThreadSubscriptionQuery) loadUser(ctx context.Context, query *Us
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*UserThreadSubscription)
 	for i := range nodes {
-		fk := nodes[i].UserId
+		fk := nodes[i].UserID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -391,7 +391,7 @@ func (utsq *UserThreadSubscriptionQuery) loadUser(ctx context.Context, query *Us
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "userId" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "user_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -403,7 +403,7 @@ func (utsq *UserThreadSubscriptionQuery) loadThread(ctx context.Context, query *
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*UserThreadSubscription)
 	for i := range nodes {
-		fk := nodes[i].ThreadId
+		fk := nodes[i].ThreadID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -420,7 +420,7 @@ func (utsq *UserThreadSubscriptionQuery) loadThread(ctx context.Context, query *
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "threadId" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "thread_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -450,10 +450,10 @@ func (utsq *UserThreadSubscriptionQuery) querySpec() *sqlgraph.QuerySpec {
 			_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 		}
 		if utsq.withUser != nil {
-			_spec.Node.AddColumnOnce(userthreadsubscription.FieldUserId)
+			_spec.Node.AddColumnOnce(userthreadsubscription.FieldUserID)
 		}
 		if utsq.withThread != nil {
-			_spec.Node.AddColumnOnce(userthreadsubscription.FieldThreadId)
+			_spec.Node.AddColumnOnce(userthreadsubscription.FieldThreadID)
 		}
 	}
 	if ps := utsq.predicates; len(ps) > 0 {

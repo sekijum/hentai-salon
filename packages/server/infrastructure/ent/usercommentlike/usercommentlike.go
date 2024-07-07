@@ -12,11 +12,11 @@ import (
 const (
 	// Label holds the string label denoting the usercommentlike type in the database.
 	Label = "user_comment_like"
-	// FieldUserId holds the string denoting the userid field in the database.
-	FieldUserId = "user_id"
-	// FieldCommentId holds the string denoting the commentid field in the database.
-	FieldCommentId = "comment_id"
-	// FieldLikedAt holds the string denoting the likedat field in the database.
+	// FieldUserID holds the string denoting the user_id field in the database.
+	FieldUserID = "user_id"
+	// FieldCommentID holds the string denoting the comment_id field in the database.
+	FieldCommentID = "comment_id"
+	// FieldLikedAt holds the string denoting the liked_at field in the database.
 	FieldLikedAt = "liked_at"
 	// EdgeUser holds the string denoting the user edge name in mutations.
 	EdgeUser = "user"
@@ -46,8 +46,8 @@ const (
 
 // Columns holds all SQL columns for usercommentlike fields.
 var Columns = []string{
-	FieldUserId,
-	FieldCommentId,
+	FieldUserID,
+	FieldCommentID,
 	FieldLikedAt,
 }
 
@@ -62,24 +62,24 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// DefaultLikedAt holds the default value on creation for the "likedAt" field.
+	// DefaultLikedAt holds the default value on creation for the "liked_at" field.
 	DefaultLikedAt func() time.Time
 )
 
 // OrderOption defines the ordering options for the UserCommentLike queries.
 type OrderOption func(*sql.Selector)
 
-// ByUserId orders the results by the userId field.
-func ByUserId(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUserId, opts...).ToFunc()
+// ByUserID orders the results by the user_id field.
+func ByUserID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUserID, opts...).ToFunc()
 }
 
-// ByCommentId orders the results by the commentId field.
-func ByCommentId(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldCommentId, opts...).ToFunc()
+// ByCommentID orders the results by the comment_id field.
+func ByCommentID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCommentID, opts...).ToFunc()
 }
 
-// ByLikedAt orders the results by the likedAt field.
+// ByLikedAt orders the results by the liked_at field.
 func ByLikedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldLikedAt, opts...).ToFunc()
 }

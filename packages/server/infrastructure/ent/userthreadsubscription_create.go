@@ -22,25 +22,25 @@ type UserThreadSubscriptionCreate struct {
 	hooks    []Hook
 }
 
-// SetUserId sets the "userId" field.
-func (utsc *UserThreadSubscriptionCreate) SetUserId(i int) *UserThreadSubscriptionCreate {
-	utsc.mutation.SetUserId(i)
+// SetUserID sets the "user_id" field.
+func (utsc *UserThreadSubscriptionCreate) SetUserID(i int) *UserThreadSubscriptionCreate {
+	utsc.mutation.SetUserID(i)
 	return utsc
 }
 
-// SetThreadId sets the "threadId" field.
-func (utsc *UserThreadSubscriptionCreate) SetThreadId(i int) *UserThreadSubscriptionCreate {
-	utsc.mutation.SetThreadId(i)
+// SetThreadID sets the "thread_id" field.
+func (utsc *UserThreadSubscriptionCreate) SetThreadID(i int) *UserThreadSubscriptionCreate {
+	utsc.mutation.SetThreadID(i)
 	return utsc
 }
 
-// SetIsNotified sets the "isNotified" field.
+// SetIsNotified sets the "is_notified" field.
 func (utsc *UserThreadSubscriptionCreate) SetIsNotified(b bool) *UserThreadSubscriptionCreate {
 	utsc.mutation.SetIsNotified(b)
 	return utsc
 }
 
-// SetNillableIsNotified sets the "isNotified" field if the given value is not nil.
+// SetNillableIsNotified sets the "is_notified" field if the given value is not nil.
 func (utsc *UserThreadSubscriptionCreate) SetNillableIsNotified(b *bool) *UserThreadSubscriptionCreate {
 	if b != nil {
 		utsc.SetIsNotified(*b)
@@ -48,13 +48,13 @@ func (utsc *UserThreadSubscriptionCreate) SetNillableIsNotified(b *bool) *UserTh
 	return utsc
 }
 
-// SetIsChecked sets the "isChecked" field.
+// SetIsChecked sets the "is_checked" field.
 func (utsc *UserThreadSubscriptionCreate) SetIsChecked(b bool) *UserThreadSubscriptionCreate {
 	utsc.mutation.SetIsChecked(b)
 	return utsc
 }
 
-// SetNillableIsChecked sets the "isChecked" field if the given value is not nil.
+// SetNillableIsChecked sets the "is_checked" field if the given value is not nil.
 func (utsc *UserThreadSubscriptionCreate) SetNillableIsChecked(b *bool) *UserThreadSubscriptionCreate {
 	if b != nil {
 		utsc.SetIsChecked(*b)
@@ -62,13 +62,13 @@ func (utsc *UserThreadSubscriptionCreate) SetNillableIsChecked(b *bool) *UserThr
 	return utsc
 }
 
-// SetSubscribedAt sets the "subscribedAt" field.
+// SetSubscribedAt sets the "subscribed_at" field.
 func (utsc *UserThreadSubscriptionCreate) SetSubscribedAt(t time.Time) *UserThreadSubscriptionCreate {
 	utsc.mutation.SetSubscribedAt(t)
 	return utsc
 }
 
-// SetNillableSubscribedAt sets the "subscribedAt" field if the given value is not nil.
+// SetNillableSubscribedAt sets the "subscribed_at" field if the given value is not nil.
 func (utsc *UserThreadSubscriptionCreate) SetNillableSubscribedAt(t *time.Time) *UserThreadSubscriptionCreate {
 	if t != nil {
 		utsc.SetSubscribedAt(*t)
@@ -76,21 +76,9 @@ func (utsc *UserThreadSubscriptionCreate) SetNillableSubscribedAt(t *time.Time) 
 	return utsc
 }
 
-// SetUserID sets the "user" edge to the User entity by ID.
-func (utsc *UserThreadSubscriptionCreate) SetUserID(id int) *UserThreadSubscriptionCreate {
-	utsc.mutation.SetUserID(id)
-	return utsc
-}
-
 // SetUser sets the "user" edge to the User entity.
 func (utsc *UserThreadSubscriptionCreate) SetUser(u *User) *UserThreadSubscriptionCreate {
 	return utsc.SetUserID(u.ID)
-}
-
-// SetThreadID sets the "thread" edge to the Thread entity by ID.
-func (utsc *UserThreadSubscriptionCreate) SetThreadID(id int) *UserThreadSubscriptionCreate {
-	utsc.mutation.SetThreadID(id)
-	return utsc
 }
 
 // SetThread sets the "thread" edge to the Thread entity.
@@ -149,20 +137,20 @@ func (utsc *UserThreadSubscriptionCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (utsc *UserThreadSubscriptionCreate) check() error {
-	if _, ok := utsc.mutation.UserId(); !ok {
-		return &ValidationError{Name: "userId", err: errors.New(`ent: missing required field "UserThreadSubscription.userId"`)}
+	if _, ok := utsc.mutation.UserID(); !ok {
+		return &ValidationError{Name: "user_id", err: errors.New(`ent: missing required field "UserThreadSubscription.user_id"`)}
 	}
-	if _, ok := utsc.mutation.ThreadId(); !ok {
-		return &ValidationError{Name: "threadId", err: errors.New(`ent: missing required field "UserThreadSubscription.threadId"`)}
+	if _, ok := utsc.mutation.ThreadID(); !ok {
+		return &ValidationError{Name: "thread_id", err: errors.New(`ent: missing required field "UserThreadSubscription.thread_id"`)}
 	}
 	if _, ok := utsc.mutation.IsNotified(); !ok {
-		return &ValidationError{Name: "isNotified", err: errors.New(`ent: missing required field "UserThreadSubscription.isNotified"`)}
+		return &ValidationError{Name: "is_notified", err: errors.New(`ent: missing required field "UserThreadSubscription.is_notified"`)}
 	}
 	if _, ok := utsc.mutation.IsChecked(); !ok {
-		return &ValidationError{Name: "isChecked", err: errors.New(`ent: missing required field "UserThreadSubscription.isChecked"`)}
+		return &ValidationError{Name: "is_checked", err: errors.New(`ent: missing required field "UserThreadSubscription.is_checked"`)}
 	}
 	if _, ok := utsc.mutation.SubscribedAt(); !ok {
-		return &ValidationError{Name: "subscribedAt", err: errors.New(`ent: missing required field "UserThreadSubscription.subscribedAt"`)}
+		return &ValidationError{Name: "subscribed_at", err: errors.New(`ent: missing required field "UserThreadSubscription.subscribed_at"`)}
 	}
 	if _, ok := utsc.mutation.UserID(); !ok {
 		return &ValidationError{Name: "user", err: errors.New(`ent: missing required edge "UserThreadSubscription.user"`)}
@@ -218,7 +206,7 @@ func (utsc *UserThreadSubscriptionCreate) createSpec() (*UserThreadSubscription,
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.UserId = nodes[0]
+		_node.UserID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := utsc.mutation.ThreadIDs(); len(nodes) > 0 {
@@ -235,7 +223,7 @@ func (utsc *UserThreadSubscriptionCreate) createSpec() (*UserThreadSubscription,
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.ThreadId = nodes[0]
+		_node.ThreadID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

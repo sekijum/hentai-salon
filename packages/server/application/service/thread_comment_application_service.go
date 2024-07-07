@@ -4,19 +4,19 @@ import (
 	"context"
 	"server/domain/model"
 	"server/infrastructure/datasource"
+	"server/infrastructure/ent"
 	request "server/presentation/request"
-
 	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
 type ThreadCommentApplicationService struct {
-	threadCommentDatasource    *datasource.ThreadCommentDatasource
+	threadCommentDatasource *datasource.ThreadCommentDatasource
 }
 
 func NewThreadCommentApplicationService(threadCommentDatasource *datasource.ThreadCommentDatasource) *ThreadCommentApplicationService {
-	return &ThreadCommentApplicationService{threadCommentDatasource: threadCommentDatasource	}
+	return &ThreadCommentApplicationService{threadCommentDatasource: threadCommentDatasource}
 }
 
 func (svc *ThreadCommentApplicationService) FindAll(
@@ -41,22 +41,23 @@ func (svc *ThreadCommentApplicationService) Create(
 	userId, exists := ginCtx.Get("user_id")
 
 	comment := &model.ThreadComment{
-		ThreadId:        body.ThreadId,
-		ParentCommentId: body.ParentCommentId,
-		Content:         body.Content,
-		IpAddress:       ginCtx.ClientIP(),
-		Status:          model.ThreadCommentStatusVisible,
-		CreatedAt:       time.Now(),
-		UpdatedAt:       time.Now(),
+		EntThreadComment: &ent.ThreadComment{
+			ThreadID:  body.ThreadId,
+			Content:   body.Content,
+			IPAddress: ginCtx.ClientIP(),
+			Status:    int(model.ThreadCommentStatusVisible),
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		},
 	}
 
 	if exists {
 		userIdInt := userId.(int)
-		comment.UserId = &userIdInt
-	} 
+		comment.EntThreadComment.UserID = &userIdInt
+	}
 
-	if err := comment.Validate(); err != nil {
-		return err
+	if body.ParentCommentId != nil {
+		comment.EntThreadComment.ParentCommentID = body.ParentCommentId
 	}
 
 	_, err := svc.threadCommentDatasource.Create(ctx, comment)

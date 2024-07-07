@@ -27,13 +27,13 @@ func (tc *TagCreate) SetName(s string) *TagCreate {
 	return tc
 }
 
-// SetCreatedAt sets the "createdAt" field.
+// SetCreatedAt sets the "created_at" field.
 func (tc *TagCreate) SetCreatedAt(t time.Time) *TagCreate {
 	tc.mutation.SetCreatedAt(t)
 	return tc
 }
 
-// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
 func (tc *TagCreate) SetNillableCreatedAt(t *time.Time) *TagCreate {
 	if t != nil {
 		tc.SetCreatedAt(*t)
@@ -114,7 +114,7 @@ func (tc *TagCreate) check() error {
 		}
 	}
 	if _, ok := tc.mutation.CreatedAt(); !ok {
-		return &ValidationError{Name: "createdAt", err: errors.New(`ent: missing required field "Tag.createdAt"`)}
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Tag.created_at"`)}
 	}
 	return nil
 }

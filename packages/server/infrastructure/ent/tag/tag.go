@@ -16,7 +16,7 @@ const (
 	FieldID = "id"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
-	// FieldCreatedAt holds the string denoting the createdat field in the database.
+	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// EdgeThreads holds the string denoting the threads edge name in mutations.
 	EdgeThreads = "threads"
@@ -64,7 +64,7 @@ func ValidColumn(column string) bool {
 var (
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
 	NameValidator func(string) error
-	// DefaultCreatedAt holds the default value on creation for the "createdAt" field.
+	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 )
 
@@ -81,7 +81,7 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
 }
 
-// ByCreatedAt orders the results by the createdAt field.
+// ByCreatedAt orders the results by the created_at field.
 func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
 }

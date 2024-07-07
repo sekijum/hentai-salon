@@ -19,24 +19,24 @@ type Thread struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// BoardId holds the value of the "boardId" field.
-	BoardId int `json:"boardId,omitempty"`
-	// UserId holds the value of the "userId" field.
-	UserId int `json:"userId,omitempty"`
+	// BoardID holds the value of the "board_id" field.
+	BoardID int `json:"board_id,omitempty"`
+	// UserID holds the value of the "user_id" field.
+	UserID int `json:"user_id,omitempty"`
 	// Title holds the value of the "title" field.
 	Title string `json:"title,omitempty"`
 	// Description holds the value of the "description" field.
 	Description string `json:"description,omitempty"`
-	// ThumbnailUrl holds the value of the "thumbnailUrl" field.
-	ThumbnailUrl string `json:"thumbnailUrl,omitempty"`
+	// ThumbnailURL holds the value of the "thumbnail_url" field.
+	ThumbnailURL string `json:"thumbnail_url,omitempty"`
 	// スレッド作成者のIPアドレス
 	IPAddress string `json:"ip_address,omitempty"`
 	// 0: Open, 1: Pending, 2: Archived
 	Status int `json:"status,omitempty"`
-	// CreatedAt holds the value of the "createdAt" field.
-	CreatedAt time.Time `json:"createdAt,omitempty"`
-	// UpdatedAt holds the value of the "updatedAt" field.
-	UpdatedAt time.Time `json:"updatedAt,omitempty"`
+	// CreatedAt holds the value of the "created_at" field.
+	CreatedAt time.Time `json:"created_at,omitempty"`
+	// UpdatedAt holds the value of the "updated_at" field.
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ThreadQuery when eager-loading is set.
 	Edges        ThreadEdges `json:"edges"`
@@ -158,9 +158,9 @@ func (*Thread) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case thread.FieldID, thread.FieldBoardId, thread.FieldUserId, thread.FieldStatus:
+		case thread.FieldID, thread.FieldBoardID, thread.FieldUserID, thread.FieldStatus:
 			values[i] = new(sql.NullInt64)
-		case thread.FieldTitle, thread.FieldDescription, thread.FieldThumbnailUrl, thread.FieldIPAddress:
+		case thread.FieldTitle, thread.FieldDescription, thread.FieldThumbnailURL, thread.FieldIPAddress:
 			values[i] = new(sql.NullString)
 		case thread.FieldCreatedAt, thread.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -185,17 +185,17 @@ func (t *Thread) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			t.ID = int(value.Int64)
-		case thread.FieldBoardId:
+		case thread.FieldBoardID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field boardId", values[i])
+				return fmt.Errorf("unexpected type %T for field board_id", values[i])
 			} else if value.Valid {
-				t.BoardId = int(value.Int64)
+				t.BoardID = int(value.Int64)
 			}
-		case thread.FieldUserId:
+		case thread.FieldUserID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field userId", values[i])
+				return fmt.Errorf("unexpected type %T for field user_id", values[i])
 			} else if value.Valid {
-				t.UserId = int(value.Int64)
+				t.UserID = int(value.Int64)
 			}
 		case thread.FieldTitle:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -209,11 +209,11 @@ func (t *Thread) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				t.Description = value.String
 			}
-		case thread.FieldThumbnailUrl:
+		case thread.FieldThumbnailURL:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field thumbnailUrl", values[i])
+				return fmt.Errorf("unexpected type %T for field thumbnail_url", values[i])
 			} else if value.Valid {
-				t.ThumbnailUrl = value.String
+				t.ThumbnailURL = value.String
 			}
 		case thread.FieldIPAddress:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -229,13 +229,13 @@ func (t *Thread) assignValues(columns []string, values []any) error {
 			}
 		case thread.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field createdAt", values[i])
+				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
 				t.CreatedAt = value.Time
 			}
 		case thread.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field updatedAt", values[i])
+				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
 				t.UpdatedAt = value.Time
 			}
@@ -320,11 +320,11 @@ func (t *Thread) String() string {
 	var builder strings.Builder
 	builder.WriteString("Thread(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", t.ID))
-	builder.WriteString("boardId=")
-	builder.WriteString(fmt.Sprintf("%v", t.BoardId))
+	builder.WriteString("board_id=")
+	builder.WriteString(fmt.Sprintf("%v", t.BoardID))
 	builder.WriteString(", ")
-	builder.WriteString("userId=")
-	builder.WriteString(fmt.Sprintf("%v", t.UserId))
+	builder.WriteString("user_id=")
+	builder.WriteString(fmt.Sprintf("%v", t.UserID))
 	builder.WriteString(", ")
 	builder.WriteString("title=")
 	builder.WriteString(t.Title)
@@ -332,8 +332,8 @@ func (t *Thread) String() string {
 	builder.WriteString("description=")
 	builder.WriteString(t.Description)
 	builder.WriteString(", ")
-	builder.WriteString("thumbnailUrl=")
-	builder.WriteString(t.ThumbnailUrl)
+	builder.WriteString("thumbnail_url=")
+	builder.WriteString(t.ThumbnailURL)
 	builder.WriteString(", ")
 	builder.WriteString("ip_address=")
 	builder.WriteString(t.IPAddress)
@@ -341,10 +341,10 @@ func (t *Thread) String() string {
 	builder.WriteString("status=")
 	builder.WriteString(fmt.Sprintf("%v", t.Status))
 	builder.WriteString(", ")
-	builder.WriteString("createdAt=")
+	builder.WriteString("created_at=")
 	builder.WriteString(t.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
-	builder.WriteString("updatedAt=")
+	builder.WriteString("updated_at=")
 	builder.WriteString(t.UpdatedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()

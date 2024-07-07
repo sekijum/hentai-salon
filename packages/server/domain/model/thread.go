@@ -1,60 +1,14 @@
 package model
 
 import (
-	"errors"
-	"fmt"
-	"net"
-	"net/url"
+	"math"
+	"server/infrastructure/ent"
 	"time"
 )
 
 type Thread struct {
-	Id                int
-	BoardId           int
-	UserId            int
-	Title             string
-	Description       *string
-	ThumbnailUrl      *string
-	IpAddress         string
-	Status            ThreadStatus
-	CreatedAt         time.Time
-	UpdatedAt         time.Time
-
-	User  *User
-	Board *Board
-	Tags              []*Tag
-}
-
-func (t *Thread) Validate() error {
-
-	if t.UserId == 0 {
-		return errors.New("ユーザーIDは必須です")
-	}
-	if t.Title == "" {
-		return errors.New("スレッドのタイトルは必須です")
-	}
-	if len(t.Title) > 50 {
-		return errors.New("スレッドのタイトルは50文字以内である必要があります")
-	}
-	if t.Description != nil && len(*t.Description) > 255 {
-		return errors.New("説明は255文字以内で入力してください")
-	}
-	if t.ThumbnailUrl != nil {
-		if _, err := url.ParseRequestURI(*t.ThumbnailUrl); err != nil {
-			return errors.New("サムネイルURLは有効なURLである必要があります")
-		}
-	}
-	if t.IpAddress == "" {
-		return errors.New("スレッドのIPアドレスは必須です")
-	}
-	if net.ParseIP(t.IpAddress) == nil {
-		return errors.New("スレッドのIPアドレスは有効な形式である必要があります")
-	}
-	if err := t.Status.Validate(); err != nil {
-		return err
-	}
-
-	return nil
+	EntThread  *ent.Thread
+	Popularity int
 }
 
 type ThreadStatus int
@@ -65,8 +19,8 @@ const (
 	ThreadStatusArchived
 )
 
-func (s ThreadStatus) String() string {
-	switch s {
+func (m *Thread) StatusToString() string {
+	switch ThreadStatus(m.EntThread.Status) {
 	case ThreadStatusOpen:
 		return "Open"
 	case ThreadStatusPending:
@@ -78,26 +32,8 @@ func (s ThreadStatus) String() string {
 	}
 }
 
-func (s ThreadStatus) Validate() error {
-	switch s {
-	case ThreadStatusOpen, ThreadStatusArchived, ThreadStatusPending:
-		return nil
-	default:
-		return errors.New("無効なスレッドステータスです")
-	}
-}
-
-func (s ThreadStatus) ToInt() int {
-	boardStatusToInt := map[ThreadStatus]int{
-		ThreadStatusOpen:     0,
-		ThreadStatusPending:  1,
-		ThreadStatusArchived: 2,
-	}
-	return boardStatusToInt[s]
-}
-
-func (s ThreadStatus) Label() string {
-	switch s {
+func (m *Thread) StatusToLabel() string {
+	switch ThreadStatus(m.EntThread.Status) {
 	case ThreadStatusOpen:
 		return "公開"
 	case ThreadStatusPending:
@@ -109,6 +45,22 @@ func (s ThreadStatus) Label() string {
 	}
 }
 
-func (t *Thread) GenerateDefaultTitle() {
-	t.Title = fmt.Sprintf("%d", time.Now().Unix())
+func (m *Thread) CalculatePopularity() {
+	var totalPopularity float64
+	currentTime := time.Now()
+
+	for _, comment := range m.EntThread.Edges.Comments {
+		timeDiff := currentTime.Sub(comment.CreatedAt).Hours() + 1
+		totalPopularity += 1 / timeDiff
+	}
+
+	if m.EntThread.Title != "" {
+		totalPopularity += 10
+	}
+	if m.EntThread.Description != "" {
+		totalPopularity += 5
+	}
+
+	scaledPopularity := int(math.Min(totalPopularity, 100))
+	m.Popularity = scaledPopularity
 }

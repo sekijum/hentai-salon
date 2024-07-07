@@ -204,60 +204,6 @@ var (
 		Columns:    UsersColumns,
 		PrimaryKey: []*schema.Column{UsersColumns[0]},
 	}
-	// UserBoardLikesColumns holds the columns for the "user_board_likes" table.
-	UserBoardLikesColumns = []*schema.Column{
-		{Name: "liked_at", Type: field.TypeTime},
-		{Name: "user_id", Type: field.TypeInt},
-		{Name: "board_id", Type: field.TypeInt},
-	}
-	// UserBoardLikesTable holds the schema information for the "user_board_likes" table.
-	UserBoardLikesTable = &schema.Table{
-		Name:       "user_board_likes",
-		Columns:    UserBoardLikesColumns,
-		PrimaryKey: []*schema.Column{UserBoardLikesColumns[1], UserBoardLikesColumns[2]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "user_board_likes_users_user",
-				Columns:    []*schema.Column{UserBoardLikesColumns[1]},
-				RefColumns: []*schema.Column{UsersColumns[0]},
-				OnDelete:   schema.NoAction,
-			},
-			{
-				Symbol:     "user_board_likes_boards_board",
-				Columns:    []*schema.Column{UserBoardLikesColumns[2]},
-				RefColumns: []*schema.Column{BoardsColumns[0]},
-				OnDelete:   schema.NoAction,
-			},
-		},
-	}
-	// UserBoardSubscriptionsColumns holds the columns for the "user_board_subscriptions" table.
-	UserBoardSubscriptionsColumns = []*schema.Column{
-		{Name: "is_notified", Type: field.TypeBool, Default: true},
-		{Name: "is_checked", Type: field.TypeBool, Default: false},
-		{Name: "subscribed_at", Type: field.TypeTime},
-		{Name: "user_id", Type: field.TypeInt},
-		{Name: "board_id", Type: field.TypeInt},
-	}
-	// UserBoardSubscriptionsTable holds the schema information for the "user_board_subscriptions" table.
-	UserBoardSubscriptionsTable = &schema.Table{
-		Name:       "user_board_subscriptions",
-		Columns:    UserBoardSubscriptionsColumns,
-		PrimaryKey: []*schema.Column{UserBoardSubscriptionsColumns[3], UserBoardSubscriptionsColumns[4]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "user_board_subscriptions_users_user",
-				Columns:    []*schema.Column{UserBoardSubscriptionsColumns[3]},
-				RefColumns: []*schema.Column{UsersColumns[0]},
-				OnDelete:   schema.NoAction,
-			},
-			{
-				Symbol:     "user_board_subscriptions_boards_board",
-				Columns:    []*schema.Column{UserBoardSubscriptionsColumns[4]},
-				RefColumns: []*schema.Column{BoardsColumns[0]},
-				OnDelete:   schema.NoAction,
-			},
-		},
-	}
 	// UserCommentLikesColumns holds the columns for the "user_comment_likes" table.
 	UserCommentLikesColumns = []*schema.Column{
 		{Name: "liked_at", Type: field.TypeTime},
@@ -375,8 +321,6 @@ var (
 		ThreadCommentAttachmentsTable,
 		ThreadTagsTable,
 		UsersTable,
-		UserBoardLikesTable,
-		UserBoardSubscriptionsTable,
 		UserCommentLikesTable,
 		UserCommentSubscriptionsTable,
 		UserThreadLikesTable,
@@ -394,10 +338,6 @@ func init() {
 	ThreadCommentAttachmentsTable.ForeignKeys[0].RefTable = ThreadCommentsTable
 	ThreadTagsTable.ForeignKeys[0].RefTable = ThreadsTable
 	ThreadTagsTable.ForeignKeys[1].RefTable = TagsTable
-	UserBoardLikesTable.ForeignKeys[0].RefTable = UsersTable
-	UserBoardLikesTable.ForeignKeys[1].RefTable = BoardsTable
-	UserBoardSubscriptionsTable.ForeignKeys[0].RefTable = UsersTable
-	UserBoardSubscriptionsTable.ForeignKeys[1].RefTable = BoardsTable
 	UserCommentLikesTable.ForeignKeys[0].RefTable = UsersTable
 	UserCommentLikesTable.ForeignKeys[1].RefTable = ThreadCommentsTable
 	UserCommentSubscriptionsTable.ForeignKeys[0].RefTable = UsersTable

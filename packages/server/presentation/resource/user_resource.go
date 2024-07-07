@@ -9,33 +9,25 @@ type UserResource struct {
 	Id        int    `json:"id"`
 	Name      string `json:"name"`
 	Email     string `json:"email"`
-	AvatarUrl string `json:"avatar_url,omitempty"`
+	AvatarUrl string `json:"avatarUrl,omitempty"`
 	Role      string `json:"role"`
-	CreatedAt string `json:"created_at"`
-	UpdatedAt string `json:"updated_at"`
+	CreatedAt string `json:"createdAt"`
+	UpdatedAt string `json:"updatedAt"`
 }
 
-func NewUserResource(user *model.User) *UserResource {
+func NewUserResource(u *model.User) *UserResource {
 	var avatarUrl string
-	if user.AvatarUrl != nil {
-		avatarUrl = *user.AvatarUrl
+	if u.EntUser.AvatarURL != nil {
+		avatarUrl = *u.EntUser.AvatarURL
 	}
 
 	return &UserResource{
-		Id:        user.Id,
-		Name:      user.Name,
-		Email:     user.Email,
+		Id:        u.EntUser.ID,
+		Name:      u.EntUser.Name,
+		Email:     u.EntUser.Email,
 		AvatarUrl: avatarUrl,
-		Role:      user.Role.String(),
-		CreatedAt: user.CreatedAt.Format(time.RFC3339),
-		UpdatedAt: user.UpdatedAt.Format(time.RFC3339),
+		Role:      u.RoleToString(),
+		CreatedAt: u.EntUser.CreatedAt.Format(time.RFC3339),
+		UpdatedAt: u.EntUser.UpdatedAt.Format(time.RFC3339),
 	}
-}
-
-func NewUserResourceList(users []*model.User) []*UserResource {
-	var userResources []*UserResource
-	for _, user := range users {
-		userResources = append(userResources, NewUserResource(user))
-	}
-	return userResources
 }

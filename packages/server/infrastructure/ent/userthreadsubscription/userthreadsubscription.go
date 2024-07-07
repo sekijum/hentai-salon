@@ -12,15 +12,15 @@ import (
 const (
 	// Label holds the string label denoting the userthreadsubscription type in the database.
 	Label = "user_thread_subscription"
-	// FieldUserId holds the string denoting the userid field in the database.
-	FieldUserId = "user_id"
-	// FieldThreadId holds the string denoting the threadid field in the database.
-	FieldThreadId = "thread_id"
-	// FieldIsNotified holds the string denoting the isnotified field in the database.
+	// FieldUserID holds the string denoting the user_id field in the database.
+	FieldUserID = "user_id"
+	// FieldThreadID holds the string denoting the thread_id field in the database.
+	FieldThreadID = "thread_id"
+	// FieldIsNotified holds the string denoting the is_notified field in the database.
 	FieldIsNotified = "is_notified"
-	// FieldIsChecked holds the string denoting the ischecked field in the database.
+	// FieldIsChecked holds the string denoting the is_checked field in the database.
 	FieldIsChecked = "is_checked"
-	// FieldSubscribedAt holds the string denoting the subscribedat field in the database.
+	// FieldSubscribedAt holds the string denoting the subscribed_at field in the database.
 	FieldSubscribedAt = "subscribed_at"
 	// EdgeUser holds the string denoting the user edge name in mutations.
 	EdgeUser = "user"
@@ -50,8 +50,8 @@ const (
 
 // Columns holds all SQL columns for userthreadsubscription fields.
 var Columns = []string{
-	FieldUserId,
-	FieldThreadId,
+	FieldUserID,
+	FieldThreadID,
 	FieldIsNotified,
 	FieldIsChecked,
 	FieldSubscribedAt,
@@ -68,38 +68,38 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// DefaultIsNotified holds the default value on creation for the "isNotified" field.
+	// DefaultIsNotified holds the default value on creation for the "is_notified" field.
 	DefaultIsNotified bool
-	// DefaultIsChecked holds the default value on creation for the "isChecked" field.
+	// DefaultIsChecked holds the default value on creation for the "is_checked" field.
 	DefaultIsChecked bool
-	// DefaultSubscribedAt holds the default value on creation for the "subscribedAt" field.
+	// DefaultSubscribedAt holds the default value on creation for the "subscribed_at" field.
 	DefaultSubscribedAt func() time.Time
 )
 
 // OrderOption defines the ordering options for the UserThreadSubscription queries.
 type OrderOption func(*sql.Selector)
 
-// ByUserId orders the results by the userId field.
-func ByUserId(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUserId, opts...).ToFunc()
+// ByUserID orders the results by the user_id field.
+func ByUserID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUserID, opts...).ToFunc()
 }
 
-// ByThreadId orders the results by the threadId field.
-func ByThreadId(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldThreadId, opts...).ToFunc()
+// ByThreadID orders the results by the thread_id field.
+func ByThreadID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldThreadID, opts...).ToFunc()
 }
 
-// ByIsNotified orders the results by the isNotified field.
+// ByIsNotified orders the results by the is_notified field.
 func ByIsNotified(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldIsNotified, opts...).ToFunc()
 }
 
-// ByIsChecked orders the results by the isChecked field.
+// ByIsChecked orders the results by the is_checked field.
 func ByIsChecked(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldIsChecked, opts...).ToFunc()
 }
 
-// BySubscribedAt orders the results by the subscribedAt field.
+// BySubscribedAt orders the results by the subscribed_at field.
 func BySubscribedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldSubscribedAt, opts...).ToFunc()
 }

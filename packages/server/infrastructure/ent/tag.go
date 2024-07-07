@@ -19,8 +19,8 @@ type Tag struct {
 	ID int `json:"id,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
-	// CreatedAt holds the value of the "createdAt" field.
-	CreatedAt time.Time `json:"createdAt,omitempty"`
+	// CreatedAt holds the value of the "created_at" field.
+	CreatedAt time.Time `json:"created_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the TagQuery when eager-loading is set.
 	Edges        TagEdges `json:"edges"`
@@ -96,7 +96,7 @@ func (t *Tag) assignValues(columns []string, values []any) error {
 			}
 		case tag.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field createdAt", values[i])
+				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
 				t.CreatedAt = value.Time
 			}
@@ -149,7 +149,7 @@ func (t *Tag) String() string {
 	builder.WriteString("name=")
 	builder.WriteString(t.Name)
 	builder.WriteString(", ")
-	builder.WriteString("createdAt=")
+	builder.WriteString("created_at=")
 	builder.WriteString(t.CreatedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()

@@ -5,29 +5,24 @@ import (
 )
 
 type BoardResource struct {
-	Id          int       `json:"id"`
-	UserId      int       `json:"userId"`
-	Title       string    `json:"title"`
-	Description string    `json:"description"`
-	ThumbnailUrl string   `json:"thumbnailUrl"`
+	Id           int    `json:"id"`
+	Title        string `json:"title"`
+	Description  string `json:"description"`
+	ThumbnailUrl string `json:"thumbnailUrl"`
 }
 
 func NewBoardResource(b *model.Board) *BoardResource {
 	description := ""
-	if b.Description != nil {
-		description = *b.Description
+	if b.EntBoard.Description != "" {
+		description = b.EntBoard.Description
 	}
 
-	thumbnailUrl := ""
-	if b.ThumbnailUrl != nil {
-		thumbnailUrl = *b.ThumbnailUrl
-	}
+	thumbnailUrl := b.EntBoard.ThumbnailURL
 
 	return &BoardResource{
-		Id:          b.Id,
-		UserId:      b.UserId,
-		Title:       b.Title,
-		Description: description,
+		Id:           b.EntBoard.ID,
+		Title:        b.EntBoard.Title,
+		Description:  description,
 		ThumbnailUrl: thumbnailUrl,
 	}
 }

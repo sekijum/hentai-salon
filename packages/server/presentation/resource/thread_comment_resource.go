@@ -7,24 +7,24 @@ import (
 )
 
 type ThreadCommentResource struct {
-	Id             int    `json:"id"`
-	ThreadId       int    `json:"threadId"`
+	Id              int    `json:"id"`
+	ThreadId        int    `json:"threadId"`
 	ParentCommentId *int   `json:"parentCommentId,omitempty"`
-	UserId         int    `json:"userId"`
-	Content        string `json:"content"`
-	IpAddress      string `json:"ip_address"`
-	Status         string `json:"status"`
-	CreatedAt      string `json:"created_at"`
+	UserId          int    `json:"userId"`
+	Content         string `json:"content"`
+	IpAddress       string `json:"ipAddress"`
+	Status          string `json:"status"`
+	CreatedAt       string `json:"createdAt"`
 }
 
-func NewCommentResource(c *model.ThreadComment) *ThreadCommentResource {
+func NewThreadCommentResource(c *model.ThreadComment) *ThreadCommentResource {
 	return &ThreadCommentResource{
-		Id:             c.Id,
-		ThreadId:       c.ThreadId,
-		ParentCommentId: c.ParentCommentId,
-		Content:        c.Content,
-		IpAddress:      c.IpAddress,
-		Status:         c.Status.String(),
-		CreatedAt:      c.CreatedAt.Format(time.RFC3339),
+		Id:              c.EntThreadComment.ID,
+		ThreadId:        c.EntThreadComment.ThreadID,
+		ParentCommentId: c.EntThreadComment.ParentCommentID,
+		Content:         c.EntThreadComment.Content,
+		IpAddress:       c.EntThreadComment.IPAddress,
+		Status:          c.StatusToString(),
+		CreatedAt:       c.EntThreadComment.CreatedAt.Format(time.RFC3339),
 	}
 }

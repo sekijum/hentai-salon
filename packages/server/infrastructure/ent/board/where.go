@@ -55,9 +55,9 @@ func IDLTE(id int) predicate.Board {
 	return predicate.Board(sql.FieldLTE(FieldID, id))
 }
 
-// UserId applies equality check predicate on the "userId" field. It's identical to UserIdEQ.
-func UserId(v int) predicate.Board {
-	return predicate.Board(sql.FieldEQ(FieldUserId, v))
+// UserID applies equality check predicate on the "user_id" field. It's identical to UserIDEQ.
+func UserID(v int) predicate.Board {
+	return predicate.Board(sql.FieldEQ(FieldUserID, v))
 }
 
 // Title applies equality check predicate on the "title" field. It's identical to TitleEQ.
@@ -70,9 +70,9 @@ func Description(v string) predicate.Board {
 	return predicate.Board(sql.FieldEQ(FieldDescription, v))
 }
 
-// ThumbnailUrl applies equality check predicate on the "thumbnailUrl" field. It's identical to ThumbnailUrlEQ.
-func ThumbnailUrl(v string) predicate.Board {
-	return predicate.Board(sql.FieldEQ(FieldThumbnailUrl, v))
+// ThumbnailURL applies equality check predicate on the "thumbnail_url" field. It's identical to ThumbnailURLEQ.
+func ThumbnailURL(v string) predicate.Board {
+	return predicate.Board(sql.FieldEQ(FieldThumbnailURL, v))
 }
 
 // Status applies equality check predicate on the "status" field. It's identical to StatusEQ.
@@ -80,34 +80,34 @@ func Status(v int) predicate.Board {
 	return predicate.Board(sql.FieldEQ(FieldStatus, v))
 }
 
-// CreatedAt applies equality check predicate on the "createdAt" field. It's identical to CreatedAtEQ.
+// CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.Board {
 	return predicate.Board(sql.FieldEQ(FieldCreatedAt, v))
 }
 
-// UpdatedAt applies equality check predicate on the "updatedAt" field. It's identical to UpdatedAtEQ.
+// UpdatedAt applies equality check predicate on the "updated_at" field. It's identical to UpdatedAtEQ.
 func UpdatedAt(v time.Time) predicate.Board {
 	return predicate.Board(sql.FieldEQ(FieldUpdatedAt, v))
 }
 
-// UserIdEQ applies the EQ predicate on the "userId" field.
-func UserIdEQ(v int) predicate.Board {
-	return predicate.Board(sql.FieldEQ(FieldUserId, v))
+// UserIDEQ applies the EQ predicate on the "user_id" field.
+func UserIDEQ(v int) predicate.Board {
+	return predicate.Board(sql.FieldEQ(FieldUserID, v))
 }
 
-// UserIdNEQ applies the NEQ predicate on the "userId" field.
-func UserIdNEQ(v int) predicate.Board {
-	return predicate.Board(sql.FieldNEQ(FieldUserId, v))
+// UserIDNEQ applies the NEQ predicate on the "user_id" field.
+func UserIDNEQ(v int) predicate.Board {
+	return predicate.Board(sql.FieldNEQ(FieldUserID, v))
 }
 
-// UserIdIn applies the In predicate on the "userId" field.
-func UserIdIn(vs ...int) predicate.Board {
-	return predicate.Board(sql.FieldIn(FieldUserId, vs...))
+// UserIDIn applies the In predicate on the "user_id" field.
+func UserIDIn(vs ...int) predicate.Board {
+	return predicate.Board(sql.FieldIn(FieldUserID, vs...))
 }
 
-// UserIdNotIn applies the NotIn predicate on the "userId" field.
-func UserIdNotIn(vs ...int) predicate.Board {
-	return predicate.Board(sql.FieldNotIn(FieldUserId, vs...))
+// UserIDNotIn applies the NotIn predicate on the "user_id" field.
+func UserIDNotIn(vs ...int) predicate.Board {
+	return predicate.Board(sql.FieldNotIn(FieldUserID, vs...))
 }
 
 // TitleEQ applies the EQ predicate on the "title" field.
@@ -250,79 +250,79 @@ func DescriptionContainsFold(v string) predicate.Board {
 	return predicate.Board(sql.FieldContainsFold(FieldDescription, v))
 }
 
-// ThumbnailUrlEQ applies the EQ predicate on the "thumbnailUrl" field.
-func ThumbnailUrlEQ(v string) predicate.Board {
-	return predicate.Board(sql.FieldEQ(FieldThumbnailUrl, v))
+// ThumbnailURLEQ applies the EQ predicate on the "thumbnail_url" field.
+func ThumbnailURLEQ(v string) predicate.Board {
+	return predicate.Board(sql.FieldEQ(FieldThumbnailURL, v))
 }
 
-// ThumbnailUrlNEQ applies the NEQ predicate on the "thumbnailUrl" field.
-func ThumbnailUrlNEQ(v string) predicate.Board {
-	return predicate.Board(sql.FieldNEQ(FieldThumbnailUrl, v))
+// ThumbnailURLNEQ applies the NEQ predicate on the "thumbnail_url" field.
+func ThumbnailURLNEQ(v string) predicate.Board {
+	return predicate.Board(sql.FieldNEQ(FieldThumbnailURL, v))
 }
 
-// ThumbnailUrlIn applies the In predicate on the "thumbnailUrl" field.
-func ThumbnailUrlIn(vs ...string) predicate.Board {
-	return predicate.Board(sql.FieldIn(FieldThumbnailUrl, vs...))
+// ThumbnailURLIn applies the In predicate on the "thumbnail_url" field.
+func ThumbnailURLIn(vs ...string) predicate.Board {
+	return predicate.Board(sql.FieldIn(FieldThumbnailURL, vs...))
 }
 
-// ThumbnailUrlNotIn applies the NotIn predicate on the "thumbnailUrl" field.
-func ThumbnailUrlNotIn(vs ...string) predicate.Board {
-	return predicate.Board(sql.FieldNotIn(FieldThumbnailUrl, vs...))
+// ThumbnailURLNotIn applies the NotIn predicate on the "thumbnail_url" field.
+func ThumbnailURLNotIn(vs ...string) predicate.Board {
+	return predicate.Board(sql.FieldNotIn(FieldThumbnailURL, vs...))
 }
 
-// ThumbnailUrlGT applies the GT predicate on the "thumbnailUrl" field.
-func ThumbnailUrlGT(v string) predicate.Board {
-	return predicate.Board(sql.FieldGT(FieldThumbnailUrl, v))
+// ThumbnailURLGT applies the GT predicate on the "thumbnail_url" field.
+func ThumbnailURLGT(v string) predicate.Board {
+	return predicate.Board(sql.FieldGT(FieldThumbnailURL, v))
 }
 
-// ThumbnailUrlGTE applies the GTE predicate on the "thumbnailUrl" field.
-func ThumbnailUrlGTE(v string) predicate.Board {
-	return predicate.Board(sql.FieldGTE(FieldThumbnailUrl, v))
+// ThumbnailURLGTE applies the GTE predicate on the "thumbnail_url" field.
+func ThumbnailURLGTE(v string) predicate.Board {
+	return predicate.Board(sql.FieldGTE(FieldThumbnailURL, v))
 }
 
-// ThumbnailUrlLT applies the LT predicate on the "thumbnailUrl" field.
-func ThumbnailUrlLT(v string) predicate.Board {
-	return predicate.Board(sql.FieldLT(FieldThumbnailUrl, v))
+// ThumbnailURLLT applies the LT predicate on the "thumbnail_url" field.
+func ThumbnailURLLT(v string) predicate.Board {
+	return predicate.Board(sql.FieldLT(FieldThumbnailURL, v))
 }
 
-// ThumbnailUrlLTE applies the LTE predicate on the "thumbnailUrl" field.
-func ThumbnailUrlLTE(v string) predicate.Board {
-	return predicate.Board(sql.FieldLTE(FieldThumbnailUrl, v))
+// ThumbnailURLLTE applies the LTE predicate on the "thumbnail_url" field.
+func ThumbnailURLLTE(v string) predicate.Board {
+	return predicate.Board(sql.FieldLTE(FieldThumbnailURL, v))
 }
 
-// ThumbnailUrlContains applies the Contains predicate on the "thumbnailUrl" field.
-func ThumbnailUrlContains(v string) predicate.Board {
-	return predicate.Board(sql.FieldContains(FieldThumbnailUrl, v))
+// ThumbnailURLContains applies the Contains predicate on the "thumbnail_url" field.
+func ThumbnailURLContains(v string) predicate.Board {
+	return predicate.Board(sql.FieldContains(FieldThumbnailURL, v))
 }
 
-// ThumbnailUrlHasPrefix applies the HasPrefix predicate on the "thumbnailUrl" field.
-func ThumbnailUrlHasPrefix(v string) predicate.Board {
-	return predicate.Board(sql.FieldHasPrefix(FieldThumbnailUrl, v))
+// ThumbnailURLHasPrefix applies the HasPrefix predicate on the "thumbnail_url" field.
+func ThumbnailURLHasPrefix(v string) predicate.Board {
+	return predicate.Board(sql.FieldHasPrefix(FieldThumbnailURL, v))
 }
 
-// ThumbnailUrlHasSuffix applies the HasSuffix predicate on the "thumbnailUrl" field.
-func ThumbnailUrlHasSuffix(v string) predicate.Board {
-	return predicate.Board(sql.FieldHasSuffix(FieldThumbnailUrl, v))
+// ThumbnailURLHasSuffix applies the HasSuffix predicate on the "thumbnail_url" field.
+func ThumbnailURLHasSuffix(v string) predicate.Board {
+	return predicate.Board(sql.FieldHasSuffix(FieldThumbnailURL, v))
 }
 
-// ThumbnailUrlIsNil applies the IsNil predicate on the "thumbnailUrl" field.
-func ThumbnailUrlIsNil() predicate.Board {
-	return predicate.Board(sql.FieldIsNull(FieldThumbnailUrl))
+// ThumbnailURLIsNil applies the IsNil predicate on the "thumbnail_url" field.
+func ThumbnailURLIsNil() predicate.Board {
+	return predicate.Board(sql.FieldIsNull(FieldThumbnailURL))
 }
 
-// ThumbnailUrlNotNil applies the NotNil predicate on the "thumbnailUrl" field.
-func ThumbnailUrlNotNil() predicate.Board {
-	return predicate.Board(sql.FieldNotNull(FieldThumbnailUrl))
+// ThumbnailURLNotNil applies the NotNil predicate on the "thumbnail_url" field.
+func ThumbnailURLNotNil() predicate.Board {
+	return predicate.Board(sql.FieldNotNull(FieldThumbnailURL))
 }
 
-// ThumbnailUrlEqualFold applies the EqualFold predicate on the "thumbnailUrl" field.
-func ThumbnailUrlEqualFold(v string) predicate.Board {
-	return predicate.Board(sql.FieldEqualFold(FieldThumbnailUrl, v))
+// ThumbnailURLEqualFold applies the EqualFold predicate on the "thumbnail_url" field.
+func ThumbnailURLEqualFold(v string) predicate.Board {
+	return predicate.Board(sql.FieldEqualFold(FieldThumbnailURL, v))
 }
 
-// ThumbnailUrlContainsFold applies the ContainsFold predicate on the "thumbnailUrl" field.
-func ThumbnailUrlContainsFold(v string) predicate.Board {
-	return predicate.Board(sql.FieldContainsFold(FieldThumbnailUrl, v))
+// ThumbnailURLContainsFold applies the ContainsFold predicate on the "thumbnail_url" field.
+func ThumbnailURLContainsFold(v string) predicate.Board {
+	return predicate.Board(sql.FieldContainsFold(FieldThumbnailURL, v))
 }
 
 // StatusEQ applies the EQ predicate on the "status" field.
@@ -365,130 +365,84 @@ func StatusLTE(v int) predicate.Board {
 	return predicate.Board(sql.FieldLTE(FieldStatus, v))
 }
 
-// CreatedAtEQ applies the EQ predicate on the "createdAt" field.
+// CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.Board {
 	return predicate.Board(sql.FieldEQ(FieldCreatedAt, v))
 }
 
-// CreatedAtNEQ applies the NEQ predicate on the "createdAt" field.
+// CreatedAtNEQ applies the NEQ predicate on the "created_at" field.
 func CreatedAtNEQ(v time.Time) predicate.Board {
 	return predicate.Board(sql.FieldNEQ(FieldCreatedAt, v))
 }
 
-// CreatedAtIn applies the In predicate on the "createdAt" field.
+// CreatedAtIn applies the In predicate on the "created_at" field.
 func CreatedAtIn(vs ...time.Time) predicate.Board {
 	return predicate.Board(sql.FieldIn(FieldCreatedAt, vs...))
 }
 
-// CreatedAtNotIn applies the NotIn predicate on the "createdAt" field.
+// CreatedAtNotIn applies the NotIn predicate on the "created_at" field.
 func CreatedAtNotIn(vs ...time.Time) predicate.Board {
 	return predicate.Board(sql.FieldNotIn(FieldCreatedAt, vs...))
 }
 
-// CreatedAtGT applies the GT predicate on the "createdAt" field.
+// CreatedAtGT applies the GT predicate on the "created_at" field.
 func CreatedAtGT(v time.Time) predicate.Board {
 	return predicate.Board(sql.FieldGT(FieldCreatedAt, v))
 }
 
-// CreatedAtGTE applies the GTE predicate on the "createdAt" field.
+// CreatedAtGTE applies the GTE predicate on the "created_at" field.
 func CreatedAtGTE(v time.Time) predicate.Board {
 	return predicate.Board(sql.FieldGTE(FieldCreatedAt, v))
 }
 
-// CreatedAtLT applies the LT predicate on the "createdAt" field.
+// CreatedAtLT applies the LT predicate on the "created_at" field.
 func CreatedAtLT(v time.Time) predicate.Board {
 	return predicate.Board(sql.FieldLT(FieldCreatedAt, v))
 }
 
-// CreatedAtLTE applies the LTE predicate on the "createdAt" field.
+// CreatedAtLTE applies the LTE predicate on the "created_at" field.
 func CreatedAtLTE(v time.Time) predicate.Board {
 	return predicate.Board(sql.FieldLTE(FieldCreatedAt, v))
 }
 
-// UpdatedAtEQ applies the EQ predicate on the "updatedAt" field.
+// UpdatedAtEQ applies the EQ predicate on the "updated_at" field.
 func UpdatedAtEQ(v time.Time) predicate.Board {
 	return predicate.Board(sql.FieldEQ(FieldUpdatedAt, v))
 }
 
-// UpdatedAtNEQ applies the NEQ predicate on the "updatedAt" field.
+// UpdatedAtNEQ applies the NEQ predicate on the "updated_at" field.
 func UpdatedAtNEQ(v time.Time) predicate.Board {
 	return predicate.Board(sql.FieldNEQ(FieldUpdatedAt, v))
 }
 
-// UpdatedAtIn applies the In predicate on the "updatedAt" field.
+// UpdatedAtIn applies the In predicate on the "updated_at" field.
 func UpdatedAtIn(vs ...time.Time) predicate.Board {
 	return predicate.Board(sql.FieldIn(FieldUpdatedAt, vs...))
 }
 
-// UpdatedAtNotIn applies the NotIn predicate on the "updatedAt" field.
+// UpdatedAtNotIn applies the NotIn predicate on the "updated_at" field.
 func UpdatedAtNotIn(vs ...time.Time) predicate.Board {
 	return predicate.Board(sql.FieldNotIn(FieldUpdatedAt, vs...))
 }
 
-// UpdatedAtGT applies the GT predicate on the "updatedAt" field.
+// UpdatedAtGT applies the GT predicate on the "updated_at" field.
 func UpdatedAtGT(v time.Time) predicate.Board {
 	return predicate.Board(sql.FieldGT(FieldUpdatedAt, v))
 }
 
-// UpdatedAtGTE applies the GTE predicate on the "updatedAt" field.
+// UpdatedAtGTE applies the GTE predicate on the "updated_at" field.
 func UpdatedAtGTE(v time.Time) predicate.Board {
 	return predicate.Board(sql.FieldGTE(FieldUpdatedAt, v))
 }
 
-// UpdatedAtLT applies the LT predicate on the "updatedAt" field.
+// UpdatedAtLT applies the LT predicate on the "updated_at" field.
 func UpdatedAtLT(v time.Time) predicate.Board {
 	return predicate.Board(sql.FieldLT(FieldUpdatedAt, v))
 }
 
-// UpdatedAtLTE applies the LTE predicate on the "updatedAt" field.
+// UpdatedAtLTE applies the LTE predicate on the "updated_at" field.
 func UpdatedAtLTE(v time.Time) predicate.Board {
 	return predicate.Board(sql.FieldLTE(FieldUpdatedAt, v))
-}
-
-// HasLikedUsers applies the HasEdge predicate on the "liked_users" edge.
-func HasLikedUsers() predicate.Board {
-	return predicate.Board(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, LikedUsersTable, LikedUsersPrimaryKey...),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasLikedUsersWith applies the HasEdge predicate on the "liked_users" edge with a given conditions (other predicates).
-func HasLikedUsersWith(preds ...predicate.User) predicate.Board {
-	return predicate.Board(func(s *sql.Selector) {
-		step := newLikedUsersStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasSubscribedUsers applies the HasEdge predicate on the "subscribed_users" edge.
-func HasSubscribedUsers() predicate.Board {
-	return predicate.Board(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, SubscribedUsersTable, SubscribedUsersPrimaryKey...),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasSubscribedUsersWith applies the HasEdge predicate on the "subscribed_users" edge with a given conditions (other predicates).
-func HasSubscribedUsersWith(preds ...predicate.User) predicate.Board {
-	return predicate.Board(func(s *sql.Selector) {
-		step := newSubscribedUsersStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
 }
 
 // HasOwner applies the HasEdge predicate on the "owner" edge.
@@ -529,52 +483,6 @@ func HasThreads() predicate.Board {
 func HasThreadsWith(preds ...predicate.Thread) predicate.Board {
 	return predicate.Board(func(s *sql.Selector) {
 		step := newThreadsStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasUserBoardLike applies the HasEdge predicate on the "user_board_like" edge.
-func HasUserBoardLike() predicate.Board {
-	return predicate.Board(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, UserBoardLikeTable, UserBoardLikeColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasUserBoardLikeWith applies the HasEdge predicate on the "user_board_like" edge with a given conditions (other predicates).
-func HasUserBoardLikeWith(preds ...predicate.UserBoardSubscription) predicate.Board {
-	return predicate.Board(func(s *sql.Selector) {
-		step := newUserBoardLikeStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasUserBoardSubscription applies the HasEdge predicate on the "user_board_subscription" edge.
-func HasUserBoardSubscription() predicate.Board {
-	return predicate.Board(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, UserBoardSubscriptionTable, UserBoardSubscriptionColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasUserBoardSubscriptionWith applies the HasEdge predicate on the "user_board_subscription" edge with a given conditions (other predicates).
-func HasUserBoardSubscriptionWith(preds ...predicate.UserBoardLike) predicate.Board {
-	return predicate.Board(func(s *sql.Selector) {
-		step := newUserBoardSubscriptionStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

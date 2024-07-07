@@ -14,8 +14,6 @@ import (
 	"server/infrastructure/ent/threadcommentattachment"
 	"server/infrastructure/ent/threadtag"
 	"server/infrastructure/ent/user"
-	"server/infrastructure/ent/userboardlike"
-	"server/infrastructure/ent/userboardsubscription"
 	"server/infrastructure/ent/usercommentlike"
 	"server/infrastructure/ent/usercommentsubscription"
 	"server/infrastructure/ent/userthreadlike"
@@ -92,8 +90,6 @@ func checkColumn(table, column string) error {
 			threadcommentattachment.Table: threadcommentattachment.ValidColumn,
 			threadtag.Table:               threadtag.ValidColumn,
 			user.Table:                    user.ValidColumn,
-			userboardlike.Table:           userboardlike.ValidColumn,
-			userboardsubscription.Table:   userboardsubscription.ValidColumn,
 			usercommentlike.Table:         usercommentlike.ValidColumn,
 			usercommentsubscription.Table: usercommentsubscription.ValidColumn,
 			userthreadlike.Table:          userthreadlike.ValidColumn,

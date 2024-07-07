@@ -55,22 +55,22 @@ func IDLTE(id int) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldLTE(FieldID, id))
 }
 
-// ThreadId applies equality check predicate on the "threadId" field. It's identical to ThreadIdEQ.
-func ThreadId(v int) predicate.ThreadComment {
-	return predicate.ThreadComment(sql.FieldEQ(FieldThreadId, v))
+// ThreadID applies equality check predicate on the "thread_id" field. It's identical to ThreadIDEQ.
+func ThreadID(v int) predicate.ThreadComment {
+	return predicate.ThreadComment(sql.FieldEQ(FieldThreadID, v))
 }
 
-// ParentCommentId applies equality check predicate on the "parentCommentId" field. It's identical to ParentCommentIdEQ.
-func ParentCommentId(v int) predicate.ThreadComment {
-	return predicate.ThreadComment(sql.FieldEQ(FieldParentCommentId, v))
+// ParentCommentID applies equality check predicate on the "parent_comment_id" field. It's identical to ParentCommentIDEQ.
+func ParentCommentID(v int) predicate.ThreadComment {
+	return predicate.ThreadComment(sql.FieldEQ(FieldParentCommentID, v))
 }
 
-// UserId applies equality check predicate on the "userId" field. It's identical to UserIdEQ.
-func UserId(v int) predicate.ThreadComment {
-	return predicate.ThreadComment(sql.FieldEQ(FieldUserId, v))
+// UserID applies equality check predicate on the "user_id" field. It's identical to UserIDEQ.
+func UserID(v int) predicate.ThreadComment {
+	return predicate.ThreadComment(sql.FieldEQ(FieldUserID, v))
 }
 
-// GuestName applies equality check predicate on the "guestName" field. It's identical to GuestNameEQ.
+// GuestName applies equality check predicate on the "guest_name" field. It's identical to GuestNameEQ.
 func GuestName(v string) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldEQ(FieldGuestName, v))
 }
@@ -90,167 +90,167 @@ func Status(v int) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldEQ(FieldStatus, v))
 }
 
-// CreatedAt applies equality check predicate on the "createdAt" field. It's identical to CreatedAtEQ.
+// CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldEQ(FieldCreatedAt, v))
 }
 
-// UpdatedAt applies equality check predicate on the "updatedAt" field. It's identical to UpdatedAtEQ.
+// UpdatedAt applies equality check predicate on the "updated_at" field. It's identical to UpdatedAtEQ.
 func UpdatedAt(v time.Time) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldEQ(FieldUpdatedAt, v))
 }
 
-// ThreadIdEQ applies the EQ predicate on the "threadId" field.
-func ThreadIdEQ(v int) predicate.ThreadComment {
-	return predicate.ThreadComment(sql.FieldEQ(FieldThreadId, v))
+// ThreadIDEQ applies the EQ predicate on the "thread_id" field.
+func ThreadIDEQ(v int) predicate.ThreadComment {
+	return predicate.ThreadComment(sql.FieldEQ(FieldThreadID, v))
 }
 
-// ThreadIdNEQ applies the NEQ predicate on the "threadId" field.
-func ThreadIdNEQ(v int) predicate.ThreadComment {
-	return predicate.ThreadComment(sql.FieldNEQ(FieldThreadId, v))
+// ThreadIDNEQ applies the NEQ predicate on the "thread_id" field.
+func ThreadIDNEQ(v int) predicate.ThreadComment {
+	return predicate.ThreadComment(sql.FieldNEQ(FieldThreadID, v))
 }
 
-// ThreadIdIn applies the In predicate on the "threadId" field.
-func ThreadIdIn(vs ...int) predicate.ThreadComment {
-	return predicate.ThreadComment(sql.FieldIn(FieldThreadId, vs...))
+// ThreadIDIn applies the In predicate on the "thread_id" field.
+func ThreadIDIn(vs ...int) predicate.ThreadComment {
+	return predicate.ThreadComment(sql.FieldIn(FieldThreadID, vs...))
 }
 
-// ThreadIdNotIn applies the NotIn predicate on the "threadId" field.
-func ThreadIdNotIn(vs ...int) predicate.ThreadComment {
-	return predicate.ThreadComment(sql.FieldNotIn(FieldThreadId, vs...))
+// ThreadIDNotIn applies the NotIn predicate on the "thread_id" field.
+func ThreadIDNotIn(vs ...int) predicate.ThreadComment {
+	return predicate.ThreadComment(sql.FieldNotIn(FieldThreadID, vs...))
 }
 
-// ParentCommentIdEQ applies the EQ predicate on the "parentCommentId" field.
-func ParentCommentIdEQ(v int) predicate.ThreadComment {
-	return predicate.ThreadComment(sql.FieldEQ(FieldParentCommentId, v))
+// ParentCommentIDEQ applies the EQ predicate on the "parent_comment_id" field.
+func ParentCommentIDEQ(v int) predicate.ThreadComment {
+	return predicate.ThreadComment(sql.FieldEQ(FieldParentCommentID, v))
 }
 
-// ParentCommentIdNEQ applies the NEQ predicate on the "parentCommentId" field.
-func ParentCommentIdNEQ(v int) predicate.ThreadComment {
-	return predicate.ThreadComment(sql.FieldNEQ(FieldParentCommentId, v))
+// ParentCommentIDNEQ applies the NEQ predicate on the "parent_comment_id" field.
+func ParentCommentIDNEQ(v int) predicate.ThreadComment {
+	return predicate.ThreadComment(sql.FieldNEQ(FieldParentCommentID, v))
 }
 
-// ParentCommentIdIn applies the In predicate on the "parentCommentId" field.
-func ParentCommentIdIn(vs ...int) predicate.ThreadComment {
-	return predicate.ThreadComment(sql.FieldIn(FieldParentCommentId, vs...))
+// ParentCommentIDIn applies the In predicate on the "parent_comment_id" field.
+func ParentCommentIDIn(vs ...int) predicate.ThreadComment {
+	return predicate.ThreadComment(sql.FieldIn(FieldParentCommentID, vs...))
 }
 
-// ParentCommentIdNotIn applies the NotIn predicate on the "parentCommentId" field.
-func ParentCommentIdNotIn(vs ...int) predicate.ThreadComment {
-	return predicate.ThreadComment(sql.FieldNotIn(FieldParentCommentId, vs...))
+// ParentCommentIDNotIn applies the NotIn predicate on the "parent_comment_id" field.
+func ParentCommentIDNotIn(vs ...int) predicate.ThreadComment {
+	return predicate.ThreadComment(sql.FieldNotIn(FieldParentCommentID, vs...))
 }
 
-// ParentCommentIdIsNil applies the IsNil predicate on the "parentCommentId" field.
-func ParentCommentIdIsNil() predicate.ThreadComment {
-	return predicate.ThreadComment(sql.FieldIsNull(FieldParentCommentId))
+// ParentCommentIDIsNil applies the IsNil predicate on the "parent_comment_id" field.
+func ParentCommentIDIsNil() predicate.ThreadComment {
+	return predicate.ThreadComment(sql.FieldIsNull(FieldParentCommentID))
 }
 
-// ParentCommentIdNotNil applies the NotNil predicate on the "parentCommentId" field.
-func ParentCommentIdNotNil() predicate.ThreadComment {
-	return predicate.ThreadComment(sql.FieldNotNull(FieldParentCommentId))
+// ParentCommentIDNotNil applies the NotNil predicate on the "parent_comment_id" field.
+func ParentCommentIDNotNil() predicate.ThreadComment {
+	return predicate.ThreadComment(sql.FieldNotNull(FieldParentCommentID))
 }
 
-// UserIdEQ applies the EQ predicate on the "userId" field.
-func UserIdEQ(v int) predicate.ThreadComment {
-	return predicate.ThreadComment(sql.FieldEQ(FieldUserId, v))
+// UserIDEQ applies the EQ predicate on the "user_id" field.
+func UserIDEQ(v int) predicate.ThreadComment {
+	return predicate.ThreadComment(sql.FieldEQ(FieldUserID, v))
 }
 
-// UserIdNEQ applies the NEQ predicate on the "userId" field.
-func UserIdNEQ(v int) predicate.ThreadComment {
-	return predicate.ThreadComment(sql.FieldNEQ(FieldUserId, v))
+// UserIDNEQ applies the NEQ predicate on the "user_id" field.
+func UserIDNEQ(v int) predicate.ThreadComment {
+	return predicate.ThreadComment(sql.FieldNEQ(FieldUserID, v))
 }
 
-// UserIdIn applies the In predicate on the "userId" field.
-func UserIdIn(vs ...int) predicate.ThreadComment {
-	return predicate.ThreadComment(sql.FieldIn(FieldUserId, vs...))
+// UserIDIn applies the In predicate on the "user_id" field.
+func UserIDIn(vs ...int) predicate.ThreadComment {
+	return predicate.ThreadComment(sql.FieldIn(FieldUserID, vs...))
 }
 
-// UserIdNotIn applies the NotIn predicate on the "userId" field.
-func UserIdNotIn(vs ...int) predicate.ThreadComment {
-	return predicate.ThreadComment(sql.FieldNotIn(FieldUserId, vs...))
+// UserIDNotIn applies the NotIn predicate on the "user_id" field.
+func UserIDNotIn(vs ...int) predicate.ThreadComment {
+	return predicate.ThreadComment(sql.FieldNotIn(FieldUserID, vs...))
 }
 
-// UserIdIsNil applies the IsNil predicate on the "userId" field.
-func UserIdIsNil() predicate.ThreadComment {
-	return predicate.ThreadComment(sql.FieldIsNull(FieldUserId))
+// UserIDIsNil applies the IsNil predicate on the "user_id" field.
+func UserIDIsNil() predicate.ThreadComment {
+	return predicate.ThreadComment(sql.FieldIsNull(FieldUserID))
 }
 
-// UserIdNotNil applies the NotNil predicate on the "userId" field.
-func UserIdNotNil() predicate.ThreadComment {
-	return predicate.ThreadComment(sql.FieldNotNull(FieldUserId))
+// UserIDNotNil applies the NotNil predicate on the "user_id" field.
+func UserIDNotNil() predicate.ThreadComment {
+	return predicate.ThreadComment(sql.FieldNotNull(FieldUserID))
 }
 
-// GuestNameEQ applies the EQ predicate on the "guestName" field.
+// GuestNameEQ applies the EQ predicate on the "guest_name" field.
 func GuestNameEQ(v string) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldEQ(FieldGuestName, v))
 }
 
-// GuestNameNEQ applies the NEQ predicate on the "guestName" field.
+// GuestNameNEQ applies the NEQ predicate on the "guest_name" field.
 func GuestNameNEQ(v string) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldNEQ(FieldGuestName, v))
 }
 
-// GuestNameIn applies the In predicate on the "guestName" field.
+// GuestNameIn applies the In predicate on the "guest_name" field.
 func GuestNameIn(vs ...string) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldIn(FieldGuestName, vs...))
 }
 
-// GuestNameNotIn applies the NotIn predicate on the "guestName" field.
+// GuestNameNotIn applies the NotIn predicate on the "guest_name" field.
 func GuestNameNotIn(vs ...string) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldNotIn(FieldGuestName, vs...))
 }
 
-// GuestNameGT applies the GT predicate on the "guestName" field.
+// GuestNameGT applies the GT predicate on the "guest_name" field.
 func GuestNameGT(v string) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldGT(FieldGuestName, v))
 }
 
-// GuestNameGTE applies the GTE predicate on the "guestName" field.
+// GuestNameGTE applies the GTE predicate on the "guest_name" field.
 func GuestNameGTE(v string) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldGTE(FieldGuestName, v))
 }
 
-// GuestNameLT applies the LT predicate on the "guestName" field.
+// GuestNameLT applies the LT predicate on the "guest_name" field.
 func GuestNameLT(v string) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldLT(FieldGuestName, v))
 }
 
-// GuestNameLTE applies the LTE predicate on the "guestName" field.
+// GuestNameLTE applies the LTE predicate on the "guest_name" field.
 func GuestNameLTE(v string) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldLTE(FieldGuestName, v))
 }
 
-// GuestNameContains applies the Contains predicate on the "guestName" field.
+// GuestNameContains applies the Contains predicate on the "guest_name" field.
 func GuestNameContains(v string) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldContains(FieldGuestName, v))
 }
 
-// GuestNameHasPrefix applies the HasPrefix predicate on the "guestName" field.
+// GuestNameHasPrefix applies the HasPrefix predicate on the "guest_name" field.
 func GuestNameHasPrefix(v string) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldHasPrefix(FieldGuestName, v))
 }
 
-// GuestNameHasSuffix applies the HasSuffix predicate on the "guestName" field.
+// GuestNameHasSuffix applies the HasSuffix predicate on the "guest_name" field.
 func GuestNameHasSuffix(v string) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldHasSuffix(FieldGuestName, v))
 }
 
-// GuestNameIsNil applies the IsNil predicate on the "guestName" field.
+// GuestNameIsNil applies the IsNil predicate on the "guest_name" field.
 func GuestNameIsNil() predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldIsNull(FieldGuestName))
 }
 
-// GuestNameNotNil applies the NotNil predicate on the "guestName" field.
+// GuestNameNotNil applies the NotNil predicate on the "guest_name" field.
 func GuestNameNotNil() predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldNotNull(FieldGuestName))
 }
 
-// GuestNameEqualFold applies the EqualFold predicate on the "guestName" field.
+// GuestNameEqualFold applies the EqualFold predicate on the "guest_name" field.
 func GuestNameEqualFold(v string) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldEqualFold(FieldGuestName, v))
 }
 
-// GuestNameContainsFold applies the ContainsFold predicate on the "guestName" field.
+// GuestNameContainsFold applies the ContainsFold predicate on the "guest_name" field.
 func GuestNameContainsFold(v string) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldContainsFold(FieldGuestName, v))
 }
@@ -425,82 +425,82 @@ func StatusLTE(v int) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldLTE(FieldStatus, v))
 }
 
-// CreatedAtEQ applies the EQ predicate on the "createdAt" field.
+// CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldEQ(FieldCreatedAt, v))
 }
 
-// CreatedAtNEQ applies the NEQ predicate on the "createdAt" field.
+// CreatedAtNEQ applies the NEQ predicate on the "created_at" field.
 func CreatedAtNEQ(v time.Time) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldNEQ(FieldCreatedAt, v))
 }
 
-// CreatedAtIn applies the In predicate on the "createdAt" field.
+// CreatedAtIn applies the In predicate on the "created_at" field.
 func CreatedAtIn(vs ...time.Time) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldIn(FieldCreatedAt, vs...))
 }
 
-// CreatedAtNotIn applies the NotIn predicate on the "createdAt" field.
+// CreatedAtNotIn applies the NotIn predicate on the "created_at" field.
 func CreatedAtNotIn(vs ...time.Time) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldNotIn(FieldCreatedAt, vs...))
 }
 
-// CreatedAtGT applies the GT predicate on the "createdAt" field.
+// CreatedAtGT applies the GT predicate on the "created_at" field.
 func CreatedAtGT(v time.Time) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldGT(FieldCreatedAt, v))
 }
 
-// CreatedAtGTE applies the GTE predicate on the "createdAt" field.
+// CreatedAtGTE applies the GTE predicate on the "created_at" field.
 func CreatedAtGTE(v time.Time) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldGTE(FieldCreatedAt, v))
 }
 
-// CreatedAtLT applies the LT predicate on the "createdAt" field.
+// CreatedAtLT applies the LT predicate on the "created_at" field.
 func CreatedAtLT(v time.Time) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldLT(FieldCreatedAt, v))
 }
 
-// CreatedAtLTE applies the LTE predicate on the "createdAt" field.
+// CreatedAtLTE applies the LTE predicate on the "created_at" field.
 func CreatedAtLTE(v time.Time) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldLTE(FieldCreatedAt, v))
 }
 
-// UpdatedAtEQ applies the EQ predicate on the "updatedAt" field.
+// UpdatedAtEQ applies the EQ predicate on the "updated_at" field.
 func UpdatedAtEQ(v time.Time) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldEQ(FieldUpdatedAt, v))
 }
 
-// UpdatedAtNEQ applies the NEQ predicate on the "updatedAt" field.
+// UpdatedAtNEQ applies the NEQ predicate on the "updated_at" field.
 func UpdatedAtNEQ(v time.Time) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldNEQ(FieldUpdatedAt, v))
 }
 
-// UpdatedAtIn applies the In predicate on the "updatedAt" field.
+// UpdatedAtIn applies the In predicate on the "updated_at" field.
 func UpdatedAtIn(vs ...time.Time) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldIn(FieldUpdatedAt, vs...))
 }
 
-// UpdatedAtNotIn applies the NotIn predicate on the "updatedAt" field.
+// UpdatedAtNotIn applies the NotIn predicate on the "updated_at" field.
 func UpdatedAtNotIn(vs ...time.Time) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldNotIn(FieldUpdatedAt, vs...))
 }
 
-// UpdatedAtGT applies the GT predicate on the "updatedAt" field.
+// UpdatedAtGT applies the GT predicate on the "updated_at" field.
 func UpdatedAtGT(v time.Time) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldGT(FieldUpdatedAt, v))
 }
 
-// UpdatedAtGTE applies the GTE predicate on the "updatedAt" field.
+// UpdatedAtGTE applies the GTE predicate on the "updated_at" field.
 func UpdatedAtGTE(v time.Time) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldGTE(FieldUpdatedAt, v))
 }
 
-// UpdatedAtLT applies the LT predicate on the "updatedAt" field.
+// UpdatedAtLT applies the LT predicate on the "updated_at" field.
 func UpdatedAtLT(v time.Time) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldLT(FieldUpdatedAt, v))
 }
 
-// UpdatedAtLTE applies the LTE predicate on the "updatedAt" field.
+// UpdatedAtLTE applies the LTE predicate on the "updated_at" field.
 func UpdatedAtLTE(v time.Time) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldLTE(FieldUpdatedAt, v))
 }

@@ -1,114 +1,46 @@
 package model
 
 import (
-	"errors"
-	"net/url"
-	"regexp"
-	"time"
+	"server/infrastructure/ent"
 )
 
 type User struct {
-	Id          int
-	Name        string
-	Email       string
-	Password    string
-	AvatarUrl   *string
-	Status      UserStatus
-	Role        UserRole
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
-}
-
-func (u *User) Validate() error {
-	if u.Name == "" {
-		return errors.New("名前は必須です")
-	}
-	if len(u.Name) > 20 {
-		return errors.New("名前は20文字以内で入力してください")
-	}
-	if u.Email == "" {
-		return errors.New("メールアドレスは必須です")
-	}
-	if !isValidEmail(u.Email) {
-		return errors.New("有効なメールアドレスを入力してください")
-	}
-	if u.Password == "" {
-		return errors.New("パスワードは必須です")
-	}
-	if len(u.Password) < 6 {
-		return errors.New("パスワードは6文字以上で入力してください")
-	}
-	if u.AvatarUrl != nil {
-		if _, err := url.ParseRequestURI(*u.AvatarUrl); err != nil {
-			return errors.New("アバターURLは有効なURLである必要があります")
-		}
-	}
-	if u.Status < 0 || u.Status > 2 {
-		return errors.New("無効なステータスです")
-	}
-	if u.Role < 0 || u.Role > 1 {
-		return errors.New("無効なロールです")
-	}
-	return nil
-}
-
-func isValidEmail(email string) bool {
-	re := regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
-	return re.MatchString(email)
+	EntUser *ent.User
 }
 
 type UserStatus int
 
 const (
-	UserRoleActive UserStatus = iota
-	UserRoleWithdrawn
-	UserRoleSuspended
-	UserRoleInactive
+	UserStatusActive UserStatus = iota
+	UserStatusWithdrawn
+	UserStatusSuspended
+	UserStatusInactive
 )
 
-func (s UserStatus) String() string {
-	switch s {
-	case UserRoleActive:
+func (m *User) StatusToString() string {
+	switch UserStatus(m.EntUser.Status) {
+	case UserStatusActive:
 		return "Active"
-	case UserRoleWithdrawn:
+	case UserStatusWithdrawn:
 		return "Withdrawn"
-	case UserRoleSuspended:
+	case UserStatusSuspended:
 		return "Suspended"
-	case UserRoleInactive:
+	case UserStatusInactive:
 		return "Inactive"
 	default:
 		return "Unknown"
 	}
 }
 
-func (s UserStatus) Validate() error {
-	switch s {
-	case UserRoleActive, UserRoleWithdrawn, UserRoleSuspended, UserRoleInactive:
-		return nil
-	default:
-		return errors.New("無効なユーザー権限です")
-	}
-}
-
-func (u UserStatus) ToInt() int {
-	UserStatusToIntToInt := map[UserStatus]int{
-		UserRoleActive:    0,
-		UserRoleWithdrawn: 1,
-		UserRoleSuspended: 2,
-		UserRoleInactive:  3,
-	}
-	return UserStatusToIntToInt[u]
-}
-
-func (s UserStatus) Label() string {
-	switch s {
-	case UserRoleActive:
+func (m *User) StatusToLabel() string {
+	switch UserStatus(m.EntUser.Status) {
+	case UserStatusActive:
 		return "有効"
-	case UserRoleWithdrawn:
+	case UserStatusWithdrawn:
 		return "退会済"
-	case UserRoleSuspended:
+	case UserStatusSuspended:
 		return "凍結"
-	case UserRoleInactive:
+	case UserStatusInactive:
 		return "無効"
 	default:
 		return "不明なステータス"
@@ -122,8 +54,8 @@ const (
 	UserRoleAdmin
 )
 
-func (s UserRole) String() string {
-	switch s {
+func (m *User) RoleToString() string {
+	switch UserRole(m.EntUser.Role) {
 	case UserRoleMember:
 		return "Member"
 	case UserRoleAdmin:
@@ -133,25 +65,8 @@ func (s UserRole) String() string {
 	}
 }
 
-func (s UserRole) Validate() error {
-	switch s {
-	case UserRoleMember, UserRoleAdmin:
-		return nil
-	default:
-		return errors.New("無効なユーザー権限です")
-	}
-}
-
-func (u UserRole) ToInt() int {
-	boardStatusToIntToInt := map[UserRole]int{
-		UserRoleMember: 0,
-		UserRoleAdmin:  1,
-	}
-	return boardStatusToIntToInt[u]
-}
-
-func (s UserRole) Label() string {
-	switch s {
+func (m *User) RoleToLabel() string {
+	switch UserRole(m.EntUser.Role) {
 	case UserRoleMember:
 		return "会員"
 	case UserRoleAdmin:
@@ -161,6 +76,6 @@ func (s UserRole) Label() string {
 	}
 }
 
-func (u *User) IsAdmin() bool {
-	return u.Role == UserRoleAdmin
+func (m *User) IsAdmin() bool {
+	return UserRole(m.EntUser.Role) == UserRoleAdmin
 }

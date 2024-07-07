@@ -23,16 +23,16 @@ type User struct {
 	Email string `json:"email,omitempty"`
 	// Password holds the value of the "password" field.
 	Password string `json:"password,omitempty"`
-	// AvatarUrl holds the value of the "avatarUrl" field.
-	AvatarUrl string `json:"avatarUrl,omitempty"`
+	// AvatarURL holds the value of the "avatar_url" field.
+	AvatarURL *string `json:"avatar_url,omitempty"`
 	// 0: Active, 1: Withdrawn, 2: Suspended, 2: Inactive
 	Status int `json:"status,omitempty"`
 	// 0: Member, 1: Admin
 	Role int `json:"role,omitempty"`
-	// CreatedAt holds the value of the "createdAt" field.
-	CreatedAt time.Time `json:"createdAt,omitempty"`
-	// UpdatedAt holds the value of the "updatedAt" field.
-	UpdatedAt time.Time `json:"updatedAt,omitempty"`
+	// CreatedAt holds the value of the "created_at" field.
+	CreatedAt time.Time `json:"created_at,omitempty"`
+	// UpdatedAt holds the value of the "updated_at" field.
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the UserQuery when eager-loading is set.
 	Edges        UserEdges `json:"edges"`
@@ -47,33 +47,25 @@ type UserEdges struct {
 	Threads []*Thread `json:"threads,omitempty"`
 	// Comments holds the value of the comments edge.
 	Comments []*ThreadComment `json:"comments,omitempty"`
-	// LikedBoards holds the value of the liked_boards edge.
-	LikedBoards []*Board `json:"liked_boards,omitempty"`
 	// LikedThreads holds the value of the liked_threads edge.
 	LikedThreads []*Thread `json:"liked_threads,omitempty"`
 	// LikedComments holds the value of the liked_comments edge.
 	LikedComments []*ThreadComment `json:"liked_comments,omitempty"`
-	// SubscribedBoards holds the value of the subscribed_boards edge.
-	SubscribedBoards []*Board `json:"subscribed_boards,omitempty"`
 	// SubscribedThreads holds the value of the subscribed_threads edge.
 	SubscribedThreads []*Thread `json:"subscribed_threads,omitempty"`
 	// SubscribedComments holds the value of the subscribed_comments edge.
 	SubscribedComments []*ThreadComment `json:"subscribed_comments,omitempty"`
-	// UserBoardLike holds the value of the user_board_like edge.
-	UserBoardLike []*UserBoardLike `json:"user_board_like,omitempty"`
 	// UserThreadLike holds the value of the user_thread_like edge.
 	UserThreadLike []*UserThreadLike `json:"user_thread_like,omitempty"`
 	// UserCommentLike holds the value of the user_comment_like edge.
 	UserCommentLike []*UserCommentLike `json:"user_comment_like,omitempty"`
-	// UserBoardSubscription holds the value of the user_board_subscription edge.
-	UserBoardSubscription []*UserBoardSubscription `json:"user_board_subscription,omitempty"`
 	// UserThreadSubscription holds the value of the user_thread_subscription edge.
 	UserThreadSubscription []*UserThreadSubscription `json:"user_thread_subscription,omitempty"`
 	// UserCommentSubscription holds the value of the user_comment_subscription edge.
 	UserCommentSubscription []*UserCommentSubscription `json:"user_comment_subscription,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [15]bool
+	loadedTypes [11]bool
 }
 
 // BoardsOrErr returns the Boards value or an error if the edge
@@ -103,19 +95,10 @@ func (e UserEdges) CommentsOrErr() ([]*ThreadComment, error) {
 	return nil, &NotLoadedError{edge: "comments"}
 }
 
-// LikedBoardsOrErr returns the LikedBoards value or an error if the edge
-// was not loaded in eager-loading.
-func (e UserEdges) LikedBoardsOrErr() ([]*Board, error) {
-	if e.loadedTypes[3] {
-		return e.LikedBoards, nil
-	}
-	return nil, &NotLoadedError{edge: "liked_boards"}
-}
-
 // LikedThreadsOrErr returns the LikedThreads value or an error if the edge
 // was not loaded in eager-loading.
 func (e UserEdges) LikedThreadsOrErr() ([]*Thread, error) {
-	if e.loadedTypes[4] {
+	if e.loadedTypes[3] {
 		return e.LikedThreads, nil
 	}
 	return nil, &NotLoadedError{edge: "liked_threads"}
@@ -124,25 +107,16 @@ func (e UserEdges) LikedThreadsOrErr() ([]*Thread, error) {
 // LikedCommentsOrErr returns the LikedComments value or an error if the edge
 // was not loaded in eager-loading.
 func (e UserEdges) LikedCommentsOrErr() ([]*ThreadComment, error) {
-	if e.loadedTypes[5] {
+	if e.loadedTypes[4] {
 		return e.LikedComments, nil
 	}
 	return nil, &NotLoadedError{edge: "liked_comments"}
 }
 
-// SubscribedBoardsOrErr returns the SubscribedBoards value or an error if the edge
-// was not loaded in eager-loading.
-func (e UserEdges) SubscribedBoardsOrErr() ([]*Board, error) {
-	if e.loadedTypes[6] {
-		return e.SubscribedBoards, nil
-	}
-	return nil, &NotLoadedError{edge: "subscribed_boards"}
-}
-
 // SubscribedThreadsOrErr returns the SubscribedThreads value or an error if the edge
 // was not loaded in eager-loading.
 func (e UserEdges) SubscribedThreadsOrErr() ([]*Thread, error) {
-	if e.loadedTypes[7] {
+	if e.loadedTypes[5] {
 		return e.SubscribedThreads, nil
 	}
 	return nil, &NotLoadedError{edge: "subscribed_threads"}
@@ -151,25 +125,16 @@ func (e UserEdges) SubscribedThreadsOrErr() ([]*Thread, error) {
 // SubscribedCommentsOrErr returns the SubscribedComments value or an error if the edge
 // was not loaded in eager-loading.
 func (e UserEdges) SubscribedCommentsOrErr() ([]*ThreadComment, error) {
-	if e.loadedTypes[8] {
+	if e.loadedTypes[6] {
 		return e.SubscribedComments, nil
 	}
 	return nil, &NotLoadedError{edge: "subscribed_comments"}
 }
 
-// UserBoardLikeOrErr returns the UserBoardLike value or an error if the edge
-// was not loaded in eager-loading.
-func (e UserEdges) UserBoardLikeOrErr() ([]*UserBoardLike, error) {
-	if e.loadedTypes[9] {
-		return e.UserBoardLike, nil
-	}
-	return nil, &NotLoadedError{edge: "user_board_like"}
-}
-
 // UserThreadLikeOrErr returns the UserThreadLike value or an error if the edge
 // was not loaded in eager-loading.
 func (e UserEdges) UserThreadLikeOrErr() ([]*UserThreadLike, error) {
-	if e.loadedTypes[10] {
+	if e.loadedTypes[7] {
 		return e.UserThreadLike, nil
 	}
 	return nil, &NotLoadedError{edge: "user_thread_like"}
@@ -178,25 +143,16 @@ func (e UserEdges) UserThreadLikeOrErr() ([]*UserThreadLike, error) {
 // UserCommentLikeOrErr returns the UserCommentLike value or an error if the edge
 // was not loaded in eager-loading.
 func (e UserEdges) UserCommentLikeOrErr() ([]*UserCommentLike, error) {
-	if e.loadedTypes[11] {
+	if e.loadedTypes[8] {
 		return e.UserCommentLike, nil
 	}
 	return nil, &NotLoadedError{edge: "user_comment_like"}
 }
 
-// UserBoardSubscriptionOrErr returns the UserBoardSubscription value or an error if the edge
-// was not loaded in eager-loading.
-func (e UserEdges) UserBoardSubscriptionOrErr() ([]*UserBoardSubscription, error) {
-	if e.loadedTypes[12] {
-		return e.UserBoardSubscription, nil
-	}
-	return nil, &NotLoadedError{edge: "user_board_subscription"}
-}
-
 // UserThreadSubscriptionOrErr returns the UserThreadSubscription value or an error if the edge
 // was not loaded in eager-loading.
 func (e UserEdges) UserThreadSubscriptionOrErr() ([]*UserThreadSubscription, error) {
-	if e.loadedTypes[13] {
+	if e.loadedTypes[9] {
 		return e.UserThreadSubscription, nil
 	}
 	return nil, &NotLoadedError{edge: "user_thread_subscription"}
@@ -205,7 +161,7 @@ func (e UserEdges) UserThreadSubscriptionOrErr() ([]*UserThreadSubscription, err
 // UserCommentSubscriptionOrErr returns the UserCommentSubscription value or an error if the edge
 // was not loaded in eager-loading.
 func (e UserEdges) UserCommentSubscriptionOrErr() ([]*UserCommentSubscription, error) {
-	if e.loadedTypes[14] {
+	if e.loadedTypes[10] {
 		return e.UserCommentSubscription, nil
 	}
 	return nil, &NotLoadedError{edge: "user_comment_subscription"}
@@ -218,7 +174,7 @@ func (*User) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case user.FieldID, user.FieldStatus, user.FieldRole:
 			values[i] = new(sql.NullInt64)
-		case user.FieldName, user.FieldEmail, user.FieldPassword, user.FieldAvatarUrl:
+		case user.FieldName, user.FieldEmail, user.FieldPassword, user.FieldAvatarURL:
 			values[i] = new(sql.NullString)
 		case user.FieldCreatedAt, user.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -261,11 +217,12 @@ func (u *User) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				u.Password = value.String
 			}
-		case user.FieldAvatarUrl:
+		case user.FieldAvatarURL:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field avatarUrl", values[i])
+				return fmt.Errorf("unexpected type %T for field avatar_url", values[i])
 			} else if value.Valid {
-				u.AvatarUrl = value.String
+				u.AvatarURL = new(string)
+				*u.AvatarURL = value.String
 			}
 		case user.FieldStatus:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -281,13 +238,13 @@ func (u *User) assignValues(columns []string, values []any) error {
 			}
 		case user.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field createdAt", values[i])
+				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
 				u.CreatedAt = value.Time
 			}
 		case user.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field updatedAt", values[i])
+				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
 				u.UpdatedAt = value.Time
 			}
@@ -319,11 +276,6 @@ func (u *User) QueryComments() *ThreadCommentQuery {
 	return NewUserClient(u.config).QueryComments(u)
 }
 
-// QueryLikedBoards queries the "liked_boards" edge of the User entity.
-func (u *User) QueryLikedBoards() *BoardQuery {
-	return NewUserClient(u.config).QueryLikedBoards(u)
-}
-
 // QueryLikedThreads queries the "liked_threads" edge of the User entity.
 func (u *User) QueryLikedThreads() *ThreadQuery {
 	return NewUserClient(u.config).QueryLikedThreads(u)
@@ -332,11 +284,6 @@ func (u *User) QueryLikedThreads() *ThreadQuery {
 // QueryLikedComments queries the "liked_comments" edge of the User entity.
 func (u *User) QueryLikedComments() *ThreadCommentQuery {
 	return NewUserClient(u.config).QueryLikedComments(u)
-}
-
-// QuerySubscribedBoards queries the "subscribed_boards" edge of the User entity.
-func (u *User) QuerySubscribedBoards() *BoardQuery {
-	return NewUserClient(u.config).QuerySubscribedBoards(u)
 }
 
 // QuerySubscribedThreads queries the "subscribed_threads" edge of the User entity.
@@ -349,11 +296,6 @@ func (u *User) QuerySubscribedComments() *ThreadCommentQuery {
 	return NewUserClient(u.config).QuerySubscribedComments(u)
 }
 
-// QueryUserBoardLike queries the "user_board_like" edge of the User entity.
-func (u *User) QueryUserBoardLike() *UserBoardLikeQuery {
-	return NewUserClient(u.config).QueryUserBoardLike(u)
-}
-
 // QueryUserThreadLike queries the "user_thread_like" edge of the User entity.
 func (u *User) QueryUserThreadLike() *UserThreadLikeQuery {
 	return NewUserClient(u.config).QueryUserThreadLike(u)
@@ -362,11 +304,6 @@ func (u *User) QueryUserThreadLike() *UserThreadLikeQuery {
 // QueryUserCommentLike queries the "user_comment_like" edge of the User entity.
 func (u *User) QueryUserCommentLike() *UserCommentLikeQuery {
 	return NewUserClient(u.config).QueryUserCommentLike(u)
-}
-
-// QueryUserBoardSubscription queries the "user_board_subscription" edge of the User entity.
-func (u *User) QueryUserBoardSubscription() *UserBoardSubscriptionQuery {
-	return NewUserClient(u.config).QueryUserBoardSubscription(u)
 }
 
 // QueryUserThreadSubscription queries the "user_thread_subscription" edge of the User entity.
@@ -411,8 +348,10 @@ func (u *User) String() string {
 	builder.WriteString("password=")
 	builder.WriteString(u.Password)
 	builder.WriteString(", ")
-	builder.WriteString("avatarUrl=")
-	builder.WriteString(u.AvatarUrl)
+	if v := u.AvatarURL; v != nil {
+		builder.WriteString("avatar_url=")
+		builder.WriteString(*v)
+	}
 	builder.WriteString(", ")
 	builder.WriteString("status=")
 	builder.WriteString(fmt.Sprintf("%v", u.Status))
@@ -420,10 +359,10 @@ func (u *User) String() string {
 	builder.WriteString("role=")
 	builder.WriteString(fmt.Sprintf("%v", u.Role))
 	builder.WriteString(", ")
-	builder.WriteString("createdAt=")
+	builder.WriteString("created_at=")
 	builder.WriteString(u.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
-	builder.WriteString("updatedAt=")
+	builder.WriteString("updated_at=")
 	builder.WriteString(u.UpdatedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()

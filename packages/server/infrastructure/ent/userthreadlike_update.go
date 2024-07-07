@@ -30,41 +30,41 @@ func (utlu *UserThreadLikeUpdate) Where(ps ...predicate.UserThreadLike) *UserThr
 	return utlu
 }
 
-// SetUserId sets the "userId" field.
-func (utlu *UserThreadLikeUpdate) SetUserId(i int) *UserThreadLikeUpdate {
-	utlu.mutation.SetUserId(i)
+// SetUserID sets the "user_id" field.
+func (utlu *UserThreadLikeUpdate) SetUserID(i int) *UserThreadLikeUpdate {
+	utlu.mutation.SetUserID(i)
 	return utlu
 }
 
-// SetNillableUserId sets the "userId" field if the given value is not nil.
-func (utlu *UserThreadLikeUpdate) SetNillableUserId(i *int) *UserThreadLikeUpdate {
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (utlu *UserThreadLikeUpdate) SetNillableUserID(i *int) *UserThreadLikeUpdate {
 	if i != nil {
-		utlu.SetUserId(*i)
+		utlu.SetUserID(*i)
 	}
 	return utlu
 }
 
-// SetThreadId sets the "threadId" field.
-func (utlu *UserThreadLikeUpdate) SetThreadId(i int) *UserThreadLikeUpdate {
-	utlu.mutation.SetThreadId(i)
+// SetThreadID sets the "thread_id" field.
+func (utlu *UserThreadLikeUpdate) SetThreadID(i int) *UserThreadLikeUpdate {
+	utlu.mutation.SetThreadID(i)
 	return utlu
 }
 
-// SetNillableThreadId sets the "threadId" field if the given value is not nil.
-func (utlu *UserThreadLikeUpdate) SetNillableThreadId(i *int) *UserThreadLikeUpdate {
+// SetNillableThreadID sets the "thread_id" field if the given value is not nil.
+func (utlu *UserThreadLikeUpdate) SetNillableThreadID(i *int) *UserThreadLikeUpdate {
 	if i != nil {
-		utlu.SetThreadId(*i)
+		utlu.SetThreadID(*i)
 	}
 	return utlu
 }
 
-// SetLikedAt sets the "likedAt" field.
+// SetLikedAt sets the "liked_at" field.
 func (utlu *UserThreadLikeUpdate) SetLikedAt(t time.Time) *UserThreadLikeUpdate {
 	utlu.mutation.SetLikedAt(t)
 	return utlu
 }
 
-// SetNillableLikedAt sets the "likedAt" field if the given value is not nil.
+// SetNillableLikedAt sets the "liked_at" field if the given value is not nil.
 func (utlu *UserThreadLikeUpdate) SetNillableLikedAt(t *time.Time) *UserThreadLikeUpdate {
 	if t != nil {
 		utlu.SetLikedAt(*t)
@@ -72,21 +72,9 @@ func (utlu *UserThreadLikeUpdate) SetNillableLikedAt(t *time.Time) *UserThreadLi
 	return utlu
 }
 
-// SetUserID sets the "user" edge to the User entity by ID.
-func (utlu *UserThreadLikeUpdate) SetUserID(id int) *UserThreadLikeUpdate {
-	utlu.mutation.SetUserID(id)
-	return utlu
-}
-
 // SetUser sets the "user" edge to the User entity.
 func (utlu *UserThreadLikeUpdate) SetUser(u *User) *UserThreadLikeUpdate {
 	return utlu.SetUserID(u.ID)
-}
-
-// SetThreadID sets the "thread" edge to the Thread entity by ID.
-func (utlu *UserThreadLikeUpdate) SetThreadID(id int) *UserThreadLikeUpdate {
-	utlu.mutation.SetThreadID(id)
-	return utlu
 }
 
 // SetThread sets the "thread" edge to the Thread entity.
@@ -153,7 +141,7 @@ func (utlu *UserThreadLikeUpdate) sqlSave(ctx context.Context) (n int, err error
 	if err := utlu.check(); err != nil {
 		return n, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(userthreadlike.Table, userthreadlike.Columns, sqlgraph.NewFieldSpec(userthreadlike.FieldUserId, field.TypeInt), sqlgraph.NewFieldSpec(userthreadlike.FieldThreadId, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(userthreadlike.Table, userthreadlike.Columns, sqlgraph.NewFieldSpec(userthreadlike.FieldUserID, field.TypeInt), sqlgraph.NewFieldSpec(userthreadlike.FieldThreadID, field.TypeInt))
 	if ps := utlu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -242,41 +230,41 @@ type UserThreadLikeUpdateOne struct {
 	mutation *UserThreadLikeMutation
 }
 
-// SetUserId sets the "userId" field.
-func (utluo *UserThreadLikeUpdateOne) SetUserId(i int) *UserThreadLikeUpdateOne {
-	utluo.mutation.SetUserId(i)
+// SetUserID sets the "user_id" field.
+func (utluo *UserThreadLikeUpdateOne) SetUserID(i int) *UserThreadLikeUpdateOne {
+	utluo.mutation.SetUserID(i)
 	return utluo
 }
 
-// SetNillableUserId sets the "userId" field if the given value is not nil.
-func (utluo *UserThreadLikeUpdateOne) SetNillableUserId(i *int) *UserThreadLikeUpdateOne {
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (utluo *UserThreadLikeUpdateOne) SetNillableUserID(i *int) *UserThreadLikeUpdateOne {
 	if i != nil {
-		utluo.SetUserId(*i)
+		utluo.SetUserID(*i)
 	}
 	return utluo
 }
 
-// SetThreadId sets the "threadId" field.
-func (utluo *UserThreadLikeUpdateOne) SetThreadId(i int) *UserThreadLikeUpdateOne {
-	utluo.mutation.SetThreadId(i)
+// SetThreadID sets the "thread_id" field.
+func (utluo *UserThreadLikeUpdateOne) SetThreadID(i int) *UserThreadLikeUpdateOne {
+	utluo.mutation.SetThreadID(i)
 	return utluo
 }
 
-// SetNillableThreadId sets the "threadId" field if the given value is not nil.
-func (utluo *UserThreadLikeUpdateOne) SetNillableThreadId(i *int) *UserThreadLikeUpdateOne {
+// SetNillableThreadID sets the "thread_id" field if the given value is not nil.
+func (utluo *UserThreadLikeUpdateOne) SetNillableThreadID(i *int) *UserThreadLikeUpdateOne {
 	if i != nil {
-		utluo.SetThreadId(*i)
+		utluo.SetThreadID(*i)
 	}
 	return utluo
 }
 
-// SetLikedAt sets the "likedAt" field.
+// SetLikedAt sets the "liked_at" field.
 func (utluo *UserThreadLikeUpdateOne) SetLikedAt(t time.Time) *UserThreadLikeUpdateOne {
 	utluo.mutation.SetLikedAt(t)
 	return utluo
 }
 
-// SetNillableLikedAt sets the "likedAt" field if the given value is not nil.
+// SetNillableLikedAt sets the "liked_at" field if the given value is not nil.
 func (utluo *UserThreadLikeUpdateOne) SetNillableLikedAt(t *time.Time) *UserThreadLikeUpdateOne {
 	if t != nil {
 		utluo.SetLikedAt(*t)
@@ -284,21 +272,9 @@ func (utluo *UserThreadLikeUpdateOne) SetNillableLikedAt(t *time.Time) *UserThre
 	return utluo
 }
 
-// SetUserID sets the "user" edge to the User entity by ID.
-func (utluo *UserThreadLikeUpdateOne) SetUserID(id int) *UserThreadLikeUpdateOne {
-	utluo.mutation.SetUserID(id)
-	return utluo
-}
-
 // SetUser sets the "user" edge to the User entity.
 func (utluo *UserThreadLikeUpdateOne) SetUser(u *User) *UserThreadLikeUpdateOne {
 	return utluo.SetUserID(u.ID)
-}
-
-// SetThreadID sets the "thread" edge to the Thread entity by ID.
-func (utluo *UserThreadLikeUpdateOne) SetThreadID(id int) *UserThreadLikeUpdateOne {
-	utluo.mutation.SetThreadID(id)
-	return utluo
 }
 
 // SetThread sets the "thread" edge to the Thread entity.
@@ -378,14 +354,14 @@ func (utluo *UserThreadLikeUpdateOne) sqlSave(ctx context.Context) (_node *UserT
 	if err := utluo.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(userthreadlike.Table, userthreadlike.Columns, sqlgraph.NewFieldSpec(userthreadlike.FieldUserId, field.TypeInt), sqlgraph.NewFieldSpec(userthreadlike.FieldThreadId, field.TypeInt))
-	if id, ok := utluo.mutation.UserId(); !ok {
-		return nil, &ValidationError{Name: "userId", err: errors.New(`ent: missing "UserThreadLike.userId" for update`)}
+	_spec := sqlgraph.NewUpdateSpec(userthreadlike.Table, userthreadlike.Columns, sqlgraph.NewFieldSpec(userthreadlike.FieldUserID, field.TypeInt), sqlgraph.NewFieldSpec(userthreadlike.FieldThreadID, field.TypeInt))
+	if id, ok := utluo.mutation.UserID(); !ok {
+		return nil, &ValidationError{Name: "user_id", err: errors.New(`ent: missing "UserThreadLike.user_id" for update`)}
 	} else {
 		_spec.Node.CompositeID[0].Value = id
 	}
-	if id, ok := utluo.mutation.ThreadId(); !ok {
-		return nil, &ValidationError{Name: "threadId", err: errors.New(`ent: missing "UserThreadLike.threadId" for update`)}
+	if id, ok := utluo.mutation.ThreadID(); !ok {
+		return nil, &ValidationError{Name: "thread_id", err: errors.New(`ent: missing "UserThreadLike.thread_id" for update`)}
 	} else {
 		_spec.Node.CompositeID[1].Value = id
 	}

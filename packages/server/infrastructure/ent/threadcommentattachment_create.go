@@ -21,9 +21,9 @@ type ThreadCommentAttachmentCreate struct {
 	hooks    []Hook
 }
 
-// SetCommentId sets the "commentId" field.
-func (tcac *ThreadCommentAttachmentCreate) SetCommentId(i int) *ThreadCommentAttachmentCreate {
-	tcac.mutation.SetCommentId(i)
+// SetCommentID sets the "comment_id" field.
+func (tcac *ThreadCommentAttachmentCreate) SetCommentID(i int) *ThreadCommentAttachmentCreate {
+	tcac.mutation.SetCommentID(i)
 	return tcac
 }
 
@@ -61,13 +61,13 @@ func (tcac *ThreadCommentAttachmentCreate) SetNillableType(i *int) *ThreadCommen
 	return tcac
 }
 
-// SetCreatedAt sets the "createdAt" field.
+// SetCreatedAt sets the "created_at" field.
 func (tcac *ThreadCommentAttachmentCreate) SetCreatedAt(t time.Time) *ThreadCommentAttachmentCreate {
 	tcac.mutation.SetCreatedAt(t)
 	return tcac
 }
 
-// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
 func (tcac *ThreadCommentAttachmentCreate) SetNillableCreatedAt(t *time.Time) *ThreadCommentAttachmentCreate {
 	if t != nil {
 		tcac.SetCreatedAt(*t)
@@ -78,12 +78,6 @@ func (tcac *ThreadCommentAttachmentCreate) SetNillableCreatedAt(t *time.Time) *T
 // SetID sets the "id" field.
 func (tcac *ThreadCommentAttachmentCreate) SetID(i int) *ThreadCommentAttachmentCreate {
 	tcac.mutation.SetID(i)
-	return tcac
-}
-
-// SetCommentID sets the "comment" edge to the ThreadComment entity by ID.
-func (tcac *ThreadCommentAttachmentCreate) SetCommentID(id int) *ThreadCommentAttachmentCreate {
-	tcac.mutation.SetCommentID(id)
 	return tcac
 }
 
@@ -143,8 +137,8 @@ func (tcac *ThreadCommentAttachmentCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (tcac *ThreadCommentAttachmentCreate) check() error {
-	if _, ok := tcac.mutation.CommentId(); !ok {
-		return &ValidationError{Name: "commentId", err: errors.New(`ent: missing required field "ThreadCommentAttachment.commentId"`)}
+	if _, ok := tcac.mutation.CommentID(); !ok {
+		return &ValidationError{Name: "comment_id", err: errors.New(`ent: missing required field "ThreadCommentAttachment.comment_id"`)}
 	}
 	if _, ok := tcac.mutation.URL(); !ok {
 		return &ValidationError{Name: "url", err: errors.New(`ent: missing required field "ThreadCommentAttachment.url"`)}
@@ -156,7 +150,7 @@ func (tcac *ThreadCommentAttachmentCreate) check() error {
 		return &ValidationError{Name: "type", err: errors.New(`ent: missing required field "ThreadCommentAttachment.type"`)}
 	}
 	if _, ok := tcac.mutation.CreatedAt(); !ok {
-		return &ValidationError{Name: "createdAt", err: errors.New(`ent: missing required field "ThreadCommentAttachment.createdAt"`)}
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "ThreadCommentAttachment.created_at"`)}
 	}
 	if _, ok := tcac.mutation.CommentID(); !ok {
 		return &ValidationError{Name: "comment", err: errors.New(`ent: missing required edge "ThreadCommentAttachment.comment"`)}
@@ -223,7 +217,7 @@ func (tcac *ThreadCommentAttachmentCreate) createSpec() (*ThreadCommentAttachmen
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.CommentId = nodes[0]
+		_node.CommentID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

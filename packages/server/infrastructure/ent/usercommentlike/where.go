@@ -10,97 +10,97 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
-// UserId applies equality check predicate on the "userId" field. It's identical to UserIdEQ.
-func UserId(v int) predicate.UserCommentLike {
-	return predicate.UserCommentLike(sql.FieldEQ(FieldUserId, v))
+// UserID applies equality check predicate on the "user_id" field. It's identical to UserIDEQ.
+func UserID(v int) predicate.UserCommentLike {
+	return predicate.UserCommentLike(sql.FieldEQ(FieldUserID, v))
 }
 
-// CommentId applies equality check predicate on the "commentId" field. It's identical to CommentIdEQ.
-func CommentId(v int) predicate.UserCommentLike {
-	return predicate.UserCommentLike(sql.FieldEQ(FieldCommentId, v))
+// CommentID applies equality check predicate on the "comment_id" field. It's identical to CommentIDEQ.
+func CommentID(v int) predicate.UserCommentLike {
+	return predicate.UserCommentLike(sql.FieldEQ(FieldCommentID, v))
 }
 
-// LikedAt applies equality check predicate on the "likedAt" field. It's identical to LikedAtEQ.
+// LikedAt applies equality check predicate on the "liked_at" field. It's identical to LikedAtEQ.
 func LikedAt(v time.Time) predicate.UserCommentLike {
 	return predicate.UserCommentLike(sql.FieldEQ(FieldLikedAt, v))
 }
 
-// UserIdEQ applies the EQ predicate on the "userId" field.
-func UserIdEQ(v int) predicate.UserCommentLike {
-	return predicate.UserCommentLike(sql.FieldEQ(FieldUserId, v))
+// UserIDEQ applies the EQ predicate on the "user_id" field.
+func UserIDEQ(v int) predicate.UserCommentLike {
+	return predicate.UserCommentLike(sql.FieldEQ(FieldUserID, v))
 }
 
-// UserIdNEQ applies the NEQ predicate on the "userId" field.
-func UserIdNEQ(v int) predicate.UserCommentLike {
-	return predicate.UserCommentLike(sql.FieldNEQ(FieldUserId, v))
+// UserIDNEQ applies the NEQ predicate on the "user_id" field.
+func UserIDNEQ(v int) predicate.UserCommentLike {
+	return predicate.UserCommentLike(sql.FieldNEQ(FieldUserID, v))
 }
 
-// UserIdIn applies the In predicate on the "userId" field.
-func UserIdIn(vs ...int) predicate.UserCommentLike {
-	return predicate.UserCommentLike(sql.FieldIn(FieldUserId, vs...))
+// UserIDIn applies the In predicate on the "user_id" field.
+func UserIDIn(vs ...int) predicate.UserCommentLike {
+	return predicate.UserCommentLike(sql.FieldIn(FieldUserID, vs...))
 }
 
-// UserIdNotIn applies the NotIn predicate on the "userId" field.
-func UserIdNotIn(vs ...int) predicate.UserCommentLike {
-	return predicate.UserCommentLike(sql.FieldNotIn(FieldUserId, vs...))
+// UserIDNotIn applies the NotIn predicate on the "user_id" field.
+func UserIDNotIn(vs ...int) predicate.UserCommentLike {
+	return predicate.UserCommentLike(sql.FieldNotIn(FieldUserID, vs...))
 }
 
-// CommentIdEQ applies the EQ predicate on the "commentId" field.
-func CommentIdEQ(v int) predicate.UserCommentLike {
-	return predicate.UserCommentLike(sql.FieldEQ(FieldCommentId, v))
+// CommentIDEQ applies the EQ predicate on the "comment_id" field.
+func CommentIDEQ(v int) predicate.UserCommentLike {
+	return predicate.UserCommentLike(sql.FieldEQ(FieldCommentID, v))
 }
 
-// CommentIdNEQ applies the NEQ predicate on the "commentId" field.
-func CommentIdNEQ(v int) predicate.UserCommentLike {
-	return predicate.UserCommentLike(sql.FieldNEQ(FieldCommentId, v))
+// CommentIDNEQ applies the NEQ predicate on the "comment_id" field.
+func CommentIDNEQ(v int) predicate.UserCommentLike {
+	return predicate.UserCommentLike(sql.FieldNEQ(FieldCommentID, v))
 }
 
-// CommentIdIn applies the In predicate on the "commentId" field.
-func CommentIdIn(vs ...int) predicate.UserCommentLike {
-	return predicate.UserCommentLike(sql.FieldIn(FieldCommentId, vs...))
+// CommentIDIn applies the In predicate on the "comment_id" field.
+func CommentIDIn(vs ...int) predicate.UserCommentLike {
+	return predicate.UserCommentLike(sql.FieldIn(FieldCommentID, vs...))
 }
 
-// CommentIdNotIn applies the NotIn predicate on the "commentId" field.
-func CommentIdNotIn(vs ...int) predicate.UserCommentLike {
-	return predicate.UserCommentLike(sql.FieldNotIn(FieldCommentId, vs...))
+// CommentIDNotIn applies the NotIn predicate on the "comment_id" field.
+func CommentIDNotIn(vs ...int) predicate.UserCommentLike {
+	return predicate.UserCommentLike(sql.FieldNotIn(FieldCommentID, vs...))
 }
 
-// LikedAtEQ applies the EQ predicate on the "likedAt" field.
+// LikedAtEQ applies the EQ predicate on the "liked_at" field.
 func LikedAtEQ(v time.Time) predicate.UserCommentLike {
 	return predicate.UserCommentLike(sql.FieldEQ(FieldLikedAt, v))
 }
 
-// LikedAtNEQ applies the NEQ predicate on the "likedAt" field.
+// LikedAtNEQ applies the NEQ predicate on the "liked_at" field.
 func LikedAtNEQ(v time.Time) predicate.UserCommentLike {
 	return predicate.UserCommentLike(sql.FieldNEQ(FieldLikedAt, v))
 }
 
-// LikedAtIn applies the In predicate on the "likedAt" field.
+// LikedAtIn applies the In predicate on the "liked_at" field.
 func LikedAtIn(vs ...time.Time) predicate.UserCommentLike {
 	return predicate.UserCommentLike(sql.FieldIn(FieldLikedAt, vs...))
 }
 
-// LikedAtNotIn applies the NotIn predicate on the "likedAt" field.
+// LikedAtNotIn applies the NotIn predicate on the "liked_at" field.
 func LikedAtNotIn(vs ...time.Time) predicate.UserCommentLike {
 	return predicate.UserCommentLike(sql.FieldNotIn(FieldLikedAt, vs...))
 }
 
-// LikedAtGT applies the GT predicate on the "likedAt" field.
+// LikedAtGT applies the GT predicate on the "liked_at" field.
 func LikedAtGT(v time.Time) predicate.UserCommentLike {
 	return predicate.UserCommentLike(sql.FieldGT(FieldLikedAt, v))
 }
 
-// LikedAtGTE applies the GTE predicate on the "likedAt" field.
+// LikedAtGTE applies the GTE predicate on the "liked_at" field.
 func LikedAtGTE(v time.Time) predicate.UserCommentLike {
 	return predicate.UserCommentLike(sql.FieldGTE(FieldLikedAt, v))
 }
 
-// LikedAtLT applies the LT predicate on the "likedAt" field.
+// LikedAtLT applies the LT predicate on the "liked_at" field.
 func LikedAtLT(v time.Time) predicate.UserCommentLike {
 	return predicate.UserCommentLike(sql.FieldLT(FieldLikedAt, v))
 }
 
-// LikedAtLTE applies the LTE predicate on the "likedAt" field.
+// LikedAtLTE applies the LTE predicate on the "liked_at" field.
 func LikedAtLTE(v time.Time) predicate.UserCommentLike {
 	return predicate.UserCommentLike(sql.FieldLTE(FieldLikedAt, v))
 }

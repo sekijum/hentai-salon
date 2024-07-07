@@ -4,8 +4,7 @@ import (
 	"context"
 	"server/domain/model"
 	"server/infrastructure/ent"
-
-	"github.com/mitchellh/mapstructure"
+	"server/infrastructure/ent/tag"
 )
 
 type TagDatasource struct {
@@ -24,21 +23,29 @@ func (ds *TagDatasource) FindAll(ctx context.Context) ([]*model.Tag, error) {
 
 	var modelTags []*model.Tag
 	for _, entTag := range tags {
-		modelTag, err := entTagToModelTag(entTag)
-		if err != nil {
-			return nil, err
-		}
-		modelTags = append(modelTags, modelTag)
+		modelTags = append(modelTags, &model.Tag{
+			EntTag: entTag,
+		})
 	}
 
 	return modelTags, nil
 }
 
-func entTagToModelTag(entTag *ent.Tag) (*model.Tag, error) {
-	var modelTag model.Tag
-	err := mapstructure.Decode(entTag, &modelTag)
-	if err != nil {
-		return nil, err
+func (ds *TagDatasource) CreateManyTx(ctx context.Context, tx *ent.Tx, tagNames []string) ([]*model.Tag, error) {
+	var modelTags []*model.Tag
+
+	for _, tagName := range tagNames {
+		entTag, err := tx.Tag.Query().Where(tag.NameEQ(tagName)).Only(ctx)
+		if entTag == nil {
+			entTag, err = tx.Tag.Create().SetName(tagName).Save(ctx)
+			if err != nil {
+				return nil, err
+			}
+		}
+		modelTags = append(modelTags, &model.Tag{
+			EntTag: entTag,
+		})
 	}
-	return &modelTag, nil
+
+	return modelTags, nil
 }

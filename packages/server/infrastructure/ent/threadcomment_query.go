@@ -582,12 +582,12 @@ func (tcq *ThreadCommentQuery) WithUserCommentSubscription(opts ...func(*UserCom
 // Example:
 //
 //	var v []struct {
-//		ThreadId int `json:"threadId,omitempty"`
+//		ThreadID int `json:"thread_id,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.ThreadComment.Query().
-//		GroupBy(threadcomment.FieldThreadId).
+//		GroupBy(threadcomment.FieldThreadID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (tcq *ThreadCommentQuery) GroupBy(field string, fields ...string) *ThreadCommentGroupBy {
@@ -605,11 +605,11 @@ func (tcq *ThreadCommentQuery) GroupBy(field string, fields ...string) *ThreadCo
 // Example:
 //
 //	var v []struct {
-//		ThreadId int `json:"threadId,omitempty"`
+//		ThreadID int `json:"thread_id,omitempty"`
 //	}
 //
 //	client.ThreadComment.Query().
-//		Select(threadcomment.FieldThreadId).
+//		Select(threadcomment.FieldThreadID).
 //		Scan(ctx, &v)
 func (tcq *ThreadCommentQuery) Select(fields ...string) *ThreadCommentSelect {
 	tcq.ctx.Fields = append(tcq.ctx.Fields, fields...)
@@ -757,7 +757,7 @@ func (tcq *ThreadCommentQuery) loadThread(ctx context.Context, query *ThreadQuer
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*ThreadComment)
 	for i := range nodes {
-		fk := nodes[i].ThreadId
+		fk := nodes[i].ThreadID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -774,7 +774,7 @@ func (tcq *ThreadCommentQuery) loadThread(ctx context.Context, query *ThreadQuer
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "threadId" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "thread_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -786,7 +786,10 @@ func (tcq *ThreadCommentQuery) loadAuthor(ctx context.Context, query *UserQuery,
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*ThreadComment)
 	for i := range nodes {
-		fk := nodes[i].UserId
+		if nodes[i].UserID == nil {
+			continue
+		}
+		fk := *nodes[i].UserID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -803,7 +806,7 @@ func (tcq *ThreadCommentQuery) loadAuthor(ctx context.Context, query *UserQuery,
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "userId" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "user_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -815,7 +818,10 @@ func (tcq *ThreadCommentQuery) loadParentComment(ctx context.Context, query *Thr
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*ThreadComment)
 	for i := range nodes {
-		fk := nodes[i].ParentCommentId
+		if nodes[i].ParentCommentID == nil {
+			continue
+		}
+		fk := *nodes[i].ParentCommentID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -832,7 +838,7 @@ func (tcq *ThreadCommentQuery) loadParentComment(ctx context.Context, query *Thr
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "parentCommentId" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "parent_comment_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -851,7 +857,7 @@ func (tcq *ThreadCommentQuery) loadReplies(ctx context.Context, query *ThreadCom
 		}
 	}
 	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(threadcomment.FieldParentCommentId)
+		query.ctx.AppendFieldOnce(threadcomment.FieldParentCommentID)
 	}
 	query.Where(predicate.ThreadComment(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(threadcomment.RepliesColumn), fks...))
@@ -861,10 +867,13 @@ func (tcq *ThreadCommentQuery) loadReplies(ctx context.Context, query *ThreadCom
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.ParentCommentId
-		node, ok := nodeids[fk]
+		fk := n.ParentCommentID
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "parent_comment_id" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "parentCommentId" returned %v for node %v`, fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "parent_comment_id" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -881,7 +890,7 @@ func (tcq *ThreadCommentQuery) loadAttachments(ctx context.Context, query *Threa
 		}
 	}
 	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(threadcommentattachment.FieldCommentId)
+		query.ctx.AppendFieldOnce(threadcommentattachment.FieldCommentID)
 	}
 	query.Where(predicate.ThreadCommentAttachment(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(threadcomment.AttachmentsColumn), fks...))
@@ -891,10 +900,10 @@ func (tcq *ThreadCommentQuery) loadAttachments(ctx context.Context, query *Threa
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.CommentId
+		fk := n.CommentID
 		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "commentId" returned %v for node %v`, fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "comment_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -1033,7 +1042,7 @@ func (tcq *ThreadCommentQuery) loadUserCommentLike(ctx context.Context, query *U
 		}
 	}
 	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(usercommentlike.FieldCommentId)
+		query.ctx.AppendFieldOnce(usercommentlike.FieldCommentID)
 	}
 	query.Where(predicate.UserCommentLike(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(threadcomment.UserCommentLikeColumn), fks...))
@@ -1043,10 +1052,10 @@ func (tcq *ThreadCommentQuery) loadUserCommentLike(ctx context.Context, query *U
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.CommentId
+		fk := n.CommentID
 		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "commentId" returned %v for node %v`, fk, n)
+			return fmt.Errorf(`unexpected referenced foreign-key "comment_id" returned %v for node %v`, fk, n)
 		}
 		assign(node, n)
 	}
@@ -1063,7 +1072,7 @@ func (tcq *ThreadCommentQuery) loadUserCommentSubscription(ctx context.Context, 
 		}
 	}
 	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(usercommentsubscription.FieldCommentId)
+		query.ctx.AppendFieldOnce(usercommentsubscription.FieldCommentID)
 	}
 	query.Where(predicate.UserCommentSubscription(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(threadcomment.UserCommentSubscriptionColumn), fks...))
@@ -1073,10 +1082,10 @@ func (tcq *ThreadCommentQuery) loadUserCommentSubscription(ctx context.Context, 
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.CommentId
+		fk := n.CommentID
 		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "commentId" returned %v for node %v`, fk, n)
+			return fmt.Errorf(`unexpected referenced foreign-key "comment_id" returned %v for node %v`, fk, n)
 		}
 		assign(node, n)
 	}
@@ -1109,13 +1118,13 @@ func (tcq *ThreadCommentQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 		if tcq.withThread != nil {
-			_spec.Node.AddColumnOnce(threadcomment.FieldThreadId)
+			_spec.Node.AddColumnOnce(threadcomment.FieldThreadID)
 		}
 		if tcq.withAuthor != nil {
-			_spec.Node.AddColumnOnce(threadcomment.FieldUserId)
+			_spec.Node.AddColumnOnce(threadcomment.FieldUserID)
 		}
 		if tcq.withParentComment != nil {
-			_spec.Node.AddColumnOnce(threadcomment.FieldParentCommentId)
+			_spec.Node.AddColumnOnce(threadcomment.FieldParentCommentID)
 		}
 	}
 	if ps := tcq.predicates; len(ps) > 0 {

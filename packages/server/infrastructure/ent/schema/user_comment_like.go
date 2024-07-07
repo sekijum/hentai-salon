@@ -10,26 +10,26 @@ import (
 )
 
 type UserCommentLike struct {
-    ent.Schema
+	ent.Schema
 }
 
 func (UserCommentLike) Annotations() []schema.Annotation {
 	return []schema.Annotation{
-		field.ID("userId", "commentId"),
+		field.ID("user_id", "comment_id"),
 	}
 }
 
 func (UserCommentLike) Fields() []ent.Field {
-    return []ent.Field{
-        field.Int("userId").StorageKey("user_id"),
-        field.Int("commentId").StorageKey("comment_id"),
-        field.Time("likedAt").Default(time.Now).StorageKey("liked_at"),
-    }
+	return []ent.Field{
+		field.Int("user_id"),
+		field.Int("comment_id"),
+		field.Time("liked_at").Default(time.Now),
+	}
 }
 
 func (UserCommentLike) Edges() []ent.Edge {
-    return []ent.Edge{
-        edge.To("user", User.Type).Unique().Required().Field("userId"),
-        edge.To("comment", ThreadComment.Type).Unique().Required().Field("commentId"),
-    }
+	return []ent.Edge{
+		edge.To("user", User.Type).Unique().Required().Field("user_id"),
+		edge.To("comment", ThreadComment.Type).Unique().Required().Field("comment_id"),
+	}
 }

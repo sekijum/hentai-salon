@@ -31,67 +31,67 @@ func (tcu *ThreadCommentUpdate) Where(ps ...predicate.ThreadComment) *ThreadComm
 	return tcu
 }
 
-// SetThreadId sets the "threadId" field.
-func (tcu *ThreadCommentUpdate) SetThreadId(i int) *ThreadCommentUpdate {
-	tcu.mutation.SetThreadId(i)
+// SetThreadID sets the "thread_id" field.
+func (tcu *ThreadCommentUpdate) SetThreadID(i int) *ThreadCommentUpdate {
+	tcu.mutation.SetThreadID(i)
 	return tcu
 }
 
-// SetNillableThreadId sets the "threadId" field if the given value is not nil.
-func (tcu *ThreadCommentUpdate) SetNillableThreadId(i *int) *ThreadCommentUpdate {
+// SetNillableThreadID sets the "thread_id" field if the given value is not nil.
+func (tcu *ThreadCommentUpdate) SetNillableThreadID(i *int) *ThreadCommentUpdate {
 	if i != nil {
-		tcu.SetThreadId(*i)
+		tcu.SetThreadID(*i)
 	}
 	return tcu
 }
 
-// SetParentCommentId sets the "parentCommentId" field.
-func (tcu *ThreadCommentUpdate) SetParentCommentId(i int) *ThreadCommentUpdate {
-	tcu.mutation.SetParentCommentId(i)
+// SetParentCommentID sets the "parent_comment_id" field.
+func (tcu *ThreadCommentUpdate) SetParentCommentID(i int) *ThreadCommentUpdate {
+	tcu.mutation.SetParentCommentID(i)
 	return tcu
 }
 
-// SetNillableParentCommentId sets the "parentCommentId" field if the given value is not nil.
-func (tcu *ThreadCommentUpdate) SetNillableParentCommentId(i *int) *ThreadCommentUpdate {
+// SetNillableParentCommentID sets the "parent_comment_id" field if the given value is not nil.
+func (tcu *ThreadCommentUpdate) SetNillableParentCommentID(i *int) *ThreadCommentUpdate {
 	if i != nil {
-		tcu.SetParentCommentId(*i)
+		tcu.SetParentCommentID(*i)
 	}
 	return tcu
 }
 
-// ClearParentCommentId clears the value of the "parentCommentId" field.
-func (tcu *ThreadCommentUpdate) ClearParentCommentId() *ThreadCommentUpdate {
-	tcu.mutation.ClearParentCommentId()
+// ClearParentCommentID clears the value of the "parent_comment_id" field.
+func (tcu *ThreadCommentUpdate) ClearParentCommentID() *ThreadCommentUpdate {
+	tcu.mutation.ClearParentCommentID()
 	return tcu
 }
 
-// SetUserId sets the "userId" field.
-func (tcu *ThreadCommentUpdate) SetUserId(i int) *ThreadCommentUpdate {
-	tcu.mutation.SetUserId(i)
+// SetUserID sets the "user_id" field.
+func (tcu *ThreadCommentUpdate) SetUserID(i int) *ThreadCommentUpdate {
+	tcu.mutation.SetUserID(i)
 	return tcu
 }
 
-// SetNillableUserId sets the "userId" field if the given value is not nil.
-func (tcu *ThreadCommentUpdate) SetNillableUserId(i *int) *ThreadCommentUpdate {
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (tcu *ThreadCommentUpdate) SetNillableUserID(i *int) *ThreadCommentUpdate {
 	if i != nil {
-		tcu.SetUserId(*i)
+		tcu.SetUserID(*i)
 	}
 	return tcu
 }
 
-// ClearUserId clears the value of the "userId" field.
-func (tcu *ThreadCommentUpdate) ClearUserId() *ThreadCommentUpdate {
-	tcu.mutation.ClearUserId()
+// ClearUserID clears the value of the "user_id" field.
+func (tcu *ThreadCommentUpdate) ClearUserID() *ThreadCommentUpdate {
+	tcu.mutation.ClearUserID()
 	return tcu
 }
 
-// SetGuestName sets the "guestName" field.
+// SetGuestName sets the "guest_name" field.
 func (tcu *ThreadCommentUpdate) SetGuestName(s string) *ThreadCommentUpdate {
 	tcu.mutation.SetGuestName(s)
 	return tcu
 }
 
-// SetNillableGuestName sets the "guestName" field if the given value is not nil.
+// SetNillableGuestName sets the "guest_name" field if the given value is not nil.
 func (tcu *ThreadCommentUpdate) SetNillableGuestName(s *string) *ThreadCommentUpdate {
 	if s != nil {
 		tcu.SetGuestName(*s)
@@ -99,7 +99,7 @@ func (tcu *ThreadCommentUpdate) SetNillableGuestName(s *string) *ThreadCommentUp
 	return tcu
 }
 
-// ClearGuestName clears the value of the "guestName" field.
+// ClearGuestName clears the value of the "guest_name" field.
 func (tcu *ThreadCommentUpdate) ClearGuestName() *ThreadCommentUpdate {
 	tcu.mutation.ClearGuestName()
 	return tcu
@@ -154,13 +154,13 @@ func (tcu *ThreadCommentUpdate) AddStatus(i int) *ThreadCommentUpdate {
 	return tcu
 }
 
-// SetCreatedAt sets the "createdAt" field.
+// SetCreatedAt sets the "created_at" field.
 func (tcu *ThreadCommentUpdate) SetCreatedAt(t time.Time) *ThreadCommentUpdate {
 	tcu.mutation.SetCreatedAt(t)
 	return tcu
 }
 
-// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
 func (tcu *ThreadCommentUpdate) SetNillableCreatedAt(t *time.Time) *ThreadCommentUpdate {
 	if t != nil {
 		tcu.SetCreatedAt(*t)
@@ -168,15 +168,9 @@ func (tcu *ThreadCommentUpdate) SetNillableCreatedAt(t *time.Time) *ThreadCommen
 	return tcu
 }
 
-// SetUpdatedAt sets the "updatedAt" field.
+// SetUpdatedAt sets the "updated_at" field.
 func (tcu *ThreadCommentUpdate) SetUpdatedAt(t time.Time) *ThreadCommentUpdate {
 	tcu.mutation.SetUpdatedAt(t)
-	return tcu
-}
-
-// SetThreadID sets the "thread" edge to the Thread entity by ID.
-func (tcu *ThreadCommentUpdate) SetThreadID(id int) *ThreadCommentUpdate {
-	tcu.mutation.SetThreadID(id)
 	return tcu
 }
 
@@ -202,20 +196,6 @@ func (tcu *ThreadCommentUpdate) SetNillableAuthorID(id *int) *ThreadCommentUpdat
 // SetAuthor sets the "author" edge to the User entity.
 func (tcu *ThreadCommentUpdate) SetAuthor(u *User) *ThreadCommentUpdate {
 	return tcu.SetAuthorID(u.ID)
-}
-
-// SetParentCommentID sets the "parent_comment" edge to the ThreadComment entity by ID.
-func (tcu *ThreadCommentUpdate) SetParentCommentID(id int) *ThreadCommentUpdate {
-	tcu.mutation.SetParentCommentID(id)
-	return tcu
-}
-
-// SetNillableParentCommentID sets the "parent_comment" edge to the ThreadComment entity by ID if the given value is not nil.
-func (tcu *ThreadCommentUpdate) SetNillableParentCommentID(id *int) *ThreadCommentUpdate {
-	if id != nil {
-		tcu = tcu.SetParentCommentID(*id)
-	}
-	return tcu
 }
 
 // SetParentComment sets the "parent_comment" edge to the ThreadComment entity.
@@ -430,7 +410,7 @@ func (tcu *ThreadCommentUpdate) defaults() {
 func (tcu *ThreadCommentUpdate) check() error {
 	if v, ok := tcu.mutation.GuestName(); ok {
 		if err := threadcomment.GuestNameValidator(v); err != nil {
-			return &ValidationError{Name: "guestName", err: fmt.Errorf(`ent: validator failed for field "ThreadComment.guestName": %w`, err)}
+			return &ValidationError{Name: "guest_name", err: fmt.Errorf(`ent: validator failed for field "ThreadComment.guest_name": %w`, err)}
 		}
 	}
 	if v, ok := tcu.mutation.IPAddress(); ok {
@@ -791,67 +771,67 @@ type ThreadCommentUpdateOne struct {
 	mutation *ThreadCommentMutation
 }
 
-// SetThreadId sets the "threadId" field.
-func (tcuo *ThreadCommentUpdateOne) SetThreadId(i int) *ThreadCommentUpdateOne {
-	tcuo.mutation.SetThreadId(i)
+// SetThreadID sets the "thread_id" field.
+func (tcuo *ThreadCommentUpdateOne) SetThreadID(i int) *ThreadCommentUpdateOne {
+	tcuo.mutation.SetThreadID(i)
 	return tcuo
 }
 
-// SetNillableThreadId sets the "threadId" field if the given value is not nil.
-func (tcuo *ThreadCommentUpdateOne) SetNillableThreadId(i *int) *ThreadCommentUpdateOne {
+// SetNillableThreadID sets the "thread_id" field if the given value is not nil.
+func (tcuo *ThreadCommentUpdateOne) SetNillableThreadID(i *int) *ThreadCommentUpdateOne {
 	if i != nil {
-		tcuo.SetThreadId(*i)
+		tcuo.SetThreadID(*i)
 	}
 	return tcuo
 }
 
-// SetParentCommentId sets the "parentCommentId" field.
-func (tcuo *ThreadCommentUpdateOne) SetParentCommentId(i int) *ThreadCommentUpdateOne {
-	tcuo.mutation.SetParentCommentId(i)
+// SetParentCommentID sets the "parent_comment_id" field.
+func (tcuo *ThreadCommentUpdateOne) SetParentCommentID(i int) *ThreadCommentUpdateOne {
+	tcuo.mutation.SetParentCommentID(i)
 	return tcuo
 }
 
-// SetNillableParentCommentId sets the "parentCommentId" field if the given value is not nil.
-func (tcuo *ThreadCommentUpdateOne) SetNillableParentCommentId(i *int) *ThreadCommentUpdateOne {
+// SetNillableParentCommentID sets the "parent_comment_id" field if the given value is not nil.
+func (tcuo *ThreadCommentUpdateOne) SetNillableParentCommentID(i *int) *ThreadCommentUpdateOne {
 	if i != nil {
-		tcuo.SetParentCommentId(*i)
+		tcuo.SetParentCommentID(*i)
 	}
 	return tcuo
 }
 
-// ClearParentCommentId clears the value of the "parentCommentId" field.
-func (tcuo *ThreadCommentUpdateOne) ClearParentCommentId() *ThreadCommentUpdateOne {
-	tcuo.mutation.ClearParentCommentId()
+// ClearParentCommentID clears the value of the "parent_comment_id" field.
+func (tcuo *ThreadCommentUpdateOne) ClearParentCommentID() *ThreadCommentUpdateOne {
+	tcuo.mutation.ClearParentCommentID()
 	return tcuo
 }
 
-// SetUserId sets the "userId" field.
-func (tcuo *ThreadCommentUpdateOne) SetUserId(i int) *ThreadCommentUpdateOne {
-	tcuo.mutation.SetUserId(i)
+// SetUserID sets the "user_id" field.
+func (tcuo *ThreadCommentUpdateOne) SetUserID(i int) *ThreadCommentUpdateOne {
+	tcuo.mutation.SetUserID(i)
 	return tcuo
 }
 
-// SetNillableUserId sets the "userId" field if the given value is not nil.
-func (tcuo *ThreadCommentUpdateOne) SetNillableUserId(i *int) *ThreadCommentUpdateOne {
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (tcuo *ThreadCommentUpdateOne) SetNillableUserID(i *int) *ThreadCommentUpdateOne {
 	if i != nil {
-		tcuo.SetUserId(*i)
+		tcuo.SetUserID(*i)
 	}
 	return tcuo
 }
 
-// ClearUserId clears the value of the "userId" field.
-func (tcuo *ThreadCommentUpdateOne) ClearUserId() *ThreadCommentUpdateOne {
-	tcuo.mutation.ClearUserId()
+// ClearUserID clears the value of the "user_id" field.
+func (tcuo *ThreadCommentUpdateOne) ClearUserID() *ThreadCommentUpdateOne {
+	tcuo.mutation.ClearUserID()
 	return tcuo
 }
 
-// SetGuestName sets the "guestName" field.
+// SetGuestName sets the "guest_name" field.
 func (tcuo *ThreadCommentUpdateOne) SetGuestName(s string) *ThreadCommentUpdateOne {
 	tcuo.mutation.SetGuestName(s)
 	return tcuo
 }
 
-// SetNillableGuestName sets the "guestName" field if the given value is not nil.
+// SetNillableGuestName sets the "guest_name" field if the given value is not nil.
 func (tcuo *ThreadCommentUpdateOne) SetNillableGuestName(s *string) *ThreadCommentUpdateOne {
 	if s != nil {
 		tcuo.SetGuestName(*s)
@@ -859,7 +839,7 @@ func (tcuo *ThreadCommentUpdateOne) SetNillableGuestName(s *string) *ThreadComme
 	return tcuo
 }
 
-// ClearGuestName clears the value of the "guestName" field.
+// ClearGuestName clears the value of the "guest_name" field.
 func (tcuo *ThreadCommentUpdateOne) ClearGuestName() *ThreadCommentUpdateOne {
 	tcuo.mutation.ClearGuestName()
 	return tcuo
@@ -914,13 +894,13 @@ func (tcuo *ThreadCommentUpdateOne) AddStatus(i int) *ThreadCommentUpdateOne {
 	return tcuo
 }
 
-// SetCreatedAt sets the "createdAt" field.
+// SetCreatedAt sets the "created_at" field.
 func (tcuo *ThreadCommentUpdateOne) SetCreatedAt(t time.Time) *ThreadCommentUpdateOne {
 	tcuo.mutation.SetCreatedAt(t)
 	return tcuo
 }
 
-// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
 func (tcuo *ThreadCommentUpdateOne) SetNillableCreatedAt(t *time.Time) *ThreadCommentUpdateOne {
 	if t != nil {
 		tcuo.SetCreatedAt(*t)
@@ -928,15 +908,9 @@ func (tcuo *ThreadCommentUpdateOne) SetNillableCreatedAt(t *time.Time) *ThreadCo
 	return tcuo
 }
 
-// SetUpdatedAt sets the "updatedAt" field.
+// SetUpdatedAt sets the "updated_at" field.
 func (tcuo *ThreadCommentUpdateOne) SetUpdatedAt(t time.Time) *ThreadCommentUpdateOne {
 	tcuo.mutation.SetUpdatedAt(t)
-	return tcuo
-}
-
-// SetThreadID sets the "thread" edge to the Thread entity by ID.
-func (tcuo *ThreadCommentUpdateOne) SetThreadID(id int) *ThreadCommentUpdateOne {
-	tcuo.mutation.SetThreadID(id)
 	return tcuo
 }
 
@@ -962,20 +936,6 @@ func (tcuo *ThreadCommentUpdateOne) SetNillableAuthorID(id *int) *ThreadCommentU
 // SetAuthor sets the "author" edge to the User entity.
 func (tcuo *ThreadCommentUpdateOne) SetAuthor(u *User) *ThreadCommentUpdateOne {
 	return tcuo.SetAuthorID(u.ID)
-}
-
-// SetParentCommentID sets the "parent_comment" edge to the ThreadComment entity by ID.
-func (tcuo *ThreadCommentUpdateOne) SetParentCommentID(id int) *ThreadCommentUpdateOne {
-	tcuo.mutation.SetParentCommentID(id)
-	return tcuo
-}
-
-// SetNillableParentCommentID sets the "parent_comment" edge to the ThreadComment entity by ID if the given value is not nil.
-func (tcuo *ThreadCommentUpdateOne) SetNillableParentCommentID(id *int) *ThreadCommentUpdateOne {
-	if id != nil {
-		tcuo = tcuo.SetParentCommentID(*id)
-	}
-	return tcuo
 }
 
 // SetParentComment sets the "parent_comment" edge to the ThreadComment entity.
@@ -1203,7 +1163,7 @@ func (tcuo *ThreadCommentUpdateOne) defaults() {
 func (tcuo *ThreadCommentUpdateOne) check() error {
 	if v, ok := tcuo.mutation.GuestName(); ok {
 		if err := threadcomment.GuestNameValidator(v); err != nil {
-			return &ValidationError{Name: "guestName", err: fmt.Errorf(`ent: validator failed for field "ThreadComment.guestName": %w`, err)}
+			return &ValidationError{Name: "guest_name", err: fmt.Errorf(`ent: validator failed for field "ThreadComment.guest_name": %w`, err)}
 		}
 	}
 	if v, ok := tcuo.mutation.IPAddress(); ok {

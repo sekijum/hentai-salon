@@ -32,30 +32,30 @@ func (tu *ThreadUpdate) Where(ps ...predicate.Thread) *ThreadUpdate {
 	return tu
 }
 
-// SetBoardId sets the "boardId" field.
-func (tu *ThreadUpdate) SetBoardId(i int) *ThreadUpdate {
-	tu.mutation.SetBoardId(i)
+// SetBoardID sets the "board_id" field.
+func (tu *ThreadUpdate) SetBoardID(i int) *ThreadUpdate {
+	tu.mutation.SetBoardID(i)
 	return tu
 }
 
-// SetNillableBoardId sets the "boardId" field if the given value is not nil.
-func (tu *ThreadUpdate) SetNillableBoardId(i *int) *ThreadUpdate {
+// SetNillableBoardID sets the "board_id" field if the given value is not nil.
+func (tu *ThreadUpdate) SetNillableBoardID(i *int) *ThreadUpdate {
 	if i != nil {
-		tu.SetBoardId(*i)
+		tu.SetBoardID(*i)
 	}
 	return tu
 }
 
-// SetUserId sets the "userId" field.
-func (tu *ThreadUpdate) SetUserId(i int) *ThreadUpdate {
-	tu.mutation.SetUserId(i)
+// SetUserID sets the "user_id" field.
+func (tu *ThreadUpdate) SetUserID(i int) *ThreadUpdate {
+	tu.mutation.SetUserID(i)
 	return tu
 }
 
-// SetNillableUserId sets the "userId" field if the given value is not nil.
-func (tu *ThreadUpdate) SetNillableUserId(i *int) *ThreadUpdate {
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (tu *ThreadUpdate) SetNillableUserID(i *int) *ThreadUpdate {
 	if i != nil {
-		tu.SetUserId(*i)
+		tu.SetUserID(*i)
 	}
 	return tu
 }
@@ -94,23 +94,23 @@ func (tu *ThreadUpdate) ClearDescription() *ThreadUpdate {
 	return tu
 }
 
-// SetThumbnailUrl sets the "thumbnailUrl" field.
-func (tu *ThreadUpdate) SetThumbnailUrl(s string) *ThreadUpdate {
-	tu.mutation.SetThumbnailUrl(s)
+// SetThumbnailURL sets the "thumbnail_url" field.
+func (tu *ThreadUpdate) SetThumbnailURL(s string) *ThreadUpdate {
+	tu.mutation.SetThumbnailURL(s)
 	return tu
 }
 
-// SetNillableThumbnailUrl sets the "thumbnailUrl" field if the given value is not nil.
-func (tu *ThreadUpdate) SetNillableThumbnailUrl(s *string) *ThreadUpdate {
+// SetNillableThumbnailURL sets the "thumbnail_url" field if the given value is not nil.
+func (tu *ThreadUpdate) SetNillableThumbnailURL(s *string) *ThreadUpdate {
 	if s != nil {
-		tu.SetThumbnailUrl(*s)
+		tu.SetThumbnailURL(*s)
 	}
 	return tu
 }
 
-// ClearThumbnailUrl clears the value of the "thumbnailUrl" field.
-func (tu *ThreadUpdate) ClearThumbnailUrl() *ThreadUpdate {
-	tu.mutation.ClearThumbnailUrl()
+// ClearThumbnailURL clears the value of the "thumbnail_url" field.
+func (tu *ThreadUpdate) ClearThumbnailURL() *ThreadUpdate {
+	tu.mutation.ClearThumbnailURL()
 	return tu
 }
 
@@ -149,13 +149,13 @@ func (tu *ThreadUpdate) AddStatus(i int) *ThreadUpdate {
 	return tu
 }
 
-// SetCreatedAt sets the "createdAt" field.
+// SetCreatedAt sets the "created_at" field.
 func (tu *ThreadUpdate) SetCreatedAt(t time.Time) *ThreadUpdate {
 	tu.mutation.SetCreatedAt(t)
 	return tu
 }
 
-// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
 func (tu *ThreadUpdate) SetNillableCreatedAt(t *time.Time) *ThreadUpdate {
 	if t != nil {
 		tu.SetCreatedAt(*t)
@@ -163,15 +163,9 @@ func (tu *ThreadUpdate) SetNillableCreatedAt(t *time.Time) *ThreadUpdate {
 	return tu
 }
 
-// SetUpdatedAt sets the "updatedAt" field.
+// SetUpdatedAt sets the "updated_at" field.
 func (tu *ThreadUpdate) SetUpdatedAt(t time.Time) *ThreadUpdate {
 	tu.mutation.SetUpdatedAt(t)
-	return tu
-}
-
-// SetBoardID sets the "board" edge to the Board entity by ID.
-func (tu *ThreadUpdate) SetBoardID(id int) *ThreadUpdate {
-	tu.mutation.SetBoardID(id)
 	return tu
 }
 
@@ -435,11 +429,11 @@ func (tu *ThreadUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if tu.mutation.DescriptionCleared() {
 		_spec.ClearField(thread.FieldDescription, field.TypeString)
 	}
-	if value, ok := tu.mutation.ThumbnailUrl(); ok {
-		_spec.SetField(thread.FieldThumbnailUrl, field.TypeString, value)
+	if value, ok := tu.mutation.ThumbnailURL(); ok {
+		_spec.SetField(thread.FieldThumbnailURL, field.TypeString, value)
 	}
-	if tu.mutation.ThumbnailUrlCleared() {
-		_spec.ClearField(thread.FieldThumbnailUrl, field.TypeString)
+	if tu.mutation.ThumbnailURLCleared() {
+		_spec.ClearField(thread.FieldThumbnailURL, field.TypeString)
 	}
 	if value, ok := tu.mutation.IPAddress(); ok {
 		_spec.SetField(thread.FieldIPAddress, field.TypeString, value)
@@ -738,30 +732,30 @@ type ThreadUpdateOne struct {
 	mutation *ThreadMutation
 }
 
-// SetBoardId sets the "boardId" field.
-func (tuo *ThreadUpdateOne) SetBoardId(i int) *ThreadUpdateOne {
-	tuo.mutation.SetBoardId(i)
+// SetBoardID sets the "board_id" field.
+func (tuo *ThreadUpdateOne) SetBoardID(i int) *ThreadUpdateOne {
+	tuo.mutation.SetBoardID(i)
 	return tuo
 }
 
-// SetNillableBoardId sets the "boardId" field if the given value is not nil.
-func (tuo *ThreadUpdateOne) SetNillableBoardId(i *int) *ThreadUpdateOne {
+// SetNillableBoardID sets the "board_id" field if the given value is not nil.
+func (tuo *ThreadUpdateOne) SetNillableBoardID(i *int) *ThreadUpdateOne {
 	if i != nil {
-		tuo.SetBoardId(*i)
+		tuo.SetBoardID(*i)
 	}
 	return tuo
 }
 
-// SetUserId sets the "userId" field.
-func (tuo *ThreadUpdateOne) SetUserId(i int) *ThreadUpdateOne {
-	tuo.mutation.SetUserId(i)
+// SetUserID sets the "user_id" field.
+func (tuo *ThreadUpdateOne) SetUserID(i int) *ThreadUpdateOne {
+	tuo.mutation.SetUserID(i)
 	return tuo
 }
 
-// SetNillableUserId sets the "userId" field if the given value is not nil.
-func (tuo *ThreadUpdateOne) SetNillableUserId(i *int) *ThreadUpdateOne {
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (tuo *ThreadUpdateOne) SetNillableUserID(i *int) *ThreadUpdateOne {
 	if i != nil {
-		tuo.SetUserId(*i)
+		tuo.SetUserID(*i)
 	}
 	return tuo
 }
@@ -800,23 +794,23 @@ func (tuo *ThreadUpdateOne) ClearDescription() *ThreadUpdateOne {
 	return tuo
 }
 
-// SetThumbnailUrl sets the "thumbnailUrl" field.
-func (tuo *ThreadUpdateOne) SetThumbnailUrl(s string) *ThreadUpdateOne {
-	tuo.mutation.SetThumbnailUrl(s)
+// SetThumbnailURL sets the "thumbnail_url" field.
+func (tuo *ThreadUpdateOne) SetThumbnailURL(s string) *ThreadUpdateOne {
+	tuo.mutation.SetThumbnailURL(s)
 	return tuo
 }
 
-// SetNillableThumbnailUrl sets the "thumbnailUrl" field if the given value is not nil.
-func (tuo *ThreadUpdateOne) SetNillableThumbnailUrl(s *string) *ThreadUpdateOne {
+// SetNillableThumbnailURL sets the "thumbnail_url" field if the given value is not nil.
+func (tuo *ThreadUpdateOne) SetNillableThumbnailURL(s *string) *ThreadUpdateOne {
 	if s != nil {
-		tuo.SetThumbnailUrl(*s)
+		tuo.SetThumbnailURL(*s)
 	}
 	return tuo
 }
 
-// ClearThumbnailUrl clears the value of the "thumbnailUrl" field.
-func (tuo *ThreadUpdateOne) ClearThumbnailUrl() *ThreadUpdateOne {
-	tuo.mutation.ClearThumbnailUrl()
+// ClearThumbnailURL clears the value of the "thumbnail_url" field.
+func (tuo *ThreadUpdateOne) ClearThumbnailURL() *ThreadUpdateOne {
+	tuo.mutation.ClearThumbnailURL()
 	return tuo
 }
 
@@ -855,13 +849,13 @@ func (tuo *ThreadUpdateOne) AddStatus(i int) *ThreadUpdateOne {
 	return tuo
 }
 
-// SetCreatedAt sets the "createdAt" field.
+// SetCreatedAt sets the "created_at" field.
 func (tuo *ThreadUpdateOne) SetCreatedAt(t time.Time) *ThreadUpdateOne {
 	tuo.mutation.SetCreatedAt(t)
 	return tuo
 }
 
-// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
 func (tuo *ThreadUpdateOne) SetNillableCreatedAt(t *time.Time) *ThreadUpdateOne {
 	if t != nil {
 		tuo.SetCreatedAt(*t)
@@ -869,15 +863,9 @@ func (tuo *ThreadUpdateOne) SetNillableCreatedAt(t *time.Time) *ThreadUpdateOne 
 	return tuo
 }
 
-// SetUpdatedAt sets the "updatedAt" field.
+// SetUpdatedAt sets the "updated_at" field.
 func (tuo *ThreadUpdateOne) SetUpdatedAt(t time.Time) *ThreadUpdateOne {
 	tuo.mutation.SetUpdatedAt(t)
-	return tuo
-}
-
-// SetBoardID sets the "board" edge to the Board entity by ID.
-func (tuo *ThreadUpdateOne) SetBoardID(id int) *ThreadUpdateOne {
-	tuo.mutation.SetBoardID(id)
 	return tuo
 }
 
@@ -1171,11 +1159,11 @@ func (tuo *ThreadUpdateOne) sqlSave(ctx context.Context) (_node *Thread, err err
 	if tuo.mutation.DescriptionCleared() {
 		_spec.ClearField(thread.FieldDescription, field.TypeString)
 	}
-	if value, ok := tuo.mutation.ThumbnailUrl(); ok {
-		_spec.SetField(thread.FieldThumbnailUrl, field.TypeString, value)
+	if value, ok := tuo.mutation.ThumbnailURL(); ok {
+		_spec.SetField(thread.FieldThumbnailURL, field.TypeString, value)
 	}
-	if tuo.mutation.ThumbnailUrlCleared() {
-		_spec.ClearField(thread.FieldThumbnailUrl, field.TypeString)
+	if tuo.mutation.ThumbnailURLCleared() {
+		_spec.ClearField(thread.FieldThumbnailURL, field.TypeString)
 	}
 	if value, ok := tuo.mutation.IPAddress(); ok {
 		_spec.SetField(thread.FieldIPAddress, field.TypeString, value)

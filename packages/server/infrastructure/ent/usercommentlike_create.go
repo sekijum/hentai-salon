@@ -22,25 +22,25 @@ type UserCommentLikeCreate struct {
 	hooks    []Hook
 }
 
-// SetUserId sets the "userId" field.
-func (uclc *UserCommentLikeCreate) SetUserId(i int) *UserCommentLikeCreate {
-	uclc.mutation.SetUserId(i)
+// SetUserID sets the "user_id" field.
+func (uclc *UserCommentLikeCreate) SetUserID(i int) *UserCommentLikeCreate {
+	uclc.mutation.SetUserID(i)
 	return uclc
 }
 
-// SetCommentId sets the "commentId" field.
-func (uclc *UserCommentLikeCreate) SetCommentId(i int) *UserCommentLikeCreate {
-	uclc.mutation.SetCommentId(i)
+// SetCommentID sets the "comment_id" field.
+func (uclc *UserCommentLikeCreate) SetCommentID(i int) *UserCommentLikeCreate {
+	uclc.mutation.SetCommentID(i)
 	return uclc
 }
 
-// SetLikedAt sets the "likedAt" field.
+// SetLikedAt sets the "liked_at" field.
 func (uclc *UserCommentLikeCreate) SetLikedAt(t time.Time) *UserCommentLikeCreate {
 	uclc.mutation.SetLikedAt(t)
 	return uclc
 }
 
-// SetNillableLikedAt sets the "likedAt" field if the given value is not nil.
+// SetNillableLikedAt sets the "liked_at" field if the given value is not nil.
 func (uclc *UserCommentLikeCreate) SetNillableLikedAt(t *time.Time) *UserCommentLikeCreate {
 	if t != nil {
 		uclc.SetLikedAt(*t)
@@ -48,21 +48,9 @@ func (uclc *UserCommentLikeCreate) SetNillableLikedAt(t *time.Time) *UserComment
 	return uclc
 }
 
-// SetUserID sets the "user" edge to the User entity by ID.
-func (uclc *UserCommentLikeCreate) SetUserID(id int) *UserCommentLikeCreate {
-	uclc.mutation.SetUserID(id)
-	return uclc
-}
-
 // SetUser sets the "user" edge to the User entity.
 func (uclc *UserCommentLikeCreate) SetUser(u *User) *UserCommentLikeCreate {
 	return uclc.SetUserID(u.ID)
-}
-
-// SetCommentID sets the "comment" edge to the ThreadComment entity by ID.
-func (uclc *UserCommentLikeCreate) SetCommentID(id int) *UserCommentLikeCreate {
-	uclc.mutation.SetCommentID(id)
-	return uclc
 }
 
 // SetComment sets the "comment" edge to the ThreadComment entity.
@@ -113,14 +101,14 @@ func (uclc *UserCommentLikeCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (uclc *UserCommentLikeCreate) check() error {
-	if _, ok := uclc.mutation.UserId(); !ok {
-		return &ValidationError{Name: "userId", err: errors.New(`ent: missing required field "UserCommentLike.userId"`)}
+	if _, ok := uclc.mutation.UserID(); !ok {
+		return &ValidationError{Name: "user_id", err: errors.New(`ent: missing required field "UserCommentLike.user_id"`)}
 	}
-	if _, ok := uclc.mutation.CommentId(); !ok {
-		return &ValidationError{Name: "commentId", err: errors.New(`ent: missing required field "UserCommentLike.commentId"`)}
+	if _, ok := uclc.mutation.CommentID(); !ok {
+		return &ValidationError{Name: "comment_id", err: errors.New(`ent: missing required field "UserCommentLike.comment_id"`)}
 	}
 	if _, ok := uclc.mutation.LikedAt(); !ok {
-		return &ValidationError{Name: "likedAt", err: errors.New(`ent: missing required field "UserCommentLike.likedAt"`)}
+		return &ValidationError{Name: "liked_at", err: errors.New(`ent: missing required field "UserCommentLike.liked_at"`)}
 	}
 	if _, ok := uclc.mutation.UserID(); !ok {
 		return &ValidationError{Name: "user", err: errors.New(`ent: missing required edge "UserCommentLike.user"`)}
@@ -168,7 +156,7 @@ func (uclc *UserCommentLikeCreate) createSpec() (*UserCommentLike, *sqlgraph.Cre
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.UserId = nodes[0]
+		_node.UserID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := uclc.mutation.CommentIDs(); len(nodes) > 0 {
@@ -185,7 +173,7 @@ func (uclc *UserCommentLikeCreate) createSpec() (*UserCommentLike, *sqlgraph.Cre
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.CommentId = nodes[0]
+		_node.CommentID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

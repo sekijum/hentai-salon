@@ -1,6 +1,13 @@
 package model
 
+import (
+	"server/infrastructure/ent"
+)
+
 type Tag struct {
-	Id   int
-	Name string
+	EntTag *ent.Tag
+}
+
+func (t *Tag) Name() string {
+	return t.EntTag.Name
 }

@@ -10,97 +10,97 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
-// UserId applies equality check predicate on the "userId" field. It's identical to UserIdEQ.
-func UserId(v int) predicate.UserThreadLike {
-	return predicate.UserThreadLike(sql.FieldEQ(FieldUserId, v))
+// UserID applies equality check predicate on the "user_id" field. It's identical to UserIDEQ.
+func UserID(v int) predicate.UserThreadLike {
+	return predicate.UserThreadLike(sql.FieldEQ(FieldUserID, v))
 }
 
-// ThreadId applies equality check predicate on the "threadId" field. It's identical to ThreadIdEQ.
-func ThreadId(v int) predicate.UserThreadLike {
-	return predicate.UserThreadLike(sql.FieldEQ(FieldThreadId, v))
+// ThreadID applies equality check predicate on the "thread_id" field. It's identical to ThreadIDEQ.
+func ThreadID(v int) predicate.UserThreadLike {
+	return predicate.UserThreadLike(sql.FieldEQ(FieldThreadID, v))
 }
 
-// LikedAt applies equality check predicate on the "likedAt" field. It's identical to LikedAtEQ.
+// LikedAt applies equality check predicate on the "liked_at" field. It's identical to LikedAtEQ.
 func LikedAt(v time.Time) predicate.UserThreadLike {
 	return predicate.UserThreadLike(sql.FieldEQ(FieldLikedAt, v))
 }
 
-// UserIdEQ applies the EQ predicate on the "userId" field.
-func UserIdEQ(v int) predicate.UserThreadLike {
-	return predicate.UserThreadLike(sql.FieldEQ(FieldUserId, v))
+// UserIDEQ applies the EQ predicate on the "user_id" field.
+func UserIDEQ(v int) predicate.UserThreadLike {
+	return predicate.UserThreadLike(sql.FieldEQ(FieldUserID, v))
 }
 
-// UserIdNEQ applies the NEQ predicate on the "userId" field.
-func UserIdNEQ(v int) predicate.UserThreadLike {
-	return predicate.UserThreadLike(sql.FieldNEQ(FieldUserId, v))
+// UserIDNEQ applies the NEQ predicate on the "user_id" field.
+func UserIDNEQ(v int) predicate.UserThreadLike {
+	return predicate.UserThreadLike(sql.FieldNEQ(FieldUserID, v))
 }
 
-// UserIdIn applies the In predicate on the "userId" field.
-func UserIdIn(vs ...int) predicate.UserThreadLike {
-	return predicate.UserThreadLike(sql.FieldIn(FieldUserId, vs...))
+// UserIDIn applies the In predicate on the "user_id" field.
+func UserIDIn(vs ...int) predicate.UserThreadLike {
+	return predicate.UserThreadLike(sql.FieldIn(FieldUserID, vs...))
 }
 
-// UserIdNotIn applies the NotIn predicate on the "userId" field.
-func UserIdNotIn(vs ...int) predicate.UserThreadLike {
-	return predicate.UserThreadLike(sql.FieldNotIn(FieldUserId, vs...))
+// UserIDNotIn applies the NotIn predicate on the "user_id" field.
+func UserIDNotIn(vs ...int) predicate.UserThreadLike {
+	return predicate.UserThreadLike(sql.FieldNotIn(FieldUserID, vs...))
 }
 
-// ThreadIdEQ applies the EQ predicate on the "threadId" field.
-func ThreadIdEQ(v int) predicate.UserThreadLike {
-	return predicate.UserThreadLike(sql.FieldEQ(FieldThreadId, v))
+// ThreadIDEQ applies the EQ predicate on the "thread_id" field.
+func ThreadIDEQ(v int) predicate.UserThreadLike {
+	return predicate.UserThreadLike(sql.FieldEQ(FieldThreadID, v))
 }
 
-// ThreadIdNEQ applies the NEQ predicate on the "threadId" field.
-func ThreadIdNEQ(v int) predicate.UserThreadLike {
-	return predicate.UserThreadLike(sql.FieldNEQ(FieldThreadId, v))
+// ThreadIDNEQ applies the NEQ predicate on the "thread_id" field.
+func ThreadIDNEQ(v int) predicate.UserThreadLike {
+	return predicate.UserThreadLike(sql.FieldNEQ(FieldThreadID, v))
 }
 
-// ThreadIdIn applies the In predicate on the "threadId" field.
-func ThreadIdIn(vs ...int) predicate.UserThreadLike {
-	return predicate.UserThreadLike(sql.FieldIn(FieldThreadId, vs...))
+// ThreadIDIn applies the In predicate on the "thread_id" field.
+func ThreadIDIn(vs ...int) predicate.UserThreadLike {
+	return predicate.UserThreadLike(sql.FieldIn(FieldThreadID, vs...))
 }
 
-// ThreadIdNotIn applies the NotIn predicate on the "threadId" field.
-func ThreadIdNotIn(vs ...int) predicate.UserThreadLike {
-	return predicate.UserThreadLike(sql.FieldNotIn(FieldThreadId, vs...))
+// ThreadIDNotIn applies the NotIn predicate on the "thread_id" field.
+func ThreadIDNotIn(vs ...int) predicate.UserThreadLike {
+	return predicate.UserThreadLike(sql.FieldNotIn(FieldThreadID, vs...))
 }
 
-// LikedAtEQ applies the EQ predicate on the "likedAt" field.
+// LikedAtEQ applies the EQ predicate on the "liked_at" field.
 func LikedAtEQ(v time.Time) predicate.UserThreadLike {
 	return predicate.UserThreadLike(sql.FieldEQ(FieldLikedAt, v))
 }
 
-// LikedAtNEQ applies the NEQ predicate on the "likedAt" field.
+// LikedAtNEQ applies the NEQ predicate on the "liked_at" field.
 func LikedAtNEQ(v time.Time) predicate.UserThreadLike {
 	return predicate.UserThreadLike(sql.FieldNEQ(FieldLikedAt, v))
 }
 
-// LikedAtIn applies the In predicate on the "likedAt" field.
+// LikedAtIn applies the In predicate on the "liked_at" field.
 func LikedAtIn(vs ...time.Time) predicate.UserThreadLike {
 	return predicate.UserThreadLike(sql.FieldIn(FieldLikedAt, vs...))
 }
 
-// LikedAtNotIn applies the NotIn predicate on the "likedAt" field.
+// LikedAtNotIn applies the NotIn predicate on the "liked_at" field.
 func LikedAtNotIn(vs ...time.Time) predicate.UserThreadLike {
 	return predicate.UserThreadLike(sql.FieldNotIn(FieldLikedAt, vs...))
 }
 
-// LikedAtGT applies the GT predicate on the "likedAt" field.
+// LikedAtGT applies the GT predicate on the "liked_at" field.
 func LikedAtGT(v time.Time) predicate.UserThreadLike {
 	return predicate.UserThreadLike(sql.FieldGT(FieldLikedAt, v))
 }
 
-// LikedAtGTE applies the GTE predicate on the "likedAt" field.
+// LikedAtGTE applies the GTE predicate on the "liked_at" field.
 func LikedAtGTE(v time.Time) predicate.UserThreadLike {
 	return predicate.UserThreadLike(sql.FieldGTE(FieldLikedAt, v))
 }
 
-// LikedAtLT applies the LT predicate on the "likedAt" field.
+// LikedAtLT applies the LT predicate on the "liked_at" field.
 func LikedAtLT(v time.Time) predicate.UserThreadLike {
 	return predicate.UserThreadLike(sql.FieldLT(FieldLikedAt, v))
 }
 
-// LikedAtLTE applies the LTE predicate on the "likedAt" field.
+// LikedAtLTE applies the LTE predicate on the "liked_at" field.
 func LikedAtLTE(v time.Time) predicate.UserThreadLike {
 	return predicate.UserThreadLike(sql.FieldLTE(FieldLikedAt, v))
 }

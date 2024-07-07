@@ -146,8 +146,8 @@ for (let i = 1; i <= 100; i++) {
             { type: 'video/mp4', url: mediaUrls[2], thumbnail: mediaUrls[0] },
           ]
         : i % 3 === 1
-        ? [{ type: 'image', url: mediaUrls[1] }]
-        : [],
+          ? [{ type: 'image', url: mediaUrls[1] }]
+          : [],
   });
 }
 

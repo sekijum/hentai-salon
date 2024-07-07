@@ -16,7 +16,6 @@ import (
 )
 
 var controllerSet = wire.NewSet(
-	controller.NewBoardAdminController,
 	controller.NewBoardController,
 	controller.NewUserController,
 	controller.NewThreadController,
@@ -25,7 +24,6 @@ var controllerSet = wire.NewSet(
 )
 
 var applicationServiceSet = wire.NewSet(
-	applicationService.NewBoardAdminApplicationService,
 	applicationService.NewBoardApplicationService,
 	applicationService.NewUserApplicationService,
 	applicationService.NewThreadApplicationService,
@@ -52,12 +50,11 @@ var datasourceSet = wire.NewSet(
 )
 
 type ControllersSet struct {
-	BoardController      *controller.BoardController
-	BoardAdminController *controller.BoardAdminController
-	UserController       *controller.UserController
-	ThreadController     *controller.ThreadController
-	ThreadCommentController     *controller.ThreadCommentController
-	TagController     *controller.TagController
+	BoardController         *controller.BoardController
+	UserController          *controller.UserController
+	ThreadController        *controller.ThreadController
+	ThreadCommentController *controller.ThreadCommentController
+	TagController           *controller.TagController
 }
 
 func InitializeControllers() (*ControllersSet, func(), error) {

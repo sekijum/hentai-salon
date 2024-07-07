@@ -10,127 +10,127 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
-// UserId applies equality check predicate on the "userId" field. It's identical to UserIdEQ.
-func UserId(v int) predicate.UserThreadSubscription {
-	return predicate.UserThreadSubscription(sql.FieldEQ(FieldUserId, v))
+// UserID applies equality check predicate on the "user_id" field. It's identical to UserIDEQ.
+func UserID(v int) predicate.UserThreadSubscription {
+	return predicate.UserThreadSubscription(sql.FieldEQ(FieldUserID, v))
 }
 
-// ThreadId applies equality check predicate on the "threadId" field. It's identical to ThreadIdEQ.
-func ThreadId(v int) predicate.UserThreadSubscription {
-	return predicate.UserThreadSubscription(sql.FieldEQ(FieldThreadId, v))
+// ThreadID applies equality check predicate on the "thread_id" field. It's identical to ThreadIDEQ.
+func ThreadID(v int) predicate.UserThreadSubscription {
+	return predicate.UserThreadSubscription(sql.FieldEQ(FieldThreadID, v))
 }
 
-// IsNotified applies equality check predicate on the "isNotified" field. It's identical to IsNotifiedEQ.
+// IsNotified applies equality check predicate on the "is_notified" field. It's identical to IsNotifiedEQ.
 func IsNotified(v bool) predicate.UserThreadSubscription {
 	return predicate.UserThreadSubscription(sql.FieldEQ(FieldIsNotified, v))
 }
 
-// IsChecked applies equality check predicate on the "isChecked" field. It's identical to IsCheckedEQ.
+// IsChecked applies equality check predicate on the "is_checked" field. It's identical to IsCheckedEQ.
 func IsChecked(v bool) predicate.UserThreadSubscription {
 	return predicate.UserThreadSubscription(sql.FieldEQ(FieldIsChecked, v))
 }
 
-// SubscribedAt applies equality check predicate on the "subscribedAt" field. It's identical to SubscribedAtEQ.
+// SubscribedAt applies equality check predicate on the "subscribed_at" field. It's identical to SubscribedAtEQ.
 func SubscribedAt(v time.Time) predicate.UserThreadSubscription {
 	return predicate.UserThreadSubscription(sql.FieldEQ(FieldSubscribedAt, v))
 }
 
-// UserIdEQ applies the EQ predicate on the "userId" field.
-func UserIdEQ(v int) predicate.UserThreadSubscription {
-	return predicate.UserThreadSubscription(sql.FieldEQ(FieldUserId, v))
+// UserIDEQ applies the EQ predicate on the "user_id" field.
+func UserIDEQ(v int) predicate.UserThreadSubscription {
+	return predicate.UserThreadSubscription(sql.FieldEQ(FieldUserID, v))
 }
 
-// UserIdNEQ applies the NEQ predicate on the "userId" field.
-func UserIdNEQ(v int) predicate.UserThreadSubscription {
-	return predicate.UserThreadSubscription(sql.FieldNEQ(FieldUserId, v))
+// UserIDNEQ applies the NEQ predicate on the "user_id" field.
+func UserIDNEQ(v int) predicate.UserThreadSubscription {
+	return predicate.UserThreadSubscription(sql.FieldNEQ(FieldUserID, v))
 }
 
-// UserIdIn applies the In predicate on the "userId" field.
-func UserIdIn(vs ...int) predicate.UserThreadSubscription {
-	return predicate.UserThreadSubscription(sql.FieldIn(FieldUserId, vs...))
+// UserIDIn applies the In predicate on the "user_id" field.
+func UserIDIn(vs ...int) predicate.UserThreadSubscription {
+	return predicate.UserThreadSubscription(sql.FieldIn(FieldUserID, vs...))
 }
 
-// UserIdNotIn applies the NotIn predicate on the "userId" field.
-func UserIdNotIn(vs ...int) predicate.UserThreadSubscription {
-	return predicate.UserThreadSubscription(sql.FieldNotIn(FieldUserId, vs...))
+// UserIDNotIn applies the NotIn predicate on the "user_id" field.
+func UserIDNotIn(vs ...int) predicate.UserThreadSubscription {
+	return predicate.UserThreadSubscription(sql.FieldNotIn(FieldUserID, vs...))
 }
 
-// ThreadIdEQ applies the EQ predicate on the "threadId" field.
-func ThreadIdEQ(v int) predicate.UserThreadSubscription {
-	return predicate.UserThreadSubscription(sql.FieldEQ(FieldThreadId, v))
+// ThreadIDEQ applies the EQ predicate on the "thread_id" field.
+func ThreadIDEQ(v int) predicate.UserThreadSubscription {
+	return predicate.UserThreadSubscription(sql.FieldEQ(FieldThreadID, v))
 }
 
-// ThreadIdNEQ applies the NEQ predicate on the "threadId" field.
-func ThreadIdNEQ(v int) predicate.UserThreadSubscription {
-	return predicate.UserThreadSubscription(sql.FieldNEQ(FieldThreadId, v))
+// ThreadIDNEQ applies the NEQ predicate on the "thread_id" field.
+func ThreadIDNEQ(v int) predicate.UserThreadSubscription {
+	return predicate.UserThreadSubscription(sql.FieldNEQ(FieldThreadID, v))
 }
 
-// ThreadIdIn applies the In predicate on the "threadId" field.
-func ThreadIdIn(vs ...int) predicate.UserThreadSubscription {
-	return predicate.UserThreadSubscription(sql.FieldIn(FieldThreadId, vs...))
+// ThreadIDIn applies the In predicate on the "thread_id" field.
+func ThreadIDIn(vs ...int) predicate.UserThreadSubscription {
+	return predicate.UserThreadSubscription(sql.FieldIn(FieldThreadID, vs...))
 }
 
-// ThreadIdNotIn applies the NotIn predicate on the "threadId" field.
-func ThreadIdNotIn(vs ...int) predicate.UserThreadSubscription {
-	return predicate.UserThreadSubscription(sql.FieldNotIn(FieldThreadId, vs...))
+// ThreadIDNotIn applies the NotIn predicate on the "thread_id" field.
+func ThreadIDNotIn(vs ...int) predicate.UserThreadSubscription {
+	return predicate.UserThreadSubscription(sql.FieldNotIn(FieldThreadID, vs...))
 }
 
-// IsNotifiedEQ applies the EQ predicate on the "isNotified" field.
+// IsNotifiedEQ applies the EQ predicate on the "is_notified" field.
 func IsNotifiedEQ(v bool) predicate.UserThreadSubscription {
 	return predicate.UserThreadSubscription(sql.FieldEQ(FieldIsNotified, v))
 }
 
-// IsNotifiedNEQ applies the NEQ predicate on the "isNotified" field.
+// IsNotifiedNEQ applies the NEQ predicate on the "is_notified" field.
 func IsNotifiedNEQ(v bool) predicate.UserThreadSubscription {
 	return predicate.UserThreadSubscription(sql.FieldNEQ(FieldIsNotified, v))
 }
 
-// IsCheckedEQ applies the EQ predicate on the "isChecked" field.
+// IsCheckedEQ applies the EQ predicate on the "is_checked" field.
 func IsCheckedEQ(v bool) predicate.UserThreadSubscription {
 	return predicate.UserThreadSubscription(sql.FieldEQ(FieldIsChecked, v))
 }
 
-// IsCheckedNEQ applies the NEQ predicate on the "isChecked" field.
+// IsCheckedNEQ applies the NEQ predicate on the "is_checked" field.
 func IsCheckedNEQ(v bool) predicate.UserThreadSubscription {
 	return predicate.UserThreadSubscription(sql.FieldNEQ(FieldIsChecked, v))
 }
 
-// SubscribedAtEQ applies the EQ predicate on the "subscribedAt" field.
+// SubscribedAtEQ applies the EQ predicate on the "subscribed_at" field.
 func SubscribedAtEQ(v time.Time) predicate.UserThreadSubscription {
 	return predicate.UserThreadSubscription(sql.FieldEQ(FieldSubscribedAt, v))
 }
 
-// SubscribedAtNEQ applies the NEQ predicate on the "subscribedAt" field.
+// SubscribedAtNEQ applies the NEQ predicate on the "subscribed_at" field.
 func SubscribedAtNEQ(v time.Time) predicate.UserThreadSubscription {
 	return predicate.UserThreadSubscription(sql.FieldNEQ(FieldSubscribedAt, v))
 }
 
-// SubscribedAtIn applies the In predicate on the "subscribedAt" field.
+// SubscribedAtIn applies the In predicate on the "subscribed_at" field.
 func SubscribedAtIn(vs ...time.Time) predicate.UserThreadSubscription {
 	return predicate.UserThreadSubscription(sql.FieldIn(FieldSubscribedAt, vs...))
 }
 
-// SubscribedAtNotIn applies the NotIn predicate on the "subscribedAt" field.
+// SubscribedAtNotIn applies the NotIn predicate on the "subscribed_at" field.
 func SubscribedAtNotIn(vs ...time.Time) predicate.UserThreadSubscription {
 	return predicate.UserThreadSubscription(sql.FieldNotIn(FieldSubscribedAt, vs...))
 }
 
-// SubscribedAtGT applies the GT predicate on the "subscribedAt" field.
+// SubscribedAtGT applies the GT predicate on the "subscribed_at" field.
 func SubscribedAtGT(v time.Time) predicate.UserThreadSubscription {
 	return predicate.UserThreadSubscription(sql.FieldGT(FieldSubscribedAt, v))
 }
 
-// SubscribedAtGTE applies the GTE predicate on the "subscribedAt" field.
+// SubscribedAtGTE applies the GTE predicate on the "subscribed_at" field.
 func SubscribedAtGTE(v time.Time) predicate.UserThreadSubscription {
 	return predicate.UserThreadSubscription(sql.FieldGTE(FieldSubscribedAt, v))
 }
 
-// SubscribedAtLT applies the LT predicate on the "subscribedAt" field.
+// SubscribedAtLT applies the LT predicate on the "subscribed_at" field.
 func SubscribedAtLT(v time.Time) predicate.UserThreadSubscription {
 	return predicate.UserThreadSubscription(sql.FieldLT(FieldSubscribedAt, v))
 }
 
-// SubscribedAtLTE applies the LTE predicate on the "subscribedAt" field.
+// SubscribedAtLTE applies the LTE predicate on the "subscribed_at" field.
 func SubscribedAtLTE(v time.Time) predicate.UserThreadSubscription {
 	return predicate.UserThreadSubscription(sql.FieldLTE(FieldSubscribedAt, v))
 }

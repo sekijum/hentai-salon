@@ -22,9 +22,9 @@ type BoardCreate struct {
 	hooks    []Hook
 }
 
-// SetUserId sets the "userId" field.
-func (bc *BoardCreate) SetUserId(i int) *BoardCreate {
-	bc.mutation.SetUserId(i)
+// SetUserID sets the "user_id" field.
+func (bc *BoardCreate) SetUserID(i int) *BoardCreate {
+	bc.mutation.SetUserID(i)
 	return bc
 }
 
@@ -48,16 +48,16 @@ func (bc *BoardCreate) SetNillableDescription(s *string) *BoardCreate {
 	return bc
 }
 
-// SetThumbnailUrl sets the "thumbnailUrl" field.
-func (bc *BoardCreate) SetThumbnailUrl(s string) *BoardCreate {
-	bc.mutation.SetThumbnailUrl(s)
+// SetThumbnailURL sets the "thumbnail_url" field.
+func (bc *BoardCreate) SetThumbnailURL(s string) *BoardCreate {
+	bc.mutation.SetThumbnailURL(s)
 	return bc
 }
 
-// SetNillableThumbnailUrl sets the "thumbnailUrl" field if the given value is not nil.
-func (bc *BoardCreate) SetNillableThumbnailUrl(s *string) *BoardCreate {
+// SetNillableThumbnailURL sets the "thumbnail_url" field if the given value is not nil.
+func (bc *BoardCreate) SetNillableThumbnailURL(s *string) *BoardCreate {
 	if s != nil {
-		bc.SetThumbnailUrl(*s)
+		bc.SetThumbnailURL(*s)
 	}
 	return bc
 }
@@ -76,13 +76,13 @@ func (bc *BoardCreate) SetNillableStatus(i *int) *BoardCreate {
 	return bc
 }
 
-// SetCreatedAt sets the "createdAt" field.
+// SetCreatedAt sets the "created_at" field.
 func (bc *BoardCreate) SetCreatedAt(t time.Time) *BoardCreate {
 	bc.mutation.SetCreatedAt(t)
 	return bc
 }
 
-// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
 func (bc *BoardCreate) SetNillableCreatedAt(t *time.Time) *BoardCreate {
 	if t != nil {
 		bc.SetCreatedAt(*t)
@@ -90,13 +90,13 @@ func (bc *BoardCreate) SetNillableCreatedAt(t *time.Time) *BoardCreate {
 	return bc
 }
 
-// SetUpdatedAt sets the "updatedAt" field.
+// SetUpdatedAt sets the "updated_at" field.
 func (bc *BoardCreate) SetUpdatedAt(t time.Time) *BoardCreate {
 	bc.mutation.SetUpdatedAt(t)
 	return bc
 }
 
-// SetNillableUpdatedAt sets the "updatedAt" field if the given value is not nil.
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
 func (bc *BoardCreate) SetNillableUpdatedAt(t *time.Time) *BoardCreate {
 	if t != nil {
 		bc.SetUpdatedAt(*t)
@@ -108,36 +108,6 @@ func (bc *BoardCreate) SetNillableUpdatedAt(t *time.Time) *BoardCreate {
 func (bc *BoardCreate) SetID(i int) *BoardCreate {
 	bc.mutation.SetID(i)
 	return bc
-}
-
-// AddLikedUserIDs adds the "liked_users" edge to the User entity by IDs.
-func (bc *BoardCreate) AddLikedUserIDs(ids ...int) *BoardCreate {
-	bc.mutation.AddLikedUserIDs(ids...)
-	return bc
-}
-
-// AddLikedUsers adds the "liked_users" edges to the User entity.
-func (bc *BoardCreate) AddLikedUsers(u ...*User) *BoardCreate {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
-	}
-	return bc.AddLikedUserIDs(ids...)
-}
-
-// AddSubscribedUserIDs adds the "subscribed_users" edge to the User entity by IDs.
-func (bc *BoardCreate) AddSubscribedUserIDs(ids ...int) *BoardCreate {
-	bc.mutation.AddSubscribedUserIDs(ids...)
-	return bc
-}
-
-// AddSubscribedUsers adds the "subscribed_users" edges to the User entity.
-func (bc *BoardCreate) AddSubscribedUsers(u ...*User) *BoardCreate {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
-	}
-	return bc.AddSubscribedUserIDs(ids...)
 }
 
 // SetOwnerID sets the "owner" edge to the User entity by ID.
@@ -217,8 +187,8 @@ func (bc *BoardCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (bc *BoardCreate) check() error {
-	if _, ok := bc.mutation.UserId(); !ok {
-		return &ValidationError{Name: "userId", err: errors.New(`ent: missing required field "Board.userId"`)}
+	if _, ok := bc.mutation.UserID(); !ok {
+		return &ValidationError{Name: "user_id", err: errors.New(`ent: missing required field "Board.user_id"`)}
 	}
 	if _, ok := bc.mutation.Title(); !ok {
 		return &ValidationError{Name: "title", err: errors.New(`ent: missing required field "Board.title"`)}
@@ -237,10 +207,10 @@ func (bc *BoardCreate) check() error {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Board.status"`)}
 	}
 	if _, ok := bc.mutation.CreatedAt(); !ok {
-		return &ValidationError{Name: "createdAt", err: errors.New(`ent: missing required field "Board.createdAt"`)}
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Board.created_at"`)}
 	}
 	if _, ok := bc.mutation.UpdatedAt(); !ok {
-		return &ValidationError{Name: "updatedAt", err: errors.New(`ent: missing required field "Board.updatedAt"`)}
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Board.updated_at"`)}
 	}
 	if _, ok := bc.mutation.OwnerID(); !ok {
 		return &ValidationError{Name: "owner", err: errors.New(`ent: missing required edge "Board.owner"`)}
@@ -285,9 +255,9 @@ func (bc *BoardCreate) createSpec() (*Board, *sqlgraph.CreateSpec) {
 		_spec.SetField(board.FieldDescription, field.TypeString, value)
 		_node.Description = value
 	}
-	if value, ok := bc.mutation.ThumbnailUrl(); ok {
-		_spec.SetField(board.FieldThumbnailUrl, field.TypeString, value)
-		_node.ThumbnailUrl = value
+	if value, ok := bc.mutation.ThumbnailURL(); ok {
+		_spec.SetField(board.FieldThumbnailURL, field.TypeString, value)
+		_node.ThumbnailURL = value
 	}
 	if value, ok := bc.mutation.Status(); ok {
 		_spec.SetField(board.FieldStatus, field.TypeInt, value)
@@ -300,46 +270,6 @@ func (bc *BoardCreate) createSpec() (*Board, *sqlgraph.CreateSpec) {
 	if value, ok := bc.mutation.UpdatedAt(); ok {
 		_spec.SetField(board.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
-	}
-	if nodes := bc.mutation.LikedUsersIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   board.LikedUsersTable,
-			Columns: board.LikedUsersPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		createE := &UserBoardSubscriptionCreate{config: bc.config, mutation: newUserBoardSubscriptionMutation(bc.config, OpCreate)}
-		createE.defaults()
-		_, specE := createE.createSpec()
-		edge.Target.Fields = specE.Fields
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := bc.mutation.SubscribedUsersIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   board.SubscribedUsersTable,
-			Columns: board.SubscribedUsersPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		createE := &UserBoardLikeCreate{config: bc.config, mutation: newUserBoardLikeMutation(bc.config, OpCreate)}
-		createE.defaults()
-		_, specE := createE.createSpec()
-		edge.Target.Fields = specE.Fields
-		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := bc.mutation.OwnerIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -355,7 +285,7 @@ func (bc *BoardCreate) createSpec() (*Board, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.UserId = nodes[0]
+		_node.UserID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := bc.mutation.ThreadsIDs(); len(nodes) > 0 {

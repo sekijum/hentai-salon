@@ -260,12 +260,12 @@ func (ucsq *UserCommentSubscriptionQuery) WithComment(opts ...func(*ThreadCommen
 // Example:
 //
 //	var v []struct {
-//		UserId int `json:"userId,omitempty"`
+//		UserID int `json:"user_id,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.UserCommentSubscription.Query().
-//		GroupBy(usercommentsubscription.FieldUserId).
+//		GroupBy(usercommentsubscription.FieldUserID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (ucsq *UserCommentSubscriptionQuery) GroupBy(field string, fields ...string) *UserCommentSubscriptionGroupBy {
@@ -283,11 +283,11 @@ func (ucsq *UserCommentSubscriptionQuery) GroupBy(field string, fields ...string
 // Example:
 //
 //	var v []struct {
-//		UserId int `json:"userId,omitempty"`
+//		UserID int `json:"user_id,omitempty"`
 //	}
 //
 //	client.UserCommentSubscription.Query().
-//		Select(usercommentsubscription.FieldUserId).
+//		Select(usercommentsubscription.FieldUserID).
 //		Scan(ctx, &v)
 func (ucsq *UserCommentSubscriptionQuery) Select(fields ...string) *UserCommentSubscriptionSelect {
 	ucsq.ctx.Fields = append(ucsq.ctx.Fields, fields...)
@@ -374,7 +374,7 @@ func (ucsq *UserCommentSubscriptionQuery) loadUser(ctx context.Context, query *U
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*UserCommentSubscription)
 	for i := range nodes {
-		fk := nodes[i].UserId
+		fk := nodes[i].UserID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -391,7 +391,7 @@ func (ucsq *UserCommentSubscriptionQuery) loadUser(ctx context.Context, query *U
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "userId" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "user_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -403,7 +403,7 @@ func (ucsq *UserCommentSubscriptionQuery) loadComment(ctx context.Context, query
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*UserCommentSubscription)
 	for i := range nodes {
-		fk := nodes[i].CommentId
+		fk := nodes[i].CommentID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -420,7 +420,7 @@ func (ucsq *UserCommentSubscriptionQuery) loadComment(ctx context.Context, query
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "commentId" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "comment_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -450,10 +450,10 @@ func (ucsq *UserCommentSubscriptionQuery) querySpec() *sqlgraph.QuerySpec {
 			_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 		}
 		if ucsq.withUser != nil {
-			_spec.Node.AddColumnOnce(usercommentsubscription.FieldUserId)
+			_spec.Node.AddColumnOnce(usercommentsubscription.FieldUserID)
 		}
 		if ucsq.withComment != nil {
-			_spec.Node.AddColumnOnce(usercommentsubscription.FieldCommentId)
+			_spec.Node.AddColumnOnce(usercommentsubscription.FieldCommentID)
 		}
 	}
 	if ps := ucsq.predicates; len(ps) > 0 {

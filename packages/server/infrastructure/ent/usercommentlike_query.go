@@ -260,12 +260,12 @@ func (uclq *UserCommentLikeQuery) WithComment(opts ...func(*ThreadCommentQuery))
 // Example:
 //
 //	var v []struct {
-//		UserId int `json:"userId,omitempty"`
+//		UserID int `json:"user_id,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.UserCommentLike.Query().
-//		GroupBy(usercommentlike.FieldUserId).
+//		GroupBy(usercommentlike.FieldUserID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (uclq *UserCommentLikeQuery) GroupBy(field string, fields ...string) *UserCommentLikeGroupBy {
@@ -283,11 +283,11 @@ func (uclq *UserCommentLikeQuery) GroupBy(field string, fields ...string) *UserC
 // Example:
 //
 //	var v []struct {
-//		UserId int `json:"userId,omitempty"`
+//		UserID int `json:"user_id,omitempty"`
 //	}
 //
 //	client.UserCommentLike.Query().
-//		Select(usercommentlike.FieldUserId).
+//		Select(usercommentlike.FieldUserID).
 //		Scan(ctx, &v)
 func (uclq *UserCommentLikeQuery) Select(fields ...string) *UserCommentLikeSelect {
 	uclq.ctx.Fields = append(uclq.ctx.Fields, fields...)
@@ -374,7 +374,7 @@ func (uclq *UserCommentLikeQuery) loadUser(ctx context.Context, query *UserQuery
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*UserCommentLike)
 	for i := range nodes {
-		fk := nodes[i].UserId
+		fk := nodes[i].UserID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -391,7 +391,7 @@ func (uclq *UserCommentLikeQuery) loadUser(ctx context.Context, query *UserQuery
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "userId" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "user_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -403,7 +403,7 @@ func (uclq *UserCommentLikeQuery) loadComment(ctx context.Context, query *Thread
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*UserCommentLike)
 	for i := range nodes {
-		fk := nodes[i].CommentId
+		fk := nodes[i].CommentID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -420,7 +420,7 @@ func (uclq *UserCommentLikeQuery) loadComment(ctx context.Context, query *Thread
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "commentId" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "comment_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -450,10 +450,10 @@ func (uclq *UserCommentLikeQuery) querySpec() *sqlgraph.QuerySpec {
 			_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 		}
 		if uclq.withUser != nil {
-			_spec.Node.AddColumnOnce(usercommentlike.FieldUserId)
+			_spec.Node.AddColumnOnce(usercommentlike.FieldUserID)
 		}
 		if uclq.withComment != nil {
-			_spec.Node.AddColumnOnce(usercommentlike.FieldCommentId)
+			_spec.Node.AddColumnOnce(usercommentlike.FieldCommentID)
 		}
 	}
 	if ps := uclq.predicates; len(ps) > 0 {

@@ -30,41 +30,41 @@ func (uclu *UserCommentLikeUpdate) Where(ps ...predicate.UserCommentLike) *UserC
 	return uclu
 }
 
-// SetUserId sets the "userId" field.
-func (uclu *UserCommentLikeUpdate) SetUserId(i int) *UserCommentLikeUpdate {
-	uclu.mutation.SetUserId(i)
+// SetUserID sets the "user_id" field.
+func (uclu *UserCommentLikeUpdate) SetUserID(i int) *UserCommentLikeUpdate {
+	uclu.mutation.SetUserID(i)
 	return uclu
 }
 
-// SetNillableUserId sets the "userId" field if the given value is not nil.
-func (uclu *UserCommentLikeUpdate) SetNillableUserId(i *int) *UserCommentLikeUpdate {
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (uclu *UserCommentLikeUpdate) SetNillableUserID(i *int) *UserCommentLikeUpdate {
 	if i != nil {
-		uclu.SetUserId(*i)
+		uclu.SetUserID(*i)
 	}
 	return uclu
 }
 
-// SetCommentId sets the "commentId" field.
-func (uclu *UserCommentLikeUpdate) SetCommentId(i int) *UserCommentLikeUpdate {
-	uclu.mutation.SetCommentId(i)
+// SetCommentID sets the "comment_id" field.
+func (uclu *UserCommentLikeUpdate) SetCommentID(i int) *UserCommentLikeUpdate {
+	uclu.mutation.SetCommentID(i)
 	return uclu
 }
 
-// SetNillableCommentId sets the "commentId" field if the given value is not nil.
-func (uclu *UserCommentLikeUpdate) SetNillableCommentId(i *int) *UserCommentLikeUpdate {
+// SetNillableCommentID sets the "comment_id" field if the given value is not nil.
+func (uclu *UserCommentLikeUpdate) SetNillableCommentID(i *int) *UserCommentLikeUpdate {
 	if i != nil {
-		uclu.SetCommentId(*i)
+		uclu.SetCommentID(*i)
 	}
 	return uclu
 }
 
-// SetLikedAt sets the "likedAt" field.
+// SetLikedAt sets the "liked_at" field.
 func (uclu *UserCommentLikeUpdate) SetLikedAt(t time.Time) *UserCommentLikeUpdate {
 	uclu.mutation.SetLikedAt(t)
 	return uclu
 }
 
-// SetNillableLikedAt sets the "likedAt" field if the given value is not nil.
+// SetNillableLikedAt sets the "liked_at" field if the given value is not nil.
 func (uclu *UserCommentLikeUpdate) SetNillableLikedAt(t *time.Time) *UserCommentLikeUpdate {
 	if t != nil {
 		uclu.SetLikedAt(*t)
@@ -72,21 +72,9 @@ func (uclu *UserCommentLikeUpdate) SetNillableLikedAt(t *time.Time) *UserComment
 	return uclu
 }
 
-// SetUserID sets the "user" edge to the User entity by ID.
-func (uclu *UserCommentLikeUpdate) SetUserID(id int) *UserCommentLikeUpdate {
-	uclu.mutation.SetUserID(id)
-	return uclu
-}
-
 // SetUser sets the "user" edge to the User entity.
 func (uclu *UserCommentLikeUpdate) SetUser(u *User) *UserCommentLikeUpdate {
 	return uclu.SetUserID(u.ID)
-}
-
-// SetCommentID sets the "comment" edge to the ThreadComment entity by ID.
-func (uclu *UserCommentLikeUpdate) SetCommentID(id int) *UserCommentLikeUpdate {
-	uclu.mutation.SetCommentID(id)
-	return uclu
 }
 
 // SetComment sets the "comment" edge to the ThreadComment entity.
@@ -153,7 +141,7 @@ func (uclu *UserCommentLikeUpdate) sqlSave(ctx context.Context) (n int, err erro
 	if err := uclu.check(); err != nil {
 		return n, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(usercommentlike.Table, usercommentlike.Columns, sqlgraph.NewFieldSpec(usercommentlike.FieldUserId, field.TypeInt), sqlgraph.NewFieldSpec(usercommentlike.FieldCommentId, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(usercommentlike.Table, usercommentlike.Columns, sqlgraph.NewFieldSpec(usercommentlike.FieldUserID, field.TypeInt), sqlgraph.NewFieldSpec(usercommentlike.FieldCommentID, field.TypeInt))
 	if ps := uclu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -242,41 +230,41 @@ type UserCommentLikeUpdateOne struct {
 	mutation *UserCommentLikeMutation
 }
 
-// SetUserId sets the "userId" field.
-func (ucluo *UserCommentLikeUpdateOne) SetUserId(i int) *UserCommentLikeUpdateOne {
-	ucluo.mutation.SetUserId(i)
+// SetUserID sets the "user_id" field.
+func (ucluo *UserCommentLikeUpdateOne) SetUserID(i int) *UserCommentLikeUpdateOne {
+	ucluo.mutation.SetUserID(i)
 	return ucluo
 }
 
-// SetNillableUserId sets the "userId" field if the given value is not nil.
-func (ucluo *UserCommentLikeUpdateOne) SetNillableUserId(i *int) *UserCommentLikeUpdateOne {
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (ucluo *UserCommentLikeUpdateOne) SetNillableUserID(i *int) *UserCommentLikeUpdateOne {
 	if i != nil {
-		ucluo.SetUserId(*i)
+		ucluo.SetUserID(*i)
 	}
 	return ucluo
 }
 
-// SetCommentId sets the "commentId" field.
-func (ucluo *UserCommentLikeUpdateOne) SetCommentId(i int) *UserCommentLikeUpdateOne {
-	ucluo.mutation.SetCommentId(i)
+// SetCommentID sets the "comment_id" field.
+func (ucluo *UserCommentLikeUpdateOne) SetCommentID(i int) *UserCommentLikeUpdateOne {
+	ucluo.mutation.SetCommentID(i)
 	return ucluo
 }
 
-// SetNillableCommentId sets the "commentId" field if the given value is not nil.
-func (ucluo *UserCommentLikeUpdateOne) SetNillableCommentId(i *int) *UserCommentLikeUpdateOne {
+// SetNillableCommentID sets the "comment_id" field if the given value is not nil.
+func (ucluo *UserCommentLikeUpdateOne) SetNillableCommentID(i *int) *UserCommentLikeUpdateOne {
 	if i != nil {
-		ucluo.SetCommentId(*i)
+		ucluo.SetCommentID(*i)
 	}
 	return ucluo
 }
 
-// SetLikedAt sets the "likedAt" field.
+// SetLikedAt sets the "liked_at" field.
 func (ucluo *UserCommentLikeUpdateOne) SetLikedAt(t time.Time) *UserCommentLikeUpdateOne {
 	ucluo.mutation.SetLikedAt(t)
 	return ucluo
 }
 
-// SetNillableLikedAt sets the "likedAt" field if the given value is not nil.
+// SetNillableLikedAt sets the "liked_at" field if the given value is not nil.
 func (ucluo *UserCommentLikeUpdateOne) SetNillableLikedAt(t *time.Time) *UserCommentLikeUpdateOne {
 	if t != nil {
 		ucluo.SetLikedAt(*t)
@@ -284,21 +272,9 @@ func (ucluo *UserCommentLikeUpdateOne) SetNillableLikedAt(t *time.Time) *UserCom
 	return ucluo
 }
 
-// SetUserID sets the "user" edge to the User entity by ID.
-func (ucluo *UserCommentLikeUpdateOne) SetUserID(id int) *UserCommentLikeUpdateOne {
-	ucluo.mutation.SetUserID(id)
-	return ucluo
-}
-
 // SetUser sets the "user" edge to the User entity.
 func (ucluo *UserCommentLikeUpdateOne) SetUser(u *User) *UserCommentLikeUpdateOne {
 	return ucluo.SetUserID(u.ID)
-}
-
-// SetCommentID sets the "comment" edge to the ThreadComment entity by ID.
-func (ucluo *UserCommentLikeUpdateOne) SetCommentID(id int) *UserCommentLikeUpdateOne {
-	ucluo.mutation.SetCommentID(id)
-	return ucluo
 }
 
 // SetComment sets the "comment" edge to the ThreadComment entity.
@@ -378,14 +354,14 @@ func (ucluo *UserCommentLikeUpdateOne) sqlSave(ctx context.Context) (_node *User
 	if err := ucluo.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(usercommentlike.Table, usercommentlike.Columns, sqlgraph.NewFieldSpec(usercommentlike.FieldUserId, field.TypeInt), sqlgraph.NewFieldSpec(usercommentlike.FieldCommentId, field.TypeInt))
-	if id, ok := ucluo.mutation.UserId(); !ok {
-		return nil, &ValidationError{Name: "userId", err: errors.New(`ent: missing "UserCommentLike.userId" for update`)}
+	_spec := sqlgraph.NewUpdateSpec(usercommentlike.Table, usercommentlike.Columns, sqlgraph.NewFieldSpec(usercommentlike.FieldUserID, field.TypeInt), sqlgraph.NewFieldSpec(usercommentlike.FieldCommentID, field.TypeInt))
+	if id, ok := ucluo.mutation.UserID(); !ok {
+		return nil, &ValidationError{Name: "user_id", err: errors.New(`ent: missing "UserCommentLike.user_id" for update`)}
 	} else {
 		_spec.Node.CompositeID[0].Value = id
 	}
-	if id, ok := ucluo.mutation.CommentId(); !ok {
-		return nil, &ValidationError{Name: "commentId", err: errors.New(`ent: missing "UserCommentLike.commentId" for update`)}
+	if id, ok := ucluo.mutation.CommentID(); !ok {
+		return nil, &ValidationError{Name: "comment_id", err: errors.New(`ent: missing "UserCommentLike.comment_id" for update`)}
 	} else {
 		_spec.Node.CompositeID[1].Value = id
 	}

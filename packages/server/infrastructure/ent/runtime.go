@@ -10,8 +10,6 @@ import (
 	"server/infrastructure/ent/threadcomment"
 	"server/infrastructure/ent/threadcommentattachment"
 	"server/infrastructure/ent/user"
-	"server/infrastructure/ent/userboardlike"
-	"server/infrastructure/ent/userboardsubscription"
 	"server/infrastructure/ent/usercommentlike"
 	"server/infrastructure/ent/usercommentsubscription"
 	"server/infrastructure/ent/userthreadlike"
@@ -37,15 +35,15 @@ func init() {
 	boardDescStatus := boardFields[5].Descriptor()
 	// board.DefaultStatus holds the default value on creation for the status field.
 	board.DefaultStatus = boardDescStatus.Default.(int)
-	// boardDescCreatedAt is the schema descriptor for createdAt field.
+	// boardDescCreatedAt is the schema descriptor for created_at field.
 	boardDescCreatedAt := boardFields[6].Descriptor()
-	// board.DefaultCreatedAt holds the default value on creation for the createdAt field.
+	// board.DefaultCreatedAt holds the default value on creation for the created_at field.
 	board.DefaultCreatedAt = boardDescCreatedAt.Default.(func() time.Time)
-	// boardDescUpdatedAt is the schema descriptor for updatedAt field.
+	// boardDescUpdatedAt is the schema descriptor for updated_at field.
 	boardDescUpdatedAt := boardFields[7].Descriptor()
-	// board.DefaultUpdatedAt holds the default value on creation for the updatedAt field.
+	// board.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	board.DefaultUpdatedAt = boardDescUpdatedAt.Default.(func() time.Time)
-	// board.UpdateDefaultUpdatedAt holds the default value on update for the updatedAt field.
+	// board.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	board.UpdateDefaultUpdatedAt = boardDescUpdatedAt.UpdateDefault.(func() time.Time)
 	tagFields := schema.Tag{}.Fields()
 	_ = tagFields
@@ -53,9 +51,9 @@ func init() {
 	tagDescName := tagFields[1].Descriptor()
 	// tag.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	tag.NameValidator = tagDescName.Validators[0].(func(string) error)
-	// tagDescCreatedAt is the schema descriptor for createdAt field.
+	// tagDescCreatedAt is the schema descriptor for created_at field.
 	tagDescCreatedAt := tagFields[2].Descriptor()
-	// tag.DefaultCreatedAt holds the default value on creation for the createdAt field.
+	// tag.DefaultCreatedAt holds the default value on creation for the created_at field.
 	tag.DefaultCreatedAt = tagDescCreatedAt.Default.(func() time.Time)
 	threadFields := schema.Thread{}.Fields()
 	_ = threadFields
@@ -75,21 +73,21 @@ func init() {
 	threadDescStatus := threadFields[7].Descriptor()
 	// thread.DefaultStatus holds the default value on creation for the status field.
 	thread.DefaultStatus = threadDescStatus.Default.(int)
-	// threadDescCreatedAt is the schema descriptor for createdAt field.
+	// threadDescCreatedAt is the schema descriptor for created_at field.
 	threadDescCreatedAt := threadFields[8].Descriptor()
-	// thread.DefaultCreatedAt holds the default value on creation for the createdAt field.
+	// thread.DefaultCreatedAt holds the default value on creation for the created_at field.
 	thread.DefaultCreatedAt = threadDescCreatedAt.Default.(func() time.Time)
-	// threadDescUpdatedAt is the schema descriptor for updatedAt field.
+	// threadDescUpdatedAt is the schema descriptor for updated_at field.
 	threadDescUpdatedAt := threadFields[9].Descriptor()
-	// thread.DefaultUpdatedAt holds the default value on creation for the updatedAt field.
+	// thread.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	thread.DefaultUpdatedAt = threadDescUpdatedAt.Default.(func() time.Time)
-	// thread.UpdateDefaultUpdatedAt holds the default value on update for the updatedAt field.
+	// thread.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	thread.UpdateDefaultUpdatedAt = threadDescUpdatedAt.UpdateDefault.(func() time.Time)
 	threadcommentFields := schema.ThreadComment{}.Fields()
 	_ = threadcommentFields
-	// threadcommentDescGuestName is the schema descriptor for guestName field.
+	// threadcommentDescGuestName is the schema descriptor for guest_name field.
 	threadcommentDescGuestName := threadcommentFields[4].Descriptor()
-	// threadcomment.GuestNameValidator is a validator for the "guestName" field. It is called by the builders before save.
+	// threadcomment.GuestNameValidator is a validator for the "guest_name" field. It is called by the builders before save.
 	threadcomment.GuestNameValidator = threadcommentDescGuestName.Validators[0].(func(string) error)
 	// threadcommentDescIPAddress is the schema descriptor for ip_address field.
 	threadcommentDescIPAddress := threadcommentFields[6].Descriptor()
@@ -99,15 +97,15 @@ func init() {
 	threadcommentDescStatus := threadcommentFields[7].Descriptor()
 	// threadcomment.DefaultStatus holds the default value on creation for the status field.
 	threadcomment.DefaultStatus = threadcommentDescStatus.Default.(int)
-	// threadcommentDescCreatedAt is the schema descriptor for createdAt field.
+	// threadcommentDescCreatedAt is the schema descriptor for created_at field.
 	threadcommentDescCreatedAt := threadcommentFields[8].Descriptor()
-	// threadcomment.DefaultCreatedAt holds the default value on creation for the createdAt field.
+	// threadcomment.DefaultCreatedAt holds the default value on creation for the created_at field.
 	threadcomment.DefaultCreatedAt = threadcommentDescCreatedAt.Default.(func() time.Time)
-	// threadcommentDescUpdatedAt is the schema descriptor for updatedAt field.
+	// threadcommentDescUpdatedAt is the schema descriptor for updated_at field.
 	threadcommentDescUpdatedAt := threadcommentFields[9].Descriptor()
-	// threadcomment.DefaultUpdatedAt holds the default value on creation for the updatedAt field.
+	// threadcomment.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	threadcomment.DefaultUpdatedAt = threadcommentDescUpdatedAt.Default.(func() time.Time)
-	// threadcomment.UpdateDefaultUpdatedAt holds the default value on update for the updatedAt field.
+	// threadcomment.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	threadcomment.UpdateDefaultUpdatedAt = threadcommentDescUpdatedAt.UpdateDefault.(func() time.Time)
 	threadcommentattachmentFields := schema.ThreadCommentAttachment{}.Fields()
 	_ = threadcommentattachmentFields
@@ -119,9 +117,9 @@ func init() {
 	threadcommentattachmentDescType := threadcommentattachmentFields[4].Descriptor()
 	// threadcommentattachment.DefaultType holds the default value on creation for the type field.
 	threadcommentattachment.DefaultType = threadcommentattachmentDescType.Default.(int)
-	// threadcommentattachmentDescCreatedAt is the schema descriptor for createdAt field.
+	// threadcommentattachmentDescCreatedAt is the schema descriptor for created_at field.
 	threadcommentattachmentDescCreatedAt := threadcommentattachmentFields[5].Descriptor()
-	// threadcommentattachment.DefaultCreatedAt holds the default value on creation for the createdAt field.
+	// threadcommentattachment.DefaultCreatedAt holds the default value on creation for the created_at field.
 	threadcommentattachment.DefaultCreatedAt = threadcommentattachmentDescCreatedAt.Default.(func() time.Time)
 	userFields := schema.User{}.Fields()
 	_ = userFields
@@ -141,74 +139,54 @@ func init() {
 	userDescRole := userFields[6].Descriptor()
 	// user.DefaultRole holds the default value on creation for the role field.
 	user.DefaultRole = userDescRole.Default.(int)
-	// userDescCreatedAt is the schema descriptor for createdAt field.
+	// userDescCreatedAt is the schema descriptor for created_at field.
 	userDescCreatedAt := userFields[7].Descriptor()
-	// user.DefaultCreatedAt holds the default value on creation for the createdAt field.
+	// user.DefaultCreatedAt holds the default value on creation for the created_at field.
 	user.DefaultCreatedAt = userDescCreatedAt.Default.(func() time.Time)
-	// userDescUpdatedAt is the schema descriptor for updatedAt field.
+	// userDescUpdatedAt is the schema descriptor for updated_at field.
 	userDescUpdatedAt := userFields[8].Descriptor()
-	// user.DefaultUpdatedAt holds the default value on creation for the updatedAt field.
+	// user.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	user.DefaultUpdatedAt = userDescUpdatedAt.Default.(func() time.Time)
-	// user.UpdateDefaultUpdatedAt holds the default value on update for the updatedAt field.
+	// user.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	user.UpdateDefaultUpdatedAt = userDescUpdatedAt.UpdateDefault.(func() time.Time)
-	userboardlikeFields := schema.UserBoardLike{}.Fields()
-	_ = userboardlikeFields
-	// userboardlikeDescLikedAt is the schema descriptor for likedAt field.
-	userboardlikeDescLikedAt := userboardlikeFields[2].Descriptor()
-	// userboardlike.DefaultLikedAt holds the default value on creation for the likedAt field.
-	userboardlike.DefaultLikedAt = userboardlikeDescLikedAt.Default.(func() time.Time)
-	userboardsubscriptionFields := schema.UserBoardSubscription{}.Fields()
-	_ = userboardsubscriptionFields
-	// userboardsubscriptionDescIsNotified is the schema descriptor for isNotified field.
-	userboardsubscriptionDescIsNotified := userboardsubscriptionFields[2].Descriptor()
-	// userboardsubscription.DefaultIsNotified holds the default value on creation for the isNotified field.
-	userboardsubscription.DefaultIsNotified = userboardsubscriptionDescIsNotified.Default.(bool)
-	// userboardsubscriptionDescIsChecked is the schema descriptor for isChecked field.
-	userboardsubscriptionDescIsChecked := userboardsubscriptionFields[3].Descriptor()
-	// userboardsubscription.DefaultIsChecked holds the default value on creation for the isChecked field.
-	userboardsubscription.DefaultIsChecked = userboardsubscriptionDescIsChecked.Default.(bool)
-	// userboardsubscriptionDescSubscribedAt is the schema descriptor for subscribedAt field.
-	userboardsubscriptionDescSubscribedAt := userboardsubscriptionFields[4].Descriptor()
-	// userboardsubscription.DefaultSubscribedAt holds the default value on creation for the subscribedAt field.
-	userboardsubscription.DefaultSubscribedAt = userboardsubscriptionDescSubscribedAt.Default.(func() time.Time)
 	usercommentlikeFields := schema.UserCommentLike{}.Fields()
 	_ = usercommentlikeFields
-	// usercommentlikeDescLikedAt is the schema descriptor for likedAt field.
+	// usercommentlikeDescLikedAt is the schema descriptor for liked_at field.
 	usercommentlikeDescLikedAt := usercommentlikeFields[2].Descriptor()
-	// usercommentlike.DefaultLikedAt holds the default value on creation for the likedAt field.
+	// usercommentlike.DefaultLikedAt holds the default value on creation for the liked_at field.
 	usercommentlike.DefaultLikedAt = usercommentlikeDescLikedAt.Default.(func() time.Time)
 	usercommentsubscriptionFields := schema.UserCommentSubscription{}.Fields()
 	_ = usercommentsubscriptionFields
-	// usercommentsubscriptionDescIsNotified is the schema descriptor for isNotified field.
+	// usercommentsubscriptionDescIsNotified is the schema descriptor for is_notified field.
 	usercommentsubscriptionDescIsNotified := usercommentsubscriptionFields[2].Descriptor()
-	// usercommentsubscription.DefaultIsNotified holds the default value on creation for the isNotified field.
+	// usercommentsubscription.DefaultIsNotified holds the default value on creation for the is_notified field.
 	usercommentsubscription.DefaultIsNotified = usercommentsubscriptionDescIsNotified.Default.(bool)
-	// usercommentsubscriptionDescIsChecked is the schema descriptor for isChecked field.
+	// usercommentsubscriptionDescIsChecked is the schema descriptor for is_checked field.
 	usercommentsubscriptionDescIsChecked := usercommentsubscriptionFields[3].Descriptor()
-	// usercommentsubscription.DefaultIsChecked holds the default value on creation for the isChecked field.
+	// usercommentsubscription.DefaultIsChecked holds the default value on creation for the is_checked field.
 	usercommentsubscription.DefaultIsChecked = usercommentsubscriptionDescIsChecked.Default.(bool)
-	// usercommentsubscriptionDescSubscribedAt is the schema descriptor for subscribedAt field.
+	// usercommentsubscriptionDescSubscribedAt is the schema descriptor for subscribed_at field.
 	usercommentsubscriptionDescSubscribedAt := usercommentsubscriptionFields[4].Descriptor()
-	// usercommentsubscription.DefaultSubscribedAt holds the default value on creation for the subscribedAt field.
+	// usercommentsubscription.DefaultSubscribedAt holds the default value on creation for the subscribed_at field.
 	usercommentsubscription.DefaultSubscribedAt = usercommentsubscriptionDescSubscribedAt.Default.(func() time.Time)
 	userthreadlikeFields := schema.UserThreadLike{}.Fields()
 	_ = userthreadlikeFields
-	// userthreadlikeDescLikedAt is the schema descriptor for likedAt field.
+	// userthreadlikeDescLikedAt is the schema descriptor for liked_at field.
 	userthreadlikeDescLikedAt := userthreadlikeFields[2].Descriptor()
-	// userthreadlike.DefaultLikedAt holds the default value on creation for the likedAt field.
+	// userthreadlike.DefaultLikedAt holds the default value on creation for the liked_at field.
 	userthreadlike.DefaultLikedAt = userthreadlikeDescLikedAt.Default.(func() time.Time)
 	userthreadsubscriptionFields := schema.UserThreadSubscription{}.Fields()
 	_ = userthreadsubscriptionFields
-	// userthreadsubscriptionDescIsNotified is the schema descriptor for isNotified field.
+	// userthreadsubscriptionDescIsNotified is the schema descriptor for is_notified field.
 	userthreadsubscriptionDescIsNotified := userthreadsubscriptionFields[2].Descriptor()
-	// userthreadsubscription.DefaultIsNotified holds the default value on creation for the isNotified field.
+	// userthreadsubscription.DefaultIsNotified holds the default value on creation for the is_notified field.
 	userthreadsubscription.DefaultIsNotified = userthreadsubscriptionDescIsNotified.Default.(bool)
-	// userthreadsubscriptionDescIsChecked is the schema descriptor for isChecked field.
+	// userthreadsubscriptionDescIsChecked is the schema descriptor for is_checked field.
 	userthreadsubscriptionDescIsChecked := userthreadsubscriptionFields[3].Descriptor()
-	// userthreadsubscription.DefaultIsChecked holds the default value on creation for the isChecked field.
+	// userthreadsubscription.DefaultIsChecked holds the default value on creation for the is_checked field.
 	userthreadsubscription.DefaultIsChecked = userthreadsubscriptionDescIsChecked.Default.(bool)
-	// userthreadsubscriptionDescSubscribedAt is the schema descriptor for subscribedAt field.
+	// userthreadsubscriptionDescSubscribedAt is the schema descriptor for subscribed_at field.
 	userthreadsubscriptionDescSubscribedAt := userthreadsubscriptionFields[4].Descriptor()
-	// userthreadsubscription.DefaultSubscribedAt holds the default value on creation for the subscribedAt field.
+	// userthreadsubscription.DefaultSubscribedAt holds the default value on creation for the subscribed_at field.
 	userthreadsubscription.DefaultSubscribedAt = userthreadsubscriptionDescSubscribedAt.Default.(func() time.Time)
 }

@@ -17,16 +17,16 @@ import (
 // UserCommentSubscription is the model entity for the UserCommentSubscription schema.
 type UserCommentSubscription struct {
 	config `json:"-"`
-	// UserId holds the value of the "userId" field.
-	UserId int `json:"userId,omitempty"`
-	// CommentId holds the value of the "commentId" field.
-	CommentId int `json:"commentId,omitempty"`
+	// UserID holds the value of the "user_id" field.
+	UserID int `json:"user_id,omitempty"`
+	// CommentID holds the value of the "comment_id" field.
+	CommentID int `json:"comment_id,omitempty"`
 	// メール通知を受け取るかどうかのフラグ
-	IsNotified bool `json:"isNotified,omitempty"`
+	IsNotified bool `json:"is_notified,omitempty"`
 	// 通知画面で確認したかどうかのフラグ
-	IsChecked bool `json:"isChecked,omitempty"`
-	// SubscribedAt holds the value of the "subscribedAt" field.
-	SubscribedAt time.Time `json:"subscribedAt,omitempty"`
+	IsChecked bool `json:"is_checked,omitempty"`
+	// SubscribedAt holds the value of the "subscribed_at" field.
+	SubscribedAt time.Time `json:"subscribed_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the UserCommentSubscriptionQuery when eager-loading is set.
 	Edges        UserCommentSubscriptionEdges `json:"edges"`
@@ -73,7 +73,7 @@ func (*UserCommentSubscription) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case usercommentsubscription.FieldIsNotified, usercommentsubscription.FieldIsChecked:
 			values[i] = new(sql.NullBool)
-		case usercommentsubscription.FieldUserId, usercommentsubscription.FieldCommentId:
+		case usercommentsubscription.FieldUserID, usercommentsubscription.FieldCommentID:
 			values[i] = new(sql.NullInt64)
 		case usercommentsubscription.FieldSubscribedAt:
 			values[i] = new(sql.NullTime)
@@ -92,33 +92,33 @@ func (ucs *UserCommentSubscription) assignValues(columns []string, values []any)
 	}
 	for i := range columns {
 		switch columns[i] {
-		case usercommentsubscription.FieldUserId:
+		case usercommentsubscription.FieldUserID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field userId", values[i])
+				return fmt.Errorf("unexpected type %T for field user_id", values[i])
 			} else if value.Valid {
-				ucs.UserId = int(value.Int64)
+				ucs.UserID = int(value.Int64)
 			}
-		case usercommentsubscription.FieldCommentId:
+		case usercommentsubscription.FieldCommentID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field commentId", values[i])
+				return fmt.Errorf("unexpected type %T for field comment_id", values[i])
 			} else if value.Valid {
-				ucs.CommentId = int(value.Int64)
+				ucs.CommentID = int(value.Int64)
 			}
 		case usercommentsubscription.FieldIsNotified:
 			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field isNotified", values[i])
+				return fmt.Errorf("unexpected type %T for field is_notified", values[i])
 			} else if value.Valid {
 				ucs.IsNotified = value.Bool
 			}
 		case usercommentsubscription.FieldIsChecked:
 			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field isChecked", values[i])
+				return fmt.Errorf("unexpected type %T for field is_checked", values[i])
 			} else if value.Valid {
 				ucs.IsChecked = value.Bool
 			}
 		case usercommentsubscription.FieldSubscribedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field subscribedAt", values[i])
+				return fmt.Errorf("unexpected type %T for field subscribed_at", values[i])
 			} else if value.Valid {
 				ucs.SubscribedAt = value.Time
 			}
@@ -167,19 +167,19 @@ func (ucs *UserCommentSubscription) Unwrap() *UserCommentSubscription {
 func (ucs *UserCommentSubscription) String() string {
 	var builder strings.Builder
 	builder.WriteString("UserCommentSubscription(")
-	builder.WriteString("userId=")
-	builder.WriteString(fmt.Sprintf("%v", ucs.UserId))
+	builder.WriteString("user_id=")
+	builder.WriteString(fmt.Sprintf("%v", ucs.UserID))
 	builder.WriteString(", ")
-	builder.WriteString("commentId=")
-	builder.WriteString(fmt.Sprintf("%v", ucs.CommentId))
+	builder.WriteString("comment_id=")
+	builder.WriteString(fmt.Sprintf("%v", ucs.CommentID))
 	builder.WriteString(", ")
-	builder.WriteString("isNotified=")
+	builder.WriteString("is_notified=")
 	builder.WriteString(fmt.Sprintf("%v", ucs.IsNotified))
 	builder.WriteString(", ")
-	builder.WriteString("isChecked=")
+	builder.WriteString("is_checked=")
 	builder.WriteString(fmt.Sprintf("%v", ucs.IsChecked))
 	builder.WriteString(", ")
-	builder.WriteString("subscribedAt=")
+	builder.WriteString("subscribed_at=")
 	builder.WriteString(ucs.SubscribedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()

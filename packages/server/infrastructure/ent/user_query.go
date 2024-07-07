@@ -12,8 +12,6 @@ import (
 	"server/infrastructure/ent/thread"
 	"server/infrastructure/ent/threadcomment"
 	"server/infrastructure/ent/user"
-	"server/infrastructure/ent/userboardlike"
-	"server/infrastructure/ent/userboardsubscription"
 	"server/infrastructure/ent/usercommentlike"
 	"server/infrastructure/ent/usercommentsubscription"
 	"server/infrastructure/ent/userthreadlike"
@@ -34,16 +32,12 @@ type UserQuery struct {
 	withBoards                  *BoardQuery
 	withThreads                 *ThreadQuery
 	withComments                *ThreadCommentQuery
-	withLikedBoards             *BoardQuery
 	withLikedThreads            *ThreadQuery
 	withLikedComments           *ThreadCommentQuery
-	withSubscribedBoards        *BoardQuery
 	withSubscribedThreads       *ThreadQuery
 	withSubscribedComments      *ThreadCommentQuery
-	withUserBoardLike           *UserBoardLikeQuery
 	withUserThreadLike          *UserThreadLikeQuery
 	withUserCommentLike         *UserCommentLikeQuery
-	withUserBoardSubscription   *UserBoardSubscriptionQuery
 	withUserThreadSubscription  *UserThreadSubscriptionQuery
 	withUserCommentSubscription *UserCommentSubscriptionQuery
 	// intermediate query (i.e. traversal path).
@@ -148,28 +142,6 @@ func (uq *UserQuery) QueryComments() *ThreadCommentQuery {
 	return query
 }
 
-// QueryLikedBoards chains the current query on the "liked_boards" edge.
-func (uq *UserQuery) QueryLikedBoards() *BoardQuery {
-	query := (&BoardClient{config: uq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := uq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := uq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(user.Table, user.FieldID, selector),
-			sqlgraph.To(board.Table, board.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, user.LikedBoardsTable, user.LikedBoardsPrimaryKey...),
-		)
-		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
 // QueryLikedThreads chains the current query on the "liked_threads" edge.
 func (uq *UserQuery) QueryLikedThreads() *ThreadQuery {
 	query := (&ThreadClient{config: uq.config}).Query()
@@ -207,28 +179,6 @@ func (uq *UserQuery) QueryLikedComments() *ThreadCommentQuery {
 			sqlgraph.From(user.Table, user.FieldID, selector),
 			sqlgraph.To(threadcomment.Table, threadcomment.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, user.LikedCommentsTable, user.LikedCommentsPrimaryKey...),
-		)
-		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QuerySubscribedBoards chains the current query on the "subscribed_boards" edge.
-func (uq *UserQuery) QuerySubscribedBoards() *BoardQuery {
-	query := (&BoardClient{config: uq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := uq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := uq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(user.Table, user.FieldID, selector),
-			sqlgraph.To(board.Table, board.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, user.SubscribedBoardsTable, user.SubscribedBoardsPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
 		return fromU, nil
@@ -280,28 +230,6 @@ func (uq *UserQuery) QuerySubscribedComments() *ThreadCommentQuery {
 	return query
 }
 
-// QueryUserBoardLike chains the current query on the "user_board_like" edge.
-func (uq *UserQuery) QueryUserBoardLike() *UserBoardLikeQuery {
-	query := (&UserBoardLikeClient{config: uq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := uq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := uq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(user.Table, user.FieldID, selector),
-			sqlgraph.To(userboardlike.Table, userboardlike.UserColumn),
-			sqlgraph.Edge(sqlgraph.O2M, true, user.UserBoardLikeTable, user.UserBoardLikeColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
 // QueryUserThreadLike chains the current query on the "user_thread_like" edge.
 func (uq *UserQuery) QueryUserThreadLike() *UserThreadLikeQuery {
 	query := (&UserThreadLikeClient{config: uq.config}).Query()
@@ -339,28 +267,6 @@ func (uq *UserQuery) QueryUserCommentLike() *UserCommentLikeQuery {
 			sqlgraph.From(user.Table, user.FieldID, selector),
 			sqlgraph.To(usercommentlike.Table, usercommentlike.UserColumn),
 			sqlgraph.Edge(sqlgraph.O2M, true, user.UserCommentLikeTable, user.UserCommentLikeColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryUserBoardSubscription chains the current query on the "user_board_subscription" edge.
-func (uq *UserQuery) QueryUserBoardSubscription() *UserBoardSubscriptionQuery {
-	query := (&UserBoardSubscriptionClient{config: uq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := uq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := uq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(user.Table, user.FieldID, selector),
-			sqlgraph.To(userboardsubscription.Table, userboardsubscription.UserColumn),
-			sqlgraph.Edge(sqlgraph.O2M, true, user.UserBoardSubscriptionTable, user.UserBoardSubscriptionColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
 		return fromU, nil
@@ -607,16 +513,12 @@ func (uq *UserQuery) Clone() *UserQuery {
 		withBoards:                  uq.withBoards.Clone(),
 		withThreads:                 uq.withThreads.Clone(),
 		withComments:                uq.withComments.Clone(),
-		withLikedBoards:             uq.withLikedBoards.Clone(),
 		withLikedThreads:            uq.withLikedThreads.Clone(),
 		withLikedComments:           uq.withLikedComments.Clone(),
-		withSubscribedBoards:        uq.withSubscribedBoards.Clone(),
 		withSubscribedThreads:       uq.withSubscribedThreads.Clone(),
 		withSubscribedComments:      uq.withSubscribedComments.Clone(),
-		withUserBoardLike:           uq.withUserBoardLike.Clone(),
 		withUserThreadLike:          uq.withUserThreadLike.Clone(),
 		withUserCommentLike:         uq.withUserCommentLike.Clone(),
-		withUserBoardSubscription:   uq.withUserBoardSubscription.Clone(),
 		withUserThreadSubscription:  uq.withUserThreadSubscription.Clone(),
 		withUserCommentSubscription: uq.withUserCommentSubscription.Clone(),
 		// clone intermediate query.
@@ -658,17 +560,6 @@ func (uq *UserQuery) WithComments(opts ...func(*ThreadCommentQuery)) *UserQuery 
 	return uq
 }
 
-// WithLikedBoards tells the query-builder to eager-load the nodes that are connected to
-// the "liked_boards" edge. The optional arguments are used to configure the query builder of the edge.
-func (uq *UserQuery) WithLikedBoards(opts ...func(*BoardQuery)) *UserQuery {
-	query := (&BoardClient{config: uq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	uq.withLikedBoards = query
-	return uq
-}
-
 // WithLikedThreads tells the query-builder to eager-load the nodes that are connected to
 // the "liked_threads" edge. The optional arguments are used to configure the query builder of the edge.
 func (uq *UserQuery) WithLikedThreads(opts ...func(*ThreadQuery)) *UserQuery {
@@ -688,17 +579,6 @@ func (uq *UserQuery) WithLikedComments(opts ...func(*ThreadCommentQuery)) *UserQ
 		opt(query)
 	}
 	uq.withLikedComments = query
-	return uq
-}
-
-// WithSubscribedBoards tells the query-builder to eager-load the nodes that are connected to
-// the "subscribed_boards" edge. The optional arguments are used to configure the query builder of the edge.
-func (uq *UserQuery) WithSubscribedBoards(opts ...func(*BoardQuery)) *UserQuery {
-	query := (&BoardClient{config: uq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	uq.withSubscribedBoards = query
 	return uq
 }
 
@@ -724,17 +604,6 @@ func (uq *UserQuery) WithSubscribedComments(opts ...func(*ThreadCommentQuery)) *
 	return uq
 }
 
-// WithUserBoardLike tells the query-builder to eager-load the nodes that are connected to
-// the "user_board_like" edge. The optional arguments are used to configure the query builder of the edge.
-func (uq *UserQuery) WithUserBoardLike(opts ...func(*UserBoardLikeQuery)) *UserQuery {
-	query := (&UserBoardLikeClient{config: uq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	uq.withUserBoardLike = query
-	return uq
-}
-
 // WithUserThreadLike tells the query-builder to eager-load the nodes that are connected to
 // the "user_thread_like" edge. The optional arguments are used to configure the query builder of the edge.
 func (uq *UserQuery) WithUserThreadLike(opts ...func(*UserThreadLikeQuery)) *UserQuery {
@@ -754,17 +623,6 @@ func (uq *UserQuery) WithUserCommentLike(opts ...func(*UserCommentLikeQuery)) *U
 		opt(query)
 	}
 	uq.withUserCommentLike = query
-	return uq
-}
-
-// WithUserBoardSubscription tells the query-builder to eager-load the nodes that are connected to
-// the "user_board_subscription" edge. The optional arguments are used to configure the query builder of the edge.
-func (uq *UserQuery) WithUserBoardSubscription(opts ...func(*UserBoardSubscriptionQuery)) *UserQuery {
-	query := (&UserBoardSubscriptionClient{config: uq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	uq.withUserBoardSubscription = query
 	return uq
 }
 
@@ -868,20 +726,16 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 	var (
 		nodes       = []*User{}
 		_spec       = uq.querySpec()
-		loadedTypes = [15]bool{
+		loadedTypes = [11]bool{
 			uq.withBoards != nil,
 			uq.withThreads != nil,
 			uq.withComments != nil,
-			uq.withLikedBoards != nil,
 			uq.withLikedThreads != nil,
 			uq.withLikedComments != nil,
-			uq.withSubscribedBoards != nil,
 			uq.withSubscribedThreads != nil,
 			uq.withSubscribedComments != nil,
-			uq.withUserBoardLike != nil,
 			uq.withUserThreadLike != nil,
 			uq.withUserCommentLike != nil,
-			uq.withUserBoardSubscription != nil,
 			uq.withUserThreadSubscription != nil,
 			uq.withUserCommentSubscription != nil,
 		}
@@ -925,13 +779,6 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 			return nil, err
 		}
 	}
-	if query := uq.withLikedBoards; query != nil {
-		if err := uq.loadLikedBoards(ctx, query, nodes,
-			func(n *User) { n.Edges.LikedBoards = []*Board{} },
-			func(n *User, e *Board) { n.Edges.LikedBoards = append(n.Edges.LikedBoards, e) }); err != nil {
-			return nil, err
-		}
-	}
 	if query := uq.withLikedThreads; query != nil {
 		if err := uq.loadLikedThreads(ctx, query, nodes,
 			func(n *User) { n.Edges.LikedThreads = []*Thread{} },
@@ -943,13 +790,6 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 		if err := uq.loadLikedComments(ctx, query, nodes,
 			func(n *User) { n.Edges.LikedComments = []*ThreadComment{} },
 			func(n *User, e *ThreadComment) { n.Edges.LikedComments = append(n.Edges.LikedComments, e) }); err != nil {
-			return nil, err
-		}
-	}
-	if query := uq.withSubscribedBoards; query != nil {
-		if err := uq.loadSubscribedBoards(ctx, query, nodes,
-			func(n *User) { n.Edges.SubscribedBoards = []*Board{} },
-			func(n *User, e *Board) { n.Edges.SubscribedBoards = append(n.Edges.SubscribedBoards, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -967,13 +807,6 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 			return nil, err
 		}
 	}
-	if query := uq.withUserBoardLike; query != nil {
-		if err := uq.loadUserBoardLike(ctx, query, nodes,
-			func(n *User) { n.Edges.UserBoardLike = []*UserBoardLike{} },
-			func(n *User, e *UserBoardLike) { n.Edges.UserBoardLike = append(n.Edges.UserBoardLike, e) }); err != nil {
-			return nil, err
-		}
-	}
 	if query := uq.withUserThreadLike; query != nil {
 		if err := uq.loadUserThreadLike(ctx, query, nodes,
 			func(n *User) { n.Edges.UserThreadLike = []*UserThreadLike{} },
@@ -985,15 +818,6 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 		if err := uq.loadUserCommentLike(ctx, query, nodes,
 			func(n *User) { n.Edges.UserCommentLike = []*UserCommentLike{} },
 			func(n *User, e *UserCommentLike) { n.Edges.UserCommentLike = append(n.Edges.UserCommentLike, e) }); err != nil {
-			return nil, err
-		}
-	}
-	if query := uq.withUserBoardSubscription; query != nil {
-		if err := uq.loadUserBoardSubscription(ctx, query, nodes,
-			func(n *User) { n.Edges.UserBoardSubscription = []*UserBoardSubscription{} },
-			func(n *User, e *UserBoardSubscription) {
-				n.Edges.UserBoardSubscription = append(n.Edges.UserBoardSubscription, e)
-			}); err != nil {
 			return nil, err
 		}
 	}
@@ -1029,7 +853,7 @@ func (uq *UserQuery) loadBoards(ctx context.Context, query *BoardQuery, nodes []
 		}
 	}
 	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(board.FieldUserId)
+		query.ctx.AppendFieldOnce(board.FieldUserID)
 	}
 	query.Where(predicate.Board(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(user.BoardsColumn), fks...))
@@ -1039,10 +863,10 @@ func (uq *UserQuery) loadBoards(ctx context.Context, query *BoardQuery, nodes []
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.UserId
+		fk := n.UserID
 		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "userId" returned %v for node %v`, fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "user_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -1059,7 +883,7 @@ func (uq *UserQuery) loadThreads(ctx context.Context, query *ThreadQuery, nodes 
 		}
 	}
 	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(thread.FieldUserId)
+		query.ctx.AppendFieldOnce(thread.FieldUserID)
 	}
 	query.Where(predicate.Thread(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(user.ThreadsColumn), fks...))
@@ -1069,10 +893,10 @@ func (uq *UserQuery) loadThreads(ctx context.Context, query *ThreadQuery, nodes 
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.UserId
+		fk := n.UserID
 		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "userId" returned %v for node %v`, fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "user_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -1089,7 +913,7 @@ func (uq *UserQuery) loadComments(ctx context.Context, query *ThreadCommentQuery
 		}
 	}
 	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(threadcomment.FieldUserId)
+		query.ctx.AppendFieldOnce(threadcomment.FieldUserID)
 	}
 	query.Where(predicate.ThreadComment(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(user.CommentsColumn), fks...))
@@ -1099,73 +923,15 @@ func (uq *UserQuery) loadComments(ctx context.Context, query *ThreadCommentQuery
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.UserId
-		node, ok := nodeids[fk]
+		fk := n.UserID
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "user_id" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "userId" returned %v for node %v`, fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "user_id" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
-	}
-	return nil
-}
-func (uq *UserQuery) loadLikedBoards(ctx context.Context, query *BoardQuery, nodes []*User, init func(*User), assign func(*User, *Board)) error {
-	edgeIDs := make([]driver.Value, len(nodes))
-	byID := make(map[int]*User)
-	nids := make(map[int]map[*User]struct{})
-	for i, node := range nodes {
-		edgeIDs[i] = node.ID
-		byID[node.ID] = node
-		if init != nil {
-			init(node)
-		}
-	}
-	query.Where(func(s *sql.Selector) {
-		joinT := sql.Table(user.LikedBoardsTable)
-		s.Join(joinT).On(s.C(board.FieldID), joinT.C(user.LikedBoardsPrimaryKey[1]))
-		s.Where(sql.InValues(joinT.C(user.LikedBoardsPrimaryKey[0]), edgeIDs...))
-		columns := s.SelectedColumns()
-		s.Select(joinT.C(user.LikedBoardsPrimaryKey[0]))
-		s.AppendSelect(columns...)
-		s.SetDistinct(false)
-	})
-	if err := query.prepareQuery(ctx); err != nil {
-		return err
-	}
-	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
-		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
-			assign := spec.Assign
-			values := spec.ScanValues
-			spec.ScanValues = func(columns []string) ([]any, error) {
-				values, err := values(columns[1:])
-				if err != nil {
-					return nil, err
-				}
-				return append([]any{new(sql.NullInt64)}, values...), nil
-			}
-			spec.Assign = func(columns []string, values []any) error {
-				outValue := int(values[0].(*sql.NullInt64).Int64)
-				inValue := int(values[1].(*sql.NullInt64).Int64)
-				if nids[inValue] == nil {
-					nids[inValue] = map[*User]struct{}{byID[outValue]: {}}
-					return assign(columns[1:], values[1:])
-				}
-				nids[inValue][byID[outValue]] = struct{}{}
-				return nil
-			}
-		})
-	})
-	neighbors, err := withInterceptors[[]*Board](ctx, query, qr, query.inters)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected "liked_boards" node returned %v`, n.ID)
-		}
-		for kn := range nodes {
-			assign(kn, n)
-		}
 	}
 	return nil
 }
@@ -1284,67 +1050,6 @@ func (uq *UserQuery) loadLikedComments(ctx context.Context, query *ThreadComment
 		nodes, ok := nids[n.ID]
 		if !ok {
 			return fmt.Errorf(`unexpected "liked_comments" node returned %v`, n.ID)
-		}
-		for kn := range nodes {
-			assign(kn, n)
-		}
-	}
-	return nil
-}
-func (uq *UserQuery) loadSubscribedBoards(ctx context.Context, query *BoardQuery, nodes []*User, init func(*User), assign func(*User, *Board)) error {
-	edgeIDs := make([]driver.Value, len(nodes))
-	byID := make(map[int]*User)
-	nids := make(map[int]map[*User]struct{})
-	for i, node := range nodes {
-		edgeIDs[i] = node.ID
-		byID[node.ID] = node
-		if init != nil {
-			init(node)
-		}
-	}
-	query.Where(func(s *sql.Selector) {
-		joinT := sql.Table(user.SubscribedBoardsTable)
-		s.Join(joinT).On(s.C(board.FieldID), joinT.C(user.SubscribedBoardsPrimaryKey[1]))
-		s.Where(sql.InValues(joinT.C(user.SubscribedBoardsPrimaryKey[0]), edgeIDs...))
-		columns := s.SelectedColumns()
-		s.Select(joinT.C(user.SubscribedBoardsPrimaryKey[0]))
-		s.AppendSelect(columns...)
-		s.SetDistinct(false)
-	})
-	if err := query.prepareQuery(ctx); err != nil {
-		return err
-	}
-	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
-		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
-			assign := spec.Assign
-			values := spec.ScanValues
-			spec.ScanValues = func(columns []string) ([]any, error) {
-				values, err := values(columns[1:])
-				if err != nil {
-					return nil, err
-				}
-				return append([]any{new(sql.NullInt64)}, values...), nil
-			}
-			spec.Assign = func(columns []string, values []any) error {
-				outValue := int(values[0].(*sql.NullInt64).Int64)
-				inValue := int(values[1].(*sql.NullInt64).Int64)
-				if nids[inValue] == nil {
-					nids[inValue] = map[*User]struct{}{byID[outValue]: {}}
-					return assign(columns[1:], values[1:])
-				}
-				nids[inValue][byID[outValue]] = struct{}{}
-				return nil
-			}
-		})
-	})
-	neighbors, err := withInterceptors[[]*Board](ctx, query, qr, query.inters)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected "subscribed_boards" node returned %v`, n.ID)
 		}
 		for kn := range nodes {
 			assign(kn, n)
@@ -1474,36 +1179,6 @@ func (uq *UserQuery) loadSubscribedComments(ctx context.Context, query *ThreadCo
 	}
 	return nil
 }
-func (uq *UserQuery) loadUserBoardLike(ctx context.Context, query *UserBoardLikeQuery, nodes []*User, init func(*User), assign func(*User, *UserBoardLike)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*User)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
-		}
-	}
-	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(userboardlike.FieldUserId)
-	}
-	query.Where(predicate.UserBoardLike(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(user.UserBoardLikeColumn), fks...))
-	}))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		fk := n.UserId
-		node, ok := nodeids[fk]
-		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "userId" returned %v for node %v`, fk, n)
-		}
-		assign(node, n)
-	}
-	return nil
-}
 func (uq *UserQuery) loadUserThreadLike(ctx context.Context, query *UserThreadLikeQuery, nodes []*User, init func(*User), assign func(*User, *UserThreadLike)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*User)
@@ -1515,7 +1190,7 @@ func (uq *UserQuery) loadUserThreadLike(ctx context.Context, query *UserThreadLi
 		}
 	}
 	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(userthreadlike.FieldUserId)
+		query.ctx.AppendFieldOnce(userthreadlike.FieldUserID)
 	}
 	query.Where(predicate.UserThreadLike(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(user.UserThreadLikeColumn), fks...))
@@ -1525,10 +1200,10 @@ func (uq *UserQuery) loadUserThreadLike(ctx context.Context, query *UserThreadLi
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.UserId
+		fk := n.UserID
 		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "userId" returned %v for node %v`, fk, n)
+			return fmt.Errorf(`unexpected referenced foreign-key "user_id" returned %v for node %v`, fk, n)
 		}
 		assign(node, n)
 	}
@@ -1545,7 +1220,7 @@ func (uq *UserQuery) loadUserCommentLike(ctx context.Context, query *UserComment
 		}
 	}
 	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(usercommentlike.FieldUserId)
+		query.ctx.AppendFieldOnce(usercommentlike.FieldUserID)
 	}
 	query.Where(predicate.UserCommentLike(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(user.UserCommentLikeColumn), fks...))
@@ -1555,40 +1230,10 @@ func (uq *UserQuery) loadUserCommentLike(ctx context.Context, query *UserComment
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.UserId
+		fk := n.UserID
 		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "userId" returned %v for node %v`, fk, n)
-		}
-		assign(node, n)
-	}
-	return nil
-}
-func (uq *UserQuery) loadUserBoardSubscription(ctx context.Context, query *UserBoardSubscriptionQuery, nodes []*User, init func(*User), assign func(*User, *UserBoardSubscription)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*User)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
-		}
-	}
-	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(userboardsubscription.FieldUserId)
-	}
-	query.Where(predicate.UserBoardSubscription(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(user.UserBoardSubscriptionColumn), fks...))
-	}))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		fk := n.UserId
-		node, ok := nodeids[fk]
-		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "userId" returned %v for node %v`, fk, n)
+			return fmt.Errorf(`unexpected referenced foreign-key "user_id" returned %v for node %v`, fk, n)
 		}
 		assign(node, n)
 	}
@@ -1605,7 +1250,7 @@ func (uq *UserQuery) loadUserThreadSubscription(ctx context.Context, query *User
 		}
 	}
 	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(userthreadsubscription.FieldUserId)
+		query.ctx.AppendFieldOnce(userthreadsubscription.FieldUserID)
 	}
 	query.Where(predicate.UserThreadSubscription(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(user.UserThreadSubscriptionColumn), fks...))
@@ -1615,10 +1260,10 @@ func (uq *UserQuery) loadUserThreadSubscription(ctx context.Context, query *User
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.UserId
+		fk := n.UserID
 		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "userId" returned %v for node %v`, fk, n)
+			return fmt.Errorf(`unexpected referenced foreign-key "user_id" returned %v for node %v`, fk, n)
 		}
 		assign(node, n)
 	}
@@ -1635,7 +1280,7 @@ func (uq *UserQuery) loadUserCommentSubscription(ctx context.Context, query *Use
 		}
 	}
 	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(usercommentsubscription.FieldUserId)
+		query.ctx.AppendFieldOnce(usercommentsubscription.FieldUserID)
 	}
 	query.Where(predicate.UserCommentSubscription(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(user.UserCommentSubscriptionColumn), fks...))
@@ -1645,10 +1290,10 @@ func (uq *UserQuery) loadUserCommentSubscription(ctx context.Context, query *Use
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.UserId
+		fk := n.UserID
 		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "userId" returned %v for node %v`, fk, n)
+			return fmt.Errorf(`unexpected referenced foreign-key "user_id" returned %v for node %v`, fk, n)
 		}
 		assign(node, n)
 	}

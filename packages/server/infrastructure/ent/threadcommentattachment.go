@@ -18,16 +18,16 @@ type ThreadCommentAttachment struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// CommentId holds the value of the "commentId" field.
-	CommentId int `json:"commentId,omitempty"`
+	// CommentID holds the value of the "comment_id" field.
+	CommentID int `json:"comment_id,omitempty"`
 	// URL holds the value of the "url" field.
 	URL string `json:"url,omitempty"`
 	// DisplayOrder holds the value of the "display_order" field.
 	DisplayOrder int `json:"display_order,omitempty"`
 	// 0: image, 1: video
 	Type int `json:"type,omitempty"`
-	// CreatedAt holds the value of the "createdAt" field.
-	CreatedAt time.Time `json:"createdAt,omitempty"`
+	// CreatedAt holds the value of the "created_at" field.
+	CreatedAt time.Time `json:"created_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ThreadCommentAttachmentQuery when eager-loading is set.
 	Edges        ThreadCommentAttachmentEdges `json:"edges"`
@@ -59,7 +59,7 @@ func (*ThreadCommentAttachment) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case threadcommentattachment.FieldID, threadcommentattachment.FieldCommentId, threadcommentattachment.FieldDisplayOrder, threadcommentattachment.FieldType:
+		case threadcommentattachment.FieldID, threadcommentattachment.FieldCommentID, threadcommentattachment.FieldDisplayOrder, threadcommentattachment.FieldType:
 			values[i] = new(sql.NullInt64)
 		case threadcommentattachment.FieldURL:
 			values[i] = new(sql.NullString)
@@ -86,11 +86,11 @@ func (tca *ThreadCommentAttachment) assignValues(columns []string, values []any)
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			tca.ID = int(value.Int64)
-		case threadcommentattachment.FieldCommentId:
+		case threadcommentattachment.FieldCommentID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field commentId", values[i])
+				return fmt.Errorf("unexpected type %T for field comment_id", values[i])
 			} else if value.Valid {
-				tca.CommentId = int(value.Int64)
+				tca.CommentID = int(value.Int64)
 			}
 		case threadcommentattachment.FieldURL:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -112,7 +112,7 @@ func (tca *ThreadCommentAttachment) assignValues(columns []string, values []any)
 			}
 		case threadcommentattachment.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field createdAt", values[i])
+				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
 				tca.CreatedAt = value.Time
 			}
@@ -157,8 +157,8 @@ func (tca *ThreadCommentAttachment) String() string {
 	var builder strings.Builder
 	builder.WriteString("ThreadCommentAttachment(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", tca.ID))
-	builder.WriteString("commentId=")
-	builder.WriteString(fmt.Sprintf("%v", tca.CommentId))
+	builder.WriteString("comment_id=")
+	builder.WriteString(fmt.Sprintf("%v", tca.CommentID))
 	builder.WriteString(", ")
 	builder.WriteString("url=")
 	builder.WriteString(tca.URL)
@@ -169,7 +169,7 @@ func (tca *ThreadCommentAttachment) String() string {
 	builder.WriteString("type=")
 	builder.WriteString(fmt.Sprintf("%v", tca.Type))
 	builder.WriteString(", ")
-	builder.WriteString("createdAt=")
+	builder.WriteString("created_at=")
 	builder.WriteString(tca.CreatedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()

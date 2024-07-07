@@ -584,12 +584,12 @@ func (tq *ThreadQuery) WithUserThreadSubscription(opts ...func(*UserThreadSubscr
 // Example:
 //
 //	var v []struct {
-//		BoardId int `json:"boardId,omitempty"`
+//		BoardID int `json:"board_id,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Thread.Query().
-//		GroupBy(thread.FieldBoardId).
+//		GroupBy(thread.FieldBoardID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (tq *ThreadQuery) GroupBy(field string, fields ...string) *ThreadGroupBy {
@@ -607,11 +607,11 @@ func (tq *ThreadQuery) GroupBy(field string, fields ...string) *ThreadGroupBy {
 // Example:
 //
 //	var v []struct {
-//		BoardId int `json:"boardId,omitempty"`
+//		BoardID int `json:"board_id,omitempty"`
 //	}
 //
 //	client.Thread.Query().
-//		Select(thread.FieldBoardId).
+//		Select(thread.FieldBoardID).
 //		Scan(ctx, &v)
 func (tq *ThreadQuery) Select(fields ...string) *ThreadSelect {
 	tq.ctx.Fields = append(tq.ctx.Fields, fields...)
@@ -756,7 +756,7 @@ func (tq *ThreadQuery) loadBoard(ctx context.Context, query *BoardQuery, nodes [
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Thread)
 	for i := range nodes {
-		fk := nodes[i].BoardId
+		fk := nodes[i].BoardID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -773,7 +773,7 @@ func (tq *ThreadQuery) loadBoard(ctx context.Context, query *BoardQuery, nodes [
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "boardId" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "board_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -785,7 +785,7 @@ func (tq *ThreadQuery) loadOwner(ctx context.Context, query *UserQuery, nodes []
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Thread)
 	for i := range nodes {
-		fk := nodes[i].UserId
+		fk := nodes[i].UserID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -802,7 +802,7 @@ func (tq *ThreadQuery) loadOwner(ctx context.Context, query *UserQuery, nodes []
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "userId" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "user_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -821,7 +821,7 @@ func (tq *ThreadQuery) loadComments(ctx context.Context, query *ThreadCommentQue
 		}
 	}
 	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(threadcomment.FieldThreadId)
+		query.ctx.AppendFieldOnce(threadcomment.FieldThreadID)
 	}
 	query.Where(predicate.ThreadComment(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(thread.CommentsColumn), fks...))
@@ -831,10 +831,10 @@ func (tq *ThreadQuery) loadComments(ctx context.Context, query *ThreadCommentQue
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.ThreadId
+		fk := n.ThreadID
 		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "threadId" returned %v for node %v`, fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "thread_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -1064,7 +1064,7 @@ func (tq *ThreadQuery) loadUserThreadLike(ctx context.Context, query *UserThread
 		}
 	}
 	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(userthreadlike.FieldThreadId)
+		query.ctx.AppendFieldOnce(userthreadlike.FieldThreadID)
 	}
 	query.Where(predicate.UserThreadLike(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(thread.UserThreadLikeColumn), fks...))
@@ -1074,10 +1074,10 @@ func (tq *ThreadQuery) loadUserThreadLike(ctx context.Context, query *UserThread
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.ThreadId
+		fk := n.ThreadID
 		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "threadId" returned %v for node %v`, fk, n)
+			return fmt.Errorf(`unexpected referenced foreign-key "thread_id" returned %v for node %v`, fk, n)
 		}
 		assign(node, n)
 	}
@@ -1094,7 +1094,7 @@ func (tq *ThreadQuery) loadUserThreadSubscription(ctx context.Context, query *Us
 		}
 	}
 	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(userthreadsubscription.FieldThreadId)
+		query.ctx.AppendFieldOnce(userthreadsubscription.FieldThreadID)
 	}
 	query.Where(predicate.UserThreadSubscription(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(thread.UserThreadSubscriptionColumn), fks...))
@@ -1104,10 +1104,10 @@ func (tq *ThreadQuery) loadUserThreadSubscription(ctx context.Context, query *Us
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.ThreadId
+		fk := n.ThreadID
 		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "threadId" returned %v for node %v`, fk, n)
+			return fmt.Errorf(`unexpected referenced foreign-key "thread_id" returned %v for node %v`, fk, n)
 		}
 		assign(node, n)
 	}
@@ -1140,10 +1140,10 @@ func (tq *ThreadQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 		if tq.withBoard != nil {
-			_spec.Node.AddColumnOnce(thread.FieldBoardId)
+			_spec.Node.AddColumnOnce(thread.FieldBoardID)
 		}
 		if tq.withOwner != nil {
-			_spec.Node.AddColumnOnce(thread.FieldUserId)
+			_spec.Node.AddColumnOnce(thread.FieldUserID)
 		}
 	}
 	if ps := tq.predicates; len(ps) > 0 {

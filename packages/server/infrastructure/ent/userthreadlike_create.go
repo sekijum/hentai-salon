@@ -22,25 +22,25 @@ type UserThreadLikeCreate struct {
 	hooks    []Hook
 }
 
-// SetUserId sets the "userId" field.
-func (utlc *UserThreadLikeCreate) SetUserId(i int) *UserThreadLikeCreate {
-	utlc.mutation.SetUserId(i)
+// SetUserID sets the "user_id" field.
+func (utlc *UserThreadLikeCreate) SetUserID(i int) *UserThreadLikeCreate {
+	utlc.mutation.SetUserID(i)
 	return utlc
 }
 
-// SetThreadId sets the "threadId" field.
-func (utlc *UserThreadLikeCreate) SetThreadId(i int) *UserThreadLikeCreate {
-	utlc.mutation.SetThreadId(i)
+// SetThreadID sets the "thread_id" field.
+func (utlc *UserThreadLikeCreate) SetThreadID(i int) *UserThreadLikeCreate {
+	utlc.mutation.SetThreadID(i)
 	return utlc
 }
 
-// SetLikedAt sets the "likedAt" field.
+// SetLikedAt sets the "liked_at" field.
 func (utlc *UserThreadLikeCreate) SetLikedAt(t time.Time) *UserThreadLikeCreate {
 	utlc.mutation.SetLikedAt(t)
 	return utlc
 }
 
-// SetNillableLikedAt sets the "likedAt" field if the given value is not nil.
+// SetNillableLikedAt sets the "liked_at" field if the given value is not nil.
 func (utlc *UserThreadLikeCreate) SetNillableLikedAt(t *time.Time) *UserThreadLikeCreate {
 	if t != nil {
 		utlc.SetLikedAt(*t)
@@ -48,21 +48,9 @@ func (utlc *UserThreadLikeCreate) SetNillableLikedAt(t *time.Time) *UserThreadLi
 	return utlc
 }
 
-// SetUserID sets the "user" edge to the User entity by ID.
-func (utlc *UserThreadLikeCreate) SetUserID(id int) *UserThreadLikeCreate {
-	utlc.mutation.SetUserID(id)
-	return utlc
-}
-
 // SetUser sets the "user" edge to the User entity.
 func (utlc *UserThreadLikeCreate) SetUser(u *User) *UserThreadLikeCreate {
 	return utlc.SetUserID(u.ID)
-}
-
-// SetThreadID sets the "thread" edge to the Thread entity by ID.
-func (utlc *UserThreadLikeCreate) SetThreadID(id int) *UserThreadLikeCreate {
-	utlc.mutation.SetThreadID(id)
-	return utlc
 }
 
 // SetThread sets the "thread" edge to the Thread entity.
@@ -113,14 +101,14 @@ func (utlc *UserThreadLikeCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (utlc *UserThreadLikeCreate) check() error {
-	if _, ok := utlc.mutation.UserId(); !ok {
-		return &ValidationError{Name: "userId", err: errors.New(`ent: missing required field "UserThreadLike.userId"`)}
+	if _, ok := utlc.mutation.UserID(); !ok {
+		return &ValidationError{Name: "user_id", err: errors.New(`ent: missing required field "UserThreadLike.user_id"`)}
 	}
-	if _, ok := utlc.mutation.ThreadId(); !ok {
-		return &ValidationError{Name: "threadId", err: errors.New(`ent: missing required field "UserThreadLike.threadId"`)}
+	if _, ok := utlc.mutation.ThreadID(); !ok {
+		return &ValidationError{Name: "thread_id", err: errors.New(`ent: missing required field "UserThreadLike.thread_id"`)}
 	}
 	if _, ok := utlc.mutation.LikedAt(); !ok {
-		return &ValidationError{Name: "likedAt", err: errors.New(`ent: missing required field "UserThreadLike.likedAt"`)}
+		return &ValidationError{Name: "liked_at", err: errors.New(`ent: missing required field "UserThreadLike.liked_at"`)}
 	}
 	if _, ok := utlc.mutation.UserID(); !ok {
 		return &ValidationError{Name: "user", err: errors.New(`ent: missing required edge "UserThreadLike.user"`)}
@@ -168,7 +156,7 @@ func (utlc *UserThreadLikeCreate) createSpec() (*UserThreadLike, *sqlgraph.Creat
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.UserId = nodes[0]
+		_node.UserID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := utlc.mutation.ThreadIDs(); len(nodes) > 0 {
@@ -185,7 +173,7 @@ func (utlc *UserThreadLikeCreate) createSpec() (*UserThreadLike, *sqlgraph.Creat
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.ThreadId = nodes[0]
+		_node.ThreadID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

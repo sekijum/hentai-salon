@@ -14,23 +14,23 @@ const (
 	Label = "thread"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldBoardId holds the string denoting the boardid field in the database.
-	FieldBoardId = "board_id"
-	// FieldUserId holds the string denoting the userid field in the database.
-	FieldUserId = "user_id"
+	// FieldBoardID holds the string denoting the board_id field in the database.
+	FieldBoardID = "board_id"
+	// FieldUserID holds the string denoting the user_id field in the database.
+	FieldUserID = "user_id"
 	// FieldTitle holds the string denoting the title field in the database.
 	FieldTitle = "title"
 	// FieldDescription holds the string denoting the description field in the database.
 	FieldDescription = "description"
-	// FieldThumbnailUrl holds the string denoting the thumbnailurl field in the database.
-	FieldThumbnailUrl = "thumbnail_url"
+	// FieldThumbnailURL holds the string denoting the thumbnail_url field in the database.
+	FieldThumbnailURL = "thumbnail_url"
 	// FieldIPAddress holds the string denoting the ip_address field in the database.
 	FieldIPAddress = "ip_address"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
-	// FieldCreatedAt holds the string denoting the createdat field in the database.
+	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
-	// FieldUpdatedAt holds the string denoting the updatedat field in the database.
+	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
 	// EdgeBoard holds the string denoting the board edge name in mutations.
 	EdgeBoard = "board"
@@ -114,11 +114,11 @@ const (
 // Columns holds all SQL columns for thread fields.
 var Columns = []string{
 	FieldID,
-	FieldBoardId,
-	FieldUserId,
+	FieldBoardID,
+	FieldUserID,
 	FieldTitle,
 	FieldDescription,
-	FieldThumbnailUrl,
+	FieldThumbnailURL,
 	FieldIPAddress,
 	FieldStatus,
 	FieldCreatedAt,
@@ -131,10 +131,10 @@ var (
 	TagsPrimaryKey = []string{"thread_id", "tag_id"}
 	// LikedUsersPrimaryKey and LikedUsersColumn2 are the table columns denoting the
 	// primary key for the liked_users relation (M2M).
-	LikedUsersPrimaryKey = []string{"userId", "threadId"}
+	LikedUsersPrimaryKey = []string{"user_id", "thread_id"}
 	// SubscribedUsersPrimaryKey and SubscribedUsersColumn2 are the table columns denoting the
 	// primary key for the subscribed_users relation (M2M).
-	SubscribedUsersPrimaryKey = []string{"userId", "threadId"}
+	SubscribedUsersPrimaryKey = []string{"user_id", "thread_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -156,11 +156,11 @@ var (
 	IPAddressValidator func(string) error
 	// DefaultStatus holds the default value on creation for the "status" field.
 	DefaultStatus int
-	// DefaultCreatedAt holds the default value on creation for the "createdAt" field.
+	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
-	// DefaultUpdatedAt holds the default value on creation for the "updatedAt" field.
+	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
 	DefaultUpdatedAt func() time.Time
-	// UpdateDefaultUpdatedAt holds the default value on update for the "updatedAt" field.
+	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
 	UpdateDefaultUpdatedAt func() time.Time
 )
 
@@ -172,14 +172,14 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// ByBoardId orders the results by the boardId field.
-func ByBoardId(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldBoardId, opts...).ToFunc()
+// ByBoardID orders the results by the board_id field.
+func ByBoardID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldBoardID, opts...).ToFunc()
 }
 
-// ByUserId orders the results by the userId field.
-func ByUserId(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUserId, opts...).ToFunc()
+// ByUserID orders the results by the user_id field.
+func ByUserID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUserID, opts...).ToFunc()
 }
 
 // ByTitle orders the results by the title field.
@@ -192,9 +192,9 @@ func ByDescription(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDescription, opts...).ToFunc()
 }
 
-// ByThumbnailUrl orders the results by the thumbnailUrl field.
-func ByThumbnailUrl(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldThumbnailUrl, opts...).ToFunc()
+// ByThumbnailURL orders the results by the thumbnail_url field.
+func ByThumbnailURL(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldThumbnailURL, opts...).ToFunc()
 }
 
 // ByIPAddress orders the results by the ip_address field.
@@ -207,12 +207,12 @@ func ByStatus(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStatus, opts...).ToFunc()
 }
 
-// ByCreatedAt orders the results by the createdAt field.
+// ByCreatedAt orders the results by the created_at field.
 func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
 }
 
-// ByUpdatedAt orders the results by the updatedAt field.
+// ByUpdatedAt orders the results by the updated_at field.
 func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
 }

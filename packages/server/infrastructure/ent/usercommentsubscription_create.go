@@ -22,25 +22,25 @@ type UserCommentSubscriptionCreate struct {
 	hooks    []Hook
 }
 
-// SetUserId sets the "userId" field.
-func (ucsc *UserCommentSubscriptionCreate) SetUserId(i int) *UserCommentSubscriptionCreate {
-	ucsc.mutation.SetUserId(i)
+// SetUserID sets the "user_id" field.
+func (ucsc *UserCommentSubscriptionCreate) SetUserID(i int) *UserCommentSubscriptionCreate {
+	ucsc.mutation.SetUserID(i)
 	return ucsc
 }
 
-// SetCommentId sets the "commentId" field.
-func (ucsc *UserCommentSubscriptionCreate) SetCommentId(i int) *UserCommentSubscriptionCreate {
-	ucsc.mutation.SetCommentId(i)
+// SetCommentID sets the "comment_id" field.
+func (ucsc *UserCommentSubscriptionCreate) SetCommentID(i int) *UserCommentSubscriptionCreate {
+	ucsc.mutation.SetCommentID(i)
 	return ucsc
 }
 
-// SetIsNotified sets the "isNotified" field.
+// SetIsNotified sets the "is_notified" field.
 func (ucsc *UserCommentSubscriptionCreate) SetIsNotified(b bool) *UserCommentSubscriptionCreate {
 	ucsc.mutation.SetIsNotified(b)
 	return ucsc
 }
 
-// SetNillableIsNotified sets the "isNotified" field if the given value is not nil.
+// SetNillableIsNotified sets the "is_notified" field if the given value is not nil.
 func (ucsc *UserCommentSubscriptionCreate) SetNillableIsNotified(b *bool) *UserCommentSubscriptionCreate {
 	if b != nil {
 		ucsc.SetIsNotified(*b)
@@ -48,13 +48,13 @@ func (ucsc *UserCommentSubscriptionCreate) SetNillableIsNotified(b *bool) *UserC
 	return ucsc
 }
 
-// SetIsChecked sets the "isChecked" field.
+// SetIsChecked sets the "is_checked" field.
 func (ucsc *UserCommentSubscriptionCreate) SetIsChecked(b bool) *UserCommentSubscriptionCreate {
 	ucsc.mutation.SetIsChecked(b)
 	return ucsc
 }
 
-// SetNillableIsChecked sets the "isChecked" field if the given value is not nil.
+// SetNillableIsChecked sets the "is_checked" field if the given value is not nil.
 func (ucsc *UserCommentSubscriptionCreate) SetNillableIsChecked(b *bool) *UserCommentSubscriptionCreate {
 	if b != nil {
 		ucsc.SetIsChecked(*b)
@@ -62,13 +62,13 @@ func (ucsc *UserCommentSubscriptionCreate) SetNillableIsChecked(b *bool) *UserCo
 	return ucsc
 }
 
-// SetSubscribedAt sets the "subscribedAt" field.
+// SetSubscribedAt sets the "subscribed_at" field.
 func (ucsc *UserCommentSubscriptionCreate) SetSubscribedAt(t time.Time) *UserCommentSubscriptionCreate {
 	ucsc.mutation.SetSubscribedAt(t)
 	return ucsc
 }
 
-// SetNillableSubscribedAt sets the "subscribedAt" field if the given value is not nil.
+// SetNillableSubscribedAt sets the "subscribed_at" field if the given value is not nil.
 func (ucsc *UserCommentSubscriptionCreate) SetNillableSubscribedAt(t *time.Time) *UserCommentSubscriptionCreate {
 	if t != nil {
 		ucsc.SetSubscribedAt(*t)
@@ -76,21 +76,9 @@ func (ucsc *UserCommentSubscriptionCreate) SetNillableSubscribedAt(t *time.Time)
 	return ucsc
 }
 
-// SetUserID sets the "user" edge to the User entity by ID.
-func (ucsc *UserCommentSubscriptionCreate) SetUserID(id int) *UserCommentSubscriptionCreate {
-	ucsc.mutation.SetUserID(id)
-	return ucsc
-}
-
 // SetUser sets the "user" edge to the User entity.
 func (ucsc *UserCommentSubscriptionCreate) SetUser(u *User) *UserCommentSubscriptionCreate {
 	return ucsc.SetUserID(u.ID)
-}
-
-// SetCommentID sets the "comment" edge to the ThreadComment entity by ID.
-func (ucsc *UserCommentSubscriptionCreate) SetCommentID(id int) *UserCommentSubscriptionCreate {
-	ucsc.mutation.SetCommentID(id)
-	return ucsc
 }
 
 // SetComment sets the "comment" edge to the ThreadComment entity.
@@ -149,20 +137,20 @@ func (ucsc *UserCommentSubscriptionCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (ucsc *UserCommentSubscriptionCreate) check() error {
-	if _, ok := ucsc.mutation.UserId(); !ok {
-		return &ValidationError{Name: "userId", err: errors.New(`ent: missing required field "UserCommentSubscription.userId"`)}
+	if _, ok := ucsc.mutation.UserID(); !ok {
+		return &ValidationError{Name: "user_id", err: errors.New(`ent: missing required field "UserCommentSubscription.user_id"`)}
 	}
-	if _, ok := ucsc.mutation.CommentId(); !ok {
-		return &ValidationError{Name: "commentId", err: errors.New(`ent: missing required field "UserCommentSubscription.commentId"`)}
+	if _, ok := ucsc.mutation.CommentID(); !ok {
+		return &ValidationError{Name: "comment_id", err: errors.New(`ent: missing required field "UserCommentSubscription.comment_id"`)}
 	}
 	if _, ok := ucsc.mutation.IsNotified(); !ok {
-		return &ValidationError{Name: "isNotified", err: errors.New(`ent: missing required field "UserCommentSubscription.isNotified"`)}
+		return &ValidationError{Name: "is_notified", err: errors.New(`ent: missing required field "UserCommentSubscription.is_notified"`)}
 	}
 	if _, ok := ucsc.mutation.IsChecked(); !ok {
-		return &ValidationError{Name: "isChecked", err: errors.New(`ent: missing required field "UserCommentSubscription.isChecked"`)}
+		return &ValidationError{Name: "is_checked", err: errors.New(`ent: missing required field "UserCommentSubscription.is_checked"`)}
 	}
 	if _, ok := ucsc.mutation.SubscribedAt(); !ok {
-		return &ValidationError{Name: "subscribedAt", err: errors.New(`ent: missing required field "UserCommentSubscription.subscribedAt"`)}
+		return &ValidationError{Name: "subscribed_at", err: errors.New(`ent: missing required field "UserCommentSubscription.subscribed_at"`)}
 	}
 	if _, ok := ucsc.mutation.UserID(); !ok {
 		return &ValidationError{Name: "user", err: errors.New(`ent: missing required edge "UserCommentSubscription.user"`)}
@@ -218,7 +206,7 @@ func (ucsc *UserCommentSubscriptionCreate) createSpec() (*UserCommentSubscriptio
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.UserId = nodes[0]
+		_node.UserID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := ucsc.mutation.CommentIDs(); len(nodes) > 0 {
@@ -235,7 +223,7 @@ func (ucsc *UserCommentSubscriptionCreate) createSpec() (*UserCommentSubscriptio
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.CommentId = nodes[0]
+		_node.CommentID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

@@ -14,7 +14,7 @@ import (
 
 var ErrNotFound = errors.New("not found")
 
-type  ThreadCommentController struct {
+type ThreadCommentController struct {
 	threadCommentApplicationService *service.ThreadCommentApplicationService
 }
 

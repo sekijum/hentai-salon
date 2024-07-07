@@ -6,7 +6,7 @@
 
     <br />
 
-    <Form @submit="submit" :validation-schema="schema" v-slot="{ meta, errors }">
+    <Form @submit="submit" :validation-schema="schema" v-slot="{ meta }">
       <div class="field">
         <Field name="boardId" v-slot="{ field, errorMessage }">
           <v-select
@@ -50,6 +50,20 @@
       </div>
 
       <div class="field">
+        <v-combobox
+          v-model="form.tagNames"
+          chips
+          small-chips
+          label="タグ"
+          variant="outlined"
+          density="compact"
+          clearable
+          multiple
+          :items="tagSuggestions"
+        />
+      </div>
+
+      <div class="field">
         <Field name="thumbnail" v-slot="{ field, errorMessage }">
           <v-file-input
             v-bind="field"
@@ -67,20 +81,6 @@
         </Field>
       </div>
 
-      <div class="field">
-        <v-combobox
-          v-model="form.tagNames"
-          chips
-          small-chips
-          label="タグ"
-          variant="outlined"
-          density="compact"
-          clearable
-          multiple
-          :items="tagSuggestions"
-        />
-      </div>
-
       <v-btn type="submit" color="primary" block :disabled="!meta?.valid" class="mt-5">作成</v-btn>
       <p class="note">＊反映には時間が掛かる場合があります＊</p>
     </Form>
@@ -91,14 +91,15 @@
 import { Form, Field, ErrorMessage } from 'vee-validate';
 import * as yup from 'yup';
 import PageTitle from '~/components/PageTitle.vue';
+import type { TBoard } from '~/types/board';
 
 const router = useRouter();
 const route = useRoute();
 const nuxtApp = useNuxtApp();
 const { $api } = nuxtApp;
 
-const tagSuggestions = ref([]);
-const boardSuggestions = ref([]);
+const tagSuggestions = ref<string[]>([]);
+const boardSuggestions = ref<{ id: number; title: string }[]>([]);
 
 const thumbnailFile = new FormData();
 
@@ -111,9 +112,8 @@ const form = ref({
 });
 
 onMounted(async () => {
-  tagSuggestions.value = await fetchTagSuggestions();
-  tagSuggestions.value.push();
-  boardSuggestions.value = await fetchBoardSuggestions();
+  await fetchTagSuggestions();
+  await fetchBoardSuggestions();
 });
 
 const schema = yup.object({
@@ -123,8 +123,8 @@ const schema = yup.object({
 
 async function fetchTagSuggestions() {
   try {
-    const response = await $api.get('/tags/names');
-    return response.data;
+    const response = await $api.get<string[]>('/tags/names');
+    tagSuggestions.value = response.data;
   } catch (error) {
     console.error('通信中にエラーが発生しました:', error);
   }
@@ -132,9 +132,9 @@ async function fetchTagSuggestions() {
 
 async function fetchBoardSuggestions() {
   try {
-    const response = await $api.get('/boards');
+    const response = await $api.get<TBoard[]>('/boards');
 
-    return response.data.map(board => ({
+    boardSuggestions.value = response.data.map(board => ({
       id: board.id,
       title: board.title,
     }));

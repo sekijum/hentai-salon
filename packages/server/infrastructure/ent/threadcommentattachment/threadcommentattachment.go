@@ -14,15 +14,15 @@ const (
 	Label = "thread_comment_attachment"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldCommentId holds the string denoting the commentid field in the database.
-	FieldCommentId = "comment_id"
+	// FieldCommentID holds the string denoting the comment_id field in the database.
+	FieldCommentID = "comment_id"
 	// FieldURL holds the string denoting the url field in the database.
 	FieldURL = "url"
 	// FieldDisplayOrder holds the string denoting the display_order field in the database.
 	FieldDisplayOrder = "display_order"
 	// FieldType holds the string denoting the type field in the database.
 	FieldType = "type"
-	// FieldCreatedAt holds the string denoting the createdat field in the database.
+	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// EdgeComment holds the string denoting the comment edge name in mutations.
 	EdgeComment = "comment"
@@ -40,7 +40,7 @@ const (
 // Columns holds all SQL columns for threadcommentattachment fields.
 var Columns = []string{
 	FieldID,
-	FieldCommentId,
+	FieldCommentID,
 	FieldURL,
 	FieldDisplayOrder,
 	FieldType,
@@ -62,7 +62,7 @@ var (
 	DefaultDisplayOrder int
 	// DefaultType holds the default value on creation for the "type" field.
 	DefaultType int
-	// DefaultCreatedAt holds the default value on creation for the "createdAt" field.
+	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 )
 
@@ -74,9 +74,9 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// ByCommentId orders the results by the commentId field.
-func ByCommentId(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldCommentId, opts...).ToFunc()
+// ByCommentID orders the results by the comment_id field.
+func ByCommentID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCommentID, opts...).ToFunc()
 }
 
 // ByURL orders the results by the url field.
@@ -94,7 +94,7 @@ func ByType(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldType, opts...).ToFunc()
 }
 
-// ByCreatedAt orders the results by the createdAt field.
+// ByCreatedAt orders the results by the created_at field.
 func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
 }

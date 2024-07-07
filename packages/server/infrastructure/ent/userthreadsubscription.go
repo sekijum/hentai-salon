@@ -17,16 +17,16 @@ import (
 // UserThreadSubscription is the model entity for the UserThreadSubscription schema.
 type UserThreadSubscription struct {
 	config `json:"-"`
-	// UserId holds the value of the "userId" field.
-	UserId int `json:"userId,omitempty"`
-	// ThreadId holds the value of the "threadId" field.
-	ThreadId int `json:"threadId,omitempty"`
+	// UserID holds the value of the "user_id" field.
+	UserID int `json:"user_id,omitempty"`
+	// ThreadID holds the value of the "thread_id" field.
+	ThreadID int `json:"thread_id,omitempty"`
 	// メール通知を受け取るかどうかのフラグ
-	IsNotified bool `json:"isNotified,omitempty"`
+	IsNotified bool `json:"is_notified,omitempty"`
 	// 通知画面で確認したかどうかのフラグ
-	IsChecked bool `json:"isChecked,omitempty"`
-	// SubscribedAt holds the value of the "subscribedAt" field.
-	SubscribedAt time.Time `json:"subscribedAt,omitempty"`
+	IsChecked bool `json:"is_checked,omitempty"`
+	// SubscribedAt holds the value of the "subscribed_at" field.
+	SubscribedAt time.Time `json:"subscribed_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the UserThreadSubscriptionQuery when eager-loading is set.
 	Edges        UserThreadSubscriptionEdges `json:"edges"`
@@ -73,7 +73,7 @@ func (*UserThreadSubscription) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case userthreadsubscription.FieldIsNotified, userthreadsubscription.FieldIsChecked:
 			values[i] = new(sql.NullBool)
-		case userthreadsubscription.FieldUserId, userthreadsubscription.FieldThreadId:
+		case userthreadsubscription.FieldUserID, userthreadsubscription.FieldThreadID:
 			values[i] = new(sql.NullInt64)
 		case userthreadsubscription.FieldSubscribedAt:
 			values[i] = new(sql.NullTime)
@@ -92,33 +92,33 @@ func (uts *UserThreadSubscription) assignValues(columns []string, values []any) 
 	}
 	for i := range columns {
 		switch columns[i] {
-		case userthreadsubscription.FieldUserId:
+		case userthreadsubscription.FieldUserID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field userId", values[i])
+				return fmt.Errorf("unexpected type %T for field user_id", values[i])
 			} else if value.Valid {
-				uts.UserId = int(value.Int64)
+				uts.UserID = int(value.Int64)
 			}
-		case userthreadsubscription.FieldThreadId:
+		case userthreadsubscription.FieldThreadID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field threadId", values[i])
+				return fmt.Errorf("unexpected type %T for field thread_id", values[i])
 			} else if value.Valid {
-				uts.ThreadId = int(value.Int64)
+				uts.ThreadID = int(value.Int64)
 			}
 		case userthreadsubscription.FieldIsNotified:
 			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field isNotified", values[i])
+				return fmt.Errorf("unexpected type %T for field is_notified", values[i])
 			} else if value.Valid {
 				uts.IsNotified = value.Bool
 			}
 		case userthreadsubscription.FieldIsChecked:
 			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field isChecked", values[i])
+				return fmt.Errorf("unexpected type %T for field is_checked", values[i])
 			} else if value.Valid {
 				uts.IsChecked = value.Bool
 			}
 		case userthreadsubscription.FieldSubscribedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field subscribedAt", values[i])
+				return fmt.Errorf("unexpected type %T for field subscribed_at", values[i])
 			} else if value.Valid {
 				uts.SubscribedAt = value.Time
 			}
@@ -167,19 +167,19 @@ func (uts *UserThreadSubscription) Unwrap() *UserThreadSubscription {
 func (uts *UserThreadSubscription) String() string {
 	var builder strings.Builder
 	builder.WriteString("UserThreadSubscription(")
-	builder.WriteString("userId=")
-	builder.WriteString(fmt.Sprintf("%v", uts.UserId))
+	builder.WriteString("user_id=")
+	builder.WriteString(fmt.Sprintf("%v", uts.UserID))
 	builder.WriteString(", ")
-	builder.WriteString("threadId=")
-	builder.WriteString(fmt.Sprintf("%v", uts.ThreadId))
+	builder.WriteString("thread_id=")
+	builder.WriteString(fmt.Sprintf("%v", uts.ThreadID))
 	builder.WriteString(", ")
-	builder.WriteString("isNotified=")
+	builder.WriteString("is_notified=")
 	builder.WriteString(fmt.Sprintf("%v", uts.IsNotified))
 	builder.WriteString(", ")
-	builder.WriteString("isChecked=")
+	builder.WriteString("is_checked=")
 	builder.WriteString(fmt.Sprintf("%v", uts.IsChecked))
 	builder.WriteString(", ")
-	builder.WriteString("subscribedAt=")
+	builder.WriteString("subscribed_at=")
 	builder.WriteString(uts.SubscribedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()

@@ -18,8 +18,6 @@ import (
 	"server/infrastructure/ent/threadcommentattachment"
 	"server/infrastructure/ent/threadtag"
 	"server/infrastructure/ent/user"
-	"server/infrastructure/ent/userboardlike"
-	"server/infrastructure/ent/userboardsubscription"
 	"server/infrastructure/ent/usercommentlike"
 	"server/infrastructure/ent/usercommentsubscription"
 	"server/infrastructure/ent/userthreadlike"
@@ -50,10 +48,6 @@ type Client struct {
 	ThreadTag *ThreadTagClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
-	// UserBoardLike is the client for interacting with the UserBoardLike builders.
-	UserBoardLike *UserBoardLikeClient
-	// UserBoardSubscription is the client for interacting with the UserBoardSubscription builders.
-	UserBoardSubscription *UserBoardSubscriptionClient
 	// UserCommentLike is the client for interacting with the UserCommentLike builders.
 	UserCommentLike *UserCommentLikeClient
 	// UserCommentSubscription is the client for interacting with the UserCommentSubscription builders.
@@ -80,8 +74,6 @@ func (c *Client) init() {
 	c.ThreadCommentAttachment = NewThreadCommentAttachmentClient(c.config)
 	c.ThreadTag = NewThreadTagClient(c.config)
 	c.User = NewUserClient(c.config)
-	c.UserBoardLike = NewUserBoardLikeClient(c.config)
-	c.UserBoardSubscription = NewUserBoardSubscriptionClient(c.config)
 	c.UserCommentLike = NewUserCommentLikeClient(c.config)
 	c.UserCommentSubscription = NewUserCommentSubscriptionClient(c.config)
 	c.UserThreadLike = NewUserThreadLikeClient(c.config)
@@ -185,8 +177,6 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ThreadCommentAttachment: NewThreadCommentAttachmentClient(cfg),
 		ThreadTag:               NewThreadTagClient(cfg),
 		User:                    NewUserClient(cfg),
-		UserBoardLike:           NewUserBoardLikeClient(cfg),
-		UserBoardSubscription:   NewUserBoardSubscriptionClient(cfg),
 		UserCommentLike:         NewUserCommentLikeClient(cfg),
 		UserCommentSubscription: NewUserCommentSubscriptionClient(cfg),
 		UserThreadLike:          NewUserThreadLikeClient(cfg),
@@ -217,8 +207,6 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ThreadCommentAttachment: NewThreadCommentAttachmentClient(cfg),
 		ThreadTag:               NewThreadTagClient(cfg),
 		User:                    NewUserClient(cfg),
-		UserBoardLike:           NewUserBoardLikeClient(cfg),
-		UserBoardSubscription:   NewUserBoardSubscriptionClient(cfg),
 		UserCommentLike:         NewUserCommentLikeClient(cfg),
 		UserCommentSubscription: NewUserCommentSubscriptionClient(cfg),
 		UserThreadLike:          NewUserThreadLikeClient(cfg),
@@ -253,9 +241,8 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.Board, c.Tag, c.Thread, c.ThreadComment, c.ThreadCommentAttachment,
-		c.ThreadTag, c.User, c.UserBoardLike, c.UserBoardSubscription,
-		c.UserCommentLike, c.UserCommentSubscription, c.UserThreadLike,
-		c.UserThreadSubscription,
+		c.ThreadTag, c.User, c.UserCommentLike, c.UserCommentSubscription,
+		c.UserThreadLike, c.UserThreadSubscription,
 	} {
 		n.Use(hooks...)
 	}
@@ -266,9 +253,8 @@ func (c *Client) Use(hooks ...Hook) {
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.Board, c.Tag, c.Thread, c.ThreadComment, c.ThreadCommentAttachment,
-		c.ThreadTag, c.User, c.UserBoardLike, c.UserBoardSubscription,
-		c.UserCommentLike, c.UserCommentSubscription, c.UserThreadLike,
-		c.UserThreadSubscription,
+		c.ThreadTag, c.User, c.UserCommentLike, c.UserCommentSubscription,
+		c.UserThreadLike, c.UserThreadSubscription,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -291,10 +277,6 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.ThreadTag.mutate(ctx, m)
 	case *UserMutation:
 		return c.User.mutate(ctx, m)
-	case *UserBoardLikeMutation:
-		return c.UserBoardLike.mutate(ctx, m)
-	case *UserBoardSubscriptionMutation:
-		return c.UserBoardSubscription.mutate(ctx, m)
 	case *UserCommentLikeMutation:
 		return c.UserCommentLike.mutate(ctx, m)
 	case *UserCommentSubscriptionMutation:
@@ -416,38 +398,6 @@ func (c *BoardClient) GetX(ctx context.Context, id int) *Board {
 	return obj
 }
 
-// QueryLikedUsers queries the liked_users edge of a Board.
-func (c *BoardClient) QueryLikedUsers(b *Board) *UserQuery {
-	query := (&UserClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := b.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(board.Table, board.FieldID, id),
-			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, board.LikedUsersTable, board.LikedUsersPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(b.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QuerySubscribedUsers queries the subscribed_users edge of a Board.
-func (c *BoardClient) QuerySubscribedUsers(b *Board) *UserQuery {
-	query := (&UserClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := b.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(board.Table, board.FieldID, id),
-			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, board.SubscribedUsersTable, board.SubscribedUsersPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(b.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
 // QueryOwner queries the owner edge of a Board.
 func (c *BoardClient) QueryOwner(b *Board) *UserQuery {
 	query := (&UserClient{config: c.config}).Query()
@@ -473,38 +423,6 @@ func (c *BoardClient) QueryThreads(b *Board) *ThreadQuery {
 			sqlgraph.From(board.Table, board.FieldID, id),
 			sqlgraph.To(thread.Table, thread.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, board.ThreadsTable, board.ThreadsColumn),
-		)
-		fromV = sqlgraph.Neighbors(b.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryUserBoardLike queries the user_board_like edge of a Board.
-func (c *BoardClient) QueryUserBoardLike(b *Board) *UserBoardSubscriptionQuery {
-	query := (&UserBoardSubscriptionClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := b.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(board.Table, board.FieldID, id),
-			sqlgraph.To(userboardsubscription.Table, userboardsubscription.BoardColumn),
-			sqlgraph.Edge(sqlgraph.O2M, true, board.UserBoardLikeTable, board.UserBoardLikeColumn),
-		)
-		fromV = sqlgraph.Neighbors(b.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryUserBoardSubscription queries the user_board_subscription edge of a Board.
-func (c *BoardClient) QueryUserBoardSubscription(b *Board) *UserBoardLikeQuery {
-	query := (&UserBoardLikeClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := b.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(board.Table, board.FieldID, id),
-			sqlgraph.To(userboardlike.Table, userboardlike.BoardColumn),
-			sqlgraph.Edge(sqlgraph.O2M, true, board.UserBoardSubscriptionTable, board.UserBoardSubscriptionColumn),
 		)
 		fromV = sqlgraph.Neighbors(b.driver.Dialect(), step)
 		return fromV, nil
@@ -1677,22 +1595,6 @@ func (c *UserClient) QueryComments(u *User) *ThreadCommentQuery {
 	return query
 }
 
-// QueryLikedBoards queries the liked_boards edge of a User.
-func (c *UserClient) QueryLikedBoards(u *User) *BoardQuery {
-	query := (&BoardClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := u.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(user.Table, user.FieldID, id),
-			sqlgraph.To(board.Table, board.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, user.LikedBoardsTable, user.LikedBoardsPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
 // QueryLikedThreads queries the liked_threads edge of a User.
 func (c *UserClient) QueryLikedThreads(u *User) *ThreadQuery {
 	query := (&ThreadClient{config: c.config}).Query()
@@ -1718,22 +1620,6 @@ func (c *UserClient) QueryLikedComments(u *User) *ThreadCommentQuery {
 			sqlgraph.From(user.Table, user.FieldID, id),
 			sqlgraph.To(threadcomment.Table, threadcomment.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, user.LikedCommentsTable, user.LikedCommentsPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QuerySubscribedBoards queries the subscribed_boards edge of a User.
-func (c *UserClient) QuerySubscribedBoards(u *User) *BoardQuery {
-	query := (&BoardClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := u.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(user.Table, user.FieldID, id),
-			sqlgraph.To(board.Table, board.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, user.SubscribedBoardsTable, user.SubscribedBoardsPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
 		return fromV, nil
@@ -1773,22 +1659,6 @@ func (c *UserClient) QuerySubscribedComments(u *User) *ThreadCommentQuery {
 	return query
 }
 
-// QueryUserBoardLike queries the user_board_like edge of a User.
-func (c *UserClient) QueryUserBoardLike(u *User) *UserBoardLikeQuery {
-	query := (&UserBoardLikeClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := u.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(user.Table, user.FieldID, id),
-			sqlgraph.To(userboardlike.Table, userboardlike.UserColumn),
-			sqlgraph.Edge(sqlgraph.O2M, true, user.UserBoardLikeTable, user.UserBoardLikeColumn),
-		)
-		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
 // QueryUserThreadLike queries the user_thread_like edge of a User.
 func (c *UserClient) QueryUserThreadLike(u *User) *UserThreadLikeQuery {
 	query := (&UserThreadLikeClient{config: c.config}).Query()
@@ -1814,22 +1684,6 @@ func (c *UserClient) QueryUserCommentLike(u *User) *UserCommentLikeQuery {
 			sqlgraph.From(user.Table, user.FieldID, id),
 			sqlgraph.To(usercommentlike.Table, usercommentlike.UserColumn),
 			sqlgraph.Edge(sqlgraph.O2M, true, user.UserCommentLikeTable, user.UserCommentLikeColumn),
-		)
-		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryUserBoardSubscription queries the user_board_subscription edge of a User.
-func (c *UserClient) QueryUserBoardSubscription(u *User) *UserBoardSubscriptionQuery {
-	query := (&UserBoardSubscriptionClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := u.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(user.Table, user.FieldID, id),
-			sqlgraph.To(userboardsubscription.Table, userboardsubscription.UserColumn),
-			sqlgraph.Edge(sqlgraph.O2M, true, user.UserBoardSubscriptionTable, user.UserBoardSubscriptionColumn),
 		)
 		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
 		return fromV, nil
@@ -1894,238 +1748,6 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 	}
 }
 
-// UserBoardLikeClient is a client for the UserBoardLike schema.
-type UserBoardLikeClient struct {
-	config
-}
-
-// NewUserBoardLikeClient returns a client for the UserBoardLike from the given config.
-func NewUserBoardLikeClient(c config) *UserBoardLikeClient {
-	return &UserBoardLikeClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `userboardlike.Hooks(f(g(h())))`.
-func (c *UserBoardLikeClient) Use(hooks ...Hook) {
-	c.hooks.UserBoardLike = append(c.hooks.UserBoardLike, hooks...)
-}
-
-// Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `userboardlike.Intercept(f(g(h())))`.
-func (c *UserBoardLikeClient) Intercept(interceptors ...Interceptor) {
-	c.inters.UserBoardLike = append(c.inters.UserBoardLike, interceptors...)
-}
-
-// Create returns a builder for creating a UserBoardLike entity.
-func (c *UserBoardLikeClient) Create() *UserBoardLikeCreate {
-	mutation := newUserBoardLikeMutation(c.config, OpCreate)
-	return &UserBoardLikeCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of UserBoardLike entities.
-func (c *UserBoardLikeClient) CreateBulk(builders ...*UserBoardLikeCreate) *UserBoardLikeCreateBulk {
-	return &UserBoardLikeCreateBulk{config: c.config, builders: builders}
-}
-
-// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
-// a builder and applies setFunc on it.
-func (c *UserBoardLikeClient) MapCreateBulk(slice any, setFunc func(*UserBoardLikeCreate, int)) *UserBoardLikeCreateBulk {
-	rv := reflect.ValueOf(slice)
-	if rv.Kind() != reflect.Slice {
-		return &UserBoardLikeCreateBulk{err: fmt.Errorf("calling to UserBoardLikeClient.MapCreateBulk with wrong type %T, need slice", slice)}
-	}
-	builders := make([]*UserBoardLikeCreate, rv.Len())
-	for i := 0; i < rv.Len(); i++ {
-		builders[i] = c.Create()
-		setFunc(builders[i], i)
-	}
-	return &UserBoardLikeCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for UserBoardLike.
-func (c *UserBoardLikeClient) Update() *UserBoardLikeUpdate {
-	mutation := newUserBoardLikeMutation(c.config, OpUpdate)
-	return &UserBoardLikeUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *UserBoardLikeClient) UpdateOne(ubl *UserBoardLike) *UserBoardLikeUpdateOne {
-	mutation := newUserBoardLikeMutation(c.config, OpUpdateOne)
-	mutation.user = &ubl.UserId
-	mutation.board = &ubl.BoardId
-	return &UserBoardLikeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for UserBoardLike.
-func (c *UserBoardLikeClient) Delete() *UserBoardLikeDelete {
-	mutation := newUserBoardLikeMutation(c.config, OpDelete)
-	return &UserBoardLikeDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Query returns a query builder for UserBoardLike.
-func (c *UserBoardLikeClient) Query() *UserBoardLikeQuery {
-	return &UserBoardLikeQuery{
-		config: c.config,
-		ctx:    &QueryContext{Type: TypeUserBoardLike},
-		inters: c.Interceptors(),
-	}
-}
-
-// QueryUser queries the user edge of a UserBoardLike.
-func (c *UserBoardLikeClient) QueryUser(ubl *UserBoardLike) *UserQuery {
-	return c.Query().
-		Where(userboardlike.UserId(ubl.UserId), userboardlike.BoardId(ubl.BoardId)).
-		QueryUser()
-}
-
-// QueryBoard queries the board edge of a UserBoardLike.
-func (c *UserBoardLikeClient) QueryBoard(ubl *UserBoardLike) *BoardQuery {
-	return c.Query().
-		Where(userboardlike.UserId(ubl.UserId), userboardlike.BoardId(ubl.BoardId)).
-		QueryBoard()
-}
-
-// Hooks returns the client hooks.
-func (c *UserBoardLikeClient) Hooks() []Hook {
-	return c.hooks.UserBoardLike
-}
-
-// Interceptors returns the client interceptors.
-func (c *UserBoardLikeClient) Interceptors() []Interceptor {
-	return c.inters.UserBoardLike
-}
-
-func (c *UserBoardLikeClient) mutate(ctx context.Context, m *UserBoardLikeMutation) (Value, error) {
-	switch m.Op() {
-	case OpCreate:
-		return (&UserBoardLikeCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdate:
-		return (&UserBoardLikeUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdateOne:
-		return (&UserBoardLikeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpDelete, OpDeleteOne:
-		return (&UserBoardLikeDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
-	default:
-		return nil, fmt.Errorf("ent: unknown UserBoardLike mutation op: %q", m.Op())
-	}
-}
-
-// UserBoardSubscriptionClient is a client for the UserBoardSubscription schema.
-type UserBoardSubscriptionClient struct {
-	config
-}
-
-// NewUserBoardSubscriptionClient returns a client for the UserBoardSubscription from the given config.
-func NewUserBoardSubscriptionClient(c config) *UserBoardSubscriptionClient {
-	return &UserBoardSubscriptionClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `userboardsubscription.Hooks(f(g(h())))`.
-func (c *UserBoardSubscriptionClient) Use(hooks ...Hook) {
-	c.hooks.UserBoardSubscription = append(c.hooks.UserBoardSubscription, hooks...)
-}
-
-// Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `userboardsubscription.Intercept(f(g(h())))`.
-func (c *UserBoardSubscriptionClient) Intercept(interceptors ...Interceptor) {
-	c.inters.UserBoardSubscription = append(c.inters.UserBoardSubscription, interceptors...)
-}
-
-// Create returns a builder for creating a UserBoardSubscription entity.
-func (c *UserBoardSubscriptionClient) Create() *UserBoardSubscriptionCreate {
-	mutation := newUserBoardSubscriptionMutation(c.config, OpCreate)
-	return &UserBoardSubscriptionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of UserBoardSubscription entities.
-func (c *UserBoardSubscriptionClient) CreateBulk(builders ...*UserBoardSubscriptionCreate) *UserBoardSubscriptionCreateBulk {
-	return &UserBoardSubscriptionCreateBulk{config: c.config, builders: builders}
-}
-
-// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
-// a builder and applies setFunc on it.
-func (c *UserBoardSubscriptionClient) MapCreateBulk(slice any, setFunc func(*UserBoardSubscriptionCreate, int)) *UserBoardSubscriptionCreateBulk {
-	rv := reflect.ValueOf(slice)
-	if rv.Kind() != reflect.Slice {
-		return &UserBoardSubscriptionCreateBulk{err: fmt.Errorf("calling to UserBoardSubscriptionClient.MapCreateBulk with wrong type %T, need slice", slice)}
-	}
-	builders := make([]*UserBoardSubscriptionCreate, rv.Len())
-	for i := 0; i < rv.Len(); i++ {
-		builders[i] = c.Create()
-		setFunc(builders[i], i)
-	}
-	return &UserBoardSubscriptionCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for UserBoardSubscription.
-func (c *UserBoardSubscriptionClient) Update() *UserBoardSubscriptionUpdate {
-	mutation := newUserBoardSubscriptionMutation(c.config, OpUpdate)
-	return &UserBoardSubscriptionUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *UserBoardSubscriptionClient) UpdateOne(ubs *UserBoardSubscription) *UserBoardSubscriptionUpdateOne {
-	mutation := newUserBoardSubscriptionMutation(c.config, OpUpdateOne)
-	mutation.user = &ubs.UserId
-	mutation.board = &ubs.BoardId
-	return &UserBoardSubscriptionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for UserBoardSubscription.
-func (c *UserBoardSubscriptionClient) Delete() *UserBoardSubscriptionDelete {
-	mutation := newUserBoardSubscriptionMutation(c.config, OpDelete)
-	return &UserBoardSubscriptionDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Query returns a query builder for UserBoardSubscription.
-func (c *UserBoardSubscriptionClient) Query() *UserBoardSubscriptionQuery {
-	return &UserBoardSubscriptionQuery{
-		config: c.config,
-		ctx:    &QueryContext{Type: TypeUserBoardSubscription},
-		inters: c.Interceptors(),
-	}
-}
-
-// QueryUser queries the user edge of a UserBoardSubscription.
-func (c *UserBoardSubscriptionClient) QueryUser(ubs *UserBoardSubscription) *UserQuery {
-	return c.Query().
-		Where(userboardsubscription.UserId(ubs.UserId), userboardsubscription.BoardId(ubs.BoardId)).
-		QueryUser()
-}
-
-// QueryBoard queries the board edge of a UserBoardSubscription.
-func (c *UserBoardSubscriptionClient) QueryBoard(ubs *UserBoardSubscription) *BoardQuery {
-	return c.Query().
-		Where(userboardsubscription.UserId(ubs.UserId), userboardsubscription.BoardId(ubs.BoardId)).
-		QueryBoard()
-}
-
-// Hooks returns the client hooks.
-func (c *UserBoardSubscriptionClient) Hooks() []Hook {
-	return c.hooks.UserBoardSubscription
-}
-
-// Interceptors returns the client interceptors.
-func (c *UserBoardSubscriptionClient) Interceptors() []Interceptor {
-	return c.inters.UserBoardSubscription
-}
-
-func (c *UserBoardSubscriptionClient) mutate(ctx context.Context, m *UserBoardSubscriptionMutation) (Value, error) {
-	switch m.Op() {
-	case OpCreate:
-		return (&UserBoardSubscriptionCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdate:
-		return (&UserBoardSubscriptionUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdateOne:
-		return (&UserBoardSubscriptionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpDelete, OpDeleteOne:
-		return (&UserBoardSubscriptionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
-	default:
-		return nil, fmt.Errorf("ent: unknown UserBoardSubscription mutation op: %q", m.Op())
-	}
-}
-
 // UserCommentLikeClient is a client for the UserCommentLike schema.
 type UserCommentLikeClient struct {
 	config
@@ -2183,8 +1805,8 @@ func (c *UserCommentLikeClient) Update() *UserCommentLikeUpdate {
 // UpdateOne returns an update builder for the given entity.
 func (c *UserCommentLikeClient) UpdateOne(ucl *UserCommentLike) *UserCommentLikeUpdateOne {
 	mutation := newUserCommentLikeMutation(c.config, OpUpdateOne)
-	mutation.user = &ucl.UserId
-	mutation.comment = &ucl.CommentId
+	mutation.user = &ucl.UserID
+	mutation.comment = &ucl.CommentID
 	return &UserCommentLikeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
@@ -2206,14 +1828,14 @@ func (c *UserCommentLikeClient) Query() *UserCommentLikeQuery {
 // QueryUser queries the user edge of a UserCommentLike.
 func (c *UserCommentLikeClient) QueryUser(ucl *UserCommentLike) *UserQuery {
 	return c.Query().
-		Where(usercommentlike.UserId(ucl.UserId), usercommentlike.CommentId(ucl.CommentId)).
+		Where(usercommentlike.UserID(ucl.UserID), usercommentlike.CommentID(ucl.CommentID)).
 		QueryUser()
 }
 
 // QueryComment queries the comment edge of a UserCommentLike.
 func (c *UserCommentLikeClient) QueryComment(ucl *UserCommentLike) *ThreadCommentQuery {
 	return c.Query().
-		Where(usercommentlike.UserId(ucl.UserId), usercommentlike.CommentId(ucl.CommentId)).
+		Where(usercommentlike.UserID(ucl.UserID), usercommentlike.CommentID(ucl.CommentID)).
 		QueryComment()
 }
 
@@ -2299,8 +1921,8 @@ func (c *UserCommentSubscriptionClient) Update() *UserCommentSubscriptionUpdate 
 // UpdateOne returns an update builder for the given entity.
 func (c *UserCommentSubscriptionClient) UpdateOne(ucs *UserCommentSubscription) *UserCommentSubscriptionUpdateOne {
 	mutation := newUserCommentSubscriptionMutation(c.config, OpUpdateOne)
-	mutation.user = &ucs.UserId
-	mutation.comment = &ucs.CommentId
+	mutation.user = &ucs.UserID
+	mutation.comment = &ucs.CommentID
 	return &UserCommentSubscriptionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
@@ -2322,14 +1944,14 @@ func (c *UserCommentSubscriptionClient) Query() *UserCommentSubscriptionQuery {
 // QueryUser queries the user edge of a UserCommentSubscription.
 func (c *UserCommentSubscriptionClient) QueryUser(ucs *UserCommentSubscription) *UserQuery {
 	return c.Query().
-		Where(usercommentsubscription.UserId(ucs.UserId), usercommentsubscription.CommentId(ucs.CommentId)).
+		Where(usercommentsubscription.UserID(ucs.UserID), usercommentsubscription.CommentID(ucs.CommentID)).
 		QueryUser()
 }
 
 // QueryComment queries the comment edge of a UserCommentSubscription.
 func (c *UserCommentSubscriptionClient) QueryComment(ucs *UserCommentSubscription) *ThreadCommentQuery {
 	return c.Query().
-		Where(usercommentsubscription.UserId(ucs.UserId), usercommentsubscription.CommentId(ucs.CommentId)).
+		Where(usercommentsubscription.UserID(ucs.UserID), usercommentsubscription.CommentID(ucs.CommentID)).
 		QueryComment()
 }
 
@@ -2415,8 +2037,8 @@ func (c *UserThreadLikeClient) Update() *UserThreadLikeUpdate {
 // UpdateOne returns an update builder for the given entity.
 func (c *UserThreadLikeClient) UpdateOne(utl *UserThreadLike) *UserThreadLikeUpdateOne {
 	mutation := newUserThreadLikeMutation(c.config, OpUpdateOne)
-	mutation.user = &utl.UserId
-	mutation.thread = &utl.ThreadId
+	mutation.user = &utl.UserID
+	mutation.thread = &utl.ThreadID
 	return &UserThreadLikeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
@@ -2438,14 +2060,14 @@ func (c *UserThreadLikeClient) Query() *UserThreadLikeQuery {
 // QueryUser queries the user edge of a UserThreadLike.
 func (c *UserThreadLikeClient) QueryUser(utl *UserThreadLike) *UserQuery {
 	return c.Query().
-		Where(userthreadlike.UserId(utl.UserId), userthreadlike.ThreadId(utl.ThreadId)).
+		Where(userthreadlike.UserID(utl.UserID), userthreadlike.ThreadID(utl.ThreadID)).
 		QueryUser()
 }
 
 // QueryThread queries the thread edge of a UserThreadLike.
 func (c *UserThreadLikeClient) QueryThread(utl *UserThreadLike) *ThreadQuery {
 	return c.Query().
-		Where(userthreadlike.UserId(utl.UserId), userthreadlike.ThreadId(utl.ThreadId)).
+		Where(userthreadlike.UserID(utl.UserID), userthreadlike.ThreadID(utl.ThreadID)).
 		QueryThread()
 }
 
@@ -2531,8 +2153,8 @@ func (c *UserThreadSubscriptionClient) Update() *UserThreadSubscriptionUpdate {
 // UpdateOne returns an update builder for the given entity.
 func (c *UserThreadSubscriptionClient) UpdateOne(uts *UserThreadSubscription) *UserThreadSubscriptionUpdateOne {
 	mutation := newUserThreadSubscriptionMutation(c.config, OpUpdateOne)
-	mutation.user = &uts.UserId
-	mutation.thread = &uts.ThreadId
+	mutation.user = &uts.UserID
+	mutation.thread = &uts.ThreadID
 	return &UserThreadSubscriptionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
@@ -2554,14 +2176,14 @@ func (c *UserThreadSubscriptionClient) Query() *UserThreadSubscriptionQuery {
 // QueryUser queries the user edge of a UserThreadSubscription.
 func (c *UserThreadSubscriptionClient) QueryUser(uts *UserThreadSubscription) *UserQuery {
 	return c.Query().
-		Where(userthreadsubscription.UserId(uts.UserId), userthreadsubscription.ThreadId(uts.ThreadId)).
+		Where(userthreadsubscription.UserID(uts.UserID), userthreadsubscription.ThreadID(uts.ThreadID)).
 		QueryUser()
 }
 
 // QueryThread queries the thread edge of a UserThreadSubscription.
 func (c *UserThreadSubscriptionClient) QueryThread(uts *UserThreadSubscription) *ThreadQuery {
 	return c.Query().
-		Where(userthreadsubscription.UserId(uts.UserId), userthreadsubscription.ThreadId(uts.ThreadId)).
+		Where(userthreadsubscription.UserID(uts.UserID), userthreadsubscription.ThreadID(uts.ThreadID)).
 		QueryThread()
 }
 
@@ -2594,12 +2216,12 @@ func (c *UserThreadSubscriptionClient) mutate(ctx context.Context, m *UserThread
 type (
 	hooks struct {
 		Board, Tag, Thread, ThreadComment, ThreadCommentAttachment, ThreadTag, User,
-		UserBoardLike, UserBoardSubscription, UserCommentLike, UserCommentSubscription,
-		UserThreadLike, UserThreadSubscription []ent.Hook
+		UserCommentLike, UserCommentSubscription, UserThreadLike,
+		UserThreadSubscription []ent.Hook
 	}
 	inters struct {
 		Board, Tag, Thread, ThreadComment, ThreadCommentAttachment, ThreadTag, User,
-		UserBoardLike, UserBoardSubscription, UserCommentLike, UserCommentSubscription,
-		UserThreadLike, UserThreadSubscription []ent.Interceptor
+		UserCommentLike, UserCommentSubscription, UserThreadLike,
+		UserThreadSubscription []ent.Interceptor
 	}
 )

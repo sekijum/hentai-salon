@@ -24,15 +24,15 @@ type ThreadCreate struct {
 	hooks    []Hook
 }
 
-// SetBoardId sets the "boardId" field.
-func (tc *ThreadCreate) SetBoardId(i int) *ThreadCreate {
-	tc.mutation.SetBoardId(i)
+// SetBoardID sets the "board_id" field.
+func (tc *ThreadCreate) SetBoardID(i int) *ThreadCreate {
+	tc.mutation.SetBoardID(i)
 	return tc
 }
 
-// SetUserId sets the "userId" field.
-func (tc *ThreadCreate) SetUserId(i int) *ThreadCreate {
-	tc.mutation.SetUserId(i)
+// SetUserID sets the "user_id" field.
+func (tc *ThreadCreate) SetUserID(i int) *ThreadCreate {
+	tc.mutation.SetUserID(i)
 	return tc
 }
 
@@ -56,16 +56,16 @@ func (tc *ThreadCreate) SetNillableDescription(s *string) *ThreadCreate {
 	return tc
 }
 
-// SetThumbnailUrl sets the "thumbnailUrl" field.
-func (tc *ThreadCreate) SetThumbnailUrl(s string) *ThreadCreate {
-	tc.mutation.SetThumbnailUrl(s)
+// SetThumbnailURL sets the "thumbnail_url" field.
+func (tc *ThreadCreate) SetThumbnailURL(s string) *ThreadCreate {
+	tc.mutation.SetThumbnailURL(s)
 	return tc
 }
 
-// SetNillableThumbnailUrl sets the "thumbnailUrl" field if the given value is not nil.
-func (tc *ThreadCreate) SetNillableThumbnailUrl(s *string) *ThreadCreate {
+// SetNillableThumbnailURL sets the "thumbnail_url" field if the given value is not nil.
+func (tc *ThreadCreate) SetNillableThumbnailURL(s *string) *ThreadCreate {
 	if s != nil {
-		tc.SetThumbnailUrl(*s)
+		tc.SetThumbnailURL(*s)
 	}
 	return tc
 }
@@ -90,13 +90,13 @@ func (tc *ThreadCreate) SetNillableStatus(i *int) *ThreadCreate {
 	return tc
 }
 
-// SetCreatedAt sets the "createdAt" field.
+// SetCreatedAt sets the "created_at" field.
 func (tc *ThreadCreate) SetCreatedAt(t time.Time) *ThreadCreate {
 	tc.mutation.SetCreatedAt(t)
 	return tc
 }
 
-// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
 func (tc *ThreadCreate) SetNillableCreatedAt(t *time.Time) *ThreadCreate {
 	if t != nil {
 		tc.SetCreatedAt(*t)
@@ -104,13 +104,13 @@ func (tc *ThreadCreate) SetNillableCreatedAt(t *time.Time) *ThreadCreate {
 	return tc
 }
 
-// SetUpdatedAt sets the "updatedAt" field.
+// SetUpdatedAt sets the "updated_at" field.
 func (tc *ThreadCreate) SetUpdatedAt(t time.Time) *ThreadCreate {
 	tc.mutation.SetUpdatedAt(t)
 	return tc
 }
 
-// SetNillableUpdatedAt sets the "updatedAt" field if the given value is not nil.
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
 func (tc *ThreadCreate) SetNillableUpdatedAt(t *time.Time) *ThreadCreate {
 	if t != nil {
 		tc.SetUpdatedAt(*t)
@@ -121,12 +121,6 @@ func (tc *ThreadCreate) SetNillableUpdatedAt(t *time.Time) *ThreadCreate {
 // SetID sets the "id" field.
 func (tc *ThreadCreate) SetID(i int) *ThreadCreate {
 	tc.mutation.SetID(i)
-	return tc
-}
-
-// SetBoardID sets the "board" edge to the Board entity by ID.
-func (tc *ThreadCreate) SetBoardID(id int) *ThreadCreate {
-	tc.mutation.SetBoardID(id)
 	return tc
 }
 
@@ -257,11 +251,11 @@ func (tc *ThreadCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (tc *ThreadCreate) check() error {
-	if _, ok := tc.mutation.BoardId(); !ok {
-		return &ValidationError{Name: "boardId", err: errors.New(`ent: missing required field "Thread.boardId"`)}
+	if _, ok := tc.mutation.BoardID(); !ok {
+		return &ValidationError{Name: "board_id", err: errors.New(`ent: missing required field "Thread.board_id"`)}
 	}
-	if _, ok := tc.mutation.UserId(); !ok {
-		return &ValidationError{Name: "userId", err: errors.New(`ent: missing required field "Thread.userId"`)}
+	if _, ok := tc.mutation.UserID(); !ok {
+		return &ValidationError{Name: "user_id", err: errors.New(`ent: missing required field "Thread.user_id"`)}
 	}
 	if _, ok := tc.mutation.Title(); !ok {
 		return &ValidationError{Name: "title", err: errors.New(`ent: missing required field "Thread.title"`)}
@@ -288,10 +282,10 @@ func (tc *ThreadCreate) check() error {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Thread.status"`)}
 	}
 	if _, ok := tc.mutation.CreatedAt(); !ok {
-		return &ValidationError{Name: "createdAt", err: errors.New(`ent: missing required field "Thread.createdAt"`)}
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Thread.created_at"`)}
 	}
 	if _, ok := tc.mutation.UpdatedAt(); !ok {
-		return &ValidationError{Name: "updatedAt", err: errors.New(`ent: missing required field "Thread.updatedAt"`)}
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Thread.updated_at"`)}
 	}
 	if _, ok := tc.mutation.BoardID(); !ok {
 		return &ValidationError{Name: "board", err: errors.New(`ent: missing required edge "Thread.board"`)}
@@ -339,9 +333,9 @@ func (tc *ThreadCreate) createSpec() (*Thread, *sqlgraph.CreateSpec) {
 		_spec.SetField(thread.FieldDescription, field.TypeString, value)
 		_node.Description = value
 	}
-	if value, ok := tc.mutation.ThumbnailUrl(); ok {
-		_spec.SetField(thread.FieldThumbnailUrl, field.TypeString, value)
-		_node.ThumbnailUrl = value
+	if value, ok := tc.mutation.ThumbnailURL(); ok {
+		_spec.SetField(thread.FieldThumbnailURL, field.TypeString, value)
+		_node.ThumbnailURL = value
 	}
 	if value, ok := tc.mutation.IPAddress(); ok {
 		_spec.SetField(thread.FieldIPAddress, field.TypeString, value)
@@ -373,7 +367,7 @@ func (tc *ThreadCreate) createSpec() (*Thread, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.BoardId = nodes[0]
+		_node.BoardID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := tc.mutation.OwnerIDs(); len(nodes) > 0 {
@@ -390,7 +384,7 @@ func (tc *ThreadCreate) createSpec() (*Thread, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.UserId = nodes[0]
+		_node.UserID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := tc.mutation.CommentsIDs(); len(nodes) > 0 {
