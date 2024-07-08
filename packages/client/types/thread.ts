@@ -1,31 +1,28 @@
-export type TThreadComment = {
+import type { IListResource } from './list-resource';
+import type { IThreadCommentAttachment } from './thread-comment-attachment';
+
+interface IThreadBoard {
   id: number;
+  title: string;
+}
+
+export interface IThreadComment {
+  id: number;
+  idx: number;
   userId?: number;
   guestName?: string;
   content: string;
-  ipAddress: string;
-  status: number;
-  parentCommentID: number;
+  parentCommentIdx?: number;
+  parentCommentId: number;
   createdAt: string;
   updatedAt: string;
-  attachments: TThreadCommentAttachment[];
+  attachments: IThreadCommentAttachment[];
   totalReplies: number;
-};
+}
 
-type TThreadCommentAttachment = {
-  url: string;
-  displayOrder: number;
-  type: string;
-};
-
-type TThreadBoard = {
+export interface IThread {
   id: number;
-  title: string;
-};
-
-export type TThread = {
-  id: number;
-  board: TThreadBoard | null;
+  board?: IThreadBoard;
   title: string;
   description: string;
   thumbnailUrl: string;
@@ -33,11 +30,5 @@ export type TThread = {
   createdAt: string;
   commentCount: number;
   popularity: string;
-  comments: TThreadComment[];
-};
-
-export type TThreadList = {
-  threadsByPopular: TThread[];
-  threadsByNewest: TThread[];
-  threadsByHistories: TThread[];
-};
+  comments: IListResource<IThreadComment>;
+}

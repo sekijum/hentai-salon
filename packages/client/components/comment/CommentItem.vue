@@ -1,34 +1,56 @@
 <template>
-  <div class="comment-item" :id="'comments-' + idx">
+  <div class="comment-item" :id="'comments-' + comment.idx">
     <v-list-item class="comment-list-item">
       <div class="comment-header">
         <div class="comment-header-text">
-          {{ idx }}
-          <router-link to="/" class="username-link">{{
+          {{ comment.idx }}
+          <nuxt-link to="/" class="username-link">{{
             comment?.guestName || '名無し' || 'ログインユーザー名表示'
-          }}</router-link>
+          }}</nuxt-link>
         </div>
       </div>
-      <div v-if="comment.parentCommentID" class="reply-indication">
-        <router-link :to="'#comments-' + comment.parentCommentID" class="reply-link">
-          >>{{ comment.parentCommentID }}
-        </router-link>
+      <div v-if="comment.parentCommentIdx" class="reply-indication">
+        <nuxt-link
+          class="reply-link"
+          :to="{
+            path: toParentComment(comment.parentCommentIdx).path,
+            query: toParentComment(comment.parentCommentIdx).query,
+            hash: toParentComment(comment.parentCommentIdx).hash,
+          }"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          >> {{ comment.parentCommentIdx }}
+        </nuxt-link>
       </div>
       <v-list-item-title class="comment-content">
         <a :href="'#comment-' + comment.id" class="comment-anchor">{{ comment.content }}</a>
       </v-list-item-title>
       <template v-if="comment.attachments && comment.attachments.length">
         <v-row dense>
-          <v-col cols="3" v-for="(attachment, index) in comment.attachments" :key="index" class="media-col">
-            <div class="media-item-wrapper" @click="() => openDialog(attachment)">
-              <v-img :src="attachment.type === 'Video' ? attachment.url : attachment.url" class="media-item">
-                <template v-slot:placeholder>
-                  <v-row align="center" class="fill-height ma-0" justify="center">
-                    <v-progress-circular color="grey-lighten-5" indeterminate></v-progress-circular>
-                  </v-row>
-                </template>
-              </v-img>
-              <v-icon v-if="attachment.type === 'Video'" size="40" class="play-icon">mdi-play-circle</v-icon>
+          <v-col
+            cols="3"
+            v-for="(attachment, index) in comment.attachments"
+            :key="index"
+            class="media-col"
+            @click="openModalMedia(attachment)"
+          >
+            <div class="media-item-wrapper">
+              <template v-if="attachment.type === 'Video'">
+                <video :src="attachment.url" class="media-item" muted @loadeddata="onVideoLoad">
+                  <source :src="attachment.url" type="video/mp4" />
+                </video>
+                <v-icon size="40" class="play-icon">mdi-play-circle</v-icon>
+              </template>
+              <template v-else>
+                <v-img :src="attachment.url" class="media-item" contain>
+                  <template v-slot:placeholder>
+                    <v-row align="center" class="fill-height ma-0" justify="center">
+                      <v-progress-circular color="grey-lighten-5" indeterminate></v-progress-circular>
+                    </v-row>
+                  </template>
+                </v-img>
+              </template>
             </div>
           </v-col>
         </v-row>
@@ -39,62 +61,86 @@
             <v-icon small @click="toggleReplyForm">{{ showReplyForm ? 'mdi-close' : 'mdi-reply' }}</v-icon>
           </v-col>
           <v-col cols="6" class="interaction-right">
-            <router-link :to="'/comments/' + comment.id + '/replies'" class="interaction-link">
+            <nuxt-link :to="'/comments/' + comment.id + '/replies'" class="interaction-link">
               <v-icon small>mdi-comment</v-icon>
               <span class="interaction-text">{{ comment.totalReplies }}</span>
-            </router-link>
-            <router-link :to="'/comments/' + comment.id" class="interaction-link id-link">
+            </nuxt-link>
+            <nuxt-link :to="'/comments/' + comment.id" class="interaction-link id-link">
               <span class="interaction-text">ID: {{ comment.id }}</span>
-            </router-link>
+            </nuxt-link>
           </v-col>
         </v-row>
       </div>
       <div v-if="showReplyForm" class="reply-form">
-        <CommentForm :formTitle="'返信 >> ' + comment.id" @submit="submitReply" @clear="clearReplyForm" />
+        <CommentForm :formTitle="'返信 >> ' + comment.id" @submit="submitReply" />
       </div>
     </v-list-item>
-    <v-divider></v-divider>
+    <v-divider />
 
-    <ModalMedia :dialog="dialog" :mediaItem="selectedMedia" @close="closeDialog" @update:dialog="dialog = $event" />
+    <MediaModal
+      v-if="selectedAttachment"
+      :dialog="isOpenMediaModalOpen"
+      :type="selectedAttachment.type"
+      :url="selectedAttachment.url"
+      @close="closeModalMedia"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import ModalMedia from '~/components/ModalMedia.vue';
+import { useRoute } from 'vue-router';
+import MediaModal from '~/components/MediaModal.vue';
 import CommentForm from '~/components/comment/CommentForm.vue';
-import type { TThreadComment } from '~/types/thread';
+import type { IThreadComment } from '~/types/thread';
+import type { IThreadCommentAttachment } from '~/types/thread-comment-attachment';
 
-defineProps<{ idx: number; comment: TThreadComment }>();
+const props = defineProps<{ comment: IThreadComment; commentLimit: number; threadId: number }>();
 
-const dialog = ref(false);
-const selectedMedia = ref(null);
+const route = useRoute();
+
+const isOpenMediaModalOpen = ref(false);
+const selectedAttachment = ref<IThreadCommentAttachment | null>();
 const showReplyForm = ref(false);
 
-const toggleReplyForm = () => {
+function toggleReplyForm() {
   showReplyForm.value = !showReplyForm.value;
-  if (!showReplyForm.value) {
-    clearReplyForm();
-  }
-};
+}
 
-const submitReply = () => {
+function submitReply() {
   console.log('返信を送信');
   alert('返信しました。');
   toggleReplyForm();
-};
+}
 
-const clearReplyForm = () => {
-  console.log('返信フォームをクリア');
-};
+function openModalMedia(attachment: IThreadCommentAttachment) {
+  selectedAttachment.value = attachment;
+  isOpenMediaModalOpen.value = true;
+}
 
-const openDialog = attachment => {
-  selectedMedia.value = attachment;
-  dialog.value = true;
-};
+function closeModalMedia() {
+  selectedAttachment.value = null;
+  isOpenMediaModalOpen.value = false;
+}
 
-const closeDialog = () => {
-  dialog.value = false;
-};
+function onVideoLoad(event) {
+  const video = event.target;
+  video.currentTime = 1;
+  video.pause();
+}
+
+function toParentComment(parentCommentIdx: number): {
+  path: string;
+  query: { offset: number; limit: number };
+  hash: string;
+} {
+  const limit = route.query.limit ? parseInt(route.query.limit as string, 10) : props.commentLimit;
+  const newOffset = Math.floor((parentCommentIdx - 1) / limit) * limit;
+  return {
+    path: `/threads/${props.threadId}`,
+    query: { offset: newOffset, limit },
+    hash: `#comments-${parentCommentIdx}`,
+  };
+}
 </script>
 
 <style scoped>
@@ -180,6 +226,7 @@ const closeDialog = () => {
   height: 100px;
   object-fit: cover;
   cursor: pointer;
+  background-color: black; /* 背景を黒に設定 */
 }
 
 .play-icon {
@@ -193,5 +240,13 @@ const closeDialog = () => {
 
 .reply-form {
   margin-top: 16px;
+}
+
+.v-img__img,
+video {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  margin: auto;
 }
 </style>

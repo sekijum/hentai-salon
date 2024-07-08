@@ -18,12 +18,9 @@ func NewThreadCommentDatasource(client *ent.Client) *ThreadCommentDatasource {
 	return &ThreadCommentDatasource{client: client}
 }
 
-func (ds *ThreadCommentDatasource) FindAll(ctx context.Context, threadId, page, limit int) ([]*model.ThreadComment, error) {
-	offset := (page - 1) * limit
+func (ds *ThreadCommentDatasource) FindAll(ctx context.Context, threadId int) ([]*model.ThreadComment, error) {
 	comments, err := ds.client.ThreadComment.Query().
 		Where(threadcomment.ThreadIDEQ(threadId)).
-		Limit(limit).
-		Offset(offset).
 		WithReplies().
 		WithAttachments().
 		All(ctx)

@@ -1,8 +1,10 @@
 package request
 
 type ThreadFindByIdRequest struct {
-	Limit  int `form:"limit"`
-	Offset int `form:"offset"`
+	Limit       int `form:"limit"`
+	Offset      int `form:"offset"`
+	SortByKey   int `form:"sort_by_key"`
+	SortByOrder int `form:"sort_by_order"`
 }
 
 type ThreadFindAllRequest struct {

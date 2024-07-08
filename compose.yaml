@@ -59,6 +59,37 @@ services:
       net1:
         ipv4_address: 192.168.10.20
 
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: hentai-salon-phpmyadmin
+    restart: always
+    depends_on:
+      - mysql
+    environment:
+      PMA_ARBITRARY: '1'
+      PMA_HOST: ${DB_HOST}
+      PMA_PORT: ${DB_PORT}
+      PMA_USER: ${DB_USER}
+      PMA_PASSWORD: ${DB_PASS}
+    ports:
+      - 8081:80  
+    networks:
+      net1:
+        ipv4_address: 192.168.10.40
+
+  # elk:
+  #   image: sebp/elk:761
+  #   container_name: hentai-salon-elk
+  #   restart: always
+  #   ports:
+  #     - "5601:5601"  # Kibanaのポート
+  #     - "5044:5044"  # LogstashのBeatsポート
+  #     - "9200:9200"  # ElasticsearchのHTTPポート
+  #   volumes:
+  #     - ./docker/logstash:/etc/logstash/conf.d
+  #   environment:
+  #     - LOGSTASH_START=0
+
   # minio:
   #   image: minio/minio:latest
   #   container_name: hentai-salon-minio
@@ -77,7 +108,7 @@ services:
   #       ipv4_address: 192.168.10.80
 
   # infra:
-  #   container_name: infra
+  #   container_name: hentai-salon-infra
   #   platform: linux/x86_64
   #   build:
   #     context: .

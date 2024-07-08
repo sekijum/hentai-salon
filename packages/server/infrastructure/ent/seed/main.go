@@ -125,40 +125,55 @@ func seed(ctx context.Context, client *ent.Client) error {
 	}
 
 	// Create Thread Comments with nested parent_comment_id
-	comments := make([]*ent.ThreadComment, 100000)
+	comments := make([]*ent.ThreadComment, 0, 100000)
 	for i := 0; i < 100000; i++ {
+		thread := threads[rand.Intn(100)]
 		var parentID *int
 		if i >= 1000 {
-			pID := comments[rand.Intn(1000)].ID
-			parentID = &pID
+			// threadに紐づくコメントからランダムに選択
+			threadComments := make([]*ent.ThreadComment, 0)
+			for _, comment := range comments {
+				if comment.ThreadID == thread.ID {
+					threadComments = append(threadComments, comment)
+				}
+			}
+			if len(threadComments) > 0 {
+				pID := threadComments[rand.Intn(len(threadComments))].ID
+				parentID = &pID
+			}
 		}
 		createComment := tx.ThreadComment.Create().
 			SetContent("コメント内容" + uuid.New().String()[:8]).
 			SetIPAddress("127.0.0.1").
-			SetThreadID(threads[rand.Intn(100)].ID).
+			SetThreadID(thread.ID).
 			SetUserID(users[rand.Intn(100)].ID).
 			SetCreatedAt(time.Now()).
 			SetUpdatedAt(time.Now())
 		if parentID != nil {
 			createComment.SetParentCommentID(*parentID)
 		}
-		comments[i] = createComment.SaveX(ctx)
+		comment, err := createComment.Save(ctx)
+		if err != nil {
+			return err
+		}
+		comments = append(comments, comment)
 	}
 
 	// Create Thread Comment Attachments
-	for i := 0; i < 300000; i++ {
+	for i := 0; i < len(comments)*4; i++ {
 		var attachmentURL string
 		if i%2 == 0 {
 			attachmentURL = randomImageURL(i)
 		} else {
 			attachmentURL = videoURL()
 		}
+		comment := comments[i/4] // Ensure a maximum of 4 attachments per comment
 		tx.ThreadCommentAttachment.Create().
 			SetURL(attachmentURL).
 			SetDisplayOrder(int(rand.Int63n(100))).
 			SetType(i % 2). // typeを0か1に設定
 			SetCreatedAt(time.Now()).
-			SetCommentID(comments[rand.Intn(100000)].ID).
+			SetCommentID(comment.ID).
 			SaveX(ctx)
 	}
 
@@ -198,7 +213,7 @@ func seed(ctx context.Context, client *ent.Client) error {
 		var key string
 		for {
 			userID = users[rand.Intn(100)].ID
-			commentID = comments[rand.Intn(100000)].ID
+			commentID = comments[rand.Intn(len(comments))].ID
 			key = fmt.Sprintf("%d-%d", userID, commentID)
 			if _, exists := userCommentLikes[key]; !exists {
 				break
@@ -219,7 +234,7 @@ func seed(ctx context.Context, client *ent.Client) error {
 		var key string
 		for {
 			userID = users[rand.Intn(100)].ID
-			commentID = comments[rand.Intn(100000)].ID
+			commentID = comments[rand.Intn(len(comments))].ID
 			key = fmt.Sprintf("%d-%d", userID, commentID)
 			if _, exists := userCommentSubscriptions[key]; !exists {
 				break

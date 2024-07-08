@@ -91,6 +91,14 @@ func (ds *ThreadDatasource) FindById(ctx context.Context, id int, limit, offset 
 		return nil, err
 	}
 
+	allCommentIDs, err := ds.client.ThreadComment.Query().
+		Where(threadcomment.HasThreadWith(thread.IDEQ(id))).
+		Order(ent.Asc(threadcomment.FieldCreatedAt)).
+		IDs(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	entThread, err := ds.client.Thread.Query().
 		Where(thread.IDEQ(id)).
 		WithTags().
@@ -115,6 +123,7 @@ func (ds *ThreadDatasource) FindById(ctx context.Context, id int, limit, offset 
 	modelThread := &model.Thread{
 		EntThread:     entThread,
 		TotalComments: totalComments,
+		CommentIDs:    allCommentIDs,
 	}
 
 	return modelThread, nil

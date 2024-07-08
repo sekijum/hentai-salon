@@ -2,24 +2,10 @@
   <div v-if="thread">
     <PageTitle :title="thread.title" />
 
-    <v-divider></v-divider>
+    <v-divider />
 
     <v-chip-group active-class="primary--text" column>
-      <v-chip
-        size="x-small"
-        v-for="tag in [
-          'Work',
-          'Home Improvement',
-          'Vacation',
-          'Food',
-          'Drawers',
-          'Shopping',
-          'Art',
-          'Tech',
-          'Creative Writing',
-        ]"
-        :key="tag"
-      >
+      <v-chip size="x-small" v-for="tag in thread.tags" :key="tag">
         {{ tag }}
       </v-chip>
     </v-chip-group>
@@ -41,13 +27,13 @@
 
       <br />
 
-      <v-divider></v-divider>
+      <v-divider />
 
       <div id="comment-top" />
-      <CommentList :comments="thread?.comments.slice(0, 50)" />
+      <CommentList :comments="thread?.comments.data" :commentLimit="commentLimit" :threadId="thread.id" />
       <div id="comment-bottom" />
 
-      <Pagination />
+      <Pagination :totalCount="thread.comments.totalCount" :limit="commentLimit" />
 
       <br />
 
@@ -74,12 +60,14 @@ import PageTitle from '~/components/PageTitle.vue';
 import Pagination from '~/components/Pagination.vue';
 import MediaGallery from '~/components/MediaGallery.vue';
 import { useRouter, useRoute } from 'vue-router';
-import type { TThread } from '~/types/thread';
+import type { IThread } from '~/types/thread';
 
 const router = useRouter();
 const route = useRoute();
 const nuxtApp = useNuxtApp();
 const { $api } = nuxtApp;
+
+const commentLimit = 50;
 
 const menuItems = [
   {
@@ -94,7 +82,7 @@ const menuItems = [
   },
 ];
 
-const thread = ref<TThread>();
+const thread = ref<IThread>();
 
 const scrollToMediaTop = () => {
   const mediaTop = document.getElementById('media-top');
@@ -123,10 +111,22 @@ onMounted(async () => {
 
 async function fetchThreads() {
   const threadId = route.params.id;
-  const response = await $api.get<TThread>(`/threads/${threadId}`);
+  const response = await $api.get<IThread>(`/threads/${threadId}`, {
+    params: {
+      limit: route.query.limit || commentLimit,
+      offset: route.query.offset,
+    },
+  });
+  console.log(response);
   thread.value = response.data;
-  console.log(thread.value);
 }
+
+watchEffect(() => {
+  if (route.query.limit) {
+    scrollToCommentTop();
+    fetchThreads();
+  }
+});
 </script>
 
 <style scoped>

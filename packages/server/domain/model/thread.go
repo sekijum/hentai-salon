@@ -10,6 +10,7 @@ type Thread struct {
 	EntThread     *ent.Thread
 	Popularity    int
 	TotalComments int
+	CommentIDs    []int
 }
 
 type ThreadStatus int

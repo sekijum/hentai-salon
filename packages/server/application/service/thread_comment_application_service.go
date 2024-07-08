@@ -23,7 +23,7 @@ func (svc *ThreadCommentApplicationService) FindAll(
 	ctx context.Context,
 	qs request.ThreadCommentFindAllRequest,
 ) ([]*model.ThreadComment, error) {
-	return svc.threadCommentDatasource.FindAll(ctx, qs.ThreadId, qs.Page, qs.Limit)
+	return svc.threadCommentDatasource.FindAll(ctx, qs.ThreadId)
 }
 
 func (svc *ThreadCommentApplicationService) FindById(

@@ -25,13 +25,13 @@
 
 <script setup lang="ts">
 import PageTitle from '~/components/PageTitle.vue';
-import type { TBoard } from '~/types/board';
+import type { IBoard } from '~/types/board';
 
 const router = useRouter();
 const nuxtApp = useNuxtApp();
 const { $api } = nuxtApp;
 
-const boards = ref<TBoard[]>([]);
+const boards = ref<IBoard[]>([]);
 const search = ref('');
 
 const filteredBoards = computed(() => {
@@ -43,7 +43,7 @@ onMounted(async () => {
 });
 
 async function fetchBoards() {
-  const response = await $api.get<TBoard[]>('/boards');
+  const response = await $api.get<IBoard[]>('/boards');
   boards.value = response.data;
 }
 

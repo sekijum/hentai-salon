@@ -26,6 +26,9 @@ func (ctrl *ThreadController) FindAll(c *gin.Context) {
 		return
 	}
 
+	qs.Limit = c.GetInt("limit")
+	qs.Offset = c.GetInt("offset")
+
 	threads, err := ctrl.threadApplicationService.FindAll(context.Background(), qs)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "スレッドの取得に失敗しました: " + err.Error()})
@@ -48,6 +51,9 @@ func (ctrl *ThreadController) FindById(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
+	qs.Limit = c.GetInt("limit")
+	qs.Offset = c.GetInt("offset")
 
 	thread, err := ctrl.threadApplicationService.FindById(context.Background(), id, qs)
 	if err != nil {

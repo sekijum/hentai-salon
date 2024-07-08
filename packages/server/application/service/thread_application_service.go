@@ -71,7 +71,7 @@ func (svc *ThreadApplicationService) FindAll(ctx context.Context, qs request.Thr
 
 	for key, threads := range threadsByOrders {
 		for _, thread := range threads {
-			res := resource.NewThreadResource(thread)
+			res := resource.NewThreadResource(thread, 0, 0)
 			threadResources[key] = append(threadResources[key], res)
 		}
 	}
@@ -84,7 +84,7 @@ func (svc *ThreadApplicationService) FindById(ctx context.Context, id int, qs re
 	if err != nil {
 		return nil, err
 	}
-	return resource.NewThreadResource(thread), nil
+	return resource.NewThreadResource(thread, qs.Limit, qs.Offset), nil
 }
 
 func (svc *ThreadApplicationService) Create(ctx context.Context, ginCtx *gin.Context, body request.ThreadCreateRequest) (*resource.ThreadResource, error) {
@@ -150,5 +150,5 @@ func (svc *ThreadApplicationService) Create(ctx context.Context, ginCtx *gin.Con
 		return nil, err
 	}
 
-	return resource.NewThreadResource(savedThread), nil
+	return resource.NewThreadResource(savedThread, 0, 0), nil
 }
