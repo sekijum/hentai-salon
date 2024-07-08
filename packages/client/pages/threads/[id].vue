@@ -2,15 +2,13 @@
   <div v-if="thread">
     <PageTitle :title="thread.title" />
 
-    <v-divider />
-
     <v-chip-group active-class="primary--text" column>
       <v-chip size="x-small" v-for="tag in thread.tags" :key="tag">
         {{ tag }}
       </v-chip>
     </v-chip-group>
 
-    <v-divider></v-divider>
+    <v-divider />
 
     <Menu :items="menuItems" />
 
@@ -26,6 +24,10 @@
       <CommentForm />
 
       <br />
+
+      <v-divider />
+
+      <Pagination :totalCount="thread.comments.totalCount" :limit="commentLimit" />
 
       <v-divider />
 
