@@ -2,8 +2,9 @@ package ent
 
 import (
 	"context"
+	"fmt"
 	"log"
-	cfg "server/shared/config"
+	"os"
 
 	"entgo.io/ent/dialect/sql"
 	_ "github.com/go-sql-driver/mysql"
@@ -16,8 +17,15 @@ func InitDatabase() (*Client, error) {
 		log.Fatalf("Error loading .env file")
 	}
 
-	dataSourceName := cfg.GetDatabaseDSN()
-	driver, err := sql.Open("mysql", dataSourceName)
+	dbUser := os.Getenv("DB_USER")
+	dbPass := os.Getenv("DB_PASS")
+	dbHost := os.Getenv("DB_HOST")
+	dbPort := os.Getenv("DB_PORT")
+	dbName := os.Getenv("DB_NAME")
+
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=True", dbUser, dbPass, dbHost, dbPort, dbName)
+
+	driver, err := sql.Open("mysql", dsn)
 	if err != nil {
 		return nil, err
 	}

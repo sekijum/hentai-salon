@@ -3,11 +3,11 @@
 ### 起動
 
 ```
-docker-compose up -d
+docker compose up -d
 ```
 
 ### 終了
 
 ```
-dokcer-compose down
+dokcer compose down
 ```
