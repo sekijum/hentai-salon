@@ -97,7 +97,6 @@
 
     <MediaModal
       v-if="selectedAttachment"
-      :dialog="isOpenMediaModalOpen"
       :type="selectedAttachment.type"
       :url="selectedAttachment.url"
       @close="closeModalMedia"
@@ -116,7 +115,6 @@ const props = defineProps<{ comment: IThreadComment; commentLimit: number; threa
 
 const route = useRoute();
 
-const isOpenMediaModalOpen = ref(false);
 const selectedAttachment = ref<IThreadCommentAttachment | null>();
 const showReplyForm = ref(false);
 
@@ -132,19 +130,17 @@ function submitReply() {
 
 function openModalMedia(attachment: IThreadCommentAttachment) {
   selectedAttachment.value = attachment;
-  isOpenMediaModalOpen.value = true;
 }
 
 function closeModalMedia() {
   selectedAttachment.value = null;
-  isOpenMediaModalOpen.value = false;
 }
 
-function onVideoLoad(event) {
-  const video = event.target;
-  video.currentTime = 1;
-  video.pause();
-}
+// function onVideoLoad(event) {
+//   const video = event.target;
+//   video.currentTime = 1;
+//   video.pause();
+// }
 
 function toParentComment(parentCommentIdx: number): {
   path: string;

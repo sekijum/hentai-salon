@@ -1,8 +1,10 @@
 <template>
-  <v-bottom-sheet :model-value="dialog" @update:model-value="closeDialog" max-height="100%">
+  <v-bottom-sheet :model-value="!!url" @update:model-value="closeDialog" max-height="100%">
     <v-card class="media-card">
       <v-toolbar dense class="toolbar">
-        <v-toolbar-title>Media</v-toolbar-title>
+        <v-toolbar-title>
+          <nuxt-link :to="to" target="_blank" rel="noopener noreferrer">{{ 'Media' }}</nuxt-link>
+        </v-toolbar-title>
         <v-spacer></v-spacer>
         <v-btn icon @click="closeDialog">
           <v-icon>mdi-close</v-icon>
@@ -23,9 +25,9 @@
 <script setup lang="ts">
 import VideoPlayer from '~/components/VideoPlayer.vue';
 
-defineProps<{ dialog: boolean; type: 'Video' | 'Image'; url: string }>();
+defineProps<{ type: 'Video' | 'Image'; url: string; to?: string }>();
 
-const emit = defineEmits(['close', 'update:dialog']);
+const emit = defineEmits(['close']);
 
 function closeDialog() {
   emit('close');

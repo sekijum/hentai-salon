@@ -2,7 +2,9 @@
   <div v-if="thread">
     <PageTitle :title="thread.title" />
 
-    <v-chip-group active-class="primary--text" column>
+    <h2 class="font-weight-regular page-description">{{ thread.description }}</h2>
+
+    <v-chip-group v-if="thread.tags" active-class="primary--text" column>
       <v-chip size="x-small" v-for="tag in thread.tags" :key="tag">
         {{ tag }}
       </v-chip>
@@ -16,10 +18,19 @@
 
     <template v-if="route.query.tab === 'media'">
       <div id="media-top" />
-      <MediaGallery :attachments="attachments" />
+      <MediaGallery
+        v-if="thread.attachments"
+        :attachments="thread.attachments"
+        :commentLimit="commentLimit"
+        :threadId="thread.id"
+      />
+      <div id="media-bottom" />
 
-      <v-btn icon large color="primary" class="fab fab-bottom" @click="scrollToMediaTop">
+      <v-btn icon large color="primary" class="fab fab-top" @click="scrollToMediaTop">
         <v-icon>mdi-arrow-up</v-icon>
+      </v-btn>
+      <v-btn icon large color="primary" class="fab fab-bottom" @click="scrollToMediaBottom">
+        <v-icon>mdi-arrow-down</v-icon>
       </v-btn>
     </template>
     <template v-else>
@@ -59,7 +70,6 @@ import Pagination from '~/components/Pagination.vue';
 import MediaGallery from '~/components/MediaGallery.vue';
 import { useRouter, useRoute } from 'vue-router';
 import type { IThread } from '~/types/thread';
-import type { IThreadCommentAttachmentForThread } from '~/types/thread-comment-attachment';
 
 const router = useRouter();
 const route = useRoute();
@@ -67,7 +77,6 @@ const nuxtApp = useNuxtApp();
 const { $api } = nuxtApp;
 
 const commentLimit = 50;
-const attachments = ref<IThreadCommentAttachmentForThread[]>([]);
 
 const menuItems = [
   {
@@ -88,6 +97,13 @@ const scrollToMediaTop = () => {
   const mediaTop = document.getElementById('media-top');
   if (mediaTop) {
     mediaTop.scrollIntoView({ behavior: 'smooth' });
+  }
+};
+
+const scrollToMediaBottom = () => {
+  const mediaBottom = document.getElementById('media-bottom');
+  if (mediaBottom) {
+    mediaBottom.scrollIntoView({ behavior: 'smooth' });
   }
 };
 
@@ -118,18 +134,21 @@ async function fetchThreads() {
     },
   });
   thread.value = response.data;
-  attachments.value = response.data.attachments;
 }
 
 watchEffect(() => {
   if (route.query.limit) {
-    scrollToCommentTop();
+    console.log('hoge');
     fetchThreads();
   }
 });
 </script>
 
 <style scoped>
+.page-description {
+  font-size: 1rem;
+}
+
 .fab {
   position: fixed;
   right: 16px;

@@ -1,69 +1,89 @@
 <template>
-  <v-infinite-scroll height="100%" :items="items" :onLoad="load">
-    <v-row class="pa-0 ma-0">
-      <v-col v-for="item in items" :key="item.id" class="d-flex child-flex pa-0 ma-0" cols="6">
-        <v-img
-          :lazy-src="item.lazySrc"
-          :src="item.src"
-          aspect-ratio="1"
-          class="bg-grey-lighten-2"
-          cover
-          @click="navigateToExternalPath(`/comments/${item.id}`)"
-        >
-          <template v-slot:placeholder>
-            <v-row align="center" class="fill-height ma-0" justify="center">
-              <v-progress-circular color="grey-lighten-5" indeterminate></v-progress-circular>
-            </v-row>
-          </template>
-          <v-icon v-if="item.type === 'video/mp4'" size="60" class="play-icon">mdi-play-circle</v-icon>
-          <div v-if="item.type === 'video/mp4'" class="time-label">{{ formatTime(item.duration) }}</div>
-        </v-img>
-      </v-col>
-    </v-row>
-  </v-infinite-scroll>
+  <div>
+    <v-infinite-scroll height="100%" :items="items" :onLoad="load">
+      <template #empty>
+        <!-- Empty slot to override the default "No more" message -->
+        <div></div>
+      </template>
+      <v-row class="pa-0 ma-0">
+        <v-col v-for="item in items" :key="item.commentId" class="d-flex child-flex pa-0 ma-0" cols="6">
+          <v-img
+            :lazy-src="item.url"
+            :src="item.url"
+            aspect-ratio="1"
+            class="bg-grey-lighten-2"
+            cover
+            @click="openModalMedia(item)"
+          >
+            <template v-slot:placeholder>
+              <v-row align="center" class="fill-height ma-0" justify="center">
+                <v-progress-circular color="grey-lighten-5" indeterminate></v-progress-circular>
+              </v-row>
+            </template>
+            <v-icon v-if="item.type === 'Video'" size="60" class="play-icon">mdi-play-circle</v-icon>
+            <div v-if="item.type === 'Video'" class="time-label">{{ formatTime(item.displayOrder) }}</div>
+          </v-img>
+        </v-col>
+      </v-row>
+    </v-infinite-scroll>
+
+    <MediaModal
+      v-if="selectedAttachment"
+      :to="selectedAttachmentMeta?.to"
+      :type="selectedAttachment.type"
+      :url="selectedAttachment.url"
+      @close="closeModalMedia"
+    />
+  </div>
 </template>
 
 <script setup lang="ts">
-const items = ref([
-  ...Array.from({ length: 20 }, (k, v) => ({
-    id: v + 1,
-    type: 'image',
-    lazySrc: `https://picsum.photos/10/6?image=${(v + 1) * 5 + 10}`,
-    src: `https://picsum.photos/500/300?image=${(v + 1) * 5 + 10}`,
-  })),
-  {
-    id: 21,
-    type: 'video/mp4',
-    lazySrc: 'https://picsum.photos/10/6?image=1000',
-    src: 'https://picsum.photos/500/300?image=1000',
-    videoSrc: 'https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4',
-    duration: 120, // 動画の時間を秒単位で指定
-  },
-]);
+import type { IThreadCommentAttachmentForThread, IThreadCommentAttachment } from '~/types/thread-comment-attachment';
 
-async function api() {
-  return new Promise(resolve => {
-    setTimeout(() => {
-      resolve(
-        Array.from({ length: 10 }, (k, v) => ({
-          id: v + items.value.at(-1).id + 1,
-          type: (v + items.value.at(-1).id + 1) % 5 === 0 ? 'video/mp4' : 'image',
-          lazySrc: `https://picsum.photos/10/6?image=${(v + items.value.at(-1).id + 1) * 5 + 10}`,
-          src: `https://picsum.photos/500/300?image=${(v + items.value.at(-1).id + 1) * 5 + 10}`,
-          ...((v + items.value.at(-1).id + 1) % 5 === 0 && {
-            thumbnail: 'https://picsum.photos/500/300?image=1000',
-            videoSrc: 'https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4',
-            duration: 150, // 動画の時間を秒単位で指定
-          }),
-        })),
-      );
-    }, 1000);
-  });
+const props = defineProps<{
+  attachments: IThreadCommentAttachmentForThread[];
+  commentLimit: number;
+  threadId: number;
+}>();
+
+const route = useRoute();
+const items = ref<IThreadCommentAttachmentForThread[]>(props.attachments.slice(0, 10));
+const currentIndex = ref(10);
+
+const selectedAttachment = ref<IThreadCommentAttachment | null>();
+const selectedAttachmentMeta = ref<{ to: string } | null>();
+
+watch(
+  () => props.attachments,
+  newAttachments => {
+    items.value = newAttachments.slice(0, 10);
+    currentIndex.value = 10;
+  },
+);
+
+function openModalMedia(attachment: IThreadCommentAttachmentForThread) {
+  const limit = route.query.limit ? parseInt(route.query.limit as string, 10) : props.commentLimit;
+  const newOffset = Math.floor((attachment.idx - 1) / limit) * limit;
+  selectedAttachmentMeta.value = {
+    to: `/threads/${props.threadId}?offset=${newOffset}&limit=${limit}#comments-${attachment.idx}`,
+  };
+  selectedAttachment.value = { url: attachment.url, type: attachment.type, displayOrder: attachment.displayOrder };
 }
 
-async function load({ done }) {
-  const res = await api();
-  items.value.push(...res);
+function closeModalMedia() {
+  selectedAttachmentMeta.value = null;
+  selectedAttachment.value = null;
+}
+
+async function load({ done }: { done: (status: string) => void }) {
+  if (currentIndex.value >= props.attachments.length) {
+    done('empty');
+    return;
+  }
+
+  const nextItems = props.attachments.slice(currentIndex.value, currentIndex.value + 10);
+  items.value.push(...nextItems);
+  currentIndex.value += 10;
   done('ok');
 }
 
