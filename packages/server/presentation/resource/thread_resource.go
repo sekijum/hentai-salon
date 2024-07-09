@@ -25,10 +25,15 @@ type ThreadCommentAttachmentResourceForThread struct {
 	Idx          int    `json:"idx"`
 }
 
+type ThreadCommentUserResource struct {
+	Id   int    `json:"id"`
+	Name string `json:"name"`
+}
+
 type ThreadCommentResource struct {
 	Id               int                                          `json:"id"`
 	Idx              int                                          `json:"idx,omitempty"`
-	UserId           *int                                         `json:"userId,omitempty"`
+	User             *ThreadCommentUserResource                   `json:"user,omitempty"`
 	GuestName        *string                                      `json:"guestName,omitempty"`
 	Content          string                                       `json:"content"`
 	ParentCommentIdx int                                          `json:"parentCommentIdx,omitempty"`
@@ -78,10 +83,17 @@ func NewThreadAttachmentResourceForThread(a *model.ThreadCommentAttachment, comm
 	}
 }
 
+func NewThreadCommentUserResource(c *model.ThreadComment) *ThreadCommentUserResource {
+	return &ThreadCommentUserResource{
+		Id:   c.EntThreadComment.Edges.Author.ID,
+		Name: c.EntThreadComment.Edges.Author.Name,
+	}
+}
+
 func NewThreadCommentResource(c *model.ThreadComment, commentIDs []int, offset int) *ThreadCommentResource {
-	var userId *int
-	if c.EntThreadComment.UserID != nil {
-		userId = c.EntThreadComment.UserID
+	var user *ThreadCommentUserResource
+	if c.EntThreadComment.Edges.Author != nil {
+		user = NewThreadCommentUserResource(c)
 	}
 
 	var guestName *string
@@ -108,7 +120,7 @@ func NewThreadCommentResource(c *model.ThreadComment, commentIDs []int, offset i
 	return &ThreadCommentResource{
 		Id:               c.EntThreadComment.ID,
 		Idx:              idx,
-		UserId:           userId,
+		User:             user,
 		GuestName:        guestName,
 		Content:          c.EntThreadComment.Content,
 		ParentCommentID:  parentCommentID,

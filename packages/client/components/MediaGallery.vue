@@ -2,12 +2,12 @@
   <div>
     <v-infinite-scroll height="100%" :items="items" :onLoad="load">
       <template #empty>
-        <!-- Empty slot to override the default "No more" message -->
         <div></div>
       </template>
       <v-row class="pa-0 ma-0">
         <v-col v-for="item in items" :key="item.commentId" class="d-flex child-flex pa-0 ma-0" cols="6">
           <v-img
+            v-if="item.type !== 'Video'"
             :lazy-src="item.url"
             :src="item.url"
             aspect-ratio="1"
@@ -20,9 +20,12 @@
                 <v-progress-circular color="grey-lighten-5" indeterminate></v-progress-circular>
               </v-row>
             </template>
-            <v-icon v-if="item.type === 'Video'" size="60" class="play-icon">mdi-play-circle</v-icon>
-            <div v-if="item.type === 'Video'" class="time-label">{{ formatTime(item.displayOrder) }}</div>
           </v-img>
+          <div v-else class="video-container" @click="openModalMedia(item)">
+            <video ref="video" :src="item.url" @loadedmetadata="updateVideoMeta(item)" muted class="video-thumbnail" />
+            <v-icon class="play-icon">mdi-play-circle</v-icon>
+            <div v-if="item.duration" class="time-label">{{ formatTime(item.duration) }}</div>
+          </div>
         </v-col>
       </v-row>
     </v-infinite-scroll>
@@ -38,6 +41,8 @@
 </template>
 
 <script setup lang="ts">
+import { ref, watch, defineProps } from 'vue';
+import { useRoute } from 'vue-router';
 import type { IThreadCommentAttachmentForThread, IThreadCommentAttachment } from '~/types/thread-comment-attachment';
 
 const props = defineProps<{
@@ -87,22 +92,40 @@ async function load({ done }: { done: (status: string) => void }) {
   done('ok');
 }
 
-function navigateToExternalPath(path: string) {
-  const domain = window.location.origin;
-  window.open(`${domain}${path}`, '_blank');
-}
-
 function formatTime(seconds: number): string {
   const minutes = Math.floor(seconds / 60);
-  const remainingSeconds = seconds % 60;
-  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  const remainingSeconds = Math.floor(seconds % 60);
+  return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+}
+
+function updateVideoMeta(item: IThreadCommentAttachmentForThread) {
+  const videoElement = document.createElement('video');
+  videoElement.src = item.url;
+  videoElement.onloadedmetadata = () => {
+    item.duration = videoElement.duration;
+  };
 }
 </script>
 
 <style scoped>
 .v-col {
-  padding: 2px !important; /* 画像同士の間隔を狭める */
-  cursor: pointer; /* マウスオーバー時にカーソルをポインターに変更 */
+  padding: 2px !important;
+  cursor: pointer;
+}
+
+.video-container {
+  position: relative;
+  width: 100%;
+  padding-bottom: 100%;
+}
+
+.video-thumbnail {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .play-icon {

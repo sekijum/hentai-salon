@@ -4,9 +4,9 @@
       <div class="comment-header">
         <div class="comment-header-text">
           {{ comment.idx }}
-          <nuxt-link to="/" class="username-link">{{
-            comment?.guestName || '名無し' || 'ログインユーザー名表示'
-          }}</nuxt-link>
+          <nuxt-link :to="userLink()" class="username-link">
+            {{ username() }}
+          </nuxt-link>
         </div>
       </div>
       <div v-if="comment.parentCommentIdx" class="reply-indication">
@@ -134,6 +134,15 @@ function openModalMedia(attachment: IThreadCommentAttachment) {
 
 function closeModalMedia() {
   selectedAttachment.value = null;
+}
+
+function userLink() {
+  return '/';
+  return props.comment?.user?.id ? `/users/${props?.comment?.user?.id}` : '';
+}
+
+function username() {
+  return props.comment?.user?.name || props.comment?.guestName || '名無し';
 }
 
 // function onVideoLoad(event) {

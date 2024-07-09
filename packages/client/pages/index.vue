@@ -11,15 +11,20 @@
 <script setup lang="ts">
 import Menu from '~/components/Menu.vue';
 import ThreadTable from '~/components/thread/ThreadTable.vue';
-import type { TThread, TThreadList } from '~/types/thread';
+import type { IThread } from '~/types/thread';
+
+interface ThreadResponse {
+  threadsByPopular: IThread[];
+  threadsByNewest: IThread[];
+}
 
 const router = useRouter();
 const nuxtApp = useNuxtApp();
 const { payload, $api } = nuxtApp;
 console.log('ユーザー情報:', payload.user);
 
-const threadsByPopular = ref<TThread[]>([]);
-const threadsByNewest = ref<TThread[]>([]);
+const threadsByPopular = ref<IThread[]>([]);
+const threadsByNewest = ref<IThread[]>([]);
 
 const menuItems = [
   { title: 'お知らせ', navigate: () => router.push('/'), icon: 'mdi-update' },
@@ -39,7 +44,7 @@ onMounted(async () => {
 });
 
 async function fetchThreads() {
-  const response = await $api.get<TThreadList>('/threads', {
+  const response = await $api.get<ThreadResponse>('/threads', {
     params: {
       orders: ['popularity', 'newest'],
       limit: 10,

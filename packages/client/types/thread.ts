@@ -9,7 +9,7 @@ interface IThreadBoard {
 export interface IThreadComment {
   id: number;
   idx: number;
-  userId?: number;
+  user?: { id: number; name: string };
   guestName?: string;
   content: string;
   parentCommentIdx?: number;
