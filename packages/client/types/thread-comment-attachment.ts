@@ -3,3 +3,8 @@ export interface IThreadCommentAttachment {
   displayOrder: number;
   type: 'Video' | 'Image';
 }
+
+export interface IThreadCommentAttachmentForThread extends IThreadCommentAttachment {
+  commentId: number;
+  idx: number;
+}

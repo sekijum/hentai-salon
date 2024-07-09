@@ -12,9 +12,11 @@
 
     <Menu :items="menuItems" />
 
+    <Pagination :totalCount="thread.comments.totalCount" :limit="commentLimit" />
+
     <template v-if="route.query.tab === 'media'">
       <div id="media-top" />
-      <MediaGallery />
+      <MediaGallery :attachments="attachments" />
 
       <v-btn icon large color="primary" class="fab fab-bottom" @click="scrollToMediaTop">
         <v-icon>mdi-arrow-up</v-icon>
@@ -23,21 +25,11 @@
     <template v-else>
       <CommentForm />
 
-      <br />
-
-      <v-divider />
-
-      <Pagination :totalCount="thread.comments.totalCount" :limit="commentLimit" />
-
       <v-divider />
 
       <div id="comment-top" />
       <CommentList :comments="thread?.comments.data" :commentLimit="commentLimit" :threadId="thread.id" />
       <div id="comment-bottom" />
-
-      <Pagination :totalCount="thread.comments.totalCount" :limit="commentLimit" />
-
-      <br />
 
       <CommentForm />
 
@@ -51,6 +43,10 @@
         <v-icon>mdi-arrow-down</v-icon>
       </v-btn>
     </template>
+
+    <v-divider />
+
+    <Pagination :totalCount="thread.comments.totalCount" :limit="commentLimit" />
   </div>
 </template>
 
@@ -63,6 +59,7 @@ import Pagination from '~/components/Pagination.vue';
 import MediaGallery from '~/components/MediaGallery.vue';
 import { useRouter, useRoute } from 'vue-router';
 import type { IThread } from '~/types/thread';
+import type { IThreadCommentAttachmentForThread } from '~/types/thread-comment-attachment';
 
 const router = useRouter();
 const route = useRoute();
@@ -70,6 +67,7 @@ const nuxtApp = useNuxtApp();
 const { $api } = nuxtApp;
 
 const commentLimit = 50;
+const attachments = ref<IThreadCommentAttachmentForThread[]>([]);
 
 const menuItems = [
   {
@@ -119,8 +117,8 @@ async function fetchThreads() {
       offset: route.query.offset,
     },
   });
-  console.log(response);
   thread.value = response.data;
+  attachments.value = response.data.attachments;
 }
 
 watchEffect(() => {

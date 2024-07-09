@@ -1,5 +1,5 @@
 import type { IListResource } from './list-resource';
-import type { IThreadCommentAttachment } from './thread-comment-attachment';
+import type { IThreadCommentAttachment, IThreadCommentAttachmentForThread } from './thread-comment-attachment';
 
 interface IThreadBoard {
   id: number;
@@ -31,4 +31,5 @@ export interface IThread {
   commentCount: number;
   popularity: string;
   comments: IListResource<IThreadComment>;
+  attachments: IThreadCommentAttachmentForThread[];
 }

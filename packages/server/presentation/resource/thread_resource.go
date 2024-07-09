@@ -11,37 +11,46 @@ type ThreadBoardResource struct {
 	Title string `json:"title"`
 }
 
-type ThreadCommentAttachmentResource struct {
+type ThreadCommentAttachmentResourceForComment struct {
 	Url          string `json:"url"`
 	DisplayOrder int    `json:"displayOrder"`
 	Type         string `json:"type"`
 }
 
+type ThreadCommentAttachmentResourceForThread struct {
+	Url          string `json:"url"`
+	DisplayOrder int    `json:"displayOrder"`
+	Type         string `json:"type"`
+	CommentID    int    `json:"commentId"`
+	Idx          int    `json:"idx"`
+}
+
 type ThreadCommentResource struct {
-	Id               int                                `json:"id"`
-	Idx              int                                `json:"idx,omitempty"` // idxを追加
-	UserId           *int                               `json:"userId,omitempty"`
-	GuestName        *string                            `json:"guestName,omitempty"`
-	Content          string                             `json:"content"`
-	ParentCommentIdx int                                `json:"parentCommentIdx,omitempty"` // 親コメントのidxを追加
-	ParentCommentID  int                                `json:"parentCommentId"`
-	CreatedAt        string                             `json:"createdAt"`
-	UpdatedAt        string                             `json:"updatedAt"`
-	Attachments      []*ThreadCommentAttachmentResource `json:"attachments"`
-	TotalReplies     int                                `json:"totalReplies"`
+	Id               int                                          `json:"id"`
+	Idx              int                                          `json:"idx,omitempty"`
+	UserId           *int                                         `json:"userId,omitempty"`
+	GuestName        *string                                      `json:"guestName,omitempty"`
+	Content          string                                       `json:"content"`
+	ParentCommentIdx int                                          `json:"parentCommentIdx,omitempty"`
+	ParentCommentID  int                                          `json:"parentCommentId"`
+	CreatedAt        string                                       `json:"createdAt"`
+	UpdatedAt        string                                       `json:"updatedAt"`
+	Attachments      []*ThreadCommentAttachmentResourceForComment `json:"attachments"`
+	TotalReplies     int                                          `json:"totalReplies"`
 }
 
 type ThreadResource struct {
-	Id           int                                  `json:"id"`
-	Board        *ThreadBoardResource                 `json:"board"`
-	Title        string                               `json:"title"`
-	Description  string                               `json:"description"`
-	ThumbnailUrl string                               `json:"thumbnailUrl"`
-	Tags         []string                             `json:"tags"`
-	CreatedAt    string                               `json:"createdAt"`
-	CommentCount int                                  `json:"commentCount"`
-	Popularity   string                               `json:"popularity"`
-	Comments     ListResource[*ThreadCommentResource] `json:"comments"`
+	Id           int                                         `json:"id"`
+	Board        *ThreadBoardResource                        `json:"board"`
+	Title        string                                      `json:"title"`
+	Description  string                                      `json:"description"`
+	ThumbnailUrl string                                      `json:"thumbnailUrl"`
+	Tags         []string                                    `json:"tags"`
+	CreatedAt    string                                      `json:"createdAt"`
+	CommentCount int                                         `json:"commentCount"`
+	Popularity   string                                      `json:"popularity"`
+	Comments     ListResource[*ThreadCommentResource]        `json:"comments"`
+	Attachments  []*ThreadCommentAttachmentResourceForThread `json:"attachments"`
 }
 
 func NewThreadBoardResource(b *model.Board) *ThreadBoardResource {
@@ -51,11 +60,21 @@ func NewThreadBoardResource(b *model.Board) *ThreadBoardResource {
 	}
 }
 
-func NewThreadAttachmentResource(a *model.ThreadCommentAttachment) *ThreadCommentAttachmentResource {
-	return &ThreadCommentAttachmentResource{
+func NewThreadAttachmentResourceForComment(a *model.ThreadCommentAttachment) *ThreadCommentAttachmentResourceForComment {
+	return &ThreadCommentAttachmentResourceForComment{
 		Url:          a.EntAttachment.URL,
 		DisplayOrder: a.EntAttachment.DisplayOrder,
 		Type:         a.TypeToString(),
+	}
+}
+
+func NewThreadAttachmentResourceForThread(a *model.ThreadCommentAttachment, commentId, idx int) *ThreadCommentAttachmentResourceForThread {
+	return &ThreadCommentAttachmentResourceForThread{
+		Url:          a.EntAttachment.URL,
+		DisplayOrder: a.EntAttachment.DisplayOrder,
+		Type:         a.TypeToString(),
+		CommentID:    commentId,
+		Idx:          idx,
 	}
 }
 
@@ -77,14 +96,14 @@ func NewThreadCommentResource(c *model.ThreadComment, commentIDs []int, offset i
 		parentCommentIdx = findCommentIndexByID(commentIDs, parentCommentID) + 1
 	}
 
-	var attachments []*ThreadCommentAttachmentResource
+	idx := offset + 1
+
+	var attachments []*ThreadCommentAttachmentResourceForComment
 	for _, attachment := range c.EntThreadComment.Edges.Attachments {
-		attachments = append(attachments, NewThreadAttachmentResource(&model.ThreadCommentAttachment{
+		attachments = append(attachments, NewThreadAttachmentResourceForComment(&model.ThreadCommentAttachment{
 			EntAttachment: attachment,
 		}))
 	}
-
-	idx := offset + 1
 
 	return &ThreadCommentResource{
 		Id:               c.EntThreadComment.ID,
@@ -133,10 +152,18 @@ func NewThreadResource(t *model.Thread, limit, offset int) *ThreadResource {
 
 	// コメントリストを作成
 	var comments []*ThreadCommentResource
+	var attachments []*ThreadCommentAttachmentResourceForThread
 	for i, comment := range t.EntThread.Edges.Comments {
-		comments = append(comments, NewThreadCommentResource(&model.ThreadComment{
+		commentResource := NewThreadCommentResource(&model.ThreadComment{
 			EntThreadComment: comment,
-		}, t.CommentIDs, offset+i))
+		}, t.CommentIDs, offset+i)
+		comments = append(comments, commentResource)
+
+		for _, attachment := range comment.Edges.Attachments {
+			attachments = append(attachments, NewThreadAttachmentResourceForThread(&model.ThreadCommentAttachment{
+				EntAttachment: attachment,
+			}, comment.ID, commentResource.Idx)) // commentIdとidxを渡す
+		}
 	}
 
 	commentsList := ListResource[*ThreadCommentResource]{
@@ -157,5 +184,6 @@ func NewThreadResource(t *model.Thread, limit, offset int) *ThreadResource {
 		CommentCount: t.TotalComments,
 		Popularity:   popularity,
 		Comments:     commentsList,
+		Attachments:  attachments,
 	}
 }
