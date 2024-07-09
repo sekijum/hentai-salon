@@ -27,6 +27,24 @@
         <a :href="'#comment-' + comment.id" class="comment-anchor">{{ comment.content }}</a>
       </v-list-item-title>
       <template v-if="comment.attachments && comment.attachments.length">
+        <v-row dense class="attachment-row">
+          <v-chip
+            v-for="(attachment, index) in comment.attachments"
+            :key="index"
+            class="attachment-chip d-flex justify-center align-center my-1 mx-1"
+            @click="openModalMedia(attachment)"
+            variant="outlined"
+            size="x-small"
+          >
+            <v-icon left>
+              <template v-if="attachment.type === 'Video'">mdi-video</template>
+              <template v-else>mdi-image</template>
+            </v-icon>
+            {{ attachment.url }}
+          </v-chip>
+        </v-row>
+      </template>
+      <!-- <template v-if="comment.attachments && comment.attachments.length">
         <v-row dense>
           <v-col
             cols="3"
@@ -54,7 +72,7 @@
             </div>
           </v-col>
         </v-row>
-      </template>
+      </template> -->
       <div class="interaction-section">
         <v-row dense>
           <v-col cols="6">
@@ -217,36 +235,15 @@ function toParentComment(parentCommentIdx: number): {
   word-wrap: break-word;
 }
 
-.media-item-wrapper {
-  position: relative;
-}
-
-.media-item {
-  width: 100px;
-  height: 100px;
-  object-fit: cover;
+.attachment-chip {
   cursor: pointer;
-  background-color: black; /* 背景を黒に設定 */
 }
 
-.play-icon {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: white;
-  font-size: 40px;
+.attachment-row {
+  flex-direction: column;
 }
 
 .reply-form {
   margin-top: 16px;
-}
-
-.v-img__img,
-video {
-  display: block;
-  max-width: 100%;
-  max-height: 100%;
-  margin: auto;
 }
 </style>
