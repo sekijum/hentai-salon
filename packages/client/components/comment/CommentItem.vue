@@ -24,7 +24,7 @@
         </nuxt-link>
       </div>
       <v-list-item-title class="comment-content">
-        <a :href="'#comment-' + comment.id" class="comment-anchor">{{ comment.content }}</a>
+        <p class="comment-anchor">{{ comment.content }}</p>
       </v-list-item-title>
       <template v-if="comment.attachments && comment.attachments.length">
         <v-row dense class="attachment-row">
@@ -90,7 +90,7 @@
         </v-row>
       </div>
       <div v-if="showReplyForm" class="reply-form">
-        <CommentForm :formTitle="'返信 >> ' + comment.id" @submit="submitReply" />
+        <CommentForm :title="'返信 >> ' + comment.id" :parentCommentId="comment.id" />
       </div>
     </v-list-item>
     <v-divider />
@@ -114,18 +114,13 @@ import type { IThreadCommentAttachment } from '~/types/thread-comment-attachment
 const props = defineProps<{ comment: IThreadComment; commentLimit: number; threadId: number }>();
 
 const route = useRoute();
+const router = useRouter();
 
 const selectedAttachment = ref<IThreadCommentAttachment | null>();
 const showReplyForm = ref(false);
 
 function toggleReplyForm() {
   showReplyForm.value = !showReplyForm.value;
-}
-
-function submitReply() {
-  console.log('返信を送信');
-  alert('返信しました。');
-  toggleReplyForm();
 }
 
 function openModalMedia(attachment: IThreadCommentAttachment) {

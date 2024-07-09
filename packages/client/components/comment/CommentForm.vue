@@ -1,78 +1,78 @@
 <template>
   <div>
-    <p class="form-title">{{ formTitle }}</p>
-    <v-form @submit.prevent="submitForm" class="form">
-      <v-text-field
-        v-model="name"
-        label="名前(省略可)"
-        variant="outlined"
-        hide-details
-        counter
-        single-line
-        clearable
-        dense
-        density="compact"
-      ></v-text-field>
+    <p class="form-title">{{ title ?? '書き込み' }}</p>
 
-      <v-textarea
-        v-model="comment"
-        label="コメント"
-        rows="3"
-        variant="outlined"
-        hide-details
-        counter
-        dense
-        single-line
-        clearable
-        density="compact"
-      ></v-textarea>
+    <Form @submit="submit" :validation-schema="schema" v-slot="{ meta }">
+      <div class="field">
+        <Field name="guestName" v-slot="{ field, errorMessage }">
+          <v-text-field
+            v-model="form.guestName"
+            v-bind="field"
+            label="名前(省略可)"
+            variant="outlined"
+            hide-details
+            counter
+            single-line
+            clearable
+            dense
+            density="compact"
+            :error-messages="errorMessage ? [errorMessage] : []"
+          />
+        </Field>
+      </div>
 
-      <input type="file" multiple @change="handleFileChange" style="display: none" ref="fileInput" />
+      <div class="field">
+        <Field name="content" v-slot="{ field, errorMessage }">
+          <v-textarea
+            v-model="form.content"
+            v-bind="field"
+            label="コメント"
+            rows="3"
+            variant="outlined"
+            hide-details
+            counter
+            dense
+            single-line
+            clearable
+            density="compact"
+            :error-messages="errorMessage ? [errorMessage] : []"
+          />
+        </Field>
+      </div>
 
-      <v-file-input
-        v-model="files"
-        label="ファイルを選択"
-        multiple
-        truncate-length="25"
-        prepend-icon=""
-        variant="outlined"
-        hide-details
-        counter
-        single-line
-        density="compact"
-      >
-        <template v-slot:selection="{ fileNames }">
-          <v-chip v-for="fileName in fileNames" :key="fileName" class="me-2" color="primary" label>
-            {{ fileName }}
-          </v-chip>
-        </template>
-        <template v-slot:loader>
-          <v-progress-linear
-            :active="custom"
-            :color="color"
-            :model-value="progress"
-            height="2"
-            indeterminate
-          ></v-progress-linear>
-        </template>
-      </v-file-input>
+      <div class="field">
+        <v-file-input
+          label="ファイルを選択"
+          show-size
+          truncate-length="25"
+          prepend-icon=""
+          variant="outlined"
+          dense
+          hide-details
+          multiple
+          accept="image/*"
+          density="compact"
+          chips
+        />
+      </div>
 
       <v-btn class="clear-button" block @click="clearForm">クリア</v-btn>
-      <v-btn type="submit" class="submit-button" block>書き込みをする</v-btn>
+      <v-btn type="submit" class="submit-button" block :disabled="!meta?.valid">書き込みをする</v-btn>
       <p class="note">＊書き込み反映には時間が掛かる場合があります＊</p>
-    </v-form>
+    </Form>
   </div>
 </template>
 
 <script setup lang="ts">
-const emit = defineEmits(['submit', 'clear']);
+import { Form, Field, ErrorMessage } from 'vee-validate';
+import * as yup from 'yup';
 
-const props = defineProps({
-  formTitle: {
-    type: String,
-    default: '書き込み',
-  },
-});
+const props = defineProps<{ title?: string; parentCommentId?: number }>();
+
+const nuxtApp = useNuxtApp();
+const router = useRouter();
+const route = useRoute();
+const { $api } = nuxtApp;
 
 const value = ref('');
 const custom = ref(false);
@@ -80,34 +80,44 @@ const custom = ref(false);
 const progress = computed(() => Math.min(100, value.value.length * 10));
 const color = computed(() => ['error', 'warning', 'success'][Math.floor(progress.value / 40)]);
 
-const name = ref('');
-const comment = ref('');
-const files = ref([]);
-const fileInput = ref(null);
+const form = ref({
+  guestName: '',
+  content: '',
+});
 
-const submitForm = () => {
-  custom.value = !custom.value;
-  console.log('名前:', name.value);
-  console.log('コメント:', comment.value);
-  console.log('ファイル:', files.value);
-  emit('submit');
-};
-
-const triggerFileInput = () => {
-  fileInput.value.click();
-};
+const schema = yup.object({
+  guestName: yup.string().optional(),
+  content: yup.string().required('コメントは必須項目です'),
+  files: yup.array().of(yup.mixed()).optional(),
+});
 
 const clearForm = () => {
-  name.value = '';
-  comment.value = '';
-  files.value = [];
-  emit('clear');
+  form.value.guestName = '';
+  form.value.content = '';
 };
 
-const handleFileChange = event => {
-  const selectedFiles = Array.from(event.target.files);
-  files.value.push(...selectedFiles);
-};
+const handleFileChange = event => {};
+
+async function submit() {
+  if (confirm('本当に書き込みますか？')) {
+    try {
+      const threadId = parseInt(route.params.id.toString(), 10);
+      if (props.parentCommentId) {
+        await $api.post(`/threads/${threadId}/comments/${props.parentCommentId}/reply`, {
+          ...form.value,
+          ...{ parentCommentId: props.parentCommentId },
+        });
+        alert('返信しました。');
+      } else {
+        await $api.post(`/threads/${threadId}/comments/`, form.value);
+        alert('書き込みました。');
+      }
+      router.go(0);
+    } catch (error) {
+      console.error('通信中にエラーが発生しました:', error);
+    }
+  }
+}
 </script>
 
 <style scoped>

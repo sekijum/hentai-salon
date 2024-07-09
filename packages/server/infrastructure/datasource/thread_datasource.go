@@ -93,7 +93,7 @@ func (ds *ThreadDatasource) FindById(ctx context.Context, id int, limit, offset 
 
 	allCommentIDs, err := ds.client.ThreadComment.Query().
 		Where(threadcomment.HasThreadWith(thread.IDEQ(id))).
-		Order(ent.Asc(threadcomment.FieldCreatedAt)).
+		Order(ent.Desc(threadcomment.FieldCreatedAt)).
 		IDs(ctx)
 	if err != nil {
 		return nil, err

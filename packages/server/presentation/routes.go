@@ -22,16 +22,18 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 	r.GET("/tags/names", controllers.TagController.FindAllName)
 	r.GET("/boards", controllers.BoardController.FindAll)
 	r.GET("/threads", controllers.ThreadController.FindAll)
-	r.GET("/threads/:id", controllers.ThreadController.FindById)
 
-	commentGroup := r.Group("/comments")
+	threadGroup := r.Group("/threads")
+	threadGroup.GET("/:thread_id", controllers.ThreadController.FindById)
+
+	commentGroup := threadGroup.Group("/:thread_id/comments")
 	commentGroup.
 		GET("/", controllers.ThreadCommentController.FindAll).
-		GET("/:id", controllers.ThreadCommentController.FindById).
+		GET("/:comment_id", controllers.ThreadCommentController.FindById).
 		POST("/", controllers.ThreadCommentController.Create).
-		POST("/reply", controllers.ThreadCommentController.Reply)
+		POST("/:comment_id/reply", controllers.ThreadCommentController.Reply)
 
-	// 以下認証必須ルート
+	// 認証必須ルート
 	authMiddleware := middleware.AuthMiddleware()
 
 	authGroup := r.Group("/").Use(authMiddleware)
@@ -40,8 +42,7 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 		authGroup.GET("/whoami", controllers.UserController.FindAuthenticatedUser)
 	}
 
+	// 管理者ルート
 	adminGroup := r.Group("/admin").Use(authMiddleware)
 	adminGroup.POST("/boards", controllers.BoardController.Create)
-	{
-	}
 }

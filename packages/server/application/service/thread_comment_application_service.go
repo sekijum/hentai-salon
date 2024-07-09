@@ -36,13 +36,15 @@ func (svc *ThreadCommentApplicationService) FindById(
 func (svc *ThreadCommentApplicationService) Create(
 	ctx context.Context,
 	ginCtx *gin.Context,
+	threadId int,
+	parentCommentId *int,
 	body request.ThreadCommentCreateRequest,
 ) error {
 	userId, exists := ginCtx.Get("user_id")
 
 	comment := &model.ThreadComment{
 		EntThreadComment: &ent.ThreadComment{
-			ThreadID:  body.ThreadId,
+			ThreadID:  threadId,
 			Content:   body.Content,
 			IPAddress: ginCtx.ClientIP(),
 			Status:    int(model.ThreadCommentStatusVisible),
@@ -56,8 +58,12 @@ func (svc *ThreadCommentApplicationService) Create(
 		comment.EntThreadComment.UserID = &userIdInt
 	}
 
-	if body.ParentCommentId != nil {
-		comment.EntThreadComment.ParentCommentID = body.ParentCommentId
+	if body.GuestName != nil {
+		comment.EntThreadComment.GuestName = body.GuestName
+	}
+
+	if parentCommentId != nil {
+		comment.EntThreadComment.ParentCommentID = parentCommentId
 	}
 
 	_, err := svc.threadCommentDatasource.Create(ctx, comment)

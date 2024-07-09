@@ -64,21 +64,17 @@
       </div>
 
       <div class="field">
-        <Field name="thumbnail" v-slot="{ field, errorMessage }">
-          <v-file-input
-            v-bind="field"
-            label="サムネイルを選択"
-            show-size
-            truncate-length="25"
-            prepend-icon=""
-            variant="outlined"
-            dense
-            hide-details
-            accept="image/*"
-            :error-messages="errorMessage ? [errorMessage] : []"
-            density="compact"
-          />
-        </Field>
+        <v-file-input
+          label="サムネイルを選択"
+          show-size
+          truncate-length="25"
+          prepend-icon=""
+          variant="outlined"
+          dense
+          hide-details
+          accept="image/*"
+          density="compact"
+        />
       </div>
 
       <v-btn type="submit" color="primary" block :disabled="!meta?.valid" class="mt-5">作成</v-btn>
@@ -91,7 +87,6 @@
 import { Form, Field, ErrorMessage } from 'vee-validate';
 import * as yup from 'yup';
 import PageTitle from '~/components/PageTitle.vue';
-import type { TBoard } from '~/types/board';
 
 const router = useRouter();
 const route = useRoute();

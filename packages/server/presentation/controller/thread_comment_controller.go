@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"server/application/service"
 	request "server/presentation/request"
-
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -61,13 +60,21 @@ func (ctrl *ThreadCommentController) FindById(c *gin.Context) {
 }
 
 func (ctrl *ThreadCommentController) Create(ginCtx *gin.Context) {
+	threadId, err := strconv.Atoi(ginCtx.Param("thread_id"))
+	if err != nil {
+		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": "無効なIDです"})
+		return
+	}
+
 	var body request.ThreadCommentCreateRequest
 	if err := ginCtx.ShouldBindJSON(&body); err != nil {
 		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	err := ctrl.threadCommentApplicationService.Create(context.Background(), ginCtx, body)
+	var parentCommentId *int = nil // Createメソッドでは親コメントIDは不要なのでnilを渡す
+
+	err = ctrl.threadCommentApplicationService.Create(context.Background(), ginCtx, threadId, parentCommentId, body)
 	if err != nil {
 		ginCtx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -77,18 +84,26 @@ func (ctrl *ThreadCommentController) Create(ginCtx *gin.Context) {
 }
 
 func (ctrl *ThreadCommentController) Reply(ginCtx *gin.Context) {
+	threadId, err := strconv.Atoi(ginCtx.Param("thread_id"))
+	if err != nil {
+		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": "無効なIDです"})
+		return
+	}
+
+	parentCommentId, err := strconv.Atoi(ginCtx.Param("comment_id"))
+	if err != nil {
+		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": "無効なコメントIDです"})
+		return
+	}
+
 	var body request.ThreadCommentCreateRequest
 	if err := ginCtx.ShouldBindJSON(&body); err != nil {
 		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	if body.ParentCommentId == nil {
-		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": "ParentCommentIdが必要です"})
-		return
-	}
-
-	err := ctrl.threadCommentApplicationService.Create(context.Background(), ginCtx, body)
+	// parentCommentIdをポインタとして渡す
+	err = ctrl.threadCommentApplicationService.Create(context.Background(), ginCtx, threadId, &parentCommentId, body)
 	if err != nil {
 		ginCtx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

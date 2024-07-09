@@ -5,7 +5,6 @@ type ThreadCommentFindAllRequest struct {
 }
 
 type ThreadCommentCreateRequest struct {
-	ThreadId        int    `json:"threadId" binding:"required"`
-	ParentCommentId *int   `json:"parentCommentId" binding:"omitempty"`
-	Content         string `json:"content" binding:"required"`
+	Content   string  `json:"content" binding:"required"`
+	GuestName *string `json:"guestName" binding:"omitempty"`
 }
