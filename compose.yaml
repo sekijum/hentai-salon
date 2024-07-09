@@ -29,7 +29,7 @@ services:
     tty: true
     init: true
     ports:
-      - 3000:3000
+      - 80:3000
     depends_on:
       - server
       - mysql
@@ -76,19 +76,6 @@ services:
     networks:
       net1:
         ipv4_address: 192.168.10.40
-
-  # elk:
-  #   image: sebp/elk:761
-  #   container_name: hentai-salon-elk
-  #   restart: always
-  #   ports:
-  #     - "5601:5601"  # Kibanaのポート
-  #     - "5044:5044"  # LogstashのBeatsポート
-  #     - "9200:9200"  # ElasticsearchのHTTPポート
-  #   volumes:
-  #     - ./docker/logstash:/etc/logstash/conf.d
-  #   environment:
-  #     - LOGSTASH_START=0
 
   # minio:
   #   image: minio/minio:latest
