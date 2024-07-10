@@ -1,5 +1,11 @@
 # 使い方
 
+### ネットワークを作成
+
+```
+docker network create hentai_salon
+```
+
 ### 起動
 
 ```
@@ -18,7 +24,7 @@ dokcer compose down
 ```
 docker compose exec server atlas migrate apply \
   --dir "file://./infrastructure/ent/migrate/migrations" \
-  --url "mysql://hentai_salon:password@192.168.10.20:3306/hentai_salon"
+  --url "mysql://hentai_salon:password@mysql:3306/hentai_salon"
 ```
 
 ### シード

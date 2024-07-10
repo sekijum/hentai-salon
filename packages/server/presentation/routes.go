@@ -22,13 +22,14 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 	r.GET("/tags/names", controllers.TagController.FindAllName)
 	r.GET("/boards", controllers.BoardController.FindAll)
 	r.GET("/threads", controllers.ThreadController.FindAll)
+	r.POST("/files/urls-for-upload", controllers.StorageController.GeneratePresignedURLs)
 
 	threadGroup := r.Group("/threads")
 	threadGroup.GET("/:thread_id", controllers.ThreadController.FindById)
 
 	commentGroup := threadGroup.Group("/:thread_id/comments")
 	commentGroup.
-		GET("/", controllers.ThreadCommentController.FindAll).
+		GET("", controllers.ThreadCommentController.FindAll).
 		GET("/:comment_id", controllers.ThreadCommentController.FindById).
 		POST("/", controllers.ThreadCommentController.Create).
 		POST("/:comment_id/reply", controllers.ThreadCommentController.Reply)

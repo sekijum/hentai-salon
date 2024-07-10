@@ -10,8 +10,10 @@ import (
 	"github.com/google/wire"
 	service2 "server/application/service"
 	"server/domain/service"
+	"server/infrastructure/aws"
 	"server/infrastructure/datasource"
 	"server/infrastructure/ent"
+	"server/infrastructure/minio"
 	"server/presentation/controller"
 )
 
@@ -39,12 +41,25 @@ func InitializeControllers() (*ControllersSet, func(), error) {
 	threadCommentController := controller.NewThreadCommentController(threadCommentApplicationService)
 	tagApplicationService := service2.NewTagApplicationService(tagDatasource)
 	tagController := controller.NewTagController(tagApplicationService)
+	minioClient, err := minio.NewMinioClient()
+	if err != nil {
+		cleanup()
+		return nil, nil, err
+	}
+	s3Client, err := aws.NewS3Client()
+	if err != nil {
+		cleanup()
+		return nil, nil, err
+	}
+	storageApplicationService := service2.NewStorageApplicationService(minioClient, s3Client)
+	storageController := controller.NewStorageController(storageApplicationService)
 	controllersSet := &ControllersSet{
 		BoardController:         boardController,
 		UserController:          userController,
 		ThreadController:        threadController,
 		ThreadCommentController: threadCommentController,
 		TagController:           tagController,
+		StorageController:       storageController,
 	}
 	return controllersSet, func() {
 		cleanup()
@@ -53,13 +68,13 @@ func InitializeControllers() (*ControllersSet, func(), error) {
 
 // wire.go:
 
-var controllerSet = wire.NewSet(controller.NewBoardController, controller.NewUserController, controller.NewThreadController, controller.NewThreadCommentController, controller.NewTagController)
+var controllerSet = wire.NewSet(controller.NewBoardController, controller.NewUserController, controller.NewThreadController, controller.NewThreadCommentController, controller.NewTagController, controller.NewStorageController)
 
-var applicationServiceSet = wire.NewSet(service2.NewBoardApplicationService, service2.NewUserApplicationService, service2.NewThreadApplicationService, service2.NewThreadCommentApplicationService, service2.NewTagApplicationService)
+var applicationServiceSet = wire.NewSet(service2.NewBoardApplicationService, service2.NewUserApplicationService, service2.NewThreadApplicationService, service2.NewThreadCommentApplicationService, service2.NewTagApplicationService, service2.NewStorageApplicationService)
 
 var domainServiceSet = wire.NewSet(service.NewBoardDomainService, service.NewUserDomainService, service.NewThreadDomainService)
 
-var entSet = wire.NewSet(ent.ProvideClient)
+var externalServiceSet = wire.NewSet(ent.ProvideClient, aws.NewS3Client, minio.NewMinioClient)
 
 var datasourceSet = wire.NewSet(datasource.NewBoardDatasource, datasource.NewUserDatasource, datasource.NewThreadDatasource, datasource.NewThreadCommentDatasource, datasource.NewTagDatasource)
 
@@ -69,4 +84,5 @@ type ControllersSet struct {
 	ThreadController        *controller.ThreadController
 	ThreadCommentController *controller.ThreadCommentController
 	TagController           *controller.TagController
+	StorageController       *controller.StorageController
 }

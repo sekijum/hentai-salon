@@ -1,15 +1,15 @@
 //go:build wireinject
 // +build wireinject
 
-// この2つがないとパッケージ内で競合する
-
 package di
 
 import (
 	applicationService "server/application/service"
 	domainService "server/domain/service"
+	aws "server/infrastructure/aws"
 	"server/infrastructure/datasource"
 	"server/infrastructure/ent"
+	minio "server/infrastructure/minio"
 	"server/presentation/controller"
 
 	"github.com/google/wire"
@@ -21,6 +21,7 @@ var controllerSet = wire.NewSet(
 	controller.NewThreadController,
 	controller.NewThreadCommentController,
 	controller.NewTagController,
+	controller.NewStorageController,
 )
 
 var applicationServiceSet = wire.NewSet(
@@ -29,6 +30,7 @@ var applicationServiceSet = wire.NewSet(
 	applicationService.NewThreadApplicationService,
 	applicationService.NewThreadCommentApplicationService,
 	applicationService.NewTagApplicationService,
+	applicationService.NewStorageApplicationService,
 )
 
 var domainServiceSet = wire.NewSet(
@@ -37,8 +39,10 @@ var domainServiceSet = wire.NewSet(
 	domainService.NewThreadDomainService,
 )
 
-var entSet = wire.NewSet(
+var externalServiceSet = wire.NewSet(
 	ent.ProvideClient,
+	aws.NewS3Client,
+	minio.NewMinioClient,
 )
 
 var datasourceSet = wire.NewSet(
@@ -55,6 +59,7 @@ type ControllersSet struct {
 	ThreadController        *controller.ThreadController
 	ThreadCommentController *controller.ThreadCommentController
 	TagController           *controller.TagController
+	StorageController       *controller.StorageController
 }
 
 func InitializeControllers() (*ControllersSet, func(), error) {
@@ -62,7 +67,7 @@ func InitializeControllers() (*ControllersSet, func(), error) {
 		controllerSet,
 		applicationServiceSet,
 		domainServiceSet,
-		entSet,
+		externalServiceSet,
 		datasourceSet,
 		wire.Struct(new(ControllersSet), "*"),
 	)

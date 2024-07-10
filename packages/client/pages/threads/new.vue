@@ -74,6 +74,7 @@
           hide-details
           accept="image/*"
           density="compact"
+          @change="handleThumbnailChange"
         />
       </div>
 
@@ -87,16 +88,18 @@
 import { Form, Field, ErrorMessage } from 'vee-validate';
 import * as yup from 'yup';
 import PageTitle from '~/components/PageTitle.vue';
+import type { IBoard } from '~/types/board';
 
 const router = useRouter();
 const route = useRoute();
 const nuxtApp = useNuxtApp();
 const { $api } = nuxtApp;
+const { fetchListPresignedUrl, uploadFileToS3WithPresignedUrl } = useActions();
 
 const tagSuggestions = ref<string[]>([]);
 const boardSuggestions = ref<{ id: number; title: string }[]>([]);
 
-const thumbnailFile = new FormData();
+const thumbnailFile = ref<File | null>(null);
 
 const form = ref({
   boardId: route.query.board_id,
@@ -127,7 +130,7 @@ async function fetchTagSuggestions() {
 
 async function fetchBoardSuggestions() {
   try {
-    const response = await $api.get<TBoard[]>('/boards');
+    const response = await $api.get<IBoard[]>('/boards');
 
     boardSuggestions.value = response.data.map(board => ({
       id: board.id,
@@ -138,10 +141,25 @@ async function fetchBoardSuggestions() {
   }
 }
 
+const handleThumbnailChange = (event: Event) => {
+  const input = event.target as HTMLInputElement;
+  if (input.files && input.files[0]) {
+    thumbnailFile.value = input.files[0];
+  }
+};
+
 async function submit() {
   try {
+    if (thumbnailFile.value) {
+      const fileName = thumbnailFile.value.name;
+      const presignedUrls = await fetchListPresignedUrl([fileName]);
+      console.log(presignedUrls);
+      const thumbnailUrl = await uploadFileToS3WithPresignedUrl(presignedUrls[0], thumbnailFile.value);
+      console.log(thumbnailUrl);
+      form.value.thumbnailUrl = thumbnailUrl;
+    }
     console.log(form.value);
-    const response = await $api.post('/threads', form.value);
+    await $api.post('/threads', form.value);
     alert('スレッドが正常に作成されました。');
     router.push('/');
   } catch (error) {

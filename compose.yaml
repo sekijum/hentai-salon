@@ -8,18 +8,11 @@ services:
       - '8080:8080'
     depends_on:
       - mysql
+      - minio
     volumes:
       - ./packages/server:/server
-    environment:
-      - DB_PASS=${DB_PASS}
-      - DB_NAME=${DB_NAME}
-      - DB_USER=${DB_USER}
-      - DB_HOST=${DB_HOST}
-      - DB_PORT=${DB_PORT}
-      - DB_URL=${DB_URL}
     networks:
-      net1:
-        ipv4_address: 192.168.10.10
+        - hentai_salon
 
   client:
     container_name: hentai-salon-client
@@ -37,8 +30,7 @@ services:
     volumes:
       - ./packages/client:/client
     networks:
-      net1:
-        ipv4_address: 192.168.10.30
+        - hentai_salon
 
   mysql:
     image: mysql:8.0
@@ -57,8 +49,7 @@ services:
       - 3306:3306
     restart: always
     networks:
-      net1:
-        ipv4_address: 192.168.10.20
+        - hentai_salon
 
   adminer:
     image: adminer
@@ -71,25 +62,23 @@ services:
     ports:
       - 8081:8080
     networks:
-      net1:
-        ipv4_address: 192.168.10.40
+        - hentai_salon
 
-  # minio:
-  #   image: minio/minio:latest
-  #   container_name: hentai-salon-minio
-  #   ports:
-  #     - 9000:9000
-  #     - 9001:9001
-  #   volumes:
-  #     - ./docker/minio/data:/export
-  #     - ./docker/minio/config:/root/.minio
-  #   environment:
-  #     MINIO_ACCESS_KEY: minio_root
-  #     MINIO_SECRET_KEY: minio_password
-  #   command: server /export --console-address ":9001"
-  #   networks:
-  #     net1:
-  #       ipv4_address: 192.168.10.80
+  minio:
+    image: minio/minio
+    container_name: hentai-salon-minio
+    ports:
+      - 9000:9000
+      - 9001:9001
+    volumes:
+      - ./docker/minio/data:/export
+      - ./docker/minio/config:/root/.minio
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    command: server /export --console-address ":9001"
+    networks:
+        - hentai_salon
 
   # infra:
   #   container_name: hentai-salon-infra
@@ -104,14 +93,7 @@ services:
   #     - ~/.aws:/root/.aws:ro
   #     - /var/run/docker.sock:/var/run/docker.sock
   #   tty: true
-  #   networks:
-  #     net1:
-  #       ipv4_address: 192.168.10.70
 
 networks:
-  net1:
-    driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: 192.168.10.0/24
+  hentai_salon:
+    external: true  
