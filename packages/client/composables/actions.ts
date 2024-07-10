@@ -14,11 +14,9 @@ export const useActions = () => {
         'Content-Type': file.type,
       },
     });
-    console.log(response);
     if (response.status !== 200) {
       throw new Error('Failed to upload file to S3');
     }
-
     return presignedUrl.split('?')[0];
   }
 

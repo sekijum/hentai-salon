@@ -42,6 +42,7 @@
           hide-details
           accept="image/*"
           density="compact"
+          @change="handleThumbnailChange"
         />
       </div>
 
@@ -59,6 +60,9 @@ import * as yup from 'yup';
 const router = useRouter();
 const nuxtApp = useNuxtApp();
 const { $api } = nuxtApp;
+const { fetchListPresignedUrl, uploadFileToS3WithPresignedUrl } = useActions();
+
+const thumbnailFile = ref<File | null>(null);
 
 const form = ref({
   title: '',
@@ -70,8 +74,20 @@ const schema = yup.object({
   title: yup.string().required('必須項目です'),
 });
 
+const handleThumbnailChange = (event: Event) => {
+  const input = event.target as HTMLInputElement;
+  if (input.files && input.files[0]) {
+    thumbnailFile.value = input.files[0];
+  }
+};
+
 async function submit() {
   try {
+    if (thumbnailFile.value) {
+      const presignedUrls = await fetchListPresignedUrl([thumbnailFile.value.name]);
+      const thumbnailUrl = await uploadFileToS3WithPresignedUrl(presignedUrls[0], thumbnailFile.value);
+      form.value.thumbnailUrl = thumbnailUrl;
+    }
     await $api.post('/admin/boards', form.value);
     alert('板が正常に作成されました。');
     router.push('/');

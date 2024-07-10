@@ -151,14 +151,10 @@ const handleThumbnailChange = (event: Event) => {
 async function submit() {
   try {
     if (thumbnailFile.value) {
-      const fileName = thumbnailFile.value.name;
-      const presignedUrls = await fetchListPresignedUrl([fileName]);
-      console.log(presignedUrls);
+      const presignedUrls = await fetchListPresignedUrl([thumbnailFile.value.name]);
       const thumbnailUrl = await uploadFileToS3WithPresignedUrl(presignedUrls[0], thumbnailFile.value);
-      console.log(thumbnailUrl);
       form.value.thumbnailUrl = thumbnailUrl;
     }
-    console.log(form.value);
     await $api.post('/threads', form.value);
     alert('スレッドが正常に作成されました。');
     router.push('/');
