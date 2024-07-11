@@ -74,12 +74,6 @@ const router = useRouter();
 const route = useRoute();
 const { $api } = nuxtApp;
 
-const value = ref('');
-const custom = ref(false);
-
-const progress = computed(() => Math.min(100, value.value.length * 10));
-const color = computed(() => ['error', 'warning', 'success'][Math.floor(progress.value / 40)]);
-
 const form = ref({
   guestName: '',
   content: '',
@@ -92,8 +86,10 @@ const schema = yup.object({
 });
 
 const clearForm = () => {
-  form.value.guestName = '';
-  form.value.content = '';
+  if (confirm('クリアしますか？')) {
+    form.value.guestName = '';
+    form.value.content = '';
+  }
 };
 
 const handleFileChange = event => {};

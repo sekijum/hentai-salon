@@ -66,7 +66,6 @@
 
       <div class="field">
         <v-file-input
-          v-bind="field"
           show-size
           truncate-length="25"
           prepend-icon=""
@@ -75,7 +74,7 @@
           density="compact"
           hide-details
           accept="image/*"
-          :error-messages="errorMessage ? [errorMessage] : []"
+          @change="handleAvatarChange"
         />
       </div>
 
@@ -93,8 +92,9 @@ import Menu from '~/components/Menu.vue';
 const router = useRouter();
 const nuxtApp = useNuxtApp();
 const { $storage, $api } = nuxtApp;
+const { fetchListPresignedUrl, uploadFileToS3WithPresignedUrl } = useActions();
 
-const avatarFile = new FormData();
+const avatarFile = ref<File | null>(null);
 
 const form = ref({
   name: '',
@@ -114,15 +114,25 @@ const schema = yup.object({
   password: yup.string().min(6, '6文字以上で入力してください').required('必須項目です'),
   confirmPassword: yup
     .string()
-    .oneOf([yup.ref('password'), null], 'パスワードが一致しません')
+    .oneOf([yup.ref('password')], 'パスワードが一致しません')
     .required('必須項目です'),
-  avatar: yup.mixed().nullable(),
 });
+
+function handleAvatarChange(event: Event) {
+  const input = event.target as HTMLInputElement;
+  if (input.files && input.files[0]) {
+    avatarFile.value = input.files[0];
+  }
+}
 
 async function submit() {
   try {
+    if (avatarFile.value) {
+      const presignedUrls = await fetchListPresignedUrl([avatarFile.value.name]);
+      const thumbnailUrl = await uploadFileToS3WithPresignedUrl(presignedUrls[0], avatarFile.value);
+      form.value.avatarUrl = thumbnailUrl;
+    }
     const response = await $api.post('/signup', form.value);
-
     const authHeader = response.headers.authorization;
     const token = authHeader.split(' ')[1];
     $storage.setItem('access_token', token);

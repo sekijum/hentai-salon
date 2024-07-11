@@ -44,12 +44,10 @@
 
       <CommentForm />
 
-      <!-- 上にスクロールするFAB -->
       <v-btn icon large color="primary" class="fab fab-top" @click="scrollToCommentTop">
         <v-icon>mdi-arrow-up</v-icon>
       </v-btn>
 
-      <!-- 下にスクロールするFAB -->
       <v-btn icon large color="primary" class="fab fab-bottom" @click="scrollToCommentBottom">
         <v-icon>mdi-arrow-down</v-icon>
       </v-btn>
@@ -59,6 +57,10 @@
 
     <Pagination :totalCount="thread.comments.totalCount" :limit="commentLimit" />
   </div>
+
+  <v-overlay :model-value="isMounted" class="align-center justify-center" scroll-strategy="none">
+    <v-progress-circular color="primary" size="64" indeterminate />
+  </v-overlay>
 </template>
 
 <script setup lang="ts">
@@ -76,7 +78,8 @@ const route = useRoute();
 const nuxtApp = useNuxtApp();
 const { $api } = nuxtApp;
 
-const commentLimit = 50;
+const commentLimit = 100;
+const isMounted = ref(true);
 
 const menuItems = [
   {
@@ -126,6 +129,7 @@ onMounted(async () => {
 });
 
 async function fetchThreads() {
+  isMounted.value = true;
   const threadId = route.params.id;
   const response = await $api.get<IThread>(`/threads/${threadId}`, {
     params: {
@@ -134,11 +138,11 @@ async function fetchThreads() {
     },
   });
   thread.value = response.data;
+  isMounted.value = false;
 }
 
 watchEffect(() => {
   if (route.query.limit) {
-    console.log('hoge');
     fetchThreads();
   }
 });

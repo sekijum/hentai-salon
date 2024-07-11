@@ -74,12 +74,12 @@ const schema = yup.object({
   title: yup.string().required('必須項目です'),
 });
 
-const handleThumbnailChange = (event: Event) => {
+function handleThumbnailChange(event: Event) {
   const input = event.target as HTMLInputElement;
   if (input.files && input.files[0]) {
     thumbnailFile.value = input.files[0];
   }
-};
+}
 
 async function submit() {
   try {

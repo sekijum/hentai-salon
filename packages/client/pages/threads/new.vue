@@ -141,12 +141,12 @@ async function fetchBoardSuggestions() {
   }
 }
 
-const handleThumbnailChange = (event: Event) => {
+function handleThumbnailChange(event: Event) {
   const input = event.target as HTMLInputElement;
   if (input.files && input.files[0]) {
-    thumbnailFile.value = input.files[0];
+    avatarFile.value = input.files[0];
   }
-};
+}
 
 async function submit() {
   try {
