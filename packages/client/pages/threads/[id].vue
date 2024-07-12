@@ -56,7 +56,7 @@
     <v-divider />
 
     <Pagination :totalCount="thread.comments.totalCount" :limit="commentLimit" />
-    <ThreadTable
+    <ThreadList
       title="閲覧履歴"
       :items="threadsByHistory"
       :navigate="() => router.push({ path: '/threads', query: { queryCriteria: ['history'] } })"
@@ -76,6 +76,7 @@ import OverlayLoagind from '~/components/OverlayLoagind.vue';
 import MediaGallery from '~/components/MediaGallery.vue';
 import { useRouter, useRoute } from 'vue-router';
 import type { IThread } from '~/types/thread';
+import ThreadList from '~/components/thread/ThreadList.vue';
 
 const router = useRouter();
 const route = useRoute();

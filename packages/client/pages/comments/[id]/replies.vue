@@ -36,7 +36,7 @@
 
 <script setup lang="ts">
 import Header from '~/components/Header.vue';
-import ThreadTable from '~/components/thread/ThreadTable.vue';
+import ThreadList from '~/components/thread/ThreadList.vue';
 import CommentList from '~/components/comment/CommentList.vue';
 import CommentForm from '~/components/comment/CommentForm.vue';
 import Menu from '~/components/Menu.vue';

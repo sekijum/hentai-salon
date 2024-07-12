@@ -19,37 +19,37 @@
     />
     <v-btn type="submit" color="primary" block @click="search">全板検索</v-btn>
 
-    <ThreadTable
+    <ThreadList
       v-if="threads?.threadsByHistory"
       title="閲覧履歴"
       :items="threads?.threadsByHistory"
       :navigate="() => router.push({ query: { queryCriteria: ['history'] } })"
     />
-    <ThreadTable
+    <ThreadList
       v-if="threads?.threadsByPopular"
       title="人気"
       :items="threads?.threadsByPopular"
       :navigate="() => router.push({ query: { queryCriteria: ['popularity'] } })"
     />
-    <ThreadTable
+    <ThreadList
       v-if="threads?.threadsByNewest"
       title="新着"
       :items="threads?.threadsByNewest"
       :navigate="() => router.push({ query: { queryCriteria: ['newest'] } })"
     />
-    <ThreadTable
+    <ThreadList
       v-if="threads?.threadsByKeyword"
       title="全板検索"
       :items="threads?.threadsByKeyword"
       :navigate="() => router.push({ query: { queryCriteria: ['keyword'] } })"
     />
-    <ThreadTable
+    <ThreadList
       v-if="threads?.threadsByRelated"
       title="関連"
       :items="threads?.threadsByRelated"
       :navigate="() => router.push({ query: { queryCriteria: ['related'] } })"
     />
-    <ThreadTable
+    <ThreadList
       v-if="threads?.threadsByBoard"
       title="板"
       :items="threads?.threadsByBoard"
@@ -59,7 +59,7 @@
 </template>
 
 <script setup lang="ts">
-import ThreadTable from '~/components/thread/ThreadTable.vue';
+import ThreadList from '~/components/thread/ThreadList.vue';
 import Menu from '~/components/Menu.vue';
 import PageTitle from '~/components/PageTitle.vue';
 import type { IThread } from '~/types/thread';

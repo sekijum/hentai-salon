@@ -11,13 +11,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRoute } from 'vue-router';
-import Header from '~/components/Header.vue';
-import ThreadTable from '~/components/thread/ThreadTable.vue';
-import CommentList from '~/components/comment/CommentList.vue';
-import CommentForm from '~/components/comment/CommentForm.vue';
-import Menu from '~/components/Menu.vue';
-import PageTitle from '~/components/PageTitle.vue';
-import Pagination from '~/components/Pagination.vue';
 import CommentItem from '~/components/comment/CommentItem.vue';
 
 const route = useRoute();

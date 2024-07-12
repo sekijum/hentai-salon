@@ -2,18 +2,18 @@
   <div>
     <Menu :items="menuItems" />
 
-    <!-- <ThreadTable title="閲覧履歴" :items="historyItems" moreLink="/history" link="/hoge" :maxItems="3" /> -->
-    <ThreadTable
+    <!-- <ThreadList title="閲覧履歴" :items="historyItems" moreLink="/history" link="/hoge" :maxItems="3" /> -->
+    <ThreadList
       title="閲覧順"
       :items="threadsByHistory"
       :navigate="() => router.push({ path: '/threads', query: { queryCriteria: ['history'] } })"
     />
-    <ThreadTable
+    <ThreadList
       title="人気"
       :items="threadsByPopular"
       :navigate="() => router.push({ path: '/threads', query: { queryCriteria: ['popularity'] } })"
     />
-    <ThreadTable
+    <ThreadList
       title="新着"
       :items="threadsByNewest"
       :navigate="() => router.push({ path: '/threads', query: { queryCriteria: ['newest'] } })"
@@ -23,7 +23,7 @@
 
 <script setup lang="ts">
 import Menu from '~/components/Menu.vue';
-import ThreadTable from '~/components/thread/ThreadTable.vue';
+import ThreadList from '~/components/thread/ThreadList.vue';
 import type { IThread } from '~/types/thread';
 const { getThreadViewHistory } = useThreadViewHistory();
 
