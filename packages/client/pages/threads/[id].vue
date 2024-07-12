@@ -58,9 +58,7 @@
     <Pagination :totalCount="thread.comments.totalCount" :limit="commentLimit" />
   </div>
 
-  <v-overlay :model-value="isMounted" class="align-center justify-center" scroll-strategy="none">
-    <v-progress-circular color="primary" size="64" indeterminate />
-  </v-overlay>
+  <OverlayLoagind :isLoading="isLoading" title="読込中" />
 </template>
 
 <script setup lang="ts">
@@ -69,6 +67,7 @@ import CommentForm from '~/components/comment/CommentForm.vue';
 import Menu from '~/components/Menu.vue';
 import PageTitle from '~/components/PageTitle.vue';
 import Pagination from '~/components/Pagination.vue';
+import OverlayLoagind from '~/components/OverlayLoagind.vue';
 import MediaGallery from '~/components/MediaGallery.vue';
 import { useRouter, useRoute } from 'vue-router';
 import type { IThread } from '~/types/thread';
@@ -79,7 +78,7 @@ const nuxtApp = useNuxtApp();
 const { $api } = nuxtApp;
 
 const commentLimit = 100;
-const isMounted = ref(true);
+const isLoading = ref(true);
 
 const menuItems = [
   {
@@ -129,7 +128,7 @@ onMounted(async () => {
 });
 
 async function fetchThreads() {
-  isMounted.value = true;
+  isLoading.value = true;
   const threadId = route.params.id;
   const response = await $api.get<IThread>(`/threads/${threadId}`, {
     params: {
@@ -138,7 +137,7 @@ async function fetchThreads() {
     },
   });
   thread.value = response.data;
-  isMounted.value = false;
+  isLoading.value = false;
 }
 
 watchEffect(() => {

@@ -42,6 +42,7 @@
 
       <div class="field">
         <v-file-input
+          ref="fileInput"
           label="ファイルを選択"
           show-size
           truncate-length="25"
@@ -50,9 +51,10 @@
           dense
           hide-details
           multiple
-          accept="image/*"
+          accept="image/jpeg,image/png,image/gif"
           density="compact"
           chips
+          @change="handleAttachmentsChange"
         />
       </div>
 
@@ -60,58 +62,108 @@
       <v-btn type="submit" class="submit-button" block :disabled="!meta?.valid">書き込みをする</v-btn>
       <p class="note">＊書き込み反映には時間が掛かる場合があります＊</p>
     </Form>
+
+    <OverlayLoagind :isLoading="isLoading" title="書き込み中" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { Form, Field, ErrorMessage } from 'vee-validate';
 import * as yup from 'yup';
+import OverlayLoagind from '~/components/OverlayLoagind.vue';
+
+interface Attachment {
+  url: string;
+  displayOrder: number;
+  type: 'Video' | 'Image';
+}
 
 const props = defineProps<{ title?: string; parentCommentId?: number }>();
 
+const attachmentFiles = ref<File[] | null>(null);
 const nuxtApp = useNuxtApp();
 const router = useRouter();
 const route = useRoute();
 const { $api } = nuxtApp;
+const { uploadFilesToImgur } = useActions();
+const fileInput = ref<InstanceType<typeof HTMLInputElement>>();
+const isLoading = ref(false);
 
 const form = ref({
   guestName: '',
   content: '',
+  attachments: [] as Attachment[],
 });
 
 const schema = yup.object({
   guestName: yup.string().optional(),
   content: yup.string().required('コメントは必須項目です'),
-  files: yup.array().of(yup.mixed()).optional(),
+  attachments: yup
+    .array()
+    .of(
+      yup.object({
+        url: yup.string().required(),
+        displayOrder: yup.number().required(),
+        type: yup.mixed<'Video' | 'Image'>().oneOf(['Video', 'Image']).required(),
+      }),
+    )
+    .optional(),
 });
 
-const clearForm = () => {
-  if (confirm('クリアしますか？')) {
+function clearForm(): void {
+  if (confirm('本当にクリアしますか？')) {
     form.value.guestName = '';
     form.value.content = '';
+    attachmentFiles.value = null;
+    if (fileInput.value) {
+      fileInput.value.reset();
+    }
   }
-};
+}
 
-const handleFileChange = event => {};
+function handleAttachmentsChange(event: Event): void {
+  const input = event.target as HTMLInputElement;
+  if (input.files) {
+    const files = Array.from(input.files);
+    if (files.length > 4) {
+      alert('ファイルの最大枚数は4枚です');
+      attachmentFiles.value = null;
+      if (fileInput.value) {
+        fileInput.value.reset();
+      }
+    } else {
+      attachmentFiles.value = files;
+    }
+  }
+}
 
-async function submit() {
+async function submit(): Promise<void> {
   if (confirm('本当に書き込みますか？')) {
+    isLoading.value = true;
     try {
+      if (attachmentFiles.value && attachmentFiles.value.length > 0) {
+        const uploadedAttachments = await uploadFilesToImgur(attachmentFiles.value);
+        form.value.attachments = uploadedAttachments;
+        console.log(uploadedAttachments);
+      }
+
       const threadId = parseInt(route.params.id.toString(), 10);
       if (props.parentCommentId) {
         await $api.post(`/threads/${threadId}/comments/${props.parentCommentId}/reply`, {
           ...form.value,
-          ...{ parentCommentId: props.parentCommentId },
+          parentCommentId: props.parentCommentId,
         });
-        alert('返信しました。');
+        alert('返信に成功しました。');
       } else {
         await $api.post(`/threads/${threadId}/comments/`, form.value);
-        alert('書き込みました。');
+        alert('書き込みに成功しました。');
       }
       router.go(0);
     } catch (error) {
       console.error('通信中にエラーが発生しました:', error);
+      alert('コメントの送信中にエラーが発生しました。');
     }
+    isLoading.value = false;
   }
 }
 </script>

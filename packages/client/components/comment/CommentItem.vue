@@ -7,6 +7,7 @@
           <nuxt-link :to="userLink()" class="username-link">
             {{ username() }}
           </nuxt-link>
+          {{ $formatDate(comment.createdAt) }}
         </div>
       </div>
       <div v-if="comment.parentCommentIdx" class="reply-indication">
@@ -112,6 +113,8 @@ import type { IThreadComment } from '~/types/thread';
 import type { IThreadCommentAttachment } from '~/types/thread-comment-attachment';
 
 const props = defineProps<{ comment: IThreadComment; commentLimit: number; threadId: number }>();
+const nuxtApp = useNuxtApp();
+const { $formatDate } = nuxtApp;
 
 const route = useRoute();
 const router = useRouter();

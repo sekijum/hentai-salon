@@ -53,7 +53,12 @@ func (ds *ThreadCommentDatasource) FindById(ctx context.Context, id int) (*model
 }
 
 func (ds *ThreadCommentDatasource) Create(ctx context.Context, m *model.ThreadComment) (*model.ThreadComment, error) {
-	commentBuilder := ds.client.ThreadComment.Create().
+	tx, err := ds.client.Tx(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	commentBuilder := tx.ThreadComment.Create().
 		SetThreadID(m.EntThreadComment.ThreadID).
 		SetContent(m.EntThreadComment.Content).
 		SetIPAddress(m.EntThreadComment.IPAddress).
@@ -70,6 +75,24 @@ func (ds *ThreadCommentDatasource) Create(ctx context.Context, m *model.ThreadCo
 
 	savedComment, err := commentBuilder.Save(ctx)
 	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	for _, attachment := range m.EntThreadComment.Edges.Attachments {
+		_, err := tx.ThreadCommentAttachment.Create().
+			SetCommentID(savedComment.ID).
+			SetURL(attachment.URL).
+			SetDisplayOrder(attachment.DisplayOrder).
+			SetType(attachment.Type).
+			Save(ctx)
+		if err != nil {
+			tx.Rollback()
+			return nil, err
+		}
+	}
+
+	if err := tx.Commit(); err != nil {
 		return nil, err
 	}
 

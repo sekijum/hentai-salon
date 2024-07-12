@@ -66,6 +66,23 @@ func (svc *ThreadCommentApplicationService) Create(
 		comment.EntThreadComment.ParentCommentID = parentCommentId
 	}
 
+	attachments := make([]*ent.ThreadCommentAttachment, len(body.Attachments))
+	for i, a := range body.Attachments {
+		attachmentType, err := model.AttachmentTypeFromString(a.Type)
+		if err != nil {
+			return err
+		}
+
+		attachments[i] = &ent.ThreadCommentAttachment{
+			URL:          a.URL,
+			DisplayOrder: a.DisplayOrder,
+			Type:         int(attachmentType),
+			CreatedAt:    time.Now(),
+		}
+	}
+
+	comment.EntThreadComment.Edges.Attachments = attachments
+
 	_, err := svc.threadCommentDatasource.Create(ctx, comment)
 	if err != nil {
 		return err

@@ -94,18 +94,18 @@ const router = useRouter();
 const route = useRoute();
 const nuxtApp = useNuxtApp();
 const { $api } = nuxtApp;
-const { fetchListPresignedUrl, uploadFileToS3WithPresignedUrl } = useActions();
+const { fetchListPresignedUrl, uploadFilesToS3 } = useActions();
 
 const tagSuggestions = ref<string[]>([]);
 const boardSuggestions = ref<{ id: number; title: string }[]>([]);
 
-const thumbnailFile = ref<File | null>(null);
+const avatarFile = ref<File | null>(null);
 
 const form = ref({
   boardId: route.query.board_id,
   title: '',
   description: '',
-  thumbnailUrl: null,
+  thumbnailUrl: null as string | null,
   tagNames: [],
 });
 
@@ -150,9 +150,9 @@ function handleThumbnailChange(event: Event) {
 
 async function submit() {
   try {
-    if (thumbnailFile.value) {
-      const presignedUrls = await fetchListPresignedUrl([thumbnailFile.value.name]);
-      const thumbnailUrl = await uploadFileToS3WithPresignedUrl(presignedUrls[0], thumbnailFile.value);
+    if (avatarFile.value) {
+      const presignedUrls = await fetchListPresignedUrl([avatarFile.value.name]);
+      const thumbnailUrl = await uploadFilesToS3(presignedUrls[0], avatarFile.value);
       form.value.thumbnailUrl = thumbnailUrl;
     }
     await $api.post('/threads', form.value);

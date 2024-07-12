@@ -92,7 +92,7 @@ import Menu from '~/components/Menu.vue';
 const router = useRouter();
 const nuxtApp = useNuxtApp();
 const { $storage, $api } = nuxtApp;
-const { fetchListPresignedUrl, uploadFileToS3WithPresignedUrl } = useActions();
+const { fetchListPresignedUrl, uploadFilesToS3 } = useActions();
 
 const avatarFile = ref<File | null>(null);
 
@@ -100,7 +100,7 @@ const form = ref({
   name: '',
   email: '',
   password: '',
-  avatarUrl: null,
+  avatarUrl: null as null | string,
 });
 
 const menuItems = [
@@ -129,7 +129,7 @@ async function submit() {
   try {
     if (avatarFile.value) {
       const presignedUrls = await fetchListPresignedUrl([avatarFile.value.name]);
-      const thumbnailUrl = await uploadFileToS3WithPresignedUrl(presignedUrls[0], avatarFile.value);
+      const thumbnailUrl = await uploadFilesToS3(presignedUrls[0], avatarFile.value);
       form.value.avatarUrl = thumbnailUrl;
     }
     const response = await $api.post('/signup', form.value);

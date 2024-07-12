@@ -15,7 +15,7 @@
           <VideoPlayer :src="url" />
         </template>
         <template v-else>
-          <v-img :src="url" class="media-image" />
+          <v-img :src="url" class="media-image" referrerpolicy="no-referrer" />
         </template>
       </div>
     </v-card>

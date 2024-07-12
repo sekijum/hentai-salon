@@ -1,12 +1,9 @@
 package model
 
 import (
+	"errors"
 	"server/infrastructure/ent"
 )
-
-type ThreadCommentAttachment struct {
-	EntAttachment *ent.ThreadCommentAttachment
-}
 
 type AttachmentType int
 
@@ -14,6 +11,10 @@ const (
 	AttachmentTypeImage AttachmentType = iota
 	AttachmentTypeVideo
 )
+
+type ThreadCommentAttachment struct {
+	EntAttachment *ent.ThreadCommentAttachment
+}
 
 func (m ThreadCommentAttachment) TypeToString() string {
 	switch AttachmentType(m.EntAttachment.Type) {
@@ -27,5 +28,16 @@ func (m ThreadCommentAttachment) TypeToString() string {
 }
 
 func (m ThreadCommentAttachment) TypeToInt() int {
-	return m.EntAttachment.Type
+	return int(m.EntAttachment.Type)
+}
+
+func AttachmentTypeFromString(s string) (AttachmentType, error) {
+	switch s {
+	case "Image":
+		return AttachmentTypeImage, nil
+	case "Video":
+		return AttachmentTypeVideo, nil
+	default:
+		return -1, errors.New("invalid attachment type")
+	}
 }

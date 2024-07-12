@@ -14,6 +14,7 @@
             class="bg-grey-lighten-2"
             cover
             @click="openModalMedia(item)"
+            referrerpolicy="no-referrer"
           >
             <template v-slot:placeholder>
               <v-row align="center" class="fill-height ma-0" justify="center">
@@ -22,7 +23,14 @@
             </template>
           </v-img>
           <div v-else class="video-container" @click="openModalMedia(item)">
-            <video ref="video" :src="item.url" @loadedmetadata="updateVideoMeta(item)" muted class="video-thumbnail" />
+            <video
+              ref="video"
+              :src="item.url"
+              @loadedmetadata="updateVideoMeta(item)"
+              muted
+              class="video-thumbnail"
+              referrerpolicy="no-referrer"
+            />
             <v-icon class="play-icon">mdi-play-circle</v-icon>
             <div v-if="item.duration" class="time-label">{{ formatTime(item.duration) }}</div>
           </div>
@@ -43,6 +51,7 @@
 <script setup lang="ts">
 import { ref, watch, defineProps } from 'vue';
 import { useRoute } from 'vue-router';
+import MediaModal from '~/components/MediaModal.vue';
 import type { IThreadCommentAttachmentForThread, IThreadCommentAttachment } from '~/types/thread-comment-attachment';
 
 const props = defineProps<{
