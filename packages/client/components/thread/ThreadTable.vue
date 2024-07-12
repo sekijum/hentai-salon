@@ -25,9 +25,6 @@
               <br />
               {{ item.board?.title }}
               <br />
-              話題度
-              {{ item.popularity }}
-              <br />
               {{ item.commentCount }}
               <v-icon small>mdi-comment</v-icon>
               <br />
@@ -37,7 +34,7 @@
       </template>
     </v-data-table>
 
-    <div v-if="moreLink && items.length > 0" class="more-link" @click="() => router.push(moreLink)">
+    <div v-if="navigate && items.length > 0" class="more-link" @click="navigate">
       {{ title }}をもっと見る <v-icon down>mdi-chevron-down</v-icon>
     </div>
   </div>
@@ -45,15 +42,15 @@
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
-import type { TThread, TThreadList } from '~/types/thread';
+import type { IThread } from '~/types/thread';
 
 const nuxtApp = useNuxtApp();
 const { $formatDate } = nuxtApp;
 
 defineProps<{
   title: String;
-  items: TThread[];
-  moreLink: string;
+  items: IThread[];
+  navigate?: () => void;
 }>();
 
 const router = useRouter();

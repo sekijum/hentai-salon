@@ -29,7 +29,6 @@ export interface IThread {
   tags: string[];
   createdAt: string;
   commentCount: number;
-  popularity: string;
   comments: IListResource<IThreadComment>;
   attachments: IThreadCommentAttachmentForThread[];
 }

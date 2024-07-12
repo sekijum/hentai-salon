@@ -1,7 +1,6 @@
 package resource
 
 import (
-	"fmt"
 	"server/domain/model"
 	"time"
 )
@@ -53,7 +52,6 @@ type ThreadResource struct {
 	Tags         []string                                    `json:"tags"`
 	CreatedAt    string                                      `json:"createdAt"`
 	CommentCount int                                         `json:"commentCount"`
-	Popularity   string                                      `json:"popularity"`
 	Comments     ListResource[*ThreadCommentResource]        `json:"comments"`
 	Attachments  []*ThreadCommentAttachmentResourceForThread `json:"attachments"`
 }
@@ -155,8 +153,6 @@ func NewThreadResource(t *model.Thread, limit, offset int) *ThreadResource {
 		tagNames = append(tagNames, tag.Name)
 	}
 
-	popularity := fmt.Sprintf("%d%%", t.Popularity)
-
 	var boardResource *ThreadBoardResource
 	if t.EntThread.Edges.Board != nil {
 		boardResource = NewThreadBoardResource(&model.Board{EntBoard: t.EntThread.Edges.Board})
@@ -194,7 +190,6 @@ func NewThreadResource(t *model.Thread, limit, offset int) *ThreadResource {
 		Tags:         tagNames,
 		CreatedAt:    t.EntThread.CreatedAt.Format(time.RFC3339),
 		CommentCount: t.TotalComments,
-		Popularity:   popularity,
 		Comments:     commentsList,
 		Attachments:  attachments,
 	}

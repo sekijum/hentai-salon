@@ -6,14 +6,55 @@
 
     <Menu :items="menuItems" />
 
-    <v-autocomplete
-      label="スレを検索"
-      :items="['California', 'Colorado', 'Florida', 'Georgia', 'Texas', 'Wyoming']"
+    <v-text-field
       v-model="keyword"
+      label="スレを検索"
+      variant="outlined"
+      hide-details
+      counter
+      single-line
+      clearable
+      dense
+      density="compact"
     />
+    <v-btn type="submit" color="primary" block @click="search">全板検索</v-btn>
 
-    <ThreadTable title="人気" :items="threadsByPopular" moreLink="/news" />
-    <ThreadTable title="新着" :items="threadsByNewest" moreLink="/popular" />
+    <ThreadTable
+      v-if="threads?.threadsByHistory"
+      title="閲覧履歴"
+      :items="threads?.threadsByHistory"
+      :navigate="() => router.push({ query: { queryCriteria: ['history'] } })"
+    />
+    <ThreadTable
+      v-if="threads?.threadsByPopular"
+      title="人気"
+      :items="threads?.threadsByPopular"
+      :navigate="() => router.push({ query: { queryCriteria: ['popularity'] } })"
+    />
+    <ThreadTable
+      v-if="threads?.threadsByNewest"
+      title="新着"
+      :items="threads?.threadsByNewest"
+      :navigate="() => router.push({ query: { queryCriteria: ['newest'] } })"
+    />
+    <ThreadTable
+      v-if="threads?.threadsByKeyword"
+      title="全板検索"
+      :items="threads?.threadsByKeyword"
+      :navigate="() => router.push({ query: { queryCriteria: ['keyword'] } })"
+    />
+    <ThreadTable
+      v-if="threads?.threadsByRelated"
+      title="関連"
+      :items="threads?.threadsByRelated"
+      :navigate="() => router.push({ query: { queryCriteria: ['related'] } })"
+    />
+    <ThreadTable
+      v-if="threads?.threadsByBoard"
+      title="板"
+      :items="threads?.threadsByBoard"
+      :navigate="() => router.push({ query: { queryCriteria: ['board'] } })"
+    />
   </div>
 </template>
 
@@ -29,58 +70,72 @@ const keyword = ref(route.query.keyword ?? '');
 interface ThreadResponse {
   threadsByPopular: IThread[];
   threadsByNewest: IThread[];
+  threadsByHistory: IThread[];
+  threadsByKeyword: IThread[];
+  threadsByRelated: IThread[];
+  threadsByBoard: IThread[];
 }
 const nuxtApp = useNuxtApp();
 const { payload, $api } = nuxtApp;
+const { getThreadViewHistory } = useThreadViewHistory();
 
-const threadsByPopular = ref<IThread[]>([]);
-const threadsByNewest = ref<IThread[]>([]);
+const threads = ref<ThreadResponse>();
 
 const menuItems = [
   {
-    title: '関連順',
-    navigate: () => router.push('/'),
+    title: '関連',
+    navigate: () => router.push({ query: { queryCriteria: 'related' } }),
     icon: 'mdi-format-list-bulleted',
   },
   {
     title: '人気',
-    navigate: () => router.push('/'),
+    navigate: () => router.push({ query: { queryCriteria: 'popularity' } }),
     icon: 'mdi-fire',
   },
   {
-    title: '閲覧履歴',
-    navigate: () => router.push('/'),
-    icon: 'mdi-update',
-  },
-  {
-    title: '閲覧順',
-    navigate: () => router.push('/'),
+    title: '関連履歴',
+    navigate: () => router.push({ query: { queryCriteria: 'history' } }),
     icon: 'mdi-earth',
   },
   {
-    title: '新着順',
-    navigate: () => router.push('/'),
+    title: '新着',
+    navigate: () => router.push({ query: { queryCriteria: 'newest' } }),
     icon: 'mdi-new-box',
   },
-  {
-    title: 'コメント数',
-    navigate: () => router.push('/'),
-    icon: 'mdi-cog',
-  },
 ];
+
+async function search() {
+  await router.push({ ...{ query: { ...{ keyword: keyword.value }, ...{ queryCriteria: 'keyword' } } } });
+  await fetchThreads();
+}
 
 onMounted(async () => {
   await fetchThreads();
 });
 
 async function fetchThreads() {
+  if (route.query.boardId) {
+    await router.push({ ...{ query: { ...{ boardId: route.query.boardId }, ...{ queryCriteria: 'board' } } } });
+  }
+  if (route.query.keyword) {
+    await router.push({ ...{ query: { ...{ keyword: keyword.value }, ...{ queryCriteria: 'keyword' } } } });
+  }
+
   const response = await $api.get<ThreadResponse>('/threads', {
     params: {
-      orders: ['popularity', 'newest'],
+      queryCriteria: route.query.queryCriteria ? [route.query.queryCriteria] : ['popularity', 'newest'],
+      threadIds: getThreadViewHistory(),
+      keyword: keyword.value,
+      boardId: route.query.boardId,
       limit: 10,
     },
   });
-  threadsByPopular.value = response.data.threadsByPopular;
-  threadsByNewest.value = response.data.threadsByNewest;
+  threads.value = response.data;
 }
+
+watchEffect(() => {
+  if (route.query.queryCriteria) {
+    fetchThreads();
+  }
+});
 </script>

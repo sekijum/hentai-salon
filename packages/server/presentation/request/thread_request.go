@@ -8,10 +8,12 @@ type ThreadFindByIdRequest struct {
 }
 
 type ThreadFindAllRequest struct {
-	Limit     int      `form:"limit"`
-	Offset    int      `form:"offset"`
-	Orders    []string `form:"orders[]"`
-	ThreadIds []int    `form:"threadIds" binding:"omitempty,dive,min=1"`
+	Limit         int      `form:"limit"`
+	Offset        int      `form:"offset"`
+	QueryCriteria []string `form:"queryCriteria[]"`
+	ThreadIds     []int    `form:"threadIds[]" binding:"omitempty,dive,min=1"`
+	Keyword       string   `form:"keyword" binding:"omitempty,max=50"`
+	BoardId       int      `form:"boardId" binding:"omitempty"`
 }
 
 type ThreadCreateRequest struct {

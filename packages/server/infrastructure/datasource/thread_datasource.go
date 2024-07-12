@@ -4,9 +4,11 @@ import (
 	"context"
 	"server/domain/model"
 	"server/infrastructure/ent"
+	"server/infrastructure/ent/tag"
 	"server/infrastructure/ent/thread"
 	"server/infrastructure/ent/threadcomment"
 	"server/infrastructure/ent/threadcommentattachment"
+	"sort"
 )
 
 type ThreadDatasource struct {
@@ -17,12 +19,22 @@ func NewThreadDatasource(client *ent.Client) *ThreadDatasource {
 	return &ThreadDatasource{client: client}
 }
 
-func (ds *ThreadDatasource) FindByPopularity(ctx context.Context, limit, offset int) ([]*model.Thread, error) {
+func (ds *ThreadDatasource) getTotalComments(ctx context.Context, threadID int) (int, error) {
+	totalComments, err := ds.client.ThreadComment.Query().
+		Where(threadcomment.HasThreadWith(thread.IDEQ(threadID))).
+		Count(ctx)
+	if err != nil {
+		return 0, err
+	}
+	return totalComments, nil
+}
+
+func (ds *ThreadDatasource) FindByBoardId(ctx context.Context, boardId, limit, offset int) ([]*model.Thread, error) {
 	threads, err := ds.client.Thread.Query().
+		Where(thread.BoardIDEQ(boardId)).
 		Limit(limit).
 		Offset(offset).
 		WithTags().
-		WithComments().
 		WithBoard().
 		All(ctx)
 	if err != nil {
@@ -31,8 +43,142 @@ func (ds *ThreadDatasource) FindByPopularity(ctx context.Context, limit, offset 
 
 	var modelThreads []*model.Thread
 	for _, entThread := range threads {
+		totalComments, err := ds.getTotalComments(ctx, entThread.ID)
+		if err != nil {
+			return nil, err
+		}
 		modelThreads = append(modelThreads, &model.Thread{
-			EntThread: entThread,
+			EntThread:     entThread,
+			TotalComments: totalComments,
+		})
+	}
+
+	return modelThreads, nil
+}
+
+func (ds *ThreadDatasource) FindByRelatedTags(ctx context.Context, threadIds []int, limit, offset int) ([]*model.Thread, error) {
+	tags, err := ds.client.Tag.Query().
+		Where(tag.HasThreadsWith(thread.IDIn(threadIds...))).
+		All(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var tagIds []int
+	for _, t := range tags {
+		tagIds = append(tagIds, t.ID)
+	}
+
+	threads, err := ds.client.Thread.Query().
+		Where(
+			thread.And(
+				thread.HasTagsWith(tag.IDIn(tagIds...)),
+				thread.Not(thread.IDIn(threadIds...)),
+			),
+		).
+		Limit(limit).
+		Offset(offset).
+		WithTags().
+		WithBoard().
+		All(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var modelThreads []*model.Thread
+	for _, entThread := range threads {
+		totalComments, err := ds.getTotalComments(ctx, entThread.ID)
+		if err != nil {
+			return nil, err
+		}
+		modelThreads = append(modelThreads, &model.Thread{
+			EntThread:     entThread,
+			TotalComments: totalComments,
+		})
+	}
+
+	return modelThreads, nil
+}
+
+func (ds *ThreadDatasource) FindByKeyword(ctx context.Context, keyword string, limit, offset int) ([]*model.Thread, error) {
+	threads, err := ds.client.Thread.Query().
+		Where(
+			thread.Or(
+				thread.TitleContainsFold(keyword),
+				thread.DescriptionContainsFold(keyword),
+			),
+		).
+		Limit(limit).
+		Offset(offset).
+		WithTags().
+		WithBoard().
+		All(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var modelThreads []*model.Thread
+	for _, entThread := range threads {
+		totalComments, err := ds.getTotalComments(ctx, entThread.ID)
+		if err != nil {
+			return nil, err
+		}
+		modelThreads = append(modelThreads, &model.Thread{
+			EntThread:     entThread,
+			TotalComments: totalComments,
+		})
+	}
+
+	return modelThreads, nil
+}
+
+func (ds *ThreadDatasource) FindByPopularity(ctx context.Context, limit, offset int) ([]*model.Thread, error) {
+	threads, err := ds.client.Thread.Query().
+		WithTags().
+		WithBoard().
+		All(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	threadWithComments := make([]struct {
+		Thread        *ent.Thread
+		TotalComments int
+	}, len(threads))
+
+	for i, entThread := range threads {
+		totalComments, err := ds.getTotalComments(ctx, entThread.ID)
+		if err != nil {
+			return nil, err
+		}
+		threadWithComments[i] = struct {
+			Thread        *ent.Thread
+			TotalComments int
+		}{
+			Thread:        entThread,
+			TotalComments: totalComments,
+		}
+	}
+
+	sort.Slice(threadWithComments, func(i, j int) bool {
+		return threadWithComments[i].TotalComments > threadWithComments[j].TotalComments
+	})
+
+	start := offset
+	if start > len(threadWithComments) {
+		start = len(threadWithComments)
+	}
+	end := offset + limit
+	if end > len(threadWithComments) {
+		end = len(threadWithComments)
+	}
+	threadWithComments = threadWithComments[start:end]
+
+	var modelThreads []*model.Thread
+	for _, twc := range threadWithComments {
+		modelThreads = append(modelThreads, &model.Thread{
+			EntThread:     twc.Thread,
+			TotalComments: twc.TotalComments,
 		})
 	}
 
@@ -45,7 +191,6 @@ func (ds *ThreadDatasource) FindByNewest(ctx context.Context, limit, offset int)
 		Limit(limit).
 		Offset(offset).
 		WithTags().
-		WithComments().
 		WithBoard().
 		All(ctx)
 	if err != nil {
@@ -54,19 +199,23 @@ func (ds *ThreadDatasource) FindByNewest(ctx context.Context, limit, offset int)
 
 	var modelThreads []*model.Thread
 	for _, entThread := range threads {
+		totalComments, err := ds.getTotalComments(ctx, entThread.ID)
+		if err != nil {
+			return nil, err
+		}
 		modelThreads = append(modelThreads, &model.Thread{
-			EntThread: entThread,
+			EntThread:     entThread,
+			TotalComments: totalComments,
 		})
 	}
 
 	return modelThreads, nil
 }
 
-func (ds *ThreadDatasource) FindByHistories(ctx context.Context, threadIds []int) ([]*model.Thread, error) {
+func (ds *ThreadDatasource) FindByHistory(ctx context.Context, threadIds []int) ([]*model.Thread, error) {
 	threads, err := ds.client.Thread.Query().
 		Where(thread.IDIn(threadIds...)).
 		WithTags().
-		WithComments().
 		WithBoard().
 		All(ctx)
 	if err != nil {
@@ -75,8 +224,13 @@ func (ds *ThreadDatasource) FindByHistories(ctx context.Context, threadIds []int
 
 	var modelThreads []*model.Thread
 	for _, entThread := range threads {
+		totalComments, err := ds.getTotalComments(ctx, entThread.ID)
+		if err != nil {
+			return nil, err
+		}
 		modelThreads = append(modelThreads, &model.Thread{
-			EntThread: entThread,
+			EntThread:     entThread,
+			TotalComments: totalComments,
 		})
 	}
 
@@ -84,9 +238,7 @@ func (ds *ThreadDatasource) FindByHistories(ctx context.Context, threadIds []int
 }
 
 func (ds *ThreadDatasource) FindById(ctx context.Context, id int, limit, offset int) (*model.Thread, error) {
-	totalComments, err := ds.client.ThreadComment.Query().
-		Where(threadcomment.HasThreadWith(thread.IDEQ(id))).
-		Count(ctx)
+	totalComments, err := ds.getTotalComments(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -140,8 +292,13 @@ func (ds *ThreadDatasource) FindByTitle(ctx context.Context, title string) ([]*m
 
 	var modelThreads []*model.Thread
 	for _, entThread := range threads {
+		totalComments, err := ds.getTotalComments(ctx, entThread.ID)
+		if err != nil {
+			return nil, err
+		}
 		modelThreads = append(modelThreads, &model.Thread{
-			EntThread: entThread,
+			EntThread:     entThread,
+			TotalComments: totalComments,
 		})
 	}
 

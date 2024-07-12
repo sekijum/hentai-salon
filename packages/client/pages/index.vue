@@ -3,8 +3,21 @@
     <Menu :items="menuItems" />
 
     <!-- <ThreadTable title="閲覧履歴" :items="historyItems" moreLink="/history" link="/hoge" :maxItems="3" /> -->
-    <ThreadTable title="人気" :items="threadsByPopular" moreLink="/news" />
-    <ThreadTable title="新着" :items="threadsByNewest" moreLink="/popular" />
+    <ThreadTable
+      title="閲覧順"
+      :items="threadsByHistory"
+      :navigate="() => router.push({ path: '/threads', query: { queryCriteria: ['history'] } })"
+    />
+    <ThreadTable
+      title="人気"
+      :items="threadsByPopular"
+      :navigate="() => router.push({ path: '/threads', query: { queryCriteria: ['popularity'] } })"
+    />
+    <ThreadTable
+      title="新着"
+      :items="threadsByNewest"
+      :navigate="() => router.push({ path: '/threads', query: { queryCriteria: ['newest'] } })"
+    />
   </div>
 </template>
 
@@ -12,10 +25,12 @@
 import Menu from '~/components/Menu.vue';
 import ThreadTable from '~/components/thread/ThreadTable.vue';
 import type { IThread } from '~/types/thread';
+const { getThreadViewHistory } = useThreadViewHistory();
 
 interface ThreadResponse {
   threadsByPopular: IThread[];
   threadsByNewest: IThread[];
+  threadsByHistory: IThread[];
 }
 
 const router = useRouter();
@@ -25,6 +40,7 @@ console.log('ユーザー情報:', payload.user);
 
 const threadsByPopular = ref<IThread[]>([]);
 const threadsByNewest = ref<IThread[]>([]);
+const threadsByHistory = ref<IThread[]>([]);
 
 const menuItems = [
   { title: 'お知らせ', navigate: () => router.push('/'), icon: 'mdi-update' },
@@ -46,11 +62,14 @@ onMounted(async () => {
 async function fetchThreads() {
   const response = await $api.get<ThreadResponse>('/threads', {
     params: {
-      orders: ['popularity', 'newest'],
+      queryCriteria: ['popularity', 'newest', 'history'],
+      threadIds: getThreadViewHistory(),
       limit: 10,
     },
   });
   threadsByPopular.value = response.data.threadsByPopular;
   threadsByNewest.value = response.data.threadsByNewest;
+  threadsByHistory.value = response.data.threadsByHistory;
+  console.log(response);
 }
 </script>

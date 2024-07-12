@@ -56,6 +56,11 @@
     <v-divider />
 
     <Pagination :totalCount="thread.comments.totalCount" :limit="commentLimit" />
+    <ThreadTable
+      title="閲覧履歴"
+      :items="threadsByHistory"
+      :navigate="() => router.push({ path: '/threads', query: { queryCriteria: ['history'] } })"
+    />
   </div>
 
   <OverlayLoagind :isLoading="isLoading" title="読込中" />
@@ -75,7 +80,9 @@ import type { IThread } from '~/types/thread';
 const router = useRouter();
 const route = useRoute();
 const nuxtApp = useNuxtApp();
+const { setThreadViewHistory } = useThreadViewHistory();
 const { $api } = nuxtApp;
+const { getThreadViewHistory } = useThreadViewHistory();
 
 const commentLimit = 100;
 const isLoading = ref(true);
@@ -94,6 +101,7 @@ const menuItems = [
 ];
 
 const thread = ref<IThread>();
+const threadsByHistory = ref<IThread[]>([]);
 
 const scrollToMediaTop = () => {
   const mediaTop = document.getElementById('media-top');
@@ -124,10 +132,12 @@ const scrollToCommentBottom = () => {
 };
 
 onMounted(async () => {
+  await fetchThread();
   await fetchThreads();
+  setThreadViewHistory(parseInt(route.params.id.toString(), 10));
 });
 
-async function fetchThreads() {
+async function fetchThread() {
   isLoading.value = true;
   const threadId = route.params.id;
   const response = await $api.get<IThread>(`/threads/${threadId}`, {
@@ -140,9 +150,20 @@ async function fetchThreads() {
   isLoading.value = false;
 }
 
+async function fetchThreads() {
+  const response = await $api.get<{ threadsByHistory: IThread[] }>('/threads', {
+    params: {
+      queryCriteria: ['history'],
+      threadIds: getThreadViewHistory(),
+      limit: 10,
+    },
+  });
+  threadsByHistory.value = response.data.threadsByHistory;
+}
+
 watchEffect(() => {
   if (route.query.limit) {
-    fetchThreads();
+    fetchThread();
   }
 });
 </script>
