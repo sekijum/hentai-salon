@@ -18,8 +18,6 @@
             query: toParentComment(comment.parentCommentIdx).query,
             hash: toParentComment(comment.parentCommentIdx).hash,
           }"
-          target="_blank"
-          rel="noopener noreferrer"
         >
           >> {{ comment.parentCommentIdx }}
         </nuxt-link>

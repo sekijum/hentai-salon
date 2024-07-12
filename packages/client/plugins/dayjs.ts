@@ -1,12 +1,14 @@
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
+import 'dayjs/locale/ja';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
+dayjs.locale('ja');
 
 const DEFAULT_TIMEZONE = 'Asia/Tokyo';
-const DEFAULT_FORMAT = 'YYYY-MM-DD HH:mm';
+const DEFAULT_FORMAT = 'YYYY年MM月DD日(dd) HH時mm分';
 
 const formatDate = (date: Date | string, { timezone = DEFAULT_TIMEZONE, format = DEFAULT_FORMAT } = {}) => {
   if (!date || !dayjs(date).isValid()) {
