@@ -4,35 +4,31 @@
       <h2 class="font-weight-regular">{{ title }}</h2>
     </div>
 
-    <v-data-table :items="items" hide-default-footer hide-default-header class="thread-section">
-      <template v-slot:item="{ item, index }">
-        <div
-          :class="{ alternate: index % 2 === 0 }"
-          @click="() => router.push(`/threads/${item.id}`)"
-          class="d-flex align-center p-2 item-row"
-        >
-          <div class="fixed-image mr-1">
-            <v-img :src="getImageSrc(item.thumbnailUrl)" class="image"></v-img>
-          </div>
-          <div class="flex-grow-1">
+    <div class="thread-section">
+      <div
+        v-for="(item, index) in items"
+        :key="item.id"
+        :class="{ alternate: index % 2 === 0 }"
+        @click="() => router.push(`/threads/${item.id}`)"
+        class="d-flex align-center p-2 item-row"
+      >
+        <v-row>
+          <v-col cols="3" class="d-flex align-center">
+            <div class="fixed-image mr-1">
+              <v-img :src="getImageSrc(item.thumbnailUrl)" class="image"></v-img>
+            </div>
+          </v-col>
+          <v-col cols="9" class="d-flex flex-column justify-center">
             <p class="item-title">
               {{ truncateTitle(item.title) }}
             </p>
-          </div>
-          <div class="text-right mr-2">
-            <small>
-              {{ $formatDate(item.createdAt) }}
-              <br />
-              {{ item.board?.title }}
-              <br />
-              {{ item.commentCount }}
-              <v-icon small>mdi-comment</v-icon>
-              <br />
-            </small>
-          </div>
-        </div>
-      </template>
-    </v-data-table>
+            <div class="item-details">
+              <small> {{ item.board?.title }} <v-icon small>mdi-comment</v-icon> {{ item.commentCount }} </small>
+            </div>
+          </v-col>
+        </v-row>
+      </div>
+    </div>
 
     <div v-if="navigate && items.length > 0" class="more-link" @click="navigate">
       {{ title }}をもっと見る <v-icon down>mdi-chevron-down</v-icon>
@@ -45,7 +41,6 @@ import { useRouter } from 'vue-router';
 import type { IThread } from '~/types/thread';
 
 const nuxtApp = useNuxtApp();
-const { $formatDate } = nuxtApp;
 
 defineProps<{
   title: String;
@@ -92,6 +87,21 @@ function getImageSrc(thumbnailUrl: string) {
 .item-row {
   border-top: 1px solid #ccc;
   border-bottom: 1px solid #ccc;
+}
+
+.item-title {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.item-details {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  flex-grow: 1;
+  text-align: right;
 }
 
 .more-link {
