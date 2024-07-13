@@ -6,26 +6,51 @@
 
     <div v-for="item in menuItems" :key="item.name" :class="{ highlight: item.type === 'header' }" class="bordered-row">
       <v-row class="align-center">
-        <v-col cols="6" class="d-flex justify-center align-center">{{ item.name }}</v-col>
-        <v-col cols="6" class="d-flex justify-center align-center">
-          <div v-if="item.key" class="d-flex justify-center align-center">
-            <v-btn v-if="item.key === 'board-history-delete'" small class="spaced-button">削除</v-btn>
-            <v-btn v-else-if="item.key === 'thread-history-delete'" small class="spaced-button">削除</v-btn>
-            <v-switch
-              v-else-if="item.key === 'display-latest-50-replies-only'"
-              flat
-              small
-              class="centered-switch"
-            ></v-switch>
-            <v-switch
-              v-else-if="item.key === 'dark-mode'"
-              flat
-              small
-              class="centered-switch"
-              @change="toggleTheme"
-            ></v-switch>
-          </div>
-        </v-col>
+        <template v-if="item.type === 'header'">
+          <div class="header-text">{{ item.name }}</div>
+        </template>
+        <template v-else>
+          <v-col cols="6" class="d-flex justify-center align-center item-name">{{ item.name }}</v-col>
+          <v-col cols="6" class="d-flex justify-center align-center">
+            <div v-if="item.key" class="d-flex justify-center align-center">
+              <v-btn
+                v-if="item.key === 'thread-history-delete'"
+                small
+                class="spaced-button"
+                @click="clearThreadViewHistory"
+                >削除</v-btn
+              >
+              <v-switch
+                v-else-if="item.key === 'comment-sort-order'"
+                v-model="commentSortOrder"
+                flat
+                small
+                class="centered-switch"
+                @change="setCommentSortOrder(commentSortOrder ? 'desc' : 'asc')"
+              ></v-switch>
+              <v-switch
+                v-else-if="item.key === 'comment-limit'"
+                v-model="commentLimit"
+                flat
+                small
+                class="centered-switch"
+                @change="setCommentLimit(commentLimit)"
+              ></v-switch>
+              <v-switch
+                v-else-if="item.key === 'theme'"
+                v-model="theme"
+                flat
+                small
+                class="centered-switch"
+                @change="
+                  () => {
+                    setTheme(theme ? 'light' : 'dark'), router.go(0);
+                  }
+                "
+              ></v-switch>
+            </div>
+          </v-col>
+        </template>
       </v-row>
     </div>
   </div>
@@ -34,22 +59,30 @@
 <script setup lang="ts">
 import PageTitle from '~/components/PageTitle.vue';
 
-const nuxtApp = useNuxtApp();
-const { $toggleTheme } = nuxtApp;
+const router = useRouter();
 
-const toggleTheme = () => {
-  $toggleTheme();
-};
+const {
+  getCommentLimit,
+  getTheme,
+  getCommentSortOrder,
+  setCommentLimit,
+  setTheme,
+  setCommentSortOrder,
+  clearThreadViewHistory,
+} = useStorage();
+
+const theme = ref(getTheme() === 'light' ? true : false);
+const commentSortOrder = ref(getCommentSortOrder() === 'desc' ? true : false);
+const commentLimit = ref(getCommentLimit() ? true : false);
+
 const menuItems = [
   { name: '表示', type: 'header' },
-  { name: 'ダークモード', key: 'dark-mode' },
-  { name: '板', type: 'header' },
-  { name: '閲覧履歴', key: 'board-history-delete' },
+  { name: 'ダークモード', key: 'theme' },
   { name: 'スレッド', type: 'header' },
   { name: '閲覧履歴', key: 'thread-history-delete' },
-  { name: '最新レス50レスのみ表示', key: 'display-latest-50-replies-only' },
+  { name: '最新レス50レスのみ表示', key: 'comment-limit' },
   { name: 'コメント', type: 'header' },
-  { name: '昇順/降順', key: 'display-latest-50-replies-only' },
+  { name: '昇順/降順', key: 'comment-sort-order' },
 ];
 </script>
 
@@ -73,5 +106,18 @@ const menuItems = [
 .spaced-button {
   margin-top: 8px;
   margin-bottom: 8px;
+}
+.text-center {
+  text-align: center;
+}
+.item-name {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.header-text {
+  padding: 16px;
+  width: 100%;
+  text-align: center;
 }
 </style>

@@ -57,9 +57,15 @@
 
     <Pagination :totalCount="thread.comments.totalCount" :limit="commentLimit" />
     <ThreadList
+      title="人気"
+      :items="threadsByPopular"
+      :clicked="() => router.push({ path: '/threads' })"
+      :isInfiniteScroll="false"
+    />
+    <ThreadList
       title="閲覧履歴"
       :items="threadsByHistory"
-      :navigate="() => router.push({ path: '/threads', query: { queryCriteria: ['history'] } })"
+      :clicked="() => router.push({ path: '/threads', query: { queryCriteria: ['history'] } })"
     />
   </div>
 
@@ -81,9 +87,8 @@ import ThreadList from '~/components/thread/ThreadList.vue';
 const router = useRouter();
 const route = useRoute();
 const nuxtApp = useNuxtApp();
-const { setThreadViewHistory } = useThreadViewHistory();
+const { setThreadViewHistory, getThreadViewHistory } = useStorage();
 const { $api } = nuxtApp;
-const { getThreadViewHistory } = useThreadViewHistory();
 
 const commentLimit = 100;
 const isLoading = ref(true);
@@ -91,18 +96,19 @@ const isLoading = ref(true);
 const menuItems = [
   {
     title: 'コメント一覧',
-    navigate: () => router.replace({ query: {} }),
+    clicked: () => router.replace({ query: {} }),
     icon: 'mdi-fire',
   },
   {
     title: 'メディア',
-    navigate: () => router.replace({ query: { tab: 'media' } }),
+    clicked: () => router.replace({ query: { tab: 'media' } }),
     icon: 'mdi-update',
   },
 ];
 
 const thread = ref<IThread>();
 const threadsByHistory = ref<IThread[]>([]);
+const threadsByPopular = ref<IThread[]>([]);
 
 const scrollToMediaTop = () => {
   const mediaTop = document.getElementById('media-top');
@@ -152,14 +158,19 @@ async function fetchThread() {
 }
 
 async function fetchThreads() {
-  const response = await $api.get<{ threadsByHistory: IThread[] }>('/threads', {
+  const queryCriteria = ['popularity'];
+  if (getThreadViewHistory().length) {
+    queryCriteria.push('history');
+  }
+  const response = await $api.get<{ threadsByHistory: IThread[]; threadsByPopular: IThread[] }>('/threads', {
     params: {
-      queryCriteria: ['history'],
+      queryCriteria: queryCriteria,
       threadIds: getThreadViewHistory(),
       limit: 10,
     },
   });
   threadsByHistory.value = response.data.threadsByHistory;
+  threadsByPopular.value = response.data.threadsByPopular;
 }
 
 watchEffect(() => {

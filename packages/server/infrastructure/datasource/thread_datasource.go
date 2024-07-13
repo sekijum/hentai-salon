@@ -212,9 +212,11 @@ func (ds *ThreadDatasource) FindByNewest(ctx context.Context, limit, offset int)
 	return modelThreads, nil
 }
 
-func (ds *ThreadDatasource) FindByHistory(ctx context.Context, threadIds []int) ([]*model.Thread, error) {
+func (ds *ThreadDatasource) FindByHistory(ctx context.Context, threadIds []int, limit, offset int) ([]*model.Thread, error) {
 	threads, err := ds.client.Thread.Query().
 		Where(thread.IDIn(threadIds...)).
+		Limit(limit).
+		Offset(offset).
 		WithTags().
 		WithBoard().
 		All(ctx)

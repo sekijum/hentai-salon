@@ -1,12 +1,12 @@
 import { AxiosInstance } from 'axios';
-import Storage from '~/plugins/storage';
+import { IStorage } from '~/plugins/storage';
 import dayjs from 'dayjs';
 
 declare module '#app' {
   interface NuxtApp {
     $toggleTheme: () => void;
     $api: AxiosInstance;
-    $storage: Storage;
+    $storage: IStorage;
     $dayjs: dayjs;
     $formatDate: (
       date: Date | string,
@@ -25,7 +25,7 @@ declare module 'vue' {
   interface ComponentCustomProperties {
     $toggleTheme: () => void;
     $api: AxiosInstance;
-    $storage: Storage;
+    $storage: IStorage;
     $dayjs: dayjs;
     $formatDate: (
       date: Date | string,

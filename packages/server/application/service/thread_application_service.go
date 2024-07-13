@@ -56,7 +56,7 @@ func (svc *ThreadApplicationService) FindAll(ctx context.Context, qs request.Thr
 			if len(qs.ThreadIds) == 0 {
 				return nil, errors.New("history順のためにthreadIdsが必要です")
 			}
-			threads, err := svc.threadDatasource.FindByHistory(ctx, qs.ThreadIds)
+			threads, err := svc.threadDatasource.FindByHistory(ctx, qs.ThreadIds, qs.Limit, qs.Offset)
 			if err != nil {
 				return nil, err
 			}
@@ -65,13 +65,12 @@ func (svc *ThreadApplicationService) FindAll(ctx context.Context, qs request.Thr
 				threadMap[thread.EntThread.ID] = thread
 			}
 			sortedThreads := make([]*model.Thread, 0, len(qs.ThreadIds))
-			for i := len(qs.ThreadIds) - 1; i >= 0; i-- {
-				id := qs.ThreadIds[i]
+			for _, id := range qs.ThreadIds {
 				if thread, exists := threadMap[id]; exists {
 					sortedThreads = append(sortedThreads, thread)
 				}
 			}
-			threadsByCriteria["threadsByHistory"] = sortedThreads
+			threadsByCriteria["threadsByHistory"] = sortedThreads		
 		case "keyword":
 			if qs.Keyword != "" {
 				threads, err := svc.threadDatasource.FindByKeyword(ctx, qs.Keyword, qs.Limit, qs.Offset)

@@ -104,8 +104,8 @@ const form = ref({
 });
 
 const menuItems = [
-  { title: 'サインイン', navigate: () => router.push('/signin'), icon: 'mdi-login' },
-  { title: 'サインアップ', navigate: () => router.push('/signup'), icon: 'mdi-account-plus' },
+  { title: 'サインイン', clicked: () => router.push('/signin'), icon: 'mdi-login' },
+  { title: 'サインアップ', clicked: () => router.push('/signup'), icon: 'mdi-account-plus' },
 ];
 
 const schema = yup.object({

@@ -23,38 +23,33 @@
       v-if="threads?.threadsByHistory"
       title="閲覧履歴"
       :items="threads?.threadsByHistory"
-      :navigate="() => router.push({ query: { queryCriteria: ['history'] } })"
+      :isInfiniteScroll="true"
     />
     <ThreadList
       v-if="threads?.threadsByPopular"
       title="人気"
       :items="threads?.threadsByPopular"
-      :navigate="() => router.push({ query: { queryCriteria: ['popularity'] } })"
+      :isInfiniteScroll="false"
     />
     <ThreadList
       v-if="threads?.threadsByNewest"
       title="新着"
       :items="threads?.threadsByNewest"
-      :navigate="() => router.push({ query: { queryCriteria: ['newest'] } })"
+      :isInfiniteScroll="true"
     />
     <ThreadList
       v-if="threads?.threadsByKeyword"
       title="全板検索"
       :items="threads?.threadsByKeyword"
-      :navigate="() => router.push({ query: { queryCriteria: ['keyword'] } })"
+      :isInfiniteScroll="true"
     />
     <ThreadList
       v-if="threads?.threadsByRelated"
       title="関連"
       :items="threads?.threadsByRelated"
-      :navigate="() => router.push({ query: { queryCriteria: ['related'] } })"
+      :isInfiniteScroll="true"
     />
-    <ThreadList
-      v-if="threads?.threadsByBoard"
-      title="板"
-      :items="threads?.threadsByBoard"
-      :navigate="() => router.push({ query: { queryCriteria: ['board'] } })"
-    />
+    <ThreadList v-if="threads?.threadsByBoard" title="板" :items="threads?.threadsByBoard" :isInfiniteScroll="true" />
   </div>
 </template>
 
@@ -77,32 +72,39 @@ interface ThreadResponse {
 }
 const nuxtApp = useNuxtApp();
 const { payload, $api } = nuxtApp;
-const { getThreadViewHistory } = useThreadViewHistory();
+const { getThreadViewHistory } = useStorage();
 
 const threads = ref<ThreadResponse>();
 
 const menuItems = [
   {
+    title: 'トップ',
+    clicked: () => router.push({ query: {} }),
+    icon: 'mdi-format-list-bulleted',
+  },
+  {
     title: '関連',
-    navigate: () => router.push({ query: { queryCriteria: 'related' } }),
+    clicked: () => router.push({ query: { queryCriteria: 'related' } }),
     icon: 'mdi-format-list-bulleted',
   },
   {
     title: '人気',
-    navigate: () => router.push({ query: { queryCriteria: 'popularity' } }),
+    clicked: () => router.push({ query: { queryCriteria: 'popularity' } }),
     icon: 'mdi-fire',
   },
   {
     title: '関連履歴',
-    navigate: () => router.push({ query: { queryCriteria: 'history' } }),
+    clicked: () => router.push({ query: { queryCriteria: 'history' } }),
     icon: 'mdi-earth',
   },
   {
     title: '新着',
-    navigate: () => router.push({ query: { queryCriteria: 'newest' } }),
+    clicked: () => router.push({ query: { queryCriteria: 'newest' } }),
     icon: 'mdi-new-box',
   },
 ];
+
+const threadLimit = 10;
 
 async function search() {
   await router.push({ ...{ query: { ...{ keyword: keyword.value }, ...{ queryCriteria: 'keyword' } } } });
@@ -127,15 +129,14 @@ async function fetchThreads() {
       threadIds: getThreadViewHistory(),
       keyword: keyword.value,
       boardId: route.query.boardId,
-      limit: 10,
+      limit: threadLimit,
     },
   });
   threads.value = response.data;
 }
 
-watchEffect(() => {
-  if (route.query.queryCriteria) {
-    fetchThreads();
-  }
-});
+watch(
+  () => route.query.queryCriteria,
+  () => fetchThreads(),
+);
 </script>

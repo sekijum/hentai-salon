@@ -53,12 +53,12 @@ const tab = ref(route.query.tab ?? 'comments');
 const menuItems = [
   {
     title: 'コメント一覧',
-    navigate: () => router.replace({ query: {} }),
+    clicked: () => router.replace({ query: {} }),
     icon: 'mdi-fire',
   },
   {
     title: 'メディア',
-    navigate: () => router.replace({ query: { tab: 'media' } }),
+    clicked: () => router.replace({ query: { tab: 'media' } }),
     icon: 'mdi-update',
   },
 ];

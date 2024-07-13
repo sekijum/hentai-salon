@@ -1,17 +1,15 @@
-// plugins/vuetify.js
 import { createVuetify } from 'vuetify';
 import * as components from 'vuetify/components';
 import * as directives from 'vuetify/directives';
-import { useState } from '#app';
 
 export default defineNuxtPlugin(nuxtApp => {
-  const theme = useState('theme', () => 'light');
+  const { getTheme } = useStorage();
 
   const vuetify = createVuetify({
     components,
     directives,
     theme: {
-      defaultTheme: theme.value,
+      defaultTheme: getTheme(),
       themes: {
         dark: {
           dark: true,
@@ -38,12 +36,4 @@ export default defineNuxtPlugin(nuxtApp => {
   });
 
   nuxtApp.vueApp.use(vuetify);
-
-  const toggleTheme = () => {
-    theme.value = theme.value === 'dark' ? 'light' : 'dark';
-    vuetify.theme.global.name.value = theme.value;
-  };
-
-  nuxtApp.provide('toggleTheme', toggleTheme);
-  nuxtApp.provide('theme', theme);
 });

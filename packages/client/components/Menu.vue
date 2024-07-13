@@ -11,7 +11,7 @@
           'no-bottom-border': rowIndex === rows.length - 1,
         }"
       >
-        <v-sheet class="menu-item" @click="item.navigate">
+        <v-sheet class="menu-item" @click="item.clicked">
           <v-icon class="menu-icon">{{ item.icon }}</v-icon>
           <span class="menu-title">{{ item.title }}</span>
         </v-sheet>

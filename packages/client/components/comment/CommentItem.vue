@@ -26,24 +26,6 @@
         <p class="comment-anchor">{{ comment.content }}</p>
       </v-list-item-title>
       <template v-if="comment.attachments && comment.attachments.length">
-        <v-row dense class="attachment-row">
-          <v-chip
-            v-for="(attachment, index) in comment.attachments"
-            :key="index"
-            class="attachment-chip d-flex justify-center align-center my-1 mx-1"
-            @click="openModalMedia(attachment)"
-            variant="outlined"
-            size="x-small"
-          >
-            <v-icon left>
-              <template v-if="attachment.type === 'Video'">mdi-video</template>
-              <template v-else>mdi-image</template>
-            </v-icon>
-            {{ attachment.url }}
-          </v-chip>
-        </v-row>
-      </template>
-      <!-- <template v-if="comment.attachments && comment.attachments.length">
         <v-row dense>
           <v-col
             cols="3"
@@ -53,25 +35,23 @@
             @click="openModalMedia(attachment)"
           >
             <div class="media-item-wrapper">
-              <template v-if="attachment.type === 'Video'">
-                <video :src="attachment.url" class="media-item" muted @loadeddata="onVideoLoad">
-                  <source :src="attachment.url" type="video/mp4" />
-                </video>
-                <v-icon size="40" class="play-icon">mdi-play-circle</v-icon>
-              </template>
-              <template v-else>
-                <v-img :src="attachment.url" class="media-item" contain>
-                  <template v-slot:placeholder>
-                    <v-row align="center" class="fill-height ma-0" justify="center">
-                      <v-progress-circular color="grey-lighten-5" indeterminate></v-progress-circular>
-                    </v-row>
-                  </template>
-                </v-img>
-              </template>
+              <v-img
+                :src="attachment.url"
+                :srcset="`${attachment.url}?w=100 100w, ${attachment.url}?w=200 200w`"
+                class="media-item"
+                contain
+                referrerpolicy="no-referrer"
+              >
+                <template v-slot:placeholder>
+                  <v-row align="center" class="fill-height ma-0" justify="center">
+                    <v-progress-circular color="grey-lighten-5" indeterminate></v-progress-circular>
+                  </v-row>
+                </template>
+              </v-img>
             </div>
           </v-col>
         </v-row>
-      </template> -->
+      </template>
       <div class="interaction-section">
         <v-row dense>
           <v-col cols="6">
@@ -140,12 +120,6 @@ function userLink() {
 function username() {
   return props.comment?.user?.name || props.comment?.guestName || '名無し';
 }
-
-// function onVideoLoad(event) {
-//   const video = event.target;
-//   video.currentTime = 1;
-//   video.pause();
-// }
 
 function toParentComment(parentCommentIdx: number): {
   path: string;
@@ -246,5 +220,21 @@ function toParentComment(parentCommentIdx: number): {
 
 .reply-form {
   margin-top: 16px;
+}
+
+.media-item-wrapper {
+  position: relative;
+  width: 100%;
+  padding-bottom: 100%;
+  background-color: black;
+}
+
+.media-item {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 </style>
