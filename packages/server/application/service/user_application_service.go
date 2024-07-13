@@ -31,14 +31,15 @@ func (svc *UserApplicationService) Signup(ctx context.Context, body request.User
 
 	user := &model.User{
 		EntUser: &ent.User{
-			Name:      body.Name,
-			Email:     body.Email,
-			Password:  hashedPassword,
-			AvatarURL: body.AvatarUrl,
-			Status:    int(model.UserStatusActive),
-			Role:      int(model.UserRoleMember),
-			CreatedAt: time.Now(),
-			UpdatedAt: time.Now(),
+			Name:        body.Name,
+			Email:       body.Email,
+			Password:    hashedPassword,
+			AvatarURL:   body.AvatarUrl,
+			ProfileLink: body.ProfileLink,
+			Status:      int(model.UserStatusActive),
+			Role:        int(model.UserRoleMember),
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
 		},
 	}
 

@@ -85,21 +85,22 @@
 </template>
 
 <script setup lang="ts">
-import { Form, Field, ErrorMessage } from 'vee-validate';
 import * as yup from 'yup';
+import { Form, Field } from 'vee-validate';
 import PageTitle from '~/components/PageTitle.vue';
 import type { IBoard } from '~/types/board';
 
 const router = useRouter();
 const route = useRoute();
 const nuxtApp = useNuxtApp();
-const { $api } = nuxtApp;
 const { fetchListPresignedUrl, uploadFilesToS3 } = useActions();
+
+const { $api } = nuxtApp;
 
 const tagSuggestions = ref<string[]>([]);
 const boardSuggestions = ref<{ id: number; title: string }[]>([]);
 
-const avatarFile = ref<File | null>(null);
+const avatarFile = ref<File>();
 
 const form = ref({
   boardId: route.query.board_id,

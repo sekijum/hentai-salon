@@ -65,6 +65,20 @@
       </div>
 
       <div class="field">
+        <Field name="profileLink" v-slot="{ field, errorMessage }">
+          <v-text-field
+            v-model="form.profileLink"
+            v-bind="field"
+            label="プロフィールリンク"
+            type="url"
+            variant="outlined"
+            density="compact"
+            :error-messages="errorMessage ? [errorMessage] : []"
+          />
+        </Field>
+      </div>
+
+      <div class="field">
         <v-file-input
           show-size
           truncate-length="25"
@@ -85,22 +99,24 @@
 
 <script setup lang="ts">
 import { Form, Field } from 'vee-validate';
-import * as yup from 'yup';
 import PageTitle from '~/components/PageTitle.vue';
 import Menu from '~/components/Menu.vue';
+import * as yup from 'yup';
 
-const router = useRouter();
 const nuxtApp = useNuxtApp();
-const { $storage, $api } = nuxtApp;
+const router = useRouter();
 const { fetchListPresignedUrl, uploadFilesToS3 } = useActions();
 
-const avatarFile = ref<File | null>(null);
+const { $storage, $api } = nuxtApp;
+
+const avatarFile = ref<File>();
 
 const form = ref({
   name: '',
   email: '',
   password: '',
   avatarUrl: null as null | string,
+  profileLink: '' as null | string,
 });
 
 const menuItems = [
@@ -116,6 +132,7 @@ const schema = yup.object({
     .string()
     .oneOf([yup.ref('password')], 'パスワードが一致しません')
     .required('必須項目です'),
+  profileLink: yup.string().url('有効なURLを入力してください').nullable(),
 });
 
 function handleAvatarChange(event: Event) {
@@ -127,10 +144,17 @@ function handleAvatarChange(event: Event) {
 
 async function submit() {
   try {
+    // 空文字列をnullに変換
+    if (form.value.profileLink === '') {
+      form.value.profileLink = null;
+    }
+
     if (avatarFile.value) {
       const presignedUrls = await fetchListPresignedUrl([avatarFile.value.name]);
       const thumbnailUrl = await uploadFilesToS3(presignedUrls[0], avatarFile.value);
       form.value.avatarUrl = thumbnailUrl;
+    } else {
+      form.value.avatarUrl = null;
     }
     const response = await $api.post('/signup', form.value);
     const authHeader = response.headers.authorization;
@@ -138,8 +162,8 @@ async function submit() {
     $storage.setItem('access_token', token);
     alert('サインアップしました。');
     router.push('/');
-  } catch (error) {
-    console.error('通信中にエラーが発生しました:', error);
+  } catch (err) {
+    alert(err.response.data.error);
   }
 }
 </script>

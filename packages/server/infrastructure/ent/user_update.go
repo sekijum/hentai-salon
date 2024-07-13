@@ -73,6 +73,26 @@ func (uu *UserUpdate) SetNillablePassword(s *string) *UserUpdate {
 	return uu
 }
 
+// SetProfileLink sets the "profile_link" field.
+func (uu *UserUpdate) SetProfileLink(s string) *UserUpdate {
+	uu.mutation.SetProfileLink(s)
+	return uu
+}
+
+// SetNillableProfileLink sets the "profile_link" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableProfileLink(s *string) *UserUpdate {
+	if s != nil {
+		uu.SetProfileLink(*s)
+	}
+	return uu
+}
+
+// ClearProfileLink clears the value of the "profile_link" field.
+func (uu *UserUpdate) ClearProfileLink() *UserUpdate {
+	uu.mutation.ClearProfileLink()
+	return uu
+}
+
 // SetAvatarURL sets the "avatar_url" field.
 func (uu *UserUpdate) SetAvatarURL(s string) *UserUpdate {
 	uu.mutation.SetAvatarURL(s)
@@ -483,6 +503,12 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := uu.mutation.Password(); ok {
 		_spec.SetField(user.FieldPassword, field.TypeString, value)
+	}
+	if value, ok := uu.mutation.ProfileLink(); ok {
+		_spec.SetField(user.FieldProfileLink, field.TypeString, value)
+	}
+	if uu.mutation.ProfileLinkCleared() {
+		_spec.ClearField(user.FieldProfileLink, field.TypeString)
 	}
 	if value, ok := uu.mutation.AvatarURL(); ok {
 		_spec.SetField(user.FieldAvatarURL, field.TypeString, value)
@@ -933,6 +959,26 @@ func (uuo *UserUpdateOne) SetNillablePassword(s *string) *UserUpdateOne {
 	return uuo
 }
 
+// SetProfileLink sets the "profile_link" field.
+func (uuo *UserUpdateOne) SetProfileLink(s string) *UserUpdateOne {
+	uuo.mutation.SetProfileLink(s)
+	return uuo
+}
+
+// SetNillableProfileLink sets the "profile_link" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableProfileLink(s *string) *UserUpdateOne {
+	if s != nil {
+		uuo.SetProfileLink(*s)
+	}
+	return uuo
+}
+
+// ClearProfileLink clears the value of the "profile_link" field.
+func (uuo *UserUpdateOne) ClearProfileLink() *UserUpdateOne {
+	uuo.mutation.ClearProfileLink()
+	return uuo
+}
+
 // SetAvatarURL sets the "avatar_url" field.
 func (uuo *UserUpdateOne) SetAvatarURL(s string) *UserUpdateOne {
 	uuo.mutation.SetAvatarURL(s)
@@ -1373,6 +1419,12 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	}
 	if value, ok := uuo.mutation.Password(); ok {
 		_spec.SetField(user.FieldPassword, field.TypeString, value)
+	}
+	if value, ok := uuo.mutation.ProfileLink(); ok {
+		_spec.SetField(user.FieldProfileLink, field.TypeString, value)
+	}
+	if uuo.mutation.ProfileLinkCleared() {
+		_spec.ClearField(user.FieldProfileLink, field.TypeString)
 	}
 	if value, ok := uuo.mutation.AvatarURL(); ok {
 		_spec.SetField(user.FieldAvatarURL, field.TypeString, value)

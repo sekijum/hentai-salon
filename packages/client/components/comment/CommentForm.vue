@@ -4,28 +4,27 @@
 
     <Form @submit="submit" :validation-schema="schema" v-slot="{ meta }">
       <div class="field">
-        <Field name="guestName" v-slot="{ field, errorMessage }">
+        <Field name="guestName" v-model="form.guestName" v-slot="{ errors }">
           <v-text-field
             v-model="form.guestName"
-            v-bind="field"
             label="名前(省略可)"
             variant="outlined"
             hide-details
             counter
             single-line
-            clearable
+            :clearable="!payload.isLoggedIn"
             dense
             density="compact"
-            :error-messages="errorMessage ? [errorMessage] : []"
+            :error-messages="errors"
+            :disabled="payload.isLoggedIn"
           />
         </Field>
       </div>
 
       <div class="field">
-        <Field name="content" v-slot="{ field, errorMessage }">
+        <Field name="content" v-model="form.content" v-slot="{ errors }">
           <v-textarea
             v-model="form.content"
-            v-bind="field"
             label="コメント"
             rows="3"
             variant="outlined"
@@ -35,7 +34,7 @@
             single-line
             clearable
             density="compact"
-            :error-messages="errorMessage ? [errorMessage] : []"
+            :error-messages="errors"
           />
         </Field>
       </div>
@@ -58,8 +57,15 @@
         />
       </div>
 
-      <v-btn class="clear-button" block @click="clearForm">クリア</v-btn>
-      <v-btn type="submit" class="submit-button" block :disabled="!meta?.valid">書き込みをする</v-btn>
+      <v-row class="no-gutters">
+        <v-col cols="6">
+          <v-btn class="clear-button" block @click="clearForm">クリア</v-btn>
+        </v-col>
+        <v-col cols="6">
+          <v-btn type="submit" class="submit-button" block :disabled="!meta?.valid">書き込みをする</v-btn>
+        </v-col>
+      </v-row>
+
       <p class="note">＊書き込み反映には時間が掛かる場合があります＊</p>
     </Form>
 
@@ -68,8 +74,8 @@
 </template>
 
 <script setup lang="ts">
-import { Form, Field, ErrorMessage } from 'vee-validate';
 import * as yup from 'yup';
+import { Form, Field } from 'vee-validate';
 import OverlayLoagind from '~/components/OverlayLoagind.vue';
 
 interface Attachment {
@@ -80,17 +86,19 @@ interface Attachment {
 
 const props = defineProps<{ title?: string; parentCommentId?: number }>();
 
-const attachmentFiles = ref<File[] | null>(null);
 const nuxtApp = useNuxtApp();
 const router = useRouter();
 const route = useRoute();
-const { $api } = nuxtApp;
 const { uploadFilesToImgur } = useActions();
+
+const { $api, payload } = nuxtApp;
+
 const fileInput = ref<InstanceType<typeof HTMLInputElement>>();
 const isLoading = ref(false);
+const attachmentFiles = ref<File[] | null>(null);
 
 const form = ref({
-  guestName: '',
+  guestName: payload.isLoggedIn ? payload?.user?.name : '',
   content: '',
   attachments: [] as Attachment[],
 });
@@ -144,7 +152,6 @@ async function submit(): Promise<void> {
       if (attachmentFiles.value && attachmentFiles.value.length > 0) {
         const uploadedAttachments = await uploadFilesToImgur(attachmentFiles.value);
         form.value.attachments = uploadedAttachments;
-        console.log(uploadedAttachments);
       }
 
       const threadId = parseInt(route.params.id.toString(), 10);
@@ -184,6 +191,16 @@ async function submit(): Promise<void> {
   font-size: 12px;
 }
 
+.v-row.no-gutters {
+  margin-right: 0;
+  margin-left: 0;
+}
+
+.v-row.no-gutters > .v-col {
+  padding-right: 0;
+  padding-left: 0;
+}
+
 .clear-button,
 .submit-button {
   padding: 10px 20px;
@@ -196,8 +213,6 @@ async function submit(): Promise<void> {
 .clear-button {
   background-color: #f0f0f0;
   color: black;
-  margin-top: 10px;
-  margin-bottom: 10px;
 }
 
 .submit-button {

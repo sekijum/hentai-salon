@@ -70,6 +70,11 @@ func Password(v string) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldPassword, v))
 }
 
+// ProfileLink applies equality check predicate on the "profile_link" field. It's identical to ProfileLinkEQ.
+func ProfileLink(v string) predicate.User {
+	return predicate.User(sql.FieldEQ(FieldProfileLink, v))
+}
+
 // AvatarURL applies equality check predicate on the "avatar_url" field. It's identical to AvatarURLEQ.
 func AvatarURL(v string) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldAvatarURL, v))
@@ -288,6 +293,81 @@ func PasswordEqualFold(v string) predicate.User {
 // PasswordContainsFold applies the ContainsFold predicate on the "password" field.
 func PasswordContainsFold(v string) predicate.User {
 	return predicate.User(sql.FieldContainsFold(FieldPassword, v))
+}
+
+// ProfileLinkEQ applies the EQ predicate on the "profile_link" field.
+func ProfileLinkEQ(v string) predicate.User {
+	return predicate.User(sql.FieldEQ(FieldProfileLink, v))
+}
+
+// ProfileLinkNEQ applies the NEQ predicate on the "profile_link" field.
+func ProfileLinkNEQ(v string) predicate.User {
+	return predicate.User(sql.FieldNEQ(FieldProfileLink, v))
+}
+
+// ProfileLinkIn applies the In predicate on the "profile_link" field.
+func ProfileLinkIn(vs ...string) predicate.User {
+	return predicate.User(sql.FieldIn(FieldProfileLink, vs...))
+}
+
+// ProfileLinkNotIn applies the NotIn predicate on the "profile_link" field.
+func ProfileLinkNotIn(vs ...string) predicate.User {
+	return predicate.User(sql.FieldNotIn(FieldProfileLink, vs...))
+}
+
+// ProfileLinkGT applies the GT predicate on the "profile_link" field.
+func ProfileLinkGT(v string) predicate.User {
+	return predicate.User(sql.FieldGT(FieldProfileLink, v))
+}
+
+// ProfileLinkGTE applies the GTE predicate on the "profile_link" field.
+func ProfileLinkGTE(v string) predicate.User {
+	return predicate.User(sql.FieldGTE(FieldProfileLink, v))
+}
+
+// ProfileLinkLT applies the LT predicate on the "profile_link" field.
+func ProfileLinkLT(v string) predicate.User {
+	return predicate.User(sql.FieldLT(FieldProfileLink, v))
+}
+
+// ProfileLinkLTE applies the LTE predicate on the "profile_link" field.
+func ProfileLinkLTE(v string) predicate.User {
+	return predicate.User(sql.FieldLTE(FieldProfileLink, v))
+}
+
+// ProfileLinkContains applies the Contains predicate on the "profile_link" field.
+func ProfileLinkContains(v string) predicate.User {
+	return predicate.User(sql.FieldContains(FieldProfileLink, v))
+}
+
+// ProfileLinkHasPrefix applies the HasPrefix predicate on the "profile_link" field.
+func ProfileLinkHasPrefix(v string) predicate.User {
+	return predicate.User(sql.FieldHasPrefix(FieldProfileLink, v))
+}
+
+// ProfileLinkHasSuffix applies the HasSuffix predicate on the "profile_link" field.
+func ProfileLinkHasSuffix(v string) predicate.User {
+	return predicate.User(sql.FieldHasSuffix(FieldProfileLink, v))
+}
+
+// ProfileLinkIsNil applies the IsNil predicate on the "profile_link" field.
+func ProfileLinkIsNil() predicate.User {
+	return predicate.User(sql.FieldIsNull(FieldProfileLink))
+}
+
+// ProfileLinkNotNil applies the NotNil predicate on the "profile_link" field.
+func ProfileLinkNotNil() predicate.User {
+	return predicate.User(sql.FieldNotNull(FieldProfileLink))
+}
+
+// ProfileLinkEqualFold applies the EqualFold predicate on the "profile_link" field.
+func ProfileLinkEqualFold(v string) predicate.User {
+	return predicate.User(sql.FieldEqualFold(FieldProfileLink, v))
+}
+
+// ProfileLinkContainsFold applies the ContainsFold predicate on the "profile_link" field.
+func ProfileLinkContainsFold(v string) predicate.User {
+	return predicate.User(sql.FieldContainsFold(FieldProfileLink, v))
 }
 
 // AvatarURLEQ applies the EQ predicate on the "avatar_url" field.

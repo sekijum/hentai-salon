@@ -23,6 +23,8 @@ type User struct {
 	Email string `json:"email,omitempty"`
 	// Password holds the value of the "password" field.
 	Password string `json:"password,omitempty"`
+	// ProfileLink holds the value of the "profile_link" field.
+	ProfileLink *string `json:"profile_link,omitempty"`
 	// AvatarURL holds the value of the "avatar_url" field.
 	AvatarURL *string `json:"avatar_url,omitempty"`
 	// 0: Active, 1: Withdrawn, 2: Suspended, 2: Inactive
@@ -174,7 +176,7 @@ func (*User) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case user.FieldID, user.FieldStatus, user.FieldRole:
 			values[i] = new(sql.NullInt64)
-		case user.FieldName, user.FieldEmail, user.FieldPassword, user.FieldAvatarURL:
+		case user.FieldName, user.FieldEmail, user.FieldPassword, user.FieldProfileLink, user.FieldAvatarURL:
 			values[i] = new(sql.NullString)
 		case user.FieldCreatedAt, user.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -216,6 +218,13 @@ func (u *User) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field password", values[i])
 			} else if value.Valid {
 				u.Password = value.String
+			}
+		case user.FieldProfileLink:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field profile_link", values[i])
+			} else if value.Valid {
+				u.ProfileLink = new(string)
+				*u.ProfileLink = value.String
 			}
 		case user.FieldAvatarURL:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -347,6 +356,11 @@ func (u *User) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("password=")
 	builder.WriteString(u.Password)
+	builder.WriteString(", ")
+	if v := u.ProfileLink; v != nil {
+		builder.WriteString("profile_link=")
+		builder.WriteString(*v)
+	}
 	builder.WriteString(", ")
 	if v := u.AvatarURL; v != nil {
 		builder.WriteString("avatar_url=")

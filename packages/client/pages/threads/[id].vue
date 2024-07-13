@@ -80,18 +80,21 @@ import PageTitle from '~/components/PageTitle.vue';
 import Pagination from '~/components/Pagination.vue';
 import OverlayLoagind from '~/components/OverlayLoagind.vue';
 import MediaGallery from '~/components/MediaGallery.vue';
-import { useRouter, useRoute } from 'vue-router';
-import type { IThread } from '~/types/thread';
 import ThreadList from '~/components/thread/ThreadList.vue';
+import type { IThread } from '~/types/thread';
 
 const router = useRouter();
 const route = useRoute();
 const nuxtApp = useNuxtApp();
 const { setThreadViewHistory, getThreadViewHistory } = useStorage();
+
 const { $api } = nuxtApp;
 
 const commentLimit = 100;
 const isLoading = ref(true);
+const thread = ref<IThread>();
+const threadsByHistory = ref<IThread[]>([]);
+const threadsByPopular = ref<IThread[]>([]);
 
 const menuItems = [
   {
@@ -106,37 +109,33 @@ const menuItems = [
   },
 ];
 
-const thread = ref<IThread>();
-const threadsByHistory = ref<IThread[]>([]);
-const threadsByPopular = ref<IThread[]>([]);
-
-const scrollToMediaTop = () => {
+function scrollToMediaTop() {
   const mediaTop = document.getElementById('media-top');
   if (mediaTop) {
     mediaTop.scrollIntoView({ behavior: 'smooth' });
   }
-};
+}
 
-const scrollToMediaBottom = () => {
+function scrollToMediaBottom() {
   const mediaBottom = document.getElementById('media-bottom');
   if (mediaBottom) {
     mediaBottom.scrollIntoView({ behavior: 'smooth' });
   }
-};
+}
 
-const scrollToCommentTop = () => {
+function scrollToCommentTop() {
   const commentTop = document.getElementById('comment-top');
   if (commentTop) {
     commentTop.scrollIntoView({ behavior: 'smooth' });
   }
-};
+}
 
-const scrollToCommentBottom = () => {
+function scrollToCommentBottom() {
   const commentBottom = document.getElementById('comment-bottom');
   if (commentBottom) {
     commentBottom.scrollIntoView({ behavior: 'smooth' });
   }
-};
+}
 
 onMounted(async () => {
   await fetchThread();
@@ -191,7 +190,7 @@ watchEffect(() => {
 }
 
 .fab-top {
-  bottom: 72px; /* 下のFABとの間にスペースを確保 */
+  bottom: 72px;
 }
 
 .fab-bottom {

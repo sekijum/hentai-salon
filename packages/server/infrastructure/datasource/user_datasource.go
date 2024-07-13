@@ -2,9 +2,11 @@ package datasource
 
 import (
 	"context"
+	"errors"
 	"server/domain/model"
 	"server/infrastructure/ent"
 	"server/infrastructure/ent/user"
+	"strings"
 )
 
 type UserDatasource struct {
@@ -52,10 +54,18 @@ func (ds *UserDatasource) Create(ctx context.Context, m *model.User) (*model.Use
 	if m.EntUser.AvatarURL != nil {
 		userBuilder.SetAvatarURL(*m.EntUser.AvatarURL)
 	}
+	if m.EntUser.ProfileLink != nil {
+		userBuilder.SetProfileLink(*m.EntUser.ProfileLink)
+	}
 
 	savedUser, err := userBuilder.Save(ctx)
 	if err != nil {
-		return nil, err
+		if ent.IsConstraintError(err) {
+			if strings.Contains(err.Error(), "Duplicate entry") && strings.Contains(err.Error(), "for key 'users.email'") {
+				return nil, errors.New("このメールアドレスは既に使用されています。")
+			}
+		}
+		return nil, translateError(err)
 	}
 
 	modelUser := &model.User{
@@ -63,4 +73,13 @@ func (ds *UserDatasource) Create(ctx context.Context, m *model.User) (*model.Use
 	}
 
 	return modelUser, nil
+}
+
+func translateError(err error) error {
+	switch {
+	case strings.Contains(err.Error(), "constraint failed"):
+		return errors.New("データの制約に違反しています。")
+	default:
+		return err
+	}
 }

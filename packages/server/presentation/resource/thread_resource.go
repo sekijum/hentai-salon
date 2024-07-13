@@ -25,8 +25,9 @@ type ThreadCommentAttachmentResourceForThread struct {
 }
 
 type ThreadCommentUserResource struct {
-	Id   int    `json:"id"`
-	Name string `json:"name"`
+	Id          int     `json:"id"`
+	Name        string  `json:"name"`
+	ProfileLink *string `json:"profileLink"`
 }
 
 type ThreadCommentResource struct {
@@ -83,8 +84,9 @@ func NewThreadAttachmentResourceForThread(a *model.ThreadCommentAttachment, comm
 
 func NewThreadCommentUserResource(c *model.ThreadComment) *ThreadCommentUserResource {
 	return &ThreadCommentUserResource{
-		Id:   c.EntThreadComment.Edges.Author.ID,
-		Name: c.EntThreadComment.Edges.Author.Name,
+		Id:          c.EntThreadComment.Edges.Author.ID,
+		Name:        c.EntThreadComment.Edges.Author.Name,
+		ProfileLink: c.EntThreadComment.Edges.Author.ProfileLink,
 	}
 }
 

@@ -9,7 +9,7 @@
         ></v-list-item>
       </v-list>
 
-      <v-divider></v-divider>
+      <v-divider />
 
       <v-list density="compact" nav>
         <v-list-item

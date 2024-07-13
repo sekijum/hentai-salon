@@ -49,8 +49,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, defineProps } from 'vue';
-import { useRoute } from 'vue-router';
 import MediaModal from '~/components/MediaModal.vue';
 import type { IThreadCommentAttachmentForThread, IThreadCommentAttachment } from '~/types/thread-comment-attachment';
 
@@ -61,19 +59,11 @@ const props = defineProps<{
 }>();
 
 const route = useRoute();
+
 const items = ref<IThreadCommentAttachmentForThread[]>(props.attachments.slice(0, 10));
 const currentIndex = ref(10);
-
 const selectedAttachment = ref<IThreadCommentAttachment | null>();
 const selectedAttachmentMeta = ref<{ to: string } | null>();
-
-watch(
-  () => props.attachments,
-  newAttachments => {
-    items.value = newAttachments.slice(0, 10);
-    currentIndex.value = 10;
-  },
-);
 
 function openModalMedia(attachment: IThreadCommentAttachmentForThread) {
   const limit = route.query.limit ? parseInt(route.query.limit as string, 10) : props.commentLimit;
@@ -89,7 +79,7 @@ function closeModalMedia() {
   selectedAttachment.value = null;
 }
 
-async function load({ done }: { done: (status: string) => void }) {
+async function load({ done }: { done: (status: 'loading' | 'error' | 'empty' | 'ok') => void }) {
   if (currentIndex.value >= props.attachments.length) {
     done('empty');
     return;
@@ -114,6 +104,14 @@ function updateVideoMeta(item: IThreadCommentAttachmentForThread) {
     item.duration = videoElement.duration;
   };
 }
+
+watch(
+  () => props.attachments,
+  newAttachments => {
+    items.value = newAttachments.slice(0, 10);
+    currentIndex.value = 10;
+  },
+);
 </script>
 
 <style scoped>

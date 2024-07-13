@@ -192,6 +192,7 @@ var (
 		{Name: "name", Type: field.TypeString, Size: 20},
 		{Name: "email", Type: field.TypeString, Unique: true, Size: 254},
 		{Name: "password", Type: field.TypeString},
+		{Name: "profile_link", Type: field.TypeString, Nullable: true},
 		{Name: "avatar_url", Type: field.TypeString, Nullable: true},
 		{Name: "status", Type: field.TypeInt, Default: 0},
 		{Name: "role", Type: field.TypeInt, Default: 0},

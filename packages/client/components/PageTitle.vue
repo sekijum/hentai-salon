@@ -3,9 +3,7 @@
 </template>
 
 <script setup lang="ts">
-defineProps({
-  title: String,
-});
+defineProps<{ title: string }>();
 </script>
 
 <style scoped>

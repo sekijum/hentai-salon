@@ -10,7 +10,7 @@ dayjs.locale('ja');
 const DEFAULT_TIMEZONE = 'Asia/Tokyo';
 const DEFAULT_FORMAT = 'YYYY年MM月DD日(dd) HH時mm分';
 
-const formatDate = (date: Date | string, { timezone = DEFAULT_TIMEZONE, format = DEFAULT_FORMAT } = {}) => {
+export const formatDate = (date: Date | string, { timezone = DEFAULT_TIMEZONE, format = DEFAULT_FORMAT } = {}) => {
   if (!date || !dayjs(date).isValid()) {
     throw new Error('Invalid date provided');
   }

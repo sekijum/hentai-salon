@@ -21,13 +21,7 @@
 </template>
 
 <script setup lang="ts">
-const props = defineProps<{ items: [] }>();
-
-const router = useRouter();
-
-const navigateTo = link => {
-  router.push(link);
-};
+const props = defineProps<{ items: { title: string; icon: string; clicked: () => void }[] }>();
 
 const rows = computed(() => {
   const result = [];
@@ -37,20 +31,20 @@ const rows = computed(() => {
   return result;
 });
 
-const columnWidth = itemsPerRow => {
+function columnWidth(itemsPerRow: number) {
   if (itemsPerRow === 1) return 12;
   if (itemsPerRow === 2) return 6;
-  return 4; // default for 3 items
-};
+  return 4;
+}
 
-const shouldRemoveRightBorder = (idx, itemsPerRow) => {
+function shouldRemoveRightBorder(idx: number, itemsPerRow: number) {
   return (idx + 1) % itemsPerRow === 0;
-};
+}
 </script>
 
 <style scoped>
 .outer-border {
-  border: 1px solid #ccc; /* Outer border */
+  border: 1px solid #ccc;
 }
 
 .menu-item {
@@ -79,16 +73,16 @@ const shouldRemoveRightBorder = (idx, itemsPerRow) => {
 
 .v-col {
   padding: 0 !important;
-  border-bottom: 1px solid #ccc; /* Add bottom border to each column */
-  border-right: 1px solid #ccc; /* Add right border to each column */
+  border-bottom: 1px solid #ccc;
+  border-right: 1px solid #ccc;
 }
 
 .v-col.no-right-border {
-  border-right: none; /* Remove right border for specific columns */
+  border-right: none;
 }
 
 .v-col.no-bottom-border {
-  border-bottom: none; /* Remove bottom border for the last row */
+  border-bottom: none;
 }
 
 .v-row {
@@ -96,6 +90,6 @@ const shouldRemoveRightBorder = (idx, itemsPerRow) => {
 }
 
 .v-row:last-child .v-col {
-  border-bottom: none; /* Remove bottom border for columns in the last row */
+  border-bottom: none;
 }
 </style>

@@ -43,14 +43,15 @@
 </template>
 
 <script setup lang="ts">
-import { Form, Field, ErrorMessage } from 'vee-validate';
-import * as yup from 'yup';
+import { Form, Field } from 'vee-validate';
 import PageTitle from '~/components/PageTitle.vue';
 import Menu from '~/components/Menu.vue';
+import * as yup from 'yup';
 
 const nuxtApp = useNuxtApp();
-const { $storage, $api } = nuxtApp;
 const router = useRouter();
+
+const { $storage, $api } = nuxtApp;
 
 const form = ref({
   email: '',

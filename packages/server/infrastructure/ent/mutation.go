@@ -5114,6 +5114,7 @@ type UserMutation struct {
 	name                       *string
 	email                      *string
 	password                   *string
+	profile_link               *string
 	avatar_url                 *string
 	status                     *int
 	addstatus                  *int
@@ -5358,6 +5359,55 @@ func (m *UserMutation) OldPassword(ctx context.Context) (v string, err error) {
 // ResetPassword resets all changes to the "password" field.
 func (m *UserMutation) ResetPassword() {
 	m.password = nil
+}
+
+// SetProfileLink sets the "profile_link" field.
+func (m *UserMutation) SetProfileLink(s string) {
+	m.profile_link = &s
+}
+
+// ProfileLink returns the value of the "profile_link" field in the mutation.
+func (m *UserMutation) ProfileLink() (r string, exists bool) {
+	v := m.profile_link
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldProfileLink returns the old "profile_link" field's value of the User entity.
+// If the User object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserMutation) OldProfileLink(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldProfileLink is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldProfileLink requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldProfileLink: %w", err)
+	}
+	return oldValue.ProfileLink, nil
+}
+
+// ClearProfileLink clears the value of the "profile_link" field.
+func (m *UserMutation) ClearProfileLink() {
+	m.profile_link = nil
+	m.clearedFields[user.FieldProfileLink] = struct{}{}
+}
+
+// ProfileLinkCleared returns if the "profile_link" field was cleared in this mutation.
+func (m *UserMutation) ProfileLinkCleared() bool {
+	_, ok := m.clearedFields[user.FieldProfileLink]
+	return ok
+}
+
+// ResetProfileLink resets all changes to the "profile_link" field.
+func (m *UserMutation) ResetProfileLink() {
+	m.profile_link = nil
+	delete(m.clearedFields, user.FieldProfileLink)
 }
 
 // SetAvatarURL sets the "avatar_url" field.
@@ -6005,7 +6055,7 @@ func (m *UserMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *UserMutation) Fields() []string {
-	fields := make([]string, 0, 8)
+	fields := make([]string, 0, 9)
 	if m.name != nil {
 		fields = append(fields, user.FieldName)
 	}
@@ -6014,6 +6064,9 @@ func (m *UserMutation) Fields() []string {
 	}
 	if m.password != nil {
 		fields = append(fields, user.FieldPassword)
+	}
+	if m.profile_link != nil {
+		fields = append(fields, user.FieldProfileLink)
 	}
 	if m.avatar_url != nil {
 		fields = append(fields, user.FieldAvatarURL)
@@ -6044,6 +6097,8 @@ func (m *UserMutation) Field(name string) (ent.Value, bool) {
 		return m.Email()
 	case user.FieldPassword:
 		return m.Password()
+	case user.FieldProfileLink:
+		return m.ProfileLink()
 	case user.FieldAvatarURL:
 		return m.AvatarURL()
 	case user.FieldStatus:
@@ -6069,6 +6124,8 @@ func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldEmail(ctx)
 	case user.FieldPassword:
 		return m.OldPassword(ctx)
+	case user.FieldProfileLink:
+		return m.OldProfileLink(ctx)
 	case user.FieldAvatarURL:
 		return m.OldAvatarURL(ctx)
 	case user.FieldStatus:
@@ -6108,6 +6165,13 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetPassword(v)
+		return nil
+	case user.FieldProfileLink:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetProfileLink(v)
 		return nil
 	case user.FieldAvatarURL:
 		v, ok := value.(string)
@@ -6201,6 +6265,9 @@ func (m *UserMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *UserMutation) ClearedFields() []string {
 	var fields []string
+	if m.FieldCleared(user.FieldProfileLink) {
+		fields = append(fields, user.FieldProfileLink)
+	}
 	if m.FieldCleared(user.FieldAvatarURL) {
 		fields = append(fields, user.FieldAvatarURL)
 	}
@@ -6218,6 +6285,9 @@ func (m *UserMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *UserMutation) ClearField(name string) error {
 	switch name {
+	case user.FieldProfileLink:
+		m.ClearProfileLink()
+		return nil
 	case user.FieldAvatarURL:
 		m.ClearAvatarURL()
 		return nil
@@ -6237,6 +6307,9 @@ func (m *UserMutation) ResetField(name string) error {
 		return nil
 	case user.FieldPassword:
 		m.ResetPassword()
+		return nil
+	case user.FieldProfileLink:
+		m.ResetProfileLink()
 		return nil
 	case user.FieldAvatarURL:
 		m.ResetAvatarURL()

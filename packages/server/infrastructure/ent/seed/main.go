@@ -32,8 +32,8 @@ func randomImageURL(index int) string {
 	return url
 }
 
-func videoURL() string {
-	return "https://www.w3schools.com/html/mov_bbb.mp4"
+func randomProfileLink(index int) string {
+	return fmt.Sprintf("https://profile.example.com/user/%d", index)
 }
 
 func seed(ctx context.Context, client *ent.Client) error {
@@ -61,6 +61,7 @@ func seed(ctx context.Context, client *ent.Client) error {
 	for i := 0; i < 90; i++ {
 		name := "ユーザー" + uuid.New().String()[:8]
 		avatarURL := randomImageURL(i)
+		profileLink := randomProfileLink(i)
 		createUser := tx.User.Create().
 			SetName(name).
 			SetEmail("user" + uuid.New().String()[:8] + "@example.com").
@@ -70,6 +71,9 @@ func seed(ctx context.Context, client *ent.Client) error {
 		if rand.Intn(1000) >= 100 { // 1000件ほどnullにする
 			createUser.SetAvatarURL(avatarURL)
 		}
+		if rand.Intn(1000) >= 100 { // 1000件ほどnullにする
+			createUser.SetProfileLink(profileLink)
+		}
 		users[i] = createUser.SaveX(ctx)
 	}
 
@@ -77,6 +81,7 @@ func seed(ctx context.Context, client *ent.Client) error {
 	for i := 90; i < 100; i++ {
 		name := "管理者" + uuid.New().String()[:8]
 		avatarURL := randomImageURL(i)
+		profileLink := randomProfileLink(i)
 		createAdmin := tx.User.Create().
 			SetName(name).
 			SetEmail("admin" + uuid.New().String()[:8] + "@example.com").
@@ -86,6 +91,9 @@ func seed(ctx context.Context, client *ent.Client) error {
 			SetUpdatedAt(time.Now())
 		if rand.Intn(1000) >= 100 { // 1000件ほどnullにする
 			createAdmin.SetAvatarURL(avatarURL)
+		}
+		if rand.Intn(1000) >= 100 { // 1000件ほどnullにする
+			createAdmin.SetProfileLink(profileLink)
 		}
 		users[i] = createAdmin.SaveX(ctx)
 	}
@@ -159,19 +167,14 @@ func seed(ctx context.Context, client *ent.Client) error {
 		comments = append(comments, comment)
 	}
 
-	// Create Thread Comment Attachments
+	// Create Thread Comment Attachments (Images Only)
 	for i := 0; i < len(comments)*4; i++ {
-		var attachmentURL string
-		if i%2 == 0 {
-			attachmentURL = randomImageURL(i)
-		} else {
-			attachmentURL = videoURL()
-		}
+		attachmentURL := randomImageURL(i)
 		comment := comments[i/4] // Ensure a maximum of 4 attachments per comment
 		tx.ThreadCommentAttachment.Create().
 			SetURL(attachmentURL).
 			SetDisplayOrder(int(rand.Int63n(100))).
-			SetType(i % 2). // typeを0か1に設定
+			SetType(0). // 画像のタイプを設定
 			SetCreatedAt(time.Now()).
 			SetCommentID(comment.ID).
 			SaveX(ctx)

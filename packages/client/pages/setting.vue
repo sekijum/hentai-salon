@@ -2,7 +2,7 @@
   <div>
     <PageTitle title="設定" />
 
-    <v-divider></v-divider>
+    <v-divider />
 
     <div v-for="item in menuItems" :key="item.name" :class="{ highlight: item.type === 'header' }" class="bordered-row">
       <v-row class="align-center">

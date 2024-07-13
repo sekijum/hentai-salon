@@ -15,8 +15,8 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
       nuxtApp.payload.isAdmin = authenticatedUser.role === 'Admin';
       nuxtApp.payload.isMember = authenticatedUser.role === 'Member';
     } catch (error) {
-      console.error('Error fetching user info:', error);
-      // $storage.removeItem('access_token');
+      alert('認証に失敗しました。');
+      $storage.removeItem('access_token');
     }
   } else {
     nuxtApp.payload.user = null;

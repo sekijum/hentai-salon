@@ -1,41 +1,33 @@
 import { AxiosInstance } from 'axios';
 import { IStorage } from '~/plugins/storage';
-import dayjs from 'dayjs';
+import dayjs, { type formatDate } from 'dayjs';
+
+interface IType {
+  payload: {
+    user?: {
+      id: number,
+      name: string,
+      role: string,
+      email: string,
+      avatarUrl: string,
+      profileLink: string,
+      createdAt: string,
+      updatedAt: string,
+    },
+    isLoggedIn: boolean,
+    isAdmin: boolean,
+    isMember: boolean,
+  };
+  $api: AxiosInstance;
+  $storage: IStorage;
+  $dayjs: dayjs;
+  $formatDate: formatDate;
+}
 
 declare module '#app' {
-  interface NuxtApp {
-    $toggleTheme: () => void;
-    $api: AxiosInstance;
-    $storage: IStorage;
-    $dayjs: dayjs;
-    $formatDate: (
-      date: Date | string,
-      {
-        timezone,
-        format,
-      }?: {
-        timezone?: string | undefined;
-        format?: string | undefined;
-      },
-    ) => string;
-  }
+  interface NuxtApp extends IType
 }
 
 declare module 'vue' {
-  interface ComponentCustomProperties {
-    $toggleTheme: () => void;
-    $api: AxiosInstance;
-    $storage: IStorage;
-    $dayjs: dayjs;
-    $formatDate: (
-      date: Date | string,
-      {
-        timezone,
-        format,
-      }?: {
-        timezone?: string | undefined;
-        format?: string | undefined;
-      },
-    ) => string;
-  }
+  interface ComponentCustomProperties extends IType
 }

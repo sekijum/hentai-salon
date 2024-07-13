@@ -4,15 +4,23 @@
       <div class="comment-header">
         <div class="comment-header-text">
           {{ comment.idx }}
-          <nuxt-link :to="userLink()" class="username-link">
+          <template v-if="comment?.user?.id && comment?.user?.profileLink">
+            <nuxt-link :to="comment.user.profileLink" class="username-link" target="_blank" rel="noopener">
+              {{ username() }}
+            </nuxt-link>
+          </template>
+          <template v-else>
             {{ username() }}
-          </nuxt-link>
+          </template>
           {{ $formatDate(comment.createdAt) }}
         </div>
       </div>
       <div v-if="comment.parentCommentIdx" class="reply-indication">
+        <template></template>
         <nuxt-link
           class="reply-link"
+          target="_blank"
+          rel="noopener"
           :to="{
             path: toParentComment(comment.parentCommentIdx).path,
             query: toParentComment(comment.parentCommentIdx).query,
@@ -36,8 +44,8 @@
           >
             <div class="media-item-wrapper">
               <v-img
-                :src="attachment.url"
-                :srcset="`${attachment.url}?w=100 100w, ${attachment.url}?w=200 200w`"
+                :src="`${attachment.url}?w=5`"
+                :srcset="`${attachment.url}?w=5 5w, ${attachment.url}?w=5 5w`"
                 class="media-item"
                 contain
                 referrerpolicy="no-referrer"
@@ -58,7 +66,7 @@
             <v-icon small @click="toggleReplyForm">{{ showReplyForm ? 'mdi-close' : 'mdi-reply' }}</v-icon>
           </v-col>
           <v-col cols="6" class="interaction-right">
-            <nuxt-link :to="'/comments/' + comment.id + '/replies'" class="interaction-link">
+            <nuxt-link :to="`/comments/${comment.id}`" class="interaction-link">
               <v-icon small>mdi-comment</v-icon>
               <span class="interaction-text">{{ comment.totalReplies }}</span>
             </nuxt-link>
@@ -92,10 +100,9 @@ import type { IThreadCommentAttachment } from '~/types/thread-comment-attachment
 
 const props = defineProps<{ comment: IThreadComment; commentLimit: number; threadId: number }>();
 const nuxtApp = useNuxtApp();
-const { $formatDate } = nuxtApp;
-
 const route = useRoute();
-const router = useRouter();
+
+const { $formatDate, payload } = nuxtApp;
 
 const selectedAttachment = ref<IThreadCommentAttachment | null>();
 const showReplyForm = ref(false);
@@ -112,13 +119,9 @@ function closeModalMedia() {
   selectedAttachment.value = null;
 }
 
-function userLink() {
-  return '/';
-  return props.comment?.user?.id ? `/users/${props?.comment?.user?.id}` : '';
-}
-
 function username() {
-  return props.comment?.user?.name || props.comment?.guestName || '名無し';
+  const name = props.comment?.user?.name || props.comment?.guestName || '名無し';
+  return `*${name}*`;
 }
 
 function toParentComment(parentCommentIdx: number): {
@@ -138,7 +141,7 @@ function toParentComment(parentCommentIdx: number): {
 
 <style scoped>
 .comment-item {
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .comment-list-item {
@@ -149,7 +152,7 @@ function toParentComment(parentCommentIdx: number): {
 .comment-header-text {
   flex: 1;
   word-wrap: break-word;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .username-link {

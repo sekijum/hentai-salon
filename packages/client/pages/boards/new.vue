@@ -59,8 +59,9 @@ import * as yup from 'yup';
 
 const router = useRouter();
 const nuxtApp = useNuxtApp();
-const { $api } = nuxtApp;
 const { fetchListPresignedUrl, uploadFilesToS3 } = useActions();
+
+const { $api } = nuxtApp;
 
 const thumbnailFile = ref<File | null>(null);
 

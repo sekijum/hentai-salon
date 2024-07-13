@@ -81,7 +81,7 @@ const props = defineProps<{
 const router = useRouter();
 const route = useRoute();
 
-const { payload, $api } = nuxtApp;
+const { $api } = nuxtApp;
 const { getThreadViewHistory } = useStorage();
 const threadLimit = 10;
 const offset = ref(0);
@@ -103,7 +103,7 @@ function getImageSrc(thumbnailUrl: string) {
   return thumbnailUrl ? thumbnailUrl : '/no-image.jpg';
 }
 
-async function load({ done }) {
+async function load({ done }: { done: (status: 'loading' | 'error' | 'empty' | 'ok') => void }) {
   offset.value += threadLimit;
   const { canNextLoad } = await fetchLoadThreads(offset.value);
   canNextLoad ? done('ok') : done('empty');
@@ -124,6 +124,7 @@ async function fetchLoadThreads(offset: number) {
       offset: offset || 0,
     },
   });
+  console.log(response);
   let canNextLoad = false;
   response.data.threadsByKeyword.map(item => {
     canNextLoad = true;
@@ -148,11 +149,11 @@ async function fetchLoadThreads(offset: number) {
 
   return {
     canNextLoad:
-      response.data.threadsByKeyword.length > threadLimit ||
-      response.data.threadsByBoard.length > threadLimit ||
-      response.data.threadsByRelated.length > threadLimit ||
-      response.data.threadsByNewest.length > threadLimit ||
-      response.data.threadsByHistory.length > threadLimit,
+      response.data.threadsByKeyword.length >= threadLimit ||
+      response.data.threadsByBoard.length >= threadLimit ||
+      response.data.threadsByRelated.length >= threadLimit ||
+      response.data.threadsByNewest.length >= threadLimit ||
+      response.data.threadsByHistory.length >= threadLimit,
   };
 }
 

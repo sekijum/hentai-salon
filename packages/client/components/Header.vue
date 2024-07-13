@@ -20,7 +20,7 @@
     <div class="d-flex justify-center">
       <span class="subtitle">変態サロンへようこそ！ここは趣味の楽園、どんな変態も大歓迎！</span>
     </div>
-    <v-divider></v-divider>
+    <v-divider />
   </div>
 </template>
 

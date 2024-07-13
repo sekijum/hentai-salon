@@ -2,7 +2,7 @@
   <div>
     <PageTitle title="板一覧" />
 
-    <v-divider></v-divider>
+    <v-divider />
 
     <br />
 
@@ -29,6 +29,7 @@ import type { IBoard } from '~/types/board';
 
 const router = useRouter();
 const nuxtApp = useNuxtApp();
+
 const { $api } = nuxtApp;
 
 const boards = ref<IBoard[]>([]);

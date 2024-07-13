@@ -2,8 +2,7 @@
   <video ref="video" class="video-js vjs-default-skin"></video>
 </template>
 
-<script setup>
-import { ref, onMounted, onBeforeUnmount, watch } from 'vue';
+<script setup lang="ts">
 import videojs from 'video.js';
 import 'video.js/dist/video-js.css';
 
@@ -14,37 +13,30 @@ const props = defineProps({
   },
 });
 
-const video = ref(null);
+const video = ref<string>();
 let player = null;
 
 onMounted(() => {
-  player = videojs(
-    video.value,
-    {
-      autoplay: false,
-      controls: true,
-      sources: [
-        {
-          src: props.src,
-          type: 'video/mp4',
-        },
-      ],
-      controlBar: {
-        remainingTimeDisplay: {
-          displayNegative: false,
-        },
+  player = videojs(video.value, {
+    autoplay: false,
+    controls: true,
+    sources: [
+      {
+        src: props.src,
+        type: 'video/mp4',
       },
-      aspectRatio: '16:9',
-      fluid: true,
-      playbackRates: [0.5, 1, 1.5, 2],
-      preferFullWindow: true,
+    ],
+    controlBar: {
+      remainingTimeDisplay: {
+        displayNegative: false,
+      },
     },
-    function onPlayerReady() {
-      console.log('Player is ready!');
-    },
-  );
+    aspectRatio: '16:9',
+    fluid: true,
+    playbackRates: [0.5, 1, 1.5, 2],
+    preferFullWindow: true,
+  });
 
-  // Prevent fullscreen on mobile
   player.on('fullscreenchange', () => {
     if (player.isFullscreen()) {
       player.exitFullscreen();
@@ -72,7 +64,6 @@ onBeforeUnmount(() => {
 </script>
 
 <style>
-/* Prevent zoom on mobile */
 .video-js {
   -webkit-user-select: none;
   -webkit-touch-callout: none;

@@ -2,7 +2,7 @@
   <div>
     <PageTitle title="コメント詳細" />
 
-    <v-divider></v-divider>
+    <v-divider />
 
     <CommentItem :comment="comment" />
   </div>

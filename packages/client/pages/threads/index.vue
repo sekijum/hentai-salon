@@ -2,7 +2,7 @@
   <div>
     <PageTitle title="スレ一覧" />
 
-    <v-divider></v-divider>
+    <v-divider />
 
     <Menu :items="menuItems" />
 
@@ -58,10 +58,7 @@ import ThreadList from '~/components/thread/ThreadList.vue';
 import Menu from '~/components/Menu.vue';
 import PageTitle from '~/components/PageTitle.vue';
 import type { IThread } from '~/types/thread';
-const route = useRoute();
-const router = useRouter();
 
-const keyword = ref(route.query.keyword ?? '');
 interface ThreadResponse {
   threadsByPopular: IThread[];
   threadsByNewest: IThread[];
@@ -70,11 +67,17 @@ interface ThreadResponse {
   threadsByRelated: IThread[];
   threadsByBoard: IThread[];
 }
+
+const route = useRoute();
+const router = useRouter();
 const nuxtApp = useNuxtApp();
-const { payload, $api } = nuxtApp;
 const { getThreadViewHistory } = useStorage();
 
+const { $api } = nuxtApp;
+
+const keyword = ref(route.query.keyword ?? '');
 const threads = ref<ThreadResponse>();
+const threadLimit = 10;
 
 const menuItems = [
   {
@@ -103,8 +106,6 @@ const menuItems = [
     icon: 'mdi-new-box',
   },
 ];
-
-const threadLimit = 10;
 
 async function search() {
   await router.push({ ...{ query: { ...{ keyword: keyword.value }, ...{ queryCriteria: 'keyword' } } } });

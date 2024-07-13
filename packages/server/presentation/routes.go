@@ -9,8 +9,9 @@ import (
 
 func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 	paginationMiddleware := middleware.PaginationMiddleware()
+	optionalAuthMiddleware := middleware.OptionalAuthMiddleware()
 
-	r.Use(paginationMiddleware)
+	r.Use(paginationMiddleware, optionalAuthMiddleware)
 
 	r.GET("/health-check", func(c *gin.Context) {
 		c.JSON(200, gin.H{"message": "ok"})

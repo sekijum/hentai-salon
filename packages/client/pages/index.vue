@@ -1,8 +1,14 @@
 <template>
   <div>
+    <v-alert
+      v-if="payload.isLoggedIn"
+      :text="`*${payload?.user?.name}*さん、あなたのアカウントにログインしています。`"
+      prominent
+      class="small-text"
+    />
+
     <Menu :items="menuItems" />
 
-    <!-- <ThreadList title="閲覧履歴" :items="historyItems" moreLink="/history" link="/hoge" :maxItems="3" /> -->
     <ThreadList
       title="スレッド閲覧履歴"
       :items="threadsByHistory"
@@ -15,12 +21,7 @@
       :clicked="() => router.push({ path: '/threads' })"
       :isInfiniteScroll="false"
     />
-    <ThreadList
-      title="新着"
-      :items="threadsByNewest"
-      :clicked="() => router.push({ path: '/threads', query: { queryCriteria: 'newest' } })"
-      :isInfiniteScroll="false"
-    />
+    <ThreadList title="新着" :items="threadsByNewest" :isInfiniteScroll="true" />
   </div>
 </template>
 
@@ -28,7 +29,6 @@
 import Menu from '~/components/Menu.vue';
 import ThreadList from '~/components/thread/ThreadList.vue';
 import type { IThread } from '~/types/thread';
-const { getThreadViewHistory } = useStorage();
 
 interface ThreadResponse {
   threadsByPopular: IThread[];
@@ -38,8 +38,9 @@ interface ThreadResponse {
 
 const router = useRouter();
 const nuxtApp = useNuxtApp();
+const { getThreadViewHistory } = useStorage();
+
 const { payload, $api } = nuxtApp;
-console.log('ユーザー情報:', payload.user);
 
 const threadsByPopular = ref<IThread[]>([]);
 const threadsByNewest = ref<IThread[]>([]);
@@ -67,7 +68,6 @@ async function fetchThreads() {
   if (getThreadViewHistory().length) {
     queryCriteria.push('history');
   }
-  console.log(queryCriteria);
   const response = await $api.get<ThreadResponse>('/threads', {
     params: {
       queryCriteria,
@@ -80,3 +80,9 @@ async function fetchThreads() {
   threadsByHistory.value = response.data.threadsByHistory;
 }
 </script>
+
+<style scoped>
+.small-text {
+  font-size: 0.75rem;
+}
+</style>

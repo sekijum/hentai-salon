@@ -11,7 +11,6 @@ export const useStorage = () => {
   };
 
   const setTheme = (theme: 'dark' | 'light'): void => {
-    console.log(theme);
     $storage.setItem(THEME, theme);
   };
 
@@ -42,7 +41,6 @@ export const useStorage = () => {
       history.splice(index, 1);
     }
     history.unshift(threadId);
-    console.log(history);
     $storage.setItem(THREAD_VIEW_HISTORY_KEY, history);
   };
 

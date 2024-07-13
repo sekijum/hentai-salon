@@ -41,6 +41,20 @@ func (uc *UserCreate) SetPassword(s string) *UserCreate {
 	return uc
 }
 
+// SetProfileLink sets the "profile_link" field.
+func (uc *UserCreate) SetProfileLink(s string) *UserCreate {
+	uc.mutation.SetProfileLink(s)
+	return uc
+}
+
+// SetNillableProfileLink sets the "profile_link" field if the given value is not nil.
+func (uc *UserCreate) SetNillableProfileLink(s *string) *UserCreate {
+	if s != nil {
+		uc.SetProfileLink(*s)
+	}
+	return uc
+}
+
 // SetAvatarURL sets the "avatar_url" field.
 func (uc *UserCreate) SetAvatarURL(s string) *UserCreate {
 	uc.mutation.SetAvatarURL(s)
@@ -351,6 +365,10 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	if value, ok := uc.mutation.Password(); ok {
 		_spec.SetField(user.FieldPassword, field.TypeString, value)
 		_node.Password = value
+	}
+	if value, ok := uc.mutation.ProfileLink(); ok {
+		_spec.SetField(user.FieldProfileLink, field.TypeString, value)
+		_node.ProfileLink = &value
 	}
 	if value, ok := uc.mutation.AvatarURL(); ok {
 		_spec.SetField(user.FieldAvatarURL, field.TypeString, value)
