@@ -105,7 +105,11 @@ func NewThreadCommentResource(c *model.ThreadComment, commentIDs []int, offset i
 	var parentCommentIdx int
 	if c.EntThreadComment.ParentCommentID != nil {
 		parentCommentID = *c.EntThreadComment.ParentCommentID
-		parentCommentIdx = findCommentIndexByID(commentIDs, parentCommentID) + 1
+		if len(commentIDs) > 0 {
+			parentCommentIdx = model.FindCommentIndexByID(commentIDs, parentCommentID) + 1
+		} else {
+			parentCommentIdx = 0
+		}
 	}
 
 	idx := offset + 1
@@ -130,16 +134,6 @@ func NewThreadCommentResource(c *model.ThreadComment, commentIDs []int, offset i
 		Attachments:      attachments,
 		TotalReplies:     len(c.EntThreadComment.Edges.Replies),
 	}
-}
-
-// コメントIDリストから特定のコメントIDのインデックスを計算するヘルパー関数
-func findCommentIndexByID(commentIDs []int, id int) int {
-	for i, commentID := range commentIDs {
-		if commentID == id {
-			return i
-		}
-	}
-	return 1
 }
 
 func NewThreadResource(t *model.Thread, limit, offset int) *ThreadResource {
@@ -177,7 +171,7 @@ func NewThreadResource(t *model.Thread, limit, offset int) *ThreadResource {
 	}
 
 	commentsList := ListResource[*ThreadCommentResource]{
-		TotalCount: t.TotalComments,
+		TotalCount: t.CommentCount,
 		Limit:      limit,
 		Offset:     offset,
 		Data:       comments,
@@ -191,7 +185,7 @@ func NewThreadResource(t *model.Thread, limit, offset int) *ThreadResource {
 		ThumbnailUrl: thumbnailUrl,
 		Tags:         tagNames,
 		CreatedAt:    t.EntThread.CreatedAt.Format(time.RFC3339),
-		CommentCount: t.TotalComments,
+		CommentCount: t.CommentCount,
 		Comments:     commentsList,
 		Attachments:  attachments,
 	}

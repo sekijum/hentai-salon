@@ -5,7 +5,9 @@ import (
 	"errors"
 	"server/domain/model"
 	"server/infrastructure/ent"
+	"server/infrastructure/ent/thread"
 	"server/infrastructure/ent/threadcomment"
+	"server/infrastructure/ent/threadcommentattachment"
 )
 
 var ErrNotFound = errors.New("not found")
@@ -16,6 +18,16 @@ type ThreadCommentDatasource struct {
 
 func NewThreadCommentDatasource(client *ent.Client) *ThreadCommentDatasource {
 	return &ThreadCommentDatasource{client: client}
+}
+
+func (ds *ThreadCommentDatasource) getReplyCount(ctx context.Context, commentId int) (int, error) {
+	replyCount, err := ds.client.ThreadComment.Query().
+		Where(threadcomment.HasParentCommentWith(threadcomment.IDEQ(commentId))).
+		Count(ctx)
+	if err != nil {
+		return 0, err
+	}
+	return replyCount, nil
 }
 
 func (ds *ThreadCommentDatasource) FindAll(ctx context.Context, threadId int) ([]*model.ThreadComment, error) {
@@ -38,8 +50,41 @@ func (ds *ThreadCommentDatasource) FindAll(ctx context.Context, threadId int) ([
 	return modelComments, nil
 }
 
-func (ds *ThreadCommentDatasource) FindById(ctx context.Context, id int) (*model.ThreadComment, error) {
-	comment, err := ds.client.ThreadComment.Get(ctx, id)
+func (ds *ThreadCommentDatasource) FindById(ctx context.Context, threadId, commentId, limit, offset int) (*model.ThreadComment, error) {
+	replyCount, err := ds.getReplyCount(ctx, commentId)
+	if err != nil {
+		return nil, err
+	}
+
+	allCommentIDs, err := ds.client.ThreadComment.Query().
+		Where(threadcomment.HasThreadWith(thread.IDEQ(threadId))).
+		Order(ent.Desc(threadcomment.FieldCreatedAt)).
+		IDs(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	comment, err := ds.client.ThreadComment.Query().
+		Where(threadcomment.IDEQ(commentId)).
+		WithAttachments().
+		WithThread().
+		WithAuthor().
+		WithParentComment(func(pq *ent.ThreadCommentQuery) {
+			pq.WithAuthor().
+				WithReplies()
+		}).
+		WithReplies(func(rq *ent.ThreadCommentQuery) {
+			rq.Order(ent.Desc(threadcomment.FieldCreatedAt)).
+				Limit(limit).
+				Offset(offset).
+				WithAuthor().
+				WithAttachments(func(aq *ent.ThreadCommentAttachmentQuery) {
+					aq.Order(ent.Asc(threadcommentattachment.FieldDisplayOrder))
+				}).
+				WithReplies()
+		}).
+		Only(ctx)
+
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return nil, ErrNotFound
@@ -49,6 +94,8 @@ func (ds *ThreadCommentDatasource) FindById(ctx context.Context, id int) (*model
 
 	return &model.ThreadComment{
 		EntThreadComment: comment,
+		ReplyCount:       replyCount,
+		RepliesIDs:       allCommentIDs,
 	}, nil
 }
 

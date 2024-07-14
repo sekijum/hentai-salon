@@ -6,6 +6,7 @@ import (
 	"server/infrastructure/datasource"
 	"server/infrastructure/ent"
 	request "server/presentation/request"
+	resource "server/presentation/resource"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -26,11 +27,15 @@ func (svc *ThreadCommentApplicationService) FindAll(
 	return svc.threadCommentDatasource.FindAll(ctx, qs.ThreadId)
 }
 
-func (svc *ThreadCommentApplicationService) FindById(
-	ctx context.Context,
-	id int,
-) (*model.ThreadComment, error) {
-	return svc.threadCommentDatasource.FindById(ctx, id)
+func (svc *ThreadCommentApplicationService) FindById(ctx context.Context, threadId, commentId int, qs request.ThreadFindByIdRequest) (*resource.CommentResource, error) {
+	comment, err := svc.threadCommentDatasource.FindById(ctx, threadId, commentId, qs.Limit, qs.Offset)
+	if err != nil {
+		return nil, err
+	}
+
+	commentResource := resource.NewCommentResource(comment, qs.Limit, qs.Offset)
+
+	return commentResource, nil
 }
 
 func (svc *ThreadCommentApplicationService) Create(
@@ -53,13 +58,14 @@ func (svc *ThreadCommentApplicationService) Create(
 		},
 	}
 
+	if body.GuestName != nil {
+		comment.EntThreadComment.GuestName = body.GuestName
+	}
+
 	if exists {
 		userIdInt := userId.(int)
 		comment.EntThreadComment.UserID = &userIdInt
-	}
-
-	if body.GuestName != nil {
-		comment.EntThreadComment.GuestName = body.GuestName
+		comment.EntThreadComment.GuestName = nil
 	}
 
 	if parentCommentId != nil {

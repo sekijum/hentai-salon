@@ -70,7 +70,7 @@ func (svc *ThreadApplicationService) FindAll(ctx context.Context, qs request.Thr
 					sortedThreads = append(sortedThreads, thread)
 				}
 			}
-			threadsByCriteria["threadsByHistory"] = sortedThreads		
+			threadsByCriteria["threadsByHistory"] = sortedThreads
 		case "keyword":
 			if qs.Keyword != "" {
 				threads, err := svc.threadDatasource.FindByKeyword(ctx, qs.Keyword, qs.Limit, qs.Offset)

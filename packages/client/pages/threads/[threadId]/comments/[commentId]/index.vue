@@ -1,61 +1,37 @@
 <template>
-  <div v-if="thread">
-    <PageTitle :title="thread.title" />
-
-    <h2 class="font-weight-regular page-description">{{ thread.description }}</h2>
-
-    <v-chip-group v-if="thread.tags" active-class="primary--text" column>
-      <v-chip size="x-small" v-for="tag in thread.tags" :key="tag">
-        {{ tag }}
-      </v-chip>
-    </v-chip-group>
+  <div v-if="threadComment">
+    <PageTitle title="コメント詳細" />
 
     <v-divider />
 
-    <Menu :items="menuItems" />
+    <CommentList :comments="[threadComment]" :commentLimit="commentLimit" :threadId="threadComment.thread.id" />
 
-    <Pagination :totalCount="thread.comments.totalCount" :limit="commentLimit" />
+    <v-divider />
+    <Pagination :totalCount="threadComment.replies.totalCount" :limit="commentLimit" />
+    <v-divider />
 
-    <template v-if="route.query.tab === 'media'">
-      <div id="media-top" />
-      <MediaGallery
-        v-if="thread.attachments"
-        :attachments="thread.attachments"
-        :commentLimit="commentLimit"
-        :threadId="thread.id"
-      />
-      <div id="media-bottom" />
+    <div id="comment-top" />
+    <CommentList
+      v-if="threadComment.replies.data"
+      :comments="threadComment?.replies.data"
+      :commentLimit="commentLimit"
+      :threadId="threadComment.thread.id"
+    />
+    <div id="comment-bottom" />
 
-      <v-btn icon large color="primary" class="fab fab-top" @click="scrollToMediaTop">
-        <v-icon>mdi-arrow-up</v-icon>
-      </v-btn>
-      <v-btn icon large color="primary" class="fab fab-bottom" @click="scrollToMediaBottom">
-        <v-icon>mdi-arrow-down</v-icon>
-      </v-btn>
-    </template>
-    <template v-else>
-      <CommentForm />
+    <Pagination :totalCount="threadComment.replies.totalCount" :limit="commentLimit" />
 
-      <v-divider />
+    <v-btn icon large color="primary" class="fab fab-top" @click="scrollToCommentTop">
+      <v-icon>mdi-arrow-up</v-icon>
+    </v-btn>
 
-      <div id="comment-top" />
-      <CommentList :comments="thread?.comments.data" :commentLimit="commentLimit" :threadId="thread.id" />
-      <div id="comment-bottom" />
-
-      <CommentForm />
-
-      <v-btn icon large color="primary" class="fab fab-top" @click="scrollToCommentTop">
-        <v-icon>mdi-arrow-up</v-icon>
-      </v-btn>
-
-      <v-btn icon large color="primary" class="fab fab-bottom" @click="scrollToCommentBottom">
-        <v-icon>mdi-arrow-down</v-icon>
-      </v-btn>
-    </template>
+    <v-btn icon large color="primary" class="fab fab-bottom" @click="scrollToCommentBottom">
+      <v-icon>mdi-arrow-down</v-icon>
+    </v-btn>
 
     <v-divider />
 
-    <Pagination :totalCount="thread.comments.totalCount" :limit="commentLimit" />
+    <!-- <Pagination :totalCount="threadComment.replies.totalReplies" :limit="commentLimit" /> -->
     <ThreadList
       title="人気"
       :items="threadsByPopular"
@@ -82,6 +58,7 @@ import OverlayLoagind from '~/components/OverlayLoagind.vue';
 import MediaGallery from '~/components/MediaGallery.vue';
 import ThreadList from '~/components/thread/ThreadList.vue';
 import type { IThread } from '~/types/thread';
+import type { IThreadComment } from '~/types/thread-comment';
 
 const router = useRouter();
 const route = useRoute();
@@ -92,9 +69,9 @@ const { $api } = nuxtApp;
 
 const commentLimit = 100;
 const isLoading = ref(true);
-const thread = ref<IThread>();
 const threadsByHistory = ref<IThread[]>([]);
 const threadsByPopular = ref<IThread[]>([]);
+const threadComment = ref<IThreadComment>();
 
 const menuItems = [
   {
@@ -108,20 +85,6 @@ const menuItems = [
     icon: 'mdi-update',
   },
 ];
-
-function scrollToMediaTop() {
-  const mediaTop = document.getElementById('media-top');
-  if (mediaTop) {
-    mediaTop.scrollIntoView({ behavior: 'smooth' });
-  }
-}
-
-function scrollToMediaBottom() {
-  const mediaBottom = document.getElementById('media-bottom');
-  if (mediaBottom) {
-    mediaBottom.scrollIntoView({ behavior: 'smooth' });
-  }
-}
 
 function scrollToCommentTop() {
   const commentTop = document.getElementById('comment-top');
@@ -138,21 +101,24 @@ function scrollToCommentBottom() {
 }
 
 onMounted(async () => {
-  await fetchThread();
   await fetchThreads();
-  setThreadViewHistory(parseInt(route.params.id.toString(), 10));
+  await fetchComment();
 });
 
-async function fetchThread() {
+async function fetchComment() {
   isLoading.value = true;
-  const threadId = route.params.id;
-  const response = await $api.get<IThread>(`/threads/${threadId}`, {
+  const threadId = route.params.threadId;
+  const commentId = route.params.commentId;
+  console.log(threadId);
+  console.log(commentId);
+  const response = await $api.get<IThreadComment>(`/threads/${threadId}/comments/${commentId}`, {
     params: {
       limit: route.query.limit || commentLimit,
       offset: route.query.offset,
     },
   });
-  thread.value = response.data;
+  console.log(response);
+  threadComment.value = response.data;
   isLoading.value = false;
 }
 
@@ -174,7 +140,7 @@ async function fetchThreads() {
 
 watchEffect(() => {
   if (route.query.limit) {
-    fetchThread();
+    fetchComment();
   }
 });
 </script>

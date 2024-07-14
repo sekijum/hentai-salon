@@ -7,10 +7,10 @@ import (
 )
 
 type Thread struct {
-	EntThread     *ent.Thread
-	Popularity    int
-	TotalComments int
-	CommentIDs    []int
+	EntThread    *ent.Thread
+	Popularity   int
+	CommentCount int
+	CommentIDs   []int
 }
 
 type ThreadStatus int

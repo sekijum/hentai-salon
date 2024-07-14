@@ -8,12 +8,12 @@ interface IThreadBoard {
 
 export interface IThreadComment {
   id: number;
-  idx: number;
+  idx?: number;
   user?: { id: number; name: string; profileLink?: string };
   guestName?: string;
   content: string;
   parentCommentIdx?: number;
-  parentCommentId: number;
+  parentCommentId?: number;
   createdAt: string;
   updatedAt: string;
   attachments: IThreadCommentAttachment[];

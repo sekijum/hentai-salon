@@ -39,14 +39,29 @@ func (ctrl *ThreadCommentController) FindAll(c *gin.Context) {
 }
 
 func (ctrl *ThreadCommentController) FindById(c *gin.Context) {
-	idStr := c.Param("id")
-	id, err := strconv.Atoi(idStr)
+	threadId, err := strconv.Atoi(c.Param("threadId"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "無効なIDです"})
+		return
+	}
+
+	commentId, err := strconv.Atoi(c.Param("commentId"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "無効なコメントID"})
 		return
 	}
 
-	comment, err := ctrl.threadCommentApplicationService.FindById(context.Background(), id)
+	var qs request.ThreadFindByIdRequest
+
+	if err := c.ShouldBindQuery(&qs); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	qs.Limit = c.GetInt("limit")
+	qs.Offset = c.GetInt("offset")
+
+	comment, err := ctrl.threadCommentApplicationService.FindById(context.Background(), threadId, commentId, qs)
 	if err != nil {
 		if err == ErrNotFound {
 			c.JSON(http.StatusNotFound, gin.H{"error": "コメントが見つかりません"})
@@ -60,7 +75,7 @@ func (ctrl *ThreadCommentController) FindById(c *gin.Context) {
 }
 
 func (ctrl *ThreadCommentController) Create(ginCtx *gin.Context) {
-	threadId, err := strconv.Atoi(ginCtx.Param("thread_id"))
+	threadId, err := strconv.Atoi(ginCtx.Param("threadId"))
 	if err != nil {
 		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": "無効なIDです"})
 		return
@@ -84,13 +99,13 @@ func (ctrl *ThreadCommentController) Create(ginCtx *gin.Context) {
 }
 
 func (ctrl *ThreadCommentController) Reply(ginCtx *gin.Context) {
-	threadId, err := strconv.Atoi(ginCtx.Param("thread_id"))
+	threadId, err := strconv.Atoi(ginCtx.Param("threadId"))
 	if err != nil {
 		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": "無効なIDです"})
 		return
 	}
 
-	parentCommentId, err := strconv.Atoi(ginCtx.Param("comment_id"))
+	parentCommentId, err := strconv.Atoi(ginCtx.Param("commentId"))
 	if err != nil {
 		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": "無効なコメントIDです"})
 		return

@@ -26,14 +26,14 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 	r.POST("/files/urls-for-upload", controllers.StorageController.GeneratePresignedURLs)
 
 	threadGroup := r.Group("/threads")
-	threadGroup.GET("/:thread_id", controllers.ThreadController.FindById)
+	threadGroup.GET("/:threadId", controllers.ThreadController.FindById)
 
-	commentGroup := threadGroup.Group("/:thread_id/comments")
+	commentGroup := threadGroup.Group("/:threadId/comments")
 	commentGroup.
 		GET("", controllers.ThreadCommentController.FindAll).
-		GET("/:comment_id", controllers.ThreadCommentController.FindById).
+		GET("/:commentId", controllers.ThreadCommentController.FindById).
 		POST("/", controllers.ThreadCommentController.Create).
-		POST("/:comment_id/reply", controllers.ThreadCommentController.Reply)
+		POST("/:commentId/reply", controllers.ThreadCommentController.Reply)
 
 	// 認証必須ルート
 	authMiddleware := middleware.AuthMiddleware()

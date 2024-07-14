@@ -1,5 +1,10 @@
 package request
 
+type ThreadCommentFindByIdRequest struct {
+	Limit  int `form:"limit"`
+	Offset int `form:"offset"`
+}
+
 type ThreadCommentFindAllRequest struct {
 	ThreadId int `form:"threadId" binding:"required"`
 }

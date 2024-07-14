@@ -154,15 +154,14 @@ async function submit(): Promise<void> {
         form.value.attachments = uploadedAttachments;
       }
 
-      const threadId = parseInt(route.params.id.toString(), 10);
       if (props.parentCommentId) {
-        await $api.post(`/threads/${threadId}/comments/${props.parentCommentId}/reply`, {
+        await $api.post(`/threads/${route.params.threadId}/comments/${props.parentCommentId}/reply`, {
           ...form.value,
           parentCommentId: props.parentCommentId,
         });
         alert('返信に成功しました。');
       } else {
-        await $api.post(`/threads/${threadId}/comments/`, form.value);
+        await $api.post(`/threads/${route.params.threadId}/comments/`, form.value);
         alert('書き込みに成功しました。');
       }
       router.go(0);

@@ -15,23 +15,34 @@
           {{ $formatDate(comment.createdAt) }}
         </div>
       </div>
-      <div v-if="comment.parentCommentIdx" class="reply-indication">
-        <template></template>
-        <nuxt-link
-          class="reply-link"
-          target="_blank"
-          rel="noopener"
-          :to="{
-            path: toParentComment(comment.parentCommentIdx).path,
-            query: toParentComment(comment.parentCommentIdx).query,
-            hash: toParentComment(comment.parentCommentIdx).hash,
-          }"
-        >
-          >> {{ comment.parentCommentIdx }}
-        </nuxt-link>
+      <div v-if="comment.parentCommentId" class="reply-indication">
+        <template v-if="comment.parentCommentIdx">
+          <nuxt-link
+            class="reply-link"
+            target="_blank"
+            rel="noopener"
+            :to="{
+              path: toParentComment(comment.parentCommentIdx).path,
+              query: toParentComment(comment.parentCommentIdx).query,
+              hash: toParentComment(comment.parentCommentIdx).hash,
+            }"
+          >
+            >> {{ comment.parentCommentIdx }}
+          </nuxt-link>
+        </template>
+        <template v-else-if="comment.parentCommentId">
+          <nuxt-link
+            class="reply-link"
+            target="_blank"
+            rel="noopener"
+            :to="`/threads/${threadId}/comments/${comment.parentCommentId}`"
+          >
+            >> {{ comment.parentCommentId }}
+          </nuxt-link>
+        </template>
       </div>
       <v-list-item-title class="comment-content">
-        <p class="comment-anchor">{{ comment.content }}</p>
+        <p>{{ comment.content }}</p>
       </v-list-item-title>
       <template v-if="comment.attachments && comment.attachments.length">
         <v-row dense>
@@ -66,11 +77,21 @@
             <v-icon small @click="toggleReplyForm">{{ showReplyForm ? 'mdi-close' : 'mdi-reply' }}</v-icon>
           </v-col>
           <v-col cols="6" class="interaction-right">
-            <nuxt-link :to="`/comments/${comment.id}`" class="interaction-link">
+            <nuxt-link
+              :to="`/threads/${threadId}/comments/${comment.id}`"
+              class="interaction-link"
+              target="_blank"
+              rel="noopener"
+            >
               <v-icon small>mdi-comment</v-icon>
               <span class="interaction-text">{{ comment.totalReplies }}</span>
             </nuxt-link>
-            <nuxt-link :to="'/comments/' + comment.id" class="interaction-link id-link">
+            <nuxt-link
+              :to="`/threads/${threadId}/comments/${comment.id}`"
+              class="interaction-link id-link"
+              target="_blank"
+              rel="noopener"
+            >
               <span class="interaction-text">ID: {{ comment.id }}</span>
             </nuxt-link>
           </v-col>
@@ -176,10 +197,6 @@ function toParentComment(parentCommentIdx: number): {
 .comment-anchor {
   color: inherit;
   text-decoration: none;
-}
-
-.comment-anchor:hover {
-  text-decoration: underline;
 }
 
 .interaction-section {

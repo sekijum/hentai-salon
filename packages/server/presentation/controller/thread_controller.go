@@ -39,7 +39,7 @@ func (ctrl *ThreadController) FindAll(c *gin.Context) {
 }
 
 func (ctrl *ThreadController) FindById(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("thread_id"))
+	id, err := strconv.Atoi(c.Param("threadId"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "無効なIDです"})
 		return
