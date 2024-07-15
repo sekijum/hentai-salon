@@ -14,12 +14,12 @@ export const useStorage = () => {
     $storage.setItem(THEME, theme);
   };
 
-  const getCommentLimit = (): boolean => {
-    return $storage.getItem<boolean>(COMMENT_LIMIT) || false;
+  const getCommentLimit = (): number => {
+    return $storage.getItem<number>(COMMENT_LIMIT) || 100;
   };
 
-  const setCommentLimit = (isBool: boolean): void => {
-    $storage.setItem(COMMENT_LIMIT, isBool);
+  const setCommentLimit = (limit: number): void => {
+    $storage.setItem(COMMENT_LIMIT, limit);
   };
 
   const getCommentSortOrder = (): 'asc' | 'desc' => {

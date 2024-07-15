@@ -239,15 +239,20 @@ func (ds *ThreadDatasource) FindByHistory(ctx context.Context, threadIds []int, 
 	return modelThreads, nil
 }
 
-func (ds *ThreadDatasource) FindById(ctx context.Context, id int, limit, offset int) (*model.Thread, error) {
+func (ds *ThreadDatasource) FindById(ctx context.Context, id int, SortOrder string, limit, offset int) (*model.Thread, error) {
 	commentCount, err := ds.getCommentCount(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 
+	orderFunc := ent.Desc
+	if SortOrder == "asc" {
+		orderFunc = ent.Asc
+	}
+
 	allCommentIDs, err := ds.client.ThreadComment.Query().
 		Where(threadcomment.HasThreadWith(thread.IDEQ(id))).
-		Order(ent.Desc(threadcomment.FieldCreatedAt)).
+		Order(orderFunc(threadcomment.FieldCreatedAt)).
 		IDs(ctx)
 	if err != nil {
 		return nil, err
@@ -257,7 +262,7 @@ func (ds *ThreadDatasource) FindById(ctx context.Context, id int, limit, offset 
 		Where(thread.IDEQ(id)).
 		WithTags().
 		WithComments(func(q *ent.ThreadCommentQuery) {
-			q.Order(ent.Desc(threadcomment.FieldCreatedAt)).
+			q.Order(orderFunc(threadcomment.FieldCreatedAt)).
 				Limit(limit).
 				Offset(offset).
 				WithAuthor().
@@ -265,7 +270,7 @@ func (ds *ThreadDatasource) FindById(ctx context.Context, id int, limit, offset 
 					aq.Order(ent.Asc(threadcommentattachment.FieldDisplayOrder))
 				}).
 				WithReplies(func(rq *ent.ThreadCommentQuery) {
-					rq.Order(ent.Desc(threadcomment.FieldCreatedAt))
+					rq.Order(orderFunc(threadcomment.FieldCreatedAt))
 				})
 		}).
 		WithBoard().

@@ -119,7 +119,7 @@ func (svc *ThreadApplicationService) FindAll(ctx context.Context, qs request.Thr
 }
 
 func (svc *ThreadApplicationService) FindById(ctx context.Context, id int, qs request.ThreadFindByIdRequest) (*resource.ThreadResource, error) {
-	thread, err := svc.threadDatasource.FindById(ctx, id, qs.Limit, qs.Offset)
+	thread, err := svc.threadDatasource.FindById(ctx, id, qs.SortOrder, qs.Limit, qs.Offset)
 	if err != nil {
 		return nil, err
 	}

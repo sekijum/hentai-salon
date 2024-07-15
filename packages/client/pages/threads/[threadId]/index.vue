@@ -86,11 +86,11 @@ import type { IThread } from '~/types/thread';
 const router = useRouter();
 const route = useRoute();
 const nuxtApp = useNuxtApp();
-const { setThreadViewHistory, getThreadViewHistory } = useStorage();
+const { setThreadViewHistory, getThreadViewHistory, getCommentLimit, getCommentSortOrder } = useStorage();
 
 const { $api } = nuxtApp;
 
-const commentLimit = 100;
+const commentLimit = getCommentLimit();
 const isLoading = ref(true);
 const thread = ref<IThread>();
 const threadsByHistory = ref<IThread[]>([]);
@@ -144,12 +144,14 @@ onMounted(async () => {
 });
 
 async function fetchThread() {
+  console.log(getCommentSortOrder());
   isLoading.value = true;
   const threadId = route.params.threadId;
   const response = await $api.get<IThread>(`/threads/${threadId}`, {
     params: {
       limit: route.query.limit || commentLimit,
       offset: route.query.offset,
+      sortOrder: getCommentSortOrder(),
     },
   });
   thread.value = response.data;
