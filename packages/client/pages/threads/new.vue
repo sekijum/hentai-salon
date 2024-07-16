@@ -51,7 +51,7 @@
 
       <div class="field">
         <v-combobox
-          v-model="form.tagNames"
+          v-model="form.tagNameList"
           chips
           small-chips
           label="タグ"
@@ -107,7 +107,7 @@ const form = ref({
   title: '',
   description: '',
   thumbnailUrl: null as string | null,
-  tagNames: [],
+  tagNameList: [],
 });
 
 onMounted(async () => {
@@ -122,7 +122,7 @@ const schema = yup.object({
 
 async function fetchTagSuggestions() {
   try {
-    const response = await $api.get<string[]>('/tags/names');
+    const response = await $api.get<string[]>('/tags/name');
     tagSuggestions.value = response.data;
   } catch (error) {
     console.error('通信中にエラーが発生しました:', error);

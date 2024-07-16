@@ -51,14 +51,14 @@ func (svc *UserAdminApplicationService) FindAll(params UserAdminApplicationServi
 		}))
 	}
 
-	listResource := &resource.ListResource[*resource.UserAdminResource]{
+	dto := &resource.ListResource[*resource.UserAdminResource]{
 		TotalCount: totalCount,
 		Limit:      params.Qs.Limit,
 		Offset:     params.Qs.Offset,
 		Data:       userAdminResources,
 	}
 
-	return listResource, nil
+	return dto, nil
 }
 
 type UserAdminApplicationServiceUpdateParams struct {
@@ -98,7 +98,7 @@ func (svc *UserAdminApplicationService) Update(params UserAdminApplicationServic
 		return nil, err
 	}
 
-	resource := resource.NewUserAdminResource(resource.NewUserAdminResourceParams{User: updatedUser})
+	dto := resource.NewUserAdminResource(resource.NewUserAdminResourceParams{User: updatedUser})
 
-	return resource, nil
+	return dto, nil
 }

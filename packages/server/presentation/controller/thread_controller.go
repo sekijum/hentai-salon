@@ -29,7 +29,7 @@ func (ctrl *ThreadController) FindAllList(ginCtx *gin.Context) {
 	qs.Limit = ginCtx.GetInt("limit")
 	qs.Offset = ginCtx.GetInt("offset")
 
-	threads, err := ctrl.threadApplicationService.FindAllList(service.ThreadApplicationServiceFindAllListParams{
+	dto, err := ctrl.threadApplicationService.FindAllList(service.ThreadApplicationServiceFindAllListParams{
 		Ctx: context.Background(),
 		Qs:  qs,
 	})
@@ -38,7 +38,7 @@ func (ctrl *ThreadController) FindAllList(ginCtx *gin.Context) {
 		return
 	}
 
-	ginCtx.JSON(http.StatusOK, threads)
+	ginCtx.JSON(http.StatusOK, dto)
 }
 
 func (ctrl *ThreadController) FindById(ginCtx *gin.Context) {
@@ -58,7 +58,7 @@ func (ctrl *ThreadController) FindById(ginCtx *gin.Context) {
 	qs.Limit = ginCtx.GetInt("limit")
 	qs.Offset = ginCtx.GetInt("offset")
 
-	thread, err := ctrl.threadApplicationService.FindByID(service.ThreadApplicationServiceFindByIDParams{
+	dto, err := ctrl.threadApplicationService.FindByID(service.ThreadApplicationServiceFindByIDParams{
 		Ctx:      context.Background(),
 		ThreadID: threadID,
 		Qs:       qs,
@@ -68,7 +68,7 @@ func (ctrl *ThreadController) FindById(ginCtx *gin.Context) {
 		return
 	}
 
-	ginCtx.JSON(http.StatusOK, thread)
+	ginCtx.JSON(http.StatusOK, dto)
 }
 
 func (ctrl *ThreadController) Create(ginCtx *gin.Context) {
@@ -78,7 +78,7 @@ func (ctrl *ThreadController) Create(ginCtx *gin.Context) {
 		return
 	}
 
-	threads, err := ctrl.threadApplicationService.Create(service.ThreadApplicationServiceCreateParams{
+	dto, err := ctrl.threadApplicationService.Create(service.ThreadApplicationServiceCreateParams{
 		Ctx:    context.Background(),
 		GinCtx: ginCtx,
 		Body:   body,
@@ -89,5 +89,5 @@ func (ctrl *ThreadController) Create(ginCtx *gin.Context) {
 		return
 	}
 
-	ginCtx.JSON(http.StatusOK, threads)
+	ginCtx.JSON(http.StatusOK, dto)
 }

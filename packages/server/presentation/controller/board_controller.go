@@ -18,7 +18,7 @@ func NewBoardController(boardService *service.BoardApplicationService) *BoardCon
 }
 
 func (ctrl *BoardController) FindAll(ginCtx *gin.Context) {
-	listResource, err := ctrl.boardService.FindAll(service.BoardApplicationServiceFindAllParams{
+	dto, err := ctrl.boardService.FindAll(service.BoardApplicationServiceFindAllParams{
 		Ctx: context.Background(),
 	})
 	if err != nil {
@@ -26,7 +26,7 @@ func (ctrl *BoardController) FindAll(ginCtx *gin.Context) {
 		return
 	}
 
-	ginCtx.JSON(http.StatusOK, listResource)
+	ginCtx.JSON(http.StatusOK, dto)
 }
 
 func (ctrl *BoardController) Create(ginCtx *gin.Context) {
@@ -36,7 +36,7 @@ func (ctrl *BoardController) Create(ginCtx *gin.Context) {
 		return
 	}
 
-	resource, err := ctrl.boardService.Create(service.BoardApplicationServiceCreateParams{
+	dto, err := ctrl.boardService.Create(service.BoardApplicationServiceCreateParams{
 		Ctx:    context.Background(),
 		GinCtx: ginCtx,
 		Body:   body,
@@ -46,5 +46,5 @@ func (ctrl *BoardController) Create(ginCtx *gin.Context) {
 		return
 	}
 
-	ginCtx.JSON(http.StatusOK, resource)
+	ginCtx.JSON(http.StatusOK, dto)
 }

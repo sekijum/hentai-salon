@@ -29,7 +29,7 @@ func (ctrl *BoardAdminController) FindAll(ginCtx *gin.Context) {
 	qs.Limit = ginCtx.GetInt("limit")
 	qs.Offset = ginCtx.GetInt("offset")
 
-	listResource, err := ctrl.boardApplicationService.FindAll(service.BoardAdminApplicationServiceFindAllParams{
+	dto, err := ctrl.boardApplicationService.FindAll(service.BoardAdminApplicationServiceFindAllParams{
 		Ctx: context.Background(),
 		Qs:  qs,
 	})
@@ -38,7 +38,7 @@ func (ctrl *BoardAdminController) FindAll(ginCtx *gin.Context) {
 		return
 	}
 
-	ginCtx.JSON(http.StatusOK, listResource)
+	ginCtx.JSON(http.StatusOK, dto)
 }
 
 func (ctrl *BoardAdminController) Update(ginCtx *gin.Context) {
@@ -55,7 +55,7 @@ func (ctrl *BoardAdminController) Update(ginCtx *gin.Context) {
 		return
 	}
 
-	resource, err := ctrl.boardApplicationService.Update(service.BoardAdminApplicationServiceUpdateParams{
+	dto, err := ctrl.boardApplicationService.Update(service.BoardAdminApplicationServiceUpdateParams{
 		Ctx:     context.Background(),
 		BoardID: boardId,
 		Body:    body,
@@ -65,5 +65,5 @@ func (ctrl *BoardAdminController) Update(ginCtx *gin.Context) {
 		return
 	}
 
-	ginCtx.JSON(http.StatusOK, resource)
+	ginCtx.JSON(http.StatusOK, dto)
 }

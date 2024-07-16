@@ -4,13 +4,12 @@
 package di
 
 import (
-	applicationService "server/application/service"
-	domainService "server/domain/service"
+	"server/application/service"
 	"server/infrastructure/aws"
-	datasource "server/infrastructure/datasource"
+	"server/infrastructure/datasource"
 	"server/infrastructure/ent"
 	"server/infrastructure/minio"
-	controller "server/presentation/controller"
+	"server/presentation/controller"
 
 	"github.com/google/wire"
 )
@@ -33,22 +32,16 @@ var controllerSet = wire.NewSet(
 	controller.NewThreadAdminController,
 )
 
-var applicationServiceSet = wire.NewSet(
-	applicationService.NewBoardApplicationService,
-	applicationService.NewUserApplicationService,
-	applicationService.NewThreadApplicationService,
-	applicationService.NewThreadCommentApplicationService,
-	applicationService.NewTagApplicationService,
-	applicationService.NewStorageApplicationService,
-	applicationService.NewUserAdminApplicationService,
-	applicationService.NewBoardAdminApplicationService,
-	applicationService.NewThreadAdminApplicationService,
-)
-
-var domainServiceSet = wire.NewSet(
-	domainService.NewBoardDomainService,
-	domainService.NewUserDomainService,
-	domainService.NewThreadDomainService,
+var serviceSet = wire.NewSet(
+	service.NewBoardApplicationService,
+	service.NewUserApplicationService,
+	service.NewThreadApplicationService,
+	service.NewThreadCommentApplicationService,
+	service.NewTagApplicationService,
+	service.NewStorageApplicationService,
+	service.NewUserAdminApplicationService,
+	service.NewBoardAdminApplicationService,
+	service.NewThreadAdminApplicationService,
 )
 
 var datasourceSet = wire.NewSet(
@@ -77,8 +70,7 @@ type ControllersSet struct {
 func InitializeControllers() (*ControllersSet, func(), error) {
 	wire.Build(
 		controllerSet,
-		applicationServiceSet,
-		domainServiceSet,
+		serviceSet,
 		externalServiceSet,
 		datasourceSet,
 		wire.Struct(new(ControllersSet), "*"),

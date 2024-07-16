@@ -13,6 +13,10 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 
 	r.Use(paginationMiddleware, optionalAuthMiddleware)
 
+	r.GET("/", func(c *gin.Context) {
+		c.JSON(200, gin.H{"message": "ok"})
+	})
+
 	r.GET("/health-check", func(c *gin.Context) {
 		c.JSON(200, gin.H{"message": "ok"})
 	})
@@ -20,7 +24,7 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 	r.POST("/signup", controllers.UserController.Signup)
 	r.POST("/signin", controllers.UserController.Signin)
 
-	r.GET("/tags/names", controllers.TagController.FindAllName)
+	r.GET("/tags/name", controllers.TagController.FindNameList)
 	r.GET("/boards", controllers.BoardController.FindAll)
 	r.POST("/files/urls-for-upload", controllers.StorageController.GeneratePresignedURLs)
 

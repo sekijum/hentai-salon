@@ -37,13 +37,13 @@ func (svc *ThreadCommentApplicationService) FindByID(params ThreadCommentApplica
 		return nil, err
 	}
 
-	resource := resource.NewThreadCommentResource(resource.NewThreadCommentResourceParams{
+	dto := resource.NewThreadCommentResource(resource.NewThreadCommentResourceParams{
 		ThreadComment: comment,
 		Limit:         params.Qs.Limit,
 		Offset:        params.Qs.Offset,
 	})
 
-	return resource, nil
+	return dto, nil
 }
 
 type ThreadCommentApplicationServiceCreateParams struct {
@@ -107,9 +107,9 @@ func (svc *ThreadCommentApplicationService) Create(params ThreadCommentApplicati
 		return nil, err
 	}
 
-	resource := resource.NewThreadCommentResource(resource.NewThreadCommentResourceParams{
+	dto := resource.NewThreadCommentResource(resource.NewThreadCommentResourceParams{
 		ThreadComment: comment,
 	})
 
-	return resource, nil
+	return dto, nil
 }

@@ -11,7 +11,7 @@ type ThreadResource struct {
 	Title        string                               `json:"title"`
 	Description  *string                              `json:"description"`
 	ThumbnailURL *string                              `json:"thumbnailUrl"`
-	Tags         []string                             `json:"tags"`
+	TagNameList  []string                             `json:"tagNameList"`
 	CreatedAt    string                               `json:"createdAt"`
 	CommentCount int                                  `json:"commentCount"`
 	Comments     ListResource[*ThreadCommentResource] `json:"comments"`
@@ -24,9 +24,9 @@ type NewThreadResourceParams struct {
 }
 
 func NewThreadResource(params NewThreadResourceParams) *ThreadResource {
-	var tagNames []string
+	var tagNameList []string
 	for _, tag := range params.Thread.EntThread.Edges.Tags {
-		tagNames = append(tagNames, tag.Name)
+		tagNameList = append(tagNameList, tag.Name)
 	}
 
 	var boardResource *BoardResource
@@ -82,7 +82,7 @@ func NewThreadResource(params NewThreadResourceParams) *ThreadResource {
 		Title:        params.Thread.EntThread.Title,
 		Description:  description,
 		ThumbnailURL: thumbnailURL,
-		Tags:         tagNames,
+		TagNameList:  tagNameList,
 		CreatedAt:    params.Thread.EntThread.CreatedAt.Format(time.RFC3339),
 		CommentCount: params.Thread.CommentCount,
 		Comments:     commentsList,

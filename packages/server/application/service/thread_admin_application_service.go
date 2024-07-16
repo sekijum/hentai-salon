@@ -85,13 +85,13 @@ func (svc *ThreadAdminApplicationService) FindByID(params ThreadAdminApplication
 		return nil, err
 	}
 
-	resource := resource.NewThreadAdminResource(resource.NewThreadAdminResourceParams{
+	dto := resource.NewThreadAdminResource(resource.NewThreadAdminResourceParams{
 		Thread: thread,
 		Limit:  params.Qs.Limit,
 		Offset: params.Qs.Offset,
 	})
 
-	return resource, nil
+	return dto, nil
 }
 
 type ThreadAdminApplicationServiceUpdateParams struct {
@@ -133,11 +133,11 @@ func (svc *ThreadAdminApplicationService) Update(params ThreadAdminApplicationSe
 		return nil, err
 	}
 
-	resource := resource.NewThreadAdminResource(resource.NewThreadAdminResourceParams{
+	dto := resource.NewThreadAdminResource(resource.NewThreadAdminResourceParams{
 		Thread: updatedThread,
 		Limit:  0,
 		Offset: 0,
 	})
 
-	return resource, nil
+	return dto, nil
 }

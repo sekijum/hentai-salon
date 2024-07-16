@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"server/domain/model"
-	domainService "server/domain/service"
 	"server/infrastructure/datasource"
 	"server/infrastructure/ent"
 	request "server/presentation/request"
@@ -15,23 +14,20 @@ import (
 )
 
 type ThreadApplicationService struct {
-	client              *ent.Client
-	threadDatasource    *datasource.ThreadDatasource
-	tagDatasource       *datasource.TagDatasource
-	threadDomainService *domainService.ThreadDomainService
+	client           *ent.Client
+	threadDatasource *datasource.ThreadDatasource
+	tagDatasource    *datasource.TagDatasource
 }
 
 func NewThreadApplicationService(
 	client *ent.Client,
 	threadDatasource *datasource.ThreadDatasource,
 	tagDatasource *datasource.TagDatasource,
-	threadDomainService *domainService.ThreadDomainService,
 ) *ThreadApplicationService {
 	return &ThreadApplicationService{
-		client:              client,
-		threadDatasource:    threadDatasource,
-		tagDatasource:       tagDatasource,
-		threadDomainService: threadDomainService,
+		client:           client,
+		threadDatasource: threadDatasource,
+		tagDatasource:    tagDatasource,
 	}
 }
 
@@ -133,22 +129,22 @@ func (svc *ThreadApplicationService) FindAllList(params ThreadApplicationService
 		}
 	}
 
-	threadResources := make(map[string][]*resource.ThreadResource)
-	threadResources["threadsByPopular"] = []*resource.ThreadResource{}
-	threadResources["threadsByNewest"] = []*resource.ThreadResource{}
-	threadResources["threadsByHistory"] = []*resource.ThreadResource{}
-	threadResources["threadsByKeyword"] = []*resource.ThreadResource{}
-	threadResources["threadsByRelated"] = []*resource.ThreadResource{}
-	threadResources["threadsByBoard"] = []*resource.ThreadResource{}
+	dto := make(map[string][]*resource.ThreadResource)
+	dto["threadsByPopular"] = []*resource.ThreadResource{}
+	dto["threadsByNewest"] = []*resource.ThreadResource{}
+	dto["threadsByHistory"] = []*resource.ThreadResource{}
+	dto["threadsByKeyword"] = []*resource.ThreadResource{}
+	dto["threadsByRelated"] = []*resource.ThreadResource{}
+	dto["threadsByBoard"] = []*resource.ThreadResource{}
 
 	for key, threads := range threadsByCriteria {
 		for _, thread := range threads {
 			resource := resource.NewThreadResource(resource.NewThreadResourceParams{Thread: thread})
-			threadResources[key] = append(threadResources[key], resource)
+			dto[key] = append(dto[key], resource)
 		}
 	}
 
-	return threadResources, nil
+	return dto, nil
 }
 
 type ThreadApplicationServiceFindByIDParams struct {
@@ -169,12 +165,12 @@ func (svc *ThreadApplicationService) FindByID(params ThreadApplicationServiceFin
 		return nil, err
 	}
 
-	resource := resource.NewThreadResource(resource.NewThreadResourceParams{
+	dto := resource.NewThreadResource(resource.NewThreadResourceParams{
 		Thread: thread,
 		Limit:  params.Qs.Limit,
 		Offset: params.Qs.Offset,
 	})
-	return resource, nil
+	return dto, nil
 }
 
 type ThreadApplicationServiceCreateParams struct {
@@ -189,11 +185,15 @@ func (svc *ThreadApplicationService) Create(params ThreadApplicationServiceCreat
 		return nil, errors.New("ユーザーIDがコンテキストに存在しません")
 	}
 
-	if duplicated, err := svc.threadDomainService.IsTitleDuplicated(domainService.ThreadDomainServiceTitleDuplicatedParams{
+	threads, err := svc.threadDatasource.FindByTitle(datasource.ThreadDatasourceFindByTitleParams{
 		Ctx:   params.Ctx,
 		Title: params.Body.Title,
-	}); err != nil || duplicated {
+	})
+	if err != nil {
 		return nil, err
+	}
+	if len(threads) > 0 {
+		return nil, errors.New("スレタイが重複しています")
 	}
 
 	tx, err := svc.client.Tx(params.Ctx)
@@ -248,7 +248,7 @@ func (svc *ThreadApplicationService) Create(params ThreadApplicationServiceCreat
 		return nil, err
 	}
 
-	resource := resource.NewThreadResource(resource.NewThreadResourceParams{Thread: savedThread})
+	dto := resource.NewThreadResource(resource.NewThreadResourceParams{Thread: savedThread})
 
-	return resource, nil
+	return dto, nil
 }

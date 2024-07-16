@@ -29,12 +29,23 @@ type UserApplicationServiceSignupParams struct {
 }
 
 func (svc *UserApplicationService) Signup(params UserApplicationServiceSignupParams) (string, error) {
+	user, err := svc.userDatasource.FindByEmail(datasource.UserDatasourceFindByEmailParams{
+		Ctx:   params.Ctx,
+		Email: params.Body.Email,
+	})
+	if err != nil {
+		return "", err
+	}
+	if user != nil {
+		return "", errors.New("このメールアドレスは既に使用されています。")
+	}
+
 	hashedPassword, err := util.HashPassword(params.Body.Password)
 	if err != nil {
 		return "", err
 	}
 
-	user := &model.User{
+	user = &model.User{
 		EntUser: &ent.User{
 			Name:        params.Body.Name,
 			Email:       params.Body.Email,

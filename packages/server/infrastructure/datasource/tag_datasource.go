@@ -34,15 +34,15 @@ func (ds *TagDatasource) FindAll(params TagDatasourceFindAllParams) ([]*model.Ta
 }
 
 type TagDatasourceCreateManyTxParams struct {
-	Ctx      context.Context
-	Tx       *ent.Tx
-	TagNames []string
+	Ctx         context.Context
+	Tx          *ent.Tx
+	TagNameList []string
 }
 
 func (ds *TagDatasource) CreateManyTx(params TagDatasourceCreateManyTxParams) ([]*model.Tag, error) {
 	var modelTags []*model.Tag
 
-	for _, tagName := range params.TagNames {
+	for _, tagName := range params.TagNameList {
 		entTag, err := params.Tx.Tag.Query().Where(tag.NameEQ(tagName)).Only(params.Ctx)
 		if entTag == nil {
 			entTag, err = params.Tx.Tag.Create().SetName(tagName).Save(params.Ctx)

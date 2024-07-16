@@ -13,11 +13,11 @@ func NewTagApplicationService(tagDatasource *datasource.TagDatasource) *TagAppli
 	return &TagApplicationService{tagDatasource: tagDatasource}
 }
 
-type TagApplicationServiceFindAllNameParams struct {
+type TagApplicationServiceFindNameListParams struct {
 	Ctx context.Context
 }
 
-func (svc *TagApplicationService) FindAllName(params TagApplicationServiceFindAllNameParams) ([]string, error) {
+func (svc *TagApplicationService) FindNameList(params TagApplicationServiceFindNameListParams) ([]string, error) {
 	tags, err := svc.tagDatasource.FindAll(datasource.TagDatasourceFindAllParams{
 		Ctx: params.Ctx,
 	})
@@ -25,9 +25,9 @@ func (svc *TagApplicationService) FindAllName(params TagApplicationServiceFindAl
 		return nil, err
 	}
 
-	var tagNames []string
+	var tagNameList []string
 	for _, tag := range tags {
-		tagNames = append(tagNames, tag.Name())
+		tagNameList = append(tagNameList, tag.Name())
 	}
-	return tagNames, nil
+	return tagNameList, nil
 }

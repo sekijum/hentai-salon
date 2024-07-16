@@ -35,7 +35,7 @@ func (ctrl *ThreadCommentController) FindById(ginCtx *gin.Context) {
 	qs.Limit = ginCtx.GetInt("limit")
 	qs.Offset = ginCtx.GetInt("offset")
 
-	comment, err := ctrl.threadCommentApplicationService.FindByID(service.ThreadCommentApplicationServiceFindByIDParams{
+	dto, err := ctrl.threadCommentApplicationService.FindByID(service.ThreadCommentApplicationServiceFindByIDParams{
 		Ctx:       context.Background(),
 		CommentID: commentID,
 		Qs:        qs,
@@ -45,7 +45,7 @@ func (ctrl *ThreadCommentController) FindById(ginCtx *gin.Context) {
 		return
 	}
 
-	ginCtx.JSON(http.StatusOK, comment)
+	ginCtx.JSON(http.StatusOK, dto)
 }
 
 func (ctrl *ThreadCommentController) Create(ginCtx *gin.Context) {
@@ -61,7 +61,7 @@ func (ctrl *ThreadCommentController) Create(ginCtx *gin.Context) {
 		return
 	}
 
-	resource, err := ctrl.threadCommentApplicationService.Create(service.ThreadCommentApplicationServiceCreateParams{
+	dto, err := ctrl.threadCommentApplicationService.Create(service.ThreadCommentApplicationServiceCreateParams{
 		Ctx:             context.Background(),
 		GinCtx:          ginCtx,
 		ThreadID:        threadID,
@@ -73,7 +73,7 @@ func (ctrl *ThreadCommentController) Create(ginCtx *gin.Context) {
 		return
 	}
 
-	ginCtx.JSON(http.StatusOK, resource)
+	ginCtx.JSON(http.StatusOK, dto)
 }
 
 func (ctrl *ThreadCommentController) Reply(ginCtx *gin.Context) {
@@ -95,8 +95,7 @@ func (ctrl *ThreadCommentController) Reply(ginCtx *gin.Context) {
 		return
 	}
 
-	// parentCommentIdをポインタとして渡す
-	resource, err := ctrl.threadCommentApplicationService.Create(service.ThreadCommentApplicationServiceCreateParams{
+	dto, err := ctrl.threadCommentApplicationService.Create(service.ThreadCommentApplicationServiceCreateParams{
 		Ctx:             context.Background(),
 		GinCtx:          ginCtx,
 		ThreadID:        threadID,
@@ -108,5 +107,5 @@ func (ctrl *ThreadCommentController) Reply(ginCtx *gin.Context) {
 		return
 	}
 
-	ginCtx.JSON(http.StatusOK, resource)
+	ginCtx.JSON(http.StatusOK, dto)
 }

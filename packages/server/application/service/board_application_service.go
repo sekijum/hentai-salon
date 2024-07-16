@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"server/domain/model"
-	domainService "server/domain/service"
 	"server/infrastructure/datasource"
 	"server/infrastructure/ent"
 	request "server/presentation/request"
@@ -15,18 +14,11 @@ import (
 )
 
 type BoardApplicationService struct {
-	boardDatasource    *datasource.BoardDatasource
-	boardDomainService *domainService.BoardDomainService
+	boardDatasource *datasource.BoardDatasource
 }
 
-func NewBoardApplicationService(
-	boardDatasource *datasource.BoardDatasource,
-	boardDomainService *domainService.BoardDomainService,
-) *BoardApplicationService {
-	return &BoardApplicationService{
-		boardDatasource:    boardDatasource,
-		boardDomainService: boardDomainService,
-	}
+func NewBoardApplicationService(boardDatasource *datasource.BoardDatasource) *BoardApplicationService {
+	return &BoardApplicationService{boardDatasource: boardDatasource}
 }
 
 type BoardApplicationServiceFindAllParams struct {
@@ -41,14 +33,14 @@ func (svc *BoardApplicationService) FindAll(params BoardApplicationServiceFindAl
 		return nil, err
 	}
 
-	var listResource []*resource.BoardResource
+	var dto []*resource.BoardResource
 	for _, board := range boards {
-		listResource = append(listResource, resource.NewBoardResource(resource.NewBoardResourceParams{
+		dto = append(dto, resource.NewBoardResource(resource.NewBoardResourceParams{
 			Board: board,
 		}))
 	}
 
-	return listResource, nil
+	return dto, nil
 }
 
 type BoardApplicationServiceCreateParams struct {
@@ -63,13 +55,14 @@ func (svc *BoardApplicationService) Create(params BoardApplicationServiceCreateP
 		return nil, errors.New("ユーザーIDがコンテキストに存在しません")
 	}
 
-	if duplicated, err := svc.boardDomainService.IsTitleDuplicated(domainService.BoardDomainServiceIsTitleDuplicatedParams{
+	boards, err := svc.boardDatasource.FindByTitle(datasource.BoardDatasourceFindByTitleParams{
 		Ctx:   params.Ctx,
 		Title: params.Body.Title,
-	}); err != nil || duplicated {
-		if err != nil {
-			return nil, err
-		}
+	})
+	if err != nil {
+		return nil, err
+	}
+	if len(boards) > 0 {
 		return nil, errors.New("板タイトルが重複しています")
 	}
 
@@ -90,7 +83,7 @@ func (svc *BoardApplicationService) Create(params BoardApplicationServiceCreateP
 		board.EntBoard.ThumbnailURL = params.Body.ThumbnailURL
 	}
 
-	board, err := svc.boardDatasource.Create(datasource.BoardDatasourceCreateParams{
+	board, err = svc.boardDatasource.Create(datasource.BoardDatasourceCreateParams{
 		Ctx:   params.Ctx,
 		Board: board,
 	})
@@ -98,9 +91,9 @@ func (svc *BoardApplicationService) Create(params BoardApplicationServiceCreateP
 		return nil, err
 	}
 
-	resource := resource.NewBoardResource(resource.NewBoardResourceParams{
+	dto := resource.NewBoardResource(resource.NewBoardResourceParams{
 		Board: board,
 	})
 
-	return resource, nil
+	return dto, nil
 }

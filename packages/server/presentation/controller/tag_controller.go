@@ -16,8 +16,8 @@ func NewTagController(tagApplicationService *service.TagApplicationService) *Tag
 	return &TagController{tagApplicationService: tagApplicationService}
 }
 
-func (ctrl *TagController) FindAllName(ginCtx *gin.Context) {
-	tags, err := ctrl.tagApplicationService.FindAllName(service.TagApplicationServiceFindAllNameParams{
+func (ctrl *TagController) FindNameList(ginCtx *gin.Context) {
+	tagNameList, err := ctrl.tagApplicationService.FindNameList(service.TagApplicationServiceFindNameListParams{
 		Ctx: context.Background(),
 	})
 	if err != nil {
@@ -25,5 +25,5 @@ func (ctrl *TagController) FindAllName(ginCtx *gin.Context) {
 		return
 	}
 
-	ginCtx.JSON(http.StatusOK, tags)
+	ginCtx.JSON(http.StatusOK, tagNameList)
 }

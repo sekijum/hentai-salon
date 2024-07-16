@@ -58,7 +58,7 @@ func (ctrl *ThreadAdminController) FindByID(ginCtx *gin.Context) {
 	qs.Limit = ginCtx.GetInt("limit")
 	qs.Offset = ginCtx.GetInt("offset")
 
-	listResource, err := ctrl.threadApplicationService.FindByID(service.ThreadAdminApplicationServiceFindByIDParams{
+	dto, err := ctrl.threadApplicationService.FindByID(service.ThreadAdminApplicationServiceFindByIDParams{
 		Ctx:      context.Background(),
 		ThreadID: threadID,
 		Qs:       qs,
@@ -68,7 +68,7 @@ func (ctrl *ThreadAdminController) FindByID(ginCtx *gin.Context) {
 		return
 	}
 
-	ginCtx.JSON(http.StatusOK, listResource)
+	ginCtx.JSON(http.StatusOK, dto)
 }
 
 func (ctrl *ThreadAdminController) Update(ginCtx *gin.Context) {
@@ -85,7 +85,7 @@ func (ctrl *ThreadAdminController) Update(ginCtx *gin.Context) {
 		return
 	}
 
-	resource, err := ctrl.threadApplicationService.Update(service.ThreadAdminApplicationServiceUpdateParams{
+	dto, err := ctrl.threadApplicationService.Update(service.ThreadAdminApplicationServiceUpdateParams{
 		Ctx:      context.Background(),
 		ThreadID: threadID,
 		Body:     body,
@@ -95,5 +95,5 @@ func (ctrl *ThreadAdminController) Update(ginCtx *gin.Context) {
 		return
 	}
 
-	ginCtx.JSON(http.StatusOK, resource)
+	ginCtx.JSON(http.StatusOK, dto)
 }

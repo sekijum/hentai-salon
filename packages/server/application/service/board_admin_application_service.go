@@ -51,14 +51,14 @@ func (svc *BoardAdminApplicationService) FindAll(params BoardAdminApplicationSer
 		}))
 	}
 
-	listResource := &resource.ListResource[*resource.BoardAdminResource]{
+	dto := &resource.ListResource[*resource.BoardAdminResource]{
 		TotalCount: totalCount,
 		Limit:      params.Qs.Limit,
 		Offset:     params.Qs.Offset,
 		Data:       boardAdminResources,
 	}
 
-	return listResource, nil
+	return dto, nil
 }
 
 type BoardAdminApplicationServiceUpdateParams struct {
@@ -98,9 +98,9 @@ func (svc *BoardAdminApplicationService) Update(params BoardAdminApplicationServ
 		return nil, err
 	}
 
-	resource := resource.NewBoardAdminResource(resource.NewBoardAdminResourceParams{
+	dto := resource.NewBoardAdminResource(resource.NewBoardAdminResourceParams{
 		Board: updatedBoard,
 	})
 
-	return resource, nil
+	return dto, nil
 }

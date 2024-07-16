@@ -109,15 +109,12 @@ async function fetchComment() {
   isLoading.value = true;
   const threadId = route.params.threadId;
   const commentId = route.params.commentId;
-  console.log(threadId);
-  console.log(commentId);
   const response = await $api.get<IThreadComment>(`/threads/${threadId}/comments/${commentId}`, {
     params: {
       limit: route.query.limit || commentLimit,
       offset: route.query.offset,
     },
   });
-  console.log(response);
   threadComment.value = response.data;
   isLoading.value = false;
 }

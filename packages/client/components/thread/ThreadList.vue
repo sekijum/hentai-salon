@@ -124,7 +124,6 @@ async function fetchLoadThreads(offset: number) {
       offset: offset || 0,
     },
   });
-  console.log(response);
   let canNextLoad = false;
   response.data.threadsByKeyword.map(item => {
     canNextLoad = true;

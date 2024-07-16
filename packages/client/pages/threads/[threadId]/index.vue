@@ -4,9 +4,9 @@
 
     <h2 class="font-weight-regular page-description">{{ thread.description }}</h2>
 
-    <v-chip-group v-if="thread.tags" active-class="primary--text" column>
-      <v-chip size="x-small" v-for="tag in thread.tags" :key="tag">
-        {{ tag }}
+    <v-chip-group v-if="thread.tagNameList" active-class="primary--text" column>
+      <v-chip size="x-small" v-for="tagName in thread.tagNameList" :key="tagName">
+        {{ tagName }}
       </v-chip>
     </v-chip-group>
 
@@ -144,7 +144,6 @@ onMounted(async () => {
 });
 
 async function fetchThread() {
-  console.log(getCommentSortOrder());
   isLoading.value = true;
   const threadId = route.params.threadId;
   const response = await $api.get<IThread>(`/threads/${threadId}`, {

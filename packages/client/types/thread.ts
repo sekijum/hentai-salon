@@ -26,7 +26,7 @@ export interface IThread {
   title: string;
   description: string;
   thumbnailUrl: string;
-  tags: string[];
+  tagNameList: string[];
   createdAt: string;
   commentCount: number;
   comments: IListResource<IThreadComment>;

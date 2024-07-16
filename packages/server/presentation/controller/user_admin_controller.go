@@ -29,7 +29,7 @@ func (ctrl *UserAdminController) FindAll(ginCtx *gin.Context) {
 	qs.Limit = ginCtx.GetInt("limit")
 	qs.Offset = ginCtx.GetInt("offset")
 
-	listResource, err := ctrl.userAdminApplicationService.FindAll(service.UserAdminApplicationServiceFindAllParams{
+	dto, err := ctrl.userAdminApplicationService.FindAll(service.UserAdminApplicationServiceFindAllParams{
 		Ctx: context.Background(),
 		Qs:  qs,
 	})
@@ -38,7 +38,7 @@ func (ctrl *UserAdminController) FindAll(ginCtx *gin.Context) {
 		return
 	}
 
-	ginCtx.JSON(http.StatusOK, listResource)
+	ginCtx.JSON(http.StatusOK, dto)
 }
 
 func (ctrl *UserAdminController) Update(ginCtx *gin.Context) {
@@ -55,7 +55,7 @@ func (ctrl *UserAdminController) Update(ginCtx *gin.Context) {
 		return
 	}
 
-	userResource, err := ctrl.userAdminApplicationService.Update(service.UserAdminApplicationServiceUpdateParams{
+	dto, err := ctrl.userAdminApplicationService.Update(service.UserAdminApplicationServiceUpdateParams{
 		Ctx:    context.Background(),
 		UserID: userID,
 		Body:   body,
@@ -65,5 +65,5 @@ func (ctrl *UserAdminController) Update(ginCtx *gin.Context) {
 		return
 	}
 
-	ginCtx.JSON(http.StatusOK, userResource)
+	ginCtx.JSON(http.StatusOK, dto)
 }
