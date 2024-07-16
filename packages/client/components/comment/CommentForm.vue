@@ -62,7 +62,14 @@
           <v-btn class="clear-button" block @click="clearForm">クリア</v-btn>
         </v-col>
         <v-col cols="6">
-          <v-btn type="submit" class="submit-button" block :disabled="!meta?.valid">書き込みをする</v-btn>
+          <template v-if="canCommentState || payload.isLoggedIn">
+            <v-btn type="submit" class="submit-button" block :disabled="!meta?.valid">書き込みをする</v-btn>
+          </template>
+          <template v-else>
+            <v-btn type="submit" class="submit-button" block disabled>
+              {{ remainingTimeText }}後に書き込み可能です
+            </v-btn>
+          </template>
         </v-col>
       </v-row>
 
@@ -84,23 +91,44 @@ interface Attachment {
   type: 'Video' | 'Image';
 }
 
+interface FormState {
+  guestName: string;
+  content: string;
+  attachments: Attachment[];
+}
+
 const props = defineProps<{ title?: string; parentCommentId?: number }>();
 
 const nuxtApp = useNuxtApp();
 const router = useRouter();
 const route = useRoute();
 const { uploadFilesToImgur } = useActions();
+const { setLastCommentTime, canComment, timeUntilNextComment } = useStorage();
 
 const { $api, payload } = nuxtApp;
 
 const fileInput = ref<InstanceType<typeof HTMLInputElement>>();
 const isLoading = ref(false);
 const attachmentFiles = ref<File[] | null>(null);
+const canCommentState = ref(canComment());
+const remainingTime = ref<{ minutes: number; seconds: number } | null>(null);
 
-const form = ref({
-  guestName: payload.isLoggedIn ? payload?.user?.name : '',
+const form = ref<FormState>({
+  guestName: payload.isLoggedIn ? payload?.user?.name || '' : '',
   content: '',
-  attachments: [] as Attachment[],
+  attachments: [],
+});
+
+const updateRemainingTime = () => {
+  remainingTime.value = timeUntilNextComment();
+  canCommentState.value = canComment();
+};
+
+const remainingTimeText = computed(() => {
+  if (!remainingTime.value) {
+    return '';
+  }
+  return `${remainingTime.value.minutes}分${remainingTime.value.seconds}秒`;
 });
 
 const schema = yup.object({
@@ -124,7 +152,7 @@ function clearForm(): void {
     form.value.content = '';
     attachmentFiles.value = null;
     if (fileInput.value) {
-      fileInput.value.reset();
+      fileInput.value.value = '';
     }
   }
 }
@@ -137,7 +165,7 @@ function handleAttachmentsChange(event: Event): void {
       alert('ファイルの最大枚数は4枚です');
       attachmentFiles.value = null;
       if (fileInput.value) {
-        fileInput.value.reset();
+        fileInput.value.value = '';
       }
     } else {
       attachmentFiles.value = files;
@@ -149,6 +177,7 @@ async function submit(): Promise<void> {
   if (confirm('本当に書き込みますか？')) {
     isLoading.value = true;
     try {
+      if (!payload.isLoggedIn) setLastCommentTime();
       if (attachmentFiles.value && attachmentFiles.value.length > 0) {
         const uploadedAttachments = await uploadFilesToImgur(attachmentFiles.value);
         form.value.attachments = uploadedAttachments;
@@ -166,12 +195,16 @@ async function submit(): Promise<void> {
       }
       router.go(0);
     } catch (error) {
-      console.error('通信中にエラーが発生しました:', error);
-      alert('コメントの送信中にエラーが発生しました。');
+      alert('書き込み中にエラーが発生しました。');
     }
     isLoading.value = false;
   }
 }
+
+onMounted(() => {
+  updateRemainingTime();
+  setInterval(updateRemainingTime, 1000); // 1秒ごとに残り時間を更新
+});
 </script>
 
 <style scoped>

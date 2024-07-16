@@ -5,6 +5,7 @@ export const useStorage = () => {
   const COMMENT_SORT_ORDER = 'comment_sort_order';
   const COMMENT_LIMIT = 'comment_limit';
   const THEME = 'theme';
+  const LAST_COMMENT_TIME = 'last_comment_time';
 
   const getTheme = (): 'dark' | 'light' => {
     return $storage.getItem<'dark' | 'light'>(THEME) || 'light';
@@ -50,6 +51,39 @@ export const useStorage = () => {
     }
   };
 
+  const setLastCommentTime = (): void => {
+    const timestamp = Date.now();
+    $storage.setItem(LAST_COMMENT_TIME, timestamp);
+  };
+
+  const canComment = (): boolean => {
+    const lastCommentTime = $storage.getItem<number>(LAST_COMMENT_TIME);
+    if (!lastCommentTime) {
+      return true; // 初回コメント
+    }
+    const now = Date.now();
+    const tenMinutes = 10 * 60 * 1000; // 10分
+    return now - lastCommentTime > tenMinutes;
+  };
+
+  const timeUntilNextComment = (): { minutes: number; seconds: number } | null => {
+    const lastCommentTime = $storage.getItem<number>(LAST_COMMENT_TIME);
+    if (!lastCommentTime) {
+      return null; // 初回コメント
+    }
+    const now = Date.now();
+    const tenMinutes = 10 * 60 * 1000; // 10分
+    const remainingTime = tenMinutes - (now - lastCommentTime);
+
+    if (remainingTime <= 0) {
+      return null; // すでにコメント可能
+    }
+
+    const minutes = Math.floor(remainingTime / 60000);
+    const seconds = Math.floor((remainingTime % 60000) / 1000);
+    return { minutes, seconds };
+  };
+
   return {
     getThreadViewHistory,
     setThreadViewHistory,
@@ -60,5 +94,8 @@ export const useStorage = () => {
     setCommentLimit,
     getTheme,
     setTheme,
+    setLastCommentTime,
+    canComment,
+    timeUntilNextComment,
   };
 };
