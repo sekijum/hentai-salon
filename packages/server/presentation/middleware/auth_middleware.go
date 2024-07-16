@@ -44,8 +44,8 @@ func AuthMiddleware() gin.HandlerFunc {
 		}
 
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-			userID := int(claims["user_id"].(float64))
-			c.Set("user_id", userID)
+			userID := int(claims["userID"].(float64))
+			c.Set("userID", userID)
 		} else {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "トークンが無効です"})
 			c.Abort()

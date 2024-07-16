@@ -15,36 +15,42 @@ func NewTagDatasource(client *ent.Client) *TagDatasource {
 	return &TagDatasource{client: client}
 }
 
-func (ds *TagDatasource) FindAll(ctx context.Context) ([]*model.Tag, error) {
-	tags, err := ds.client.Tag.Query().All(ctx)
+type TagDatasourceFindAllParams struct {
+	Ctx context.Context
+}
+
+func (ds *TagDatasource) FindAll(params TagDatasourceFindAllParams) ([]*model.Tag, error) {
+	tags, err := ds.client.Tag.Query().All(params.Ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	var modelTags []*model.Tag
 	for _, entTag := range tags {
-		modelTags = append(modelTags, &model.Tag{
-			EntTag: entTag,
-		})
+		modelTags = append(modelTags, &model.Tag{EntTag: entTag})
 	}
 
 	return modelTags, nil
 }
 
-func (ds *TagDatasource) CreateManyTx(ctx context.Context, tx *ent.Tx, tagNames []string) ([]*model.Tag, error) {
+type TagDatasourceCreateManyTxParams struct {
+	Ctx      context.Context
+	Tx       *ent.Tx
+	TagNames []string
+}
+
+func (ds *TagDatasource) CreateManyTx(params TagDatasourceCreateManyTxParams) ([]*model.Tag, error) {
 	var modelTags []*model.Tag
 
-	for _, tagName := range tagNames {
-		entTag, err := tx.Tag.Query().Where(tag.NameEQ(tagName)).Only(ctx)
+	for _, tagName := range params.TagNames {
+		entTag, err := params.Tx.Tag.Query().Where(tag.NameEQ(tagName)).Only(params.Ctx)
 		if entTag == nil {
-			entTag, err = tx.Tag.Create().SetName(tagName).Save(ctx)
+			entTag, err = params.Tx.Tag.Create().SetName(tagName).Save(params.Ctx)
 			if err != nil {
 				return nil, err
 			}
 		}
-		modelTags = append(modelTags, &model.Tag{
-			EntTag: entTag,
-		})
+		modelTags = append(modelTags, &model.Tag{EntTag: entTag})
 	}
 
 	return modelTags, nil

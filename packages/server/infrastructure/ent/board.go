@@ -23,9 +23,9 @@ type Board struct {
 	// 板名
 	Title string `json:"title,omitempty"`
 	// Description holds the value of the "description" field.
-	Description string `json:"description,omitempty"`
+	Description *string `json:"description,omitempty"`
 	// ThumbnailURL holds the value of the "thumbnail_url" field.
-	ThumbnailURL string `json:"thumbnail_url,omitempty"`
+	ThumbnailURL *string `json:"thumbnail_url,omitempty"`
 	// 0: Public, 1: Private, 3: Pending, 3: Archived
 	Status int `json:"status,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
@@ -117,13 +117,15 @@ func (b *Board) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field description", values[i])
 			} else if value.Valid {
-				b.Description = value.String
+				b.Description = new(string)
+				*b.Description = value.String
 			}
 		case board.FieldThumbnailURL:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field thumbnail_url", values[i])
 			} else if value.Valid {
-				b.ThumbnailURL = value.String
+				b.ThumbnailURL = new(string)
+				*b.ThumbnailURL = value.String
 			}
 		case board.FieldStatus:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -195,11 +197,15 @@ func (b *Board) String() string {
 	builder.WriteString("title=")
 	builder.WriteString(b.Title)
 	builder.WriteString(", ")
-	builder.WriteString("description=")
-	builder.WriteString(b.Description)
+	if v := b.Description; v != nil {
+		builder.WriteString("description=")
+		builder.WriteString(*v)
+	}
 	builder.WriteString(", ")
-	builder.WriteString("thumbnail_url=")
-	builder.WriteString(b.ThumbnailURL)
+	if v := b.ThumbnailURL; v != nil {
+		builder.WriteString("thumbnail_url=")
+		builder.WriteString(*v)
+	}
 	builder.WriteString(", ")
 	builder.WriteString("status=")
 	builder.WriteString(fmt.Sprintf("%v", b.Status))

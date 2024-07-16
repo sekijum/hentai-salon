@@ -20,63 +20,73 @@ func NewThreadCommentApplicationService(threadCommentDatasource *datasource.Thre
 	return &ThreadCommentApplicationService{threadCommentDatasource: threadCommentDatasource}
 }
 
-func (svc *ThreadCommentApplicationService) FindAll(
-	ctx context.Context,
-	qs request.ThreadCommentFindAllRequest,
-) ([]*model.ThreadComment, error) {
-	return svc.threadCommentDatasource.FindAll(ctx, qs.ThreadId)
+type ThreadCommentApplicationServiceFindByIDParams struct {
+	Ctx       context.Context
+	CommentID int
+	Qs        request.ThreadFindByIdRequest
 }
 
-func (svc *ThreadCommentApplicationService) FindById(ctx context.Context, threadId, commentId int, qs request.ThreadFindByIdRequest) (*resource.CommentResource, error) {
-	comment, err := svc.threadCommentDatasource.FindById(ctx, threadId, commentId, qs.Limit, qs.Offset)
+func (svc *ThreadCommentApplicationService) FindByID(params ThreadCommentApplicationServiceFindByIDParams) (*resource.ThreadCommentResource, error) {
+	comment, err := svc.threadCommentDatasource.FindByID(datasource.ThreadCommentDatasourceFindByIDParams{
+		Ctx:       params.Ctx,
+		CommentID: params.CommentID,
+		Limit:     params.Qs.Limit,
+		Offset:    params.Qs.Offset,
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	commentResource := resource.NewCommentResource(comment, qs.Limit, qs.Offset)
+	resource := resource.NewThreadCommentResource(resource.NewThreadCommentResourceParams{
+		ThreadComment: comment,
+		Limit:         params.Qs.Limit,
+		Offset:        params.Qs.Offset,
+	})
 
-	return commentResource, nil
+	return resource, nil
 }
 
-func (svc *ThreadCommentApplicationService) Create(
-	ctx context.Context,
-	ginCtx *gin.Context,
-	threadId int,
-	parentCommentId *int,
-	body request.ThreadCommentCreateRequest,
-) error {
-	userId, exists := ginCtx.Get("user_id")
+type ThreadCommentApplicationServiceCreateParams struct {
+	Ctx             context.Context
+	GinCtx          *gin.Context
+	ThreadID        int
+	ParentCommentID *int
+	Body            request.ThreadCommentCreateRequest
+}
+
+func (svc *ThreadCommentApplicationService) Create(params ThreadCommentApplicationServiceCreateParams) (*resource.ThreadCommentResource, error) {
+	userID, exists := params.GinCtx.Get("userID")
 
 	comment := &model.ThreadComment{
 		EntThreadComment: &ent.ThreadComment{
-			ThreadID:  threadId,
-			Content:   body.Content,
-			IPAddress: ginCtx.ClientIP(),
+			ThreadID:  params.ThreadID,
+			Content:   params.Body.Content,
+			IPAddress: params.GinCtx.ClientIP(),
 			Status:    int(model.ThreadCommentStatusVisible),
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 		},
 	}
 
-	if body.GuestName != nil {
-		comment.EntThreadComment.GuestName = body.GuestName
+	if params.Body.GuestName != nil {
+		comment.EntThreadComment.GuestName = params.Body.GuestName
 	}
 
 	if exists {
-		userIdInt := userId.(int)
+		userIdInt := userID.(int)
 		comment.EntThreadComment.UserID = &userIdInt
 		comment.EntThreadComment.GuestName = nil
 	}
 
-	if parentCommentId != nil {
-		comment.EntThreadComment.ParentCommentID = parentCommentId
+	if params.ParentCommentID != nil {
+		comment.EntThreadComment.ParentCommentID = params.ParentCommentID
 	}
 
-	attachments := make([]*ent.ThreadCommentAttachment, len(body.Attachments))
-	for i, a := range body.Attachments {
+	attachments := make([]*ent.ThreadCommentAttachment, len(params.Body.Attachments))
+	for i, a := range params.Body.Attachments {
 		attachmentType, err := model.AttachmentTypeFromString(a.Type)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		attachments[i] = &ent.ThreadCommentAttachment{
@@ -89,10 +99,17 @@ func (svc *ThreadCommentApplicationService) Create(
 
 	comment.EntThreadComment.Edges.Attachments = attachments
 
-	_, err := svc.threadCommentDatasource.Create(ctx, comment)
+	_, err := svc.threadCommentDatasource.Create(datasource.ThreadCommentDatasourceCreateParams{
+		Ctx:           params.Ctx,
+		ThreadComment: comment,
+	})
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	resource := resource.NewThreadCommentResource(resource.NewThreadCommentResourceParams{
+		ThreadComment: comment,
+	})
+
+	return resource, nil
 }

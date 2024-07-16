@@ -1,6 +1,6 @@
 <template>
   <v-container fluid>
-    <v-breadcrumbs :items="['HOME', 'スレッド']"></v-breadcrumbs>
+    <v-breadcrumbs :items="['ホーム', 'スレッド']"></v-breadcrumbs>
     <v-data-table
       :headers="headers"
       :items="desserts"

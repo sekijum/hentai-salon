@@ -253,11 +253,11 @@ func (bc *BoardCreate) createSpec() (*Board, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := bc.mutation.Description(); ok {
 		_spec.SetField(board.FieldDescription, field.TypeString, value)
-		_node.Description = value
+		_node.Description = &value
 	}
 	if value, ok := bc.mutation.ThumbnailURL(); ok {
 		_spec.SetField(board.FieldThumbnailURL, field.TypeString, value)
-		_node.ThumbnailURL = value
+		_node.ThumbnailURL = &value
 	}
 	if value, ok := bc.mutation.Status(); ok {
 		_spec.SetField(board.FieldStatus, field.TypeInt, value)

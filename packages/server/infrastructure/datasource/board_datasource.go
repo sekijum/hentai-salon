@@ -15,69 +15,67 @@ func NewBoardDatasource(client *ent.Client) *BoardDatasource {
 	return &BoardDatasource{client: client}
 }
 
-func (ds *BoardDatasource) Create(ctx context.Context, m *model.Board) (*model.Board, error) {
-	tx, err := ds.client.Tx(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	boardBuilder := tx.Board.Create().
-		SetUserID(m.EntBoard.UserID).
-		SetTitle(m.EntBoard.Title).
-		SetStatus(m.EntBoard.Status)
-	if m.EntBoard.Description != "" {
-		boardBuilder.SetDescription(m.EntBoard.Description)
-	}
-	if m.EntBoard.ThumbnailURL != "" {
-		boardBuilder.SetThumbnailURL(m.EntBoard.ThumbnailURL)
-	}
-
-	savedBoard, err := boardBuilder.Save(ctx)
-	if err != nil {
-		tx.Rollback()
-		return nil, err
-	}
-
-	if err := tx.Commit(); err != nil {
-		return nil, err
-	}
-
-	return &model.Board{
-		EntBoard: savedBoard,
-	}, nil
+type BoardDatasourceFindAllParams struct {
+	Ctx context.Context
 }
 
-func (ds *BoardDatasource) FindAll(ctx context.Context) ([]*model.Board, error) {
-	boards, err := ds.client.Board.Query().WithThreads().All(ctx)
+func (ds *BoardDatasource) FindAll(params BoardDatasourceFindAllParams) ([]*model.Board, error) {
+	boards, err := ds.client.Board.Query().WithThreads().All(params.Ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	var modelBoards []*model.Board
 	for _, entBoard := range boards {
-		modelBoards = append(modelBoards, &model.Board{
-			EntBoard: entBoard,
-		})
+		modelBoards = append(modelBoards, &model.Board{EntBoard: entBoard})
 	}
 
 	return modelBoards, nil
 }
 
-func (ds *BoardDatasource) FindByTitle(
-	ctx context.Context,
-	title string,
-) ([]*model.Board, error) {
-	boards, err := ds.client.Board.Query().Where(board.TitleEQ(title)).WithThreads().All(ctx)
+type BoardDatasourceFindByTitleParams struct {
+	Ctx   context.Context
+	Title string
+}
+
+func (ds *BoardDatasource) FindByTitle(params BoardDatasourceFindByTitleParams) ([]*model.Board, error) {
+	boards, err := ds.client.Board.Query().Where(board.TitleEQ(params.Title)).WithThreads().All(params.Ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	var modelBoards []*model.Board
 	for _, entBoard := range boards {
-		modelBoards = append(modelBoards, &model.Board{
-			EntBoard: entBoard,
-		})
+		modelBoards = append(modelBoards, &model.Board{EntBoard: entBoard})
 	}
 
 	return modelBoards, nil
+}
+
+type BoardDatasourceCreateParams struct {
+	Ctx   context.Context
+	Board *model.Board
+}
+
+func (ds *BoardDatasource) Create(params BoardDatasourceCreateParams) (*model.Board, error) {
+
+	boardBuilder := ds.client.Board.Create().
+		SetUserID(params.Board.EntBoard.UserID).
+		SetTitle(params.Board.EntBoard.Title).
+		SetStatus(params.Board.EntBoard.Status)
+
+	if params.Board.EntBoard.Description != nil {
+		boardBuilder.SetDescription(*params.Board.EntBoard.Description)
+	}
+	if params.Board.EntBoard.ThumbnailURL != nil {
+		boardBuilder.SetThumbnailURL(*params.Board.EntBoard.ThumbnailURL)
+	}
+
+	savedBoard, err := boardBuilder.Save(params.Ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Board{EntBoard: savedBoard}, nil
 }

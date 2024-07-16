@@ -17,7 +17,7 @@ export interface IThreadComment {
   createdAt: string;
   updatedAt: string;
   attachments: IThreadCommentAttachment[];
-  totalReplies: number;
+  replyCount: number;
 }
 
 export interface IThread {

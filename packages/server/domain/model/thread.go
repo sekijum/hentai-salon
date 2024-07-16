@@ -59,7 +59,7 @@ func (m *Thread) CalculatePopularity() {
 	if m.EntThread.Title != "" {
 		totalPopularity += 10
 	}
-	if m.EntThread.Description != "" {
+	if m.EntThread.Description != nil {
 		totalPopularity += 5
 	}
 

@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"context"
 	"net/http"
 	"server/application/service"
 
@@ -15,12 +16,14 @@ func NewTagController(tagApplicationService *service.TagApplicationService) *Tag
 	return &TagController{tagApplicationService: tagApplicationService}
 }
 
-func (ctrl *TagController) FindAllName(c *gin.Context) {
-	tags, err := ctrl.tagApplicationService.FindAllName(c.Request.Context())
+func (ctrl *TagController) FindAllName(ginCtx *gin.Context) {
+	tags, err := ctrl.tagApplicationService.FindAllName(service.TagApplicationServiceFindAllNameParams{
+		Ctx: context.Background(),
+	})
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "タグの取得に失敗しました: " + err.Error()})
+		ginCtx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, tags)
+	ginCtx.JSON(http.StatusOK, tags)
 }

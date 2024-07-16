@@ -22,29 +22,54 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 
 	r.GET("/tags/names", controllers.TagController.FindAllName)
 	r.GET("/boards", controllers.BoardController.FindAll)
-	r.GET("/threads", controllers.ThreadController.FindAll)
 	r.POST("/files/urls-for-upload", controllers.StorageController.GeneratePresignedURLs)
 
 	threadGroup := r.Group("/threads")
-	threadGroup.GET("/:threadId", controllers.ThreadController.FindById)
+	{
+		threadGroup.GET("/", controllers.ThreadController.FindAllList)
+		threadGroup.GET("/:threadID", controllers.ThreadController.FindById)
 
-	commentGroup := threadGroup.Group("/:threadId/comments")
-	commentGroup.
-		GET("", controllers.ThreadCommentController.FindAll).
-		GET("/:commentId", controllers.ThreadCommentController.FindById).
-		POST("/", controllers.ThreadCommentController.Create).
-		POST("/:commentId/reply", controllers.ThreadCommentController.Reply)
+		commentGroup := threadGroup.Group("/:threadID/comments")
+		{
+			commentGroup.GET("/:commentID", controllers.ThreadCommentController.FindById)
+			commentGroup.POST("/", controllers.ThreadCommentController.Create)
+			commentGroup.POST("/:commentID/reply", controllers.ThreadCommentController.Reply)
+		}
+	}
 
 	// 認証必須ルート
 	authMiddleware := middleware.AuthMiddleware()
 
-	authGroup := r.Group("/").Use(authMiddleware)
+	authGroup := r.Group("/")
+	authGroup.Use(authMiddleware)
 	{
 		authGroup.POST("/threads", controllers.ThreadController.Create)
 		authGroup.GET("/whoami", controllers.UserController.FindAuthenticatedUser)
 	}
 
 	// 管理者ルート
-	adminGroup := r.Group("/admin").Use(authMiddleware)
-	adminGroup.POST("/boards", controllers.BoardController.Create)
+	adminGroup := r.Group("/admin")
+	adminGroup.Use(authMiddleware)
+	{
+		adminGroup.POST("/boards", controllers.BoardController.Create)
+
+		usersGroup := adminGroup.Group("/users")
+		{
+			usersGroup.GET("/", controllers.UserAdminController.FindAll)
+			usersGroup.PUT("/:userID", controllers.UserAdminController.Update)
+		}
+
+		boardsGroup := adminGroup.Group("/boards")
+		{
+			boardsGroup.GET("/", controllers.BoardAdminController.FindAll)
+			boardsGroup.PUT("/:boardID", controllers.BoardAdminController.Update)
+		}
+
+		threadsGroup := adminGroup.Group("/threads")
+		{
+			threadsGroup.GET("/", controllers.ThreadAdminController.FindAll)
+			threadsGroup.GET("/:threadID", controllers.ThreadAdminController.FindByID)
+			threadsGroup.PUT("/:threadID", controllers.ThreadAdminController.Update)
+		}
+	}
 }

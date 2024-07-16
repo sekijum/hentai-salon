@@ -264,7 +264,7 @@ func (m *BoardMutation) Description() (r string, exists bool) {
 // OldDescription returns the old "description" field's value of the Board entity.
 // If the Board object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *BoardMutation) OldDescription(ctx context.Context) (v string, err error) {
+func (m *BoardMutation) OldDescription(ctx context.Context) (v *string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
 	}
@@ -313,7 +313,7 @@ func (m *BoardMutation) ThumbnailURL() (r string, exists bool) {
 // OldThumbnailURL returns the old "thumbnail_url" field's value of the Board entity.
 // If the Board object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *BoardMutation) OldThumbnailURL(ctx context.Context) (v string, err error) {
+func (m *BoardMutation) OldThumbnailURL(ctx context.Context) (v *string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldThumbnailURL is only allowed on UpdateOne operations")
 	}
@@ -1676,7 +1676,7 @@ func (m *ThreadMutation) Description() (r string, exists bool) {
 // OldDescription returns the old "description" field's value of the Thread entity.
 // If the Thread object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ThreadMutation) OldDescription(ctx context.Context) (v string, err error) {
+func (m *ThreadMutation) OldDescription(ctx context.Context) (v *string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
 	}
@@ -1725,7 +1725,7 @@ func (m *ThreadMutation) ThumbnailURL() (r string, exists bool) {
 // OldThumbnailURL returns the old "thumbnail_url" field's value of the Thread entity.
 // If the Thread object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ThreadMutation) OldThumbnailURL(ctx context.Context) (v string, err error) {
+func (m *ThreadMutation) OldThumbnailURL(ctx context.Context) (v *string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldThumbnailURL is only allowed on UpdateOne operations")
 	}

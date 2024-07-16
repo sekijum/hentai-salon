@@ -2,7 +2,6 @@ package controller
 
 import (
 	"context"
-	"errors"
 	"net/http"
 	"server/application/service"
 	request "server/presentation/request"
@@ -10,8 +9,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 )
-
-var ErrNotFound = errors.New("not found")
 
 type ThreadCommentController struct {
 	threadCommentApplicationService *service.ThreadCommentApplicationService
@@ -21,61 +18,38 @@ func NewThreadCommentController(threadCommentApplicationService *service.ThreadC
 	return &ThreadCommentController{threadCommentApplicationService: threadCommentApplicationService}
 }
 
-func (ctrl *ThreadCommentController) FindAll(c *gin.Context) {
-	var qs request.ThreadCommentFindAllRequest
-
-	if err := c.ShouldBindQuery(&qs); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	comments, err := ctrl.threadCommentApplicationService.FindAll(context.Background(), qs)
+func (ctrl *ThreadCommentController) FindById(ginCtx *gin.Context) {
+	commentID, err := strconv.Atoi(ginCtx.Param("commentID"))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "コメントの取得に失敗しました: " + err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, comments)
-}
-
-func (ctrl *ThreadCommentController) FindById(c *gin.Context) {
-	threadId, err := strconv.Atoi(c.Param("threadId"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "無効なIDです"})
-		return
-	}
-
-	commentId, err := strconv.Atoi(c.Param("commentId"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "無効なコメントID"})
+		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": "無効なコメントID"})
 		return
 	}
 
 	var qs request.ThreadFindByIdRequest
 
-	if err := c.ShouldBindQuery(&qs); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := ginCtx.ShouldBindQuery(&qs); err != nil {
+		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	qs.Limit = c.GetInt("limit")
-	qs.Offset = c.GetInt("offset")
+	qs.Limit = ginCtx.GetInt("limit")
+	qs.Offset = ginCtx.GetInt("offset")
 
-	comment, err := ctrl.threadCommentApplicationService.FindById(context.Background(), threadId, commentId, qs)
+	comment, err := ctrl.threadCommentApplicationService.FindByID(service.ThreadCommentApplicationServiceFindByIDParams{
+		Ctx:       context.Background(),
+		CommentID: commentID,
+		Qs:        qs,
+	})
 	if err != nil {
-		if err == ErrNotFound {
-			c.JSON(http.StatusNotFound, gin.H{"error": "コメントが見つかりません"})
-		} else {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "コメントの取得に失敗しました: " + err.Error()})
-		}
+		ginCtx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, comment)
+	ginCtx.JSON(http.StatusOK, comment)
 }
 
 func (ctrl *ThreadCommentController) Create(ginCtx *gin.Context) {
-	threadId, err := strconv.Atoi(ginCtx.Param("threadId"))
+	threadID, err := strconv.Atoi(ginCtx.Param("threadID"))
 	if err != nil {
 		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": "無効なIDです"})
 		return
@@ -87,25 +61,29 @@ func (ctrl *ThreadCommentController) Create(ginCtx *gin.Context) {
 		return
 	}
 
-	var parentCommentId *int = nil // Createメソッドでは親コメントIDは不要なのでnilを渡す
-
-	err = ctrl.threadCommentApplicationService.Create(context.Background(), ginCtx, threadId, parentCommentId, body)
+	resource, err := ctrl.threadCommentApplicationService.Create(service.ThreadCommentApplicationServiceCreateParams{
+		Ctx:             context.Background(),
+		GinCtx:          ginCtx,
+		ThreadID:        threadID,
+		ParentCommentID: nil,
+		Body:            body,
+	})
 	if err != nil {
 		ginCtx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	ginCtx.JSON(http.StatusOK, nil)
+	ginCtx.JSON(http.StatusOK, resource)
 }
 
 func (ctrl *ThreadCommentController) Reply(ginCtx *gin.Context) {
-	threadId, err := strconv.Atoi(ginCtx.Param("threadId"))
+	threadID, err := strconv.Atoi(ginCtx.Param("threadID"))
 	if err != nil {
 		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": "無効なIDです"})
 		return
 	}
 
-	parentCommentId, err := strconv.Atoi(ginCtx.Param("commentId"))
+	parentCommentID, err := strconv.Atoi(ginCtx.Param("commentID"))
 	if err != nil {
 		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": "無効なコメントIDです"})
 		return
@@ -118,11 +96,17 @@ func (ctrl *ThreadCommentController) Reply(ginCtx *gin.Context) {
 	}
 
 	// parentCommentIdをポインタとして渡す
-	err = ctrl.threadCommentApplicationService.Create(context.Background(), ginCtx, threadId, &parentCommentId, body)
+	resource, err := ctrl.threadCommentApplicationService.Create(service.ThreadCommentApplicationServiceCreateParams{
+		Ctx:             context.Background(),
+		GinCtx:          ginCtx,
+		ThreadID:        threadID,
+		ParentCommentID: &parentCommentID,
+		Body:            body,
+	})
 	if err != nil {
 		ginCtx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	ginCtx.JSON(http.StatusOK, nil)
+	ginCtx.JSON(http.StatusOK, resource)
 }

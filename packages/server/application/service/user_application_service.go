@@ -23,19 +23,24 @@ func NewUserApplicationService(userDatasource *datasource.UserDatasource) *UserA
 	return &UserApplicationService{userDatasource: userDatasource}
 }
 
-func (svc *UserApplicationService) Signup(ctx context.Context, body request.UserSignupRequest) (string, error) {
-	hashedPassword, err := util.HashPassword(body.Password)
+type UserApplicationServiceSignupParams struct {
+	Ctx  context.Context
+	Body request.UserSignupRequest
+}
+
+func (svc *UserApplicationService) Signup(params UserApplicationServiceSignupParams) (string, error) {
+	hashedPassword, err := util.HashPassword(params.Body.Password)
 	if err != nil {
 		return "", err
 	}
 
 	user := &model.User{
 		EntUser: &ent.User{
-			Name:        body.Name,
-			Email:       body.Email,
+			Name:        params.Body.Name,
+			Email:       params.Body.Email,
 			Password:    hashedPassword,
-			AvatarURL:   body.AvatarUrl,
-			ProfileLink: body.ProfileLink,
+			AvatarURL:   params.Body.AvatarURL,
+			ProfileLink: params.Body.ProfileLink,
 			Status:      int(model.UserStatusActive),
 			Role:        int(model.UserRoleMember),
 			CreatedAt:   time.Now(),
@@ -43,21 +48,41 @@ func (svc *UserApplicationService) Signup(ctx context.Context, body request.User
 		},
 	}
 
-	_, err = svc.userDatasource.Create(ctx, user)
+	_, err = svc.userDatasource.Create(datasource.UserDatasourceCreateParams{
+		Ctx:  params.Ctx,
+		User: user,
+	})
 	if err != nil {
 		return "", err
 	}
 
-	return svc.Signin(ctx, body.Email, body.Password)
+	token, err := svc.Signin(UserApplicationServiceSigninParams{
+		Ctx:      params.Ctx,
+		Email:    params.Body.Email,
+		Password: params.Body.Password,
+	})
+	if err != nil {
+		return "", err
+	}
+
+	return token, nil
 }
 
-func (svc *UserApplicationService) Signin(ctx context.Context, email, password string) (string, error) {
-	user, err := svc.userDatasource.FindByEmail(ctx, email)
+type UserApplicationServiceSigninParams struct {
+	Ctx             context.Context
+	Email, Password string
+}
+
+func (svc *UserApplicationService) Signin(params UserApplicationServiceSigninParams) (string, error) {
+	user, err := svc.userDatasource.FindByEmail(datasource.UserDatasourceFindByEmailParams{
+		Ctx:   params.Ctx,
+		Email: params.Email,
+	})
 	if err != nil {
 		return "", err
 	}
 
-	err = util.ComparePassword(user.EntUser.Password, password)
+	err = util.ComparePassword(user.EntUser.Password, params.Password)
 	if err != nil {
 		return "", errors.New("認証情報が無効です")
 	}
@@ -68,8 +93,8 @@ func (svc *UserApplicationService) Signin(ctx context.Context, email, password s
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user_id": user.EntUser.ID,
-		"exp":     time.Now().Add(time.Hour * 72).Unix(),
+		"userID": user.EntUser.ID,
+		"exp":    time.Now().AddDate(0, 1, 0).Unix(),
 	})
 
 	tokenString, err := token.SignedString([]byte(secretKey))
@@ -80,13 +105,18 @@ func (svc *UserApplicationService) Signin(ctx context.Context, email, password s
 	return tokenString, nil
 }
 
-func (svc *UserApplicationService) GetAuthenticatedUser(ctx context.Context, tokenString string) (*resource.UserResource, error) {
+type UserApplicationGetAuthenticatedUserParams struct {
+	Ctx         context.Context
+	TokenString string
+}
+
+func (svc *UserApplicationService) GetAuthenticatedUser(params UserApplicationGetAuthenticatedUserParams) (*resource.UserResource, error) {
 	secretKey := os.Getenv("JWT_SECRET_KEY")
 	if secretKey == "" {
 		return nil, errors.New("秘密鍵が設定されていません")
 	}
 
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.Parse(params.TokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("予期しない署名方法です")
 		}
@@ -98,12 +128,18 @@ func (svc *UserApplicationService) GetAuthenticatedUser(ctx context.Context, tok
 	}
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		userID := int(claims["user_id"].(float64))
-		user, err := svc.userDatasource.FindByID(ctx, userID)
+		userID := int(claims["userID"].(float64))
+		user, err := svc.userDatasource.FindByID(datasource.UserDatasourceFindByIDParams{
+			Ctx:    params.Ctx,
+			UserID: userID,
+		})
 		if err != nil {
 			return nil, errors.New("ユーザーの取得に失敗しました")
 		}
-		return resource.NewUserResource(user), nil
+
+		resource := resource.NewUserResource(resource.NewUserResourceParams{User: user})
+
+		return resource, nil
 	} else {
 		return nil, errors.New("トークンが無効です")
 	}

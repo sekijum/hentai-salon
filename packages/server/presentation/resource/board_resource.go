@@ -8,21 +8,27 @@ type BoardResource struct {
 	Id           int    `json:"id"`
 	Title        string `json:"title"`
 	Description  string `json:"description"`
-	ThumbnailUrl string `json:"thumbnailUrl"`
+	ThumbnailURL string `json:"thumbnailUrl"`
 }
 
-func NewBoardResource(b *model.Board) *BoardResource {
+type NewBoardResourceParams struct {
+	Board *model.Board
+}
+
+func NewBoardResource(params NewBoardResourceParams) *BoardResource {
 	description := ""
-	if b.EntBoard.Description != "" {
-		description = b.EntBoard.Description
+	if params.Board.EntBoard.Description != nil {
+		description = *params.Board.EntBoard.Description
+	}
+	thumbnailURL := ""
+	if params.Board.EntBoard.ThumbnailURL != nil {
+		thumbnailURL = *params.Board.EntBoard.ThumbnailURL
 	}
 
-	thumbnailUrl := b.EntBoard.ThumbnailURL
-
 	return &BoardResource{
-		Id:           b.EntBoard.ID,
-		Title:        b.EntBoard.Title,
+		Id:           params.Board.EntBoard.ID,
+		Title:        params.Board.EntBoard.Title,
 		Description:  description,
-		ThumbnailUrl: thumbnailUrl,
+		ThumbnailURL: thumbnailURL,
 	}
 }

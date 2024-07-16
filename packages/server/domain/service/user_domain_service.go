@@ -13,8 +13,16 @@ func NewUserDomainService(userDatasource *datasource.UserDatasource) *UserDomain
 	return &UserDomainService{userDatasource: userDatasource}
 }
 
-func (svc *UserDomainService) IsUserAdmin(ctx context.Context, userID int) (bool, error) {
-	user, err := svc.userDatasource.FindByID(ctx, userID)
+type NewUserDomainServiceIsUserAdminParams struct {
+	Ctx    context.Context
+	UserID int
+}
+
+func (svc *UserDomainService) IsUserAdmin(params NewUserDomainServiceIsUserAdminParams) (bool, error) {
+	user, err := svc.userDatasource.FindByID(datasource.UserDatasourceFindByIDParams{
+		Ctx:    params.Ctx,
+		UserID: params.UserID,
+	})
 	if err != nil {
 		return false, err
 	}

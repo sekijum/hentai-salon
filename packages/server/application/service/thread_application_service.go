@@ -35,28 +35,46 @@ func NewThreadApplicationService(
 	}
 }
 
-func (svc *ThreadApplicationService) FindAll(ctx context.Context, qs request.ThreadFindAllRequest) (map[string][]*resource.ThreadResource, error) {
+type ThreadApplicationServiceFindAllListParams struct {
+	Ctx context.Context
+	Qs  request.ThreadFindAllRequest
+}
+
+func (svc *ThreadApplicationService) FindAllList(params ThreadApplicationServiceFindAllListParams) (map[string][]*resource.ThreadResource, error) {
 	threadsByCriteria := make(map[string][]*model.Thread)
 
-	for _, criteria := range qs.QueryCriteria {
+	for _, criteria := range params.Qs.QueryCriteria {
 		switch criteria {
 		case "popularity":
-			threads, err := svc.threadDatasource.FindByPopularity(ctx, qs.Limit, qs.Offset)
+			threads, err := svc.threadDatasource.FindByPopularity(datasource.ThreadDatasourceFindByPopularityParams{
+				Ctx:    params.Ctx,
+				Limit:  params.Qs.Limit,
+				Offset: params.Qs.Offset,
+			})
 			if err != nil {
 				return nil, err
 			}
 			threadsByCriteria["threadsByPopular"] = threads
 		case "newest":
-			threads, err := svc.threadDatasource.FindByNewest(ctx, qs.Limit, qs.Offset)
+			threads, err := svc.threadDatasource.FindByNewest(datasource.ThreadDatasourceFindByNewestParams{
+				Ctx:    params.Ctx,
+				Limit:  params.Qs.Limit,
+				Offset: params.Qs.Offset,
+			})
 			if err != nil {
 				return nil, err
 			}
 			threadsByCriteria["threadsByNewest"] = threads
 		case "history":
-			if len(qs.ThreadIds) == 0 {
+			if len(params.Qs.ThreadIDs) == 0 {
 				return nil, errors.New("history順のためにthreadIdsが必要です")
 			}
-			threads, err := svc.threadDatasource.FindByHistory(ctx, qs.ThreadIds, qs.Limit, qs.Offset)
+			threads, err := svc.threadDatasource.FindByHistory(datasource.ThreadDatasourceFindByHistoryParams{
+				Ctx:       params.Ctx,
+				ThreadIDs: params.Qs.ThreadIDs,
+				Limit:     params.Qs.Limit,
+				Offset:    params.Qs.Offset,
+			})
 			if err != nil {
 				return nil, err
 			}
@@ -64,35 +82,50 @@ func (svc *ThreadApplicationService) FindAll(ctx context.Context, qs request.Thr
 			for _, thread := range threads {
 				threadMap[thread.EntThread.ID] = thread
 			}
-			sortedThreads := make([]*model.Thread, 0, len(qs.ThreadIds))
-			for _, id := range qs.ThreadIds {
+			sortedThreads := make([]*model.Thread, 0, len(params.Qs.ThreadIDs))
+			for _, id := range params.Qs.ThreadIDs {
 				if thread, exists := threadMap[id]; exists {
 					sortedThreads = append(sortedThreads, thread)
 				}
 			}
 			threadsByCriteria["threadsByHistory"] = sortedThreads
 		case "keyword":
-			if qs.Keyword != "" {
-				threads, err := svc.threadDatasource.FindByKeyword(ctx, qs.Keyword, qs.Limit, qs.Offset)
+			if params.Qs.Keyword != "" {
+				threads, err := svc.threadDatasource.FindByKeyword(datasource.ThreadDatasourceFindByKeywordParams{
+					Ctx:     params.Ctx,
+					Keyword: params.Qs.Keyword,
+					Limit:   params.Qs.Limit,
+					Offset:  params.Qs.Offset,
+				})
 				if err != nil {
 					return nil, err
 				}
 				threadsByCriteria["threadsByKeyword"] = threads
 			}
 		case "related":
-			if len(qs.ThreadIds) == 0 {
+			if len(params.Qs.ThreadIDs) == 0 {
 				return nil, errors.New("関連順のためにthreadIdsが必要です")
 			}
-			threads, err := svc.threadDatasource.FindByRelatedTags(ctx, qs.ThreadIds, qs.Limit, qs.Offset)
+			threads, err := svc.threadDatasource.FindByRelatedTag(datasource.ThreadDatasourceFindByRelatedTagParams{
+				Ctx:       params.Ctx,
+				ThreadIDs: params.Qs.ThreadIDs,
+				Limit:     params.Qs.Limit,
+				Offset:    params.Qs.Offset,
+			})
 			if err != nil {
 				return nil, err
 			}
 			threadsByCriteria["threadsByRelated"] = threads
 		case "board":
-			if qs.BoardId == 0 {
+			if params.Qs.BoardID == 0 {
 				return nil, errors.New("BoardIDが必要です")
 			}
-			threads, err := svc.threadDatasource.FindByBoardId(ctx, qs.BoardId, qs.Limit, qs.Offset)
+			threads, err := svc.threadDatasource.FindByBoardID(datasource.ThreadDatasourceFindByBoardIDParams{
+				Ctx:     params.Ctx,
+				BoardID: params.Qs.BoardID,
+				Limit:   params.Qs.Limit,
+				Offset:  params.Qs.Offset,
+			})
 			if err != nil {
 				return nil, err
 			}
@@ -110,76 +143,102 @@ func (svc *ThreadApplicationService) FindAll(ctx context.Context, qs request.Thr
 
 	for key, threads := range threadsByCriteria {
 		for _, thread := range threads {
-			res := resource.NewThreadResource(thread, 0, 0)
-			threadResources[key] = append(threadResources[key], res)
+			resource := resource.NewThreadResource(resource.NewThreadResourceParams{Thread: thread})
+			threadResources[key] = append(threadResources[key], resource)
 		}
 	}
 
 	return threadResources, nil
 }
 
-func (svc *ThreadApplicationService) FindById(ctx context.Context, id int, qs request.ThreadFindByIdRequest) (*resource.ThreadResource, error) {
-	thread, err := svc.threadDatasource.FindById(ctx, id, qs.SortOrder, qs.Limit, qs.Offset)
+type ThreadApplicationServiceFindByIDParams struct {
+	Ctx      context.Context
+	ThreadID int
+	Qs       request.ThreadFindByIdRequest
+}
+
+func (svc *ThreadApplicationService) FindByID(params ThreadApplicationServiceFindByIDParams) (*resource.ThreadResource, error) {
+	thread, err := svc.threadDatasource.FindById(datasource.ThreadDatasourceFindByIDParams{
+		Ctx:       params.Ctx,
+		SortOrder: params.Qs.SortOrder,
+		Limit:     params.Qs.Limit,
+		Offset:    params.Qs.Offset,
+		ThreadID:  params.ThreadID,
+	})
 	if err != nil {
 		return nil, err
 	}
-	return resource.NewThreadResource(thread, qs.Limit, qs.Offset), nil
+
+	resource := resource.NewThreadResource(resource.NewThreadResourceParams{
+		Thread: thread,
+		Limit:  params.Qs.Limit,
+		Offset: params.Qs.Offset,
+	})
+	return resource, nil
 }
 
-func (svc *ThreadApplicationService) Create(ctx context.Context, ginCtx *gin.Context, body request.ThreadCreateRequest) (*resource.ThreadResource, error) {
-	userId, exists := ginCtx.Get("user_id")
+type ThreadApplicationServiceCreateParams struct {
+	Ctx    context.Context
+	GinCtx *gin.Context
+	Body   request.ThreadCreateRequest
+}
+
+func (svc *ThreadApplicationService) Create(params ThreadApplicationServiceCreateParams) (*resource.ThreadResource, error) {
+	userID, exists := params.GinCtx.Get("userID")
 	if !exists {
 		return nil, errors.New("ユーザーIDがコンテキストに存在しません")
 	}
 
-	if duplicated, err := svc.threadDomainService.IsTitleDuplicated(ctx, body.Title); err != nil || duplicated {
-		if err != nil {
-			return nil, err
-		}
-		return nil, errors.New("スレタイが重複しています")
+	if duplicated, err := svc.threadDomainService.IsTitleDuplicated(domainService.ThreadDomainServiceTitleDuplicatedParams{
+		Ctx:   params.Ctx,
+		Title: params.Body.Title,
+	}); err != nil || duplicated {
+		return nil, err
 	}
 
-	tx, err := svc.client.Tx(ctx)
+	tx, err := svc.client.Tx(params.Ctx)
 	if err != nil {
 		return nil, err
 	}
 	defer tx.Rollback()
 
-	modelTags, err := svc.tagDatasource.CreateManyTx(ctx, tx, body.TagNames)
+	modelTags, err := svc.tagDatasource.CreateManyTx(datasource.TagDatasourceCreateManyTxParams{
+		Ctx: params.Ctx,
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	tagIDs := make([]int, len(modelTags))
-	for i, tag := range modelTags {
-		tagIDs[i] = tag.EntTag.ID
-	}
-
-	description := ""
-	if body.Description != nil {
-		description = *body.Description
-	}
-
-	thumbnailUrl := ""
-	if body.ThumbnailUrl != nil {
-		thumbnailUrl = *body.ThumbnailUrl
+	var tagIDs []int
+	for _, tag := range modelTags {
+		tagIDs = append(tagIDs, tag.EntTag.ID)
 	}
 
 	thread := &model.Thread{
 		EntThread: &ent.Thread{
-			Title:        body.Title,
-			BoardID:      body.BoardId,
-			Description:  description,
-			UserID:       userId.(int),
-			ThumbnailURL: thumbnailUrl,
-			IPAddress:    ginCtx.ClientIP(),
-			Status:       int(model.ThreadStatusOpen),
-			CreatedAt:    time.Now(),
-			UpdatedAt:    time.Now(),
+			Title:     params.Body.Title,
+			BoardID:   params.Body.BoardId,
+			UserID:    userID.(int),
+			IPAddress: params.GinCtx.ClientIP(),
+			Status:    int(model.ThreadStatusOpen),
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
 		},
 	}
 
-	savedThread, err := svc.threadDatasource.CreateTx(ctx, tx, thread, tagIDs)
+	if params.Body.Description != nil {
+		thread.EntThread.Description = params.Body.Description
+	}
+	if params.Body.ThumbnailURL != nil {
+		thread.EntThread.ThumbnailURL = params.Body.ThumbnailURL
+	}
+
+	savedThread, err := svc.threadDatasource.CreateTx(datasource.ThreadDatasourceCreateTxParams{
+		Ctx:    params.Ctx,
+		Tx:     tx,
+		Thread: thread,
+		TagIDs: tagIDs,
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -189,5 +248,7 @@ func (svc *ThreadApplicationService) Create(ctx context.Context, ginCtx *gin.Con
 		return nil, err
 	}
 
-	return resource.NewThreadResource(savedThread, 0, 0), nil
+	resource := resource.NewThreadResource(resource.NewThreadResourceParams{Thread: savedThread})
+
+	return resource, nil
 }

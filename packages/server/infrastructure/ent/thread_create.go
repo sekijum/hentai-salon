@@ -331,11 +331,11 @@ func (tc *ThreadCreate) createSpec() (*Thread, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := tc.mutation.Description(); ok {
 		_spec.SetField(thread.FieldDescription, field.TypeString, value)
-		_node.Description = value
+		_node.Description = &value
 	}
 	if value, ok := tc.mutation.ThumbnailURL(); ok {
 		_spec.SetField(thread.FieldThumbnailURL, field.TypeString, value)
-		_node.ThumbnailURL = value
+		_node.ThumbnailURL = &value
 	}
 	if value, ok := tc.mutation.IPAddress(); ok {
 		_spec.SetField(thread.FieldIPAddress, field.TypeString, value)

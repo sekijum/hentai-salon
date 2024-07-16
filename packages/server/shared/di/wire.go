@@ -6,13 +6,19 @@ package di
 import (
 	applicationService "server/application/service"
 	domainService "server/domain/service"
-	aws "server/infrastructure/aws"
-	"server/infrastructure/datasource"
+	"server/infrastructure/aws"
+	datasource "server/infrastructure/datasource"
 	"server/infrastructure/ent"
-	minio "server/infrastructure/minio"
-	"server/presentation/controller"
+	"server/infrastructure/minio"
+	controller "server/presentation/controller"
 
 	"github.com/google/wire"
+)
+
+var externalServiceSet = wire.NewSet(
+	ent.ProvideClient,
+	aws.NewS3Client,
+	minio.NewMinioClient,
 )
 
 var controllerSet = wire.NewSet(
@@ -22,6 +28,9 @@ var controllerSet = wire.NewSet(
 	controller.NewThreadCommentController,
 	controller.NewTagController,
 	controller.NewStorageController,
+	controller.NewUserAdminController,
+	controller.NewBoardAdminController,
+	controller.NewThreadAdminController,
 )
 
 var applicationServiceSet = wire.NewSet(
@@ -31,6 +40,9 @@ var applicationServiceSet = wire.NewSet(
 	applicationService.NewThreadCommentApplicationService,
 	applicationService.NewTagApplicationService,
 	applicationService.NewStorageApplicationService,
+	applicationService.NewUserAdminApplicationService,
+	applicationService.NewBoardAdminApplicationService,
+	applicationService.NewThreadAdminApplicationService,
 )
 
 var domainServiceSet = wire.NewSet(
@@ -39,18 +51,15 @@ var domainServiceSet = wire.NewSet(
 	domainService.NewThreadDomainService,
 )
 
-var externalServiceSet = wire.NewSet(
-	ent.ProvideClient,
-	aws.NewS3Client,
-	minio.NewMinioClient,
-)
-
 var datasourceSet = wire.NewSet(
 	datasource.NewBoardDatasource,
 	datasource.NewUserDatasource,
 	datasource.NewThreadDatasource,
 	datasource.NewThreadCommentDatasource,
 	datasource.NewTagDatasource,
+	datasource.NewUserAdminDatasource,
+	datasource.NewBoardAdminDatasource,
+	datasource.NewThreadAdminDatasource,
 )
 
 type ControllersSet struct {
@@ -60,6 +69,9 @@ type ControllersSet struct {
 	ThreadCommentController *controller.ThreadCommentController
 	TagController           *controller.TagController
 	StorageController       *controller.StorageController
+	UserAdminController     *controller.UserAdminController
+	BoardAdminController    *controller.BoardAdminController
+	ThreadAdminController   *controller.ThreadAdminController
 }
 
 func InitializeControllers() (*ControllersSet, func(), error) {

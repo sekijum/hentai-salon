@@ -18,50 +18,57 @@ func NewThreadController(threadApplicationService *service.ThreadApplicationServ
 	return &ThreadController{threadApplicationService: threadApplicationService}
 }
 
-func (ctrl *ThreadController) FindAll(c *gin.Context) {
+func (ctrl *ThreadController) FindAllList(ginCtx *gin.Context) {
 	var qs request.ThreadFindAllRequest
 
-	if err := c.ShouldBindQuery(&qs); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := ginCtx.ShouldBindQuery(&qs); err != nil {
+		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	qs.Limit = c.GetInt("limit")
-	qs.Offset = c.GetInt("offset")
+	qs.Limit = ginCtx.GetInt("limit")
+	qs.Offset = ginCtx.GetInt("offset")
 
-	threads, err := ctrl.threadApplicationService.FindAll(context.Background(), qs)
+	threads, err := ctrl.threadApplicationService.FindAllList(service.ThreadApplicationServiceFindAllListParams{
+		Ctx: context.Background(),
+		Qs:  qs,
+	})
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "スレッドの取得に失敗しました: " + err.Error()})
+		ginCtx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, threads)
+	ginCtx.JSON(http.StatusOK, threads)
 }
 
-func (ctrl *ThreadController) FindById(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("threadId"))
+func (ctrl *ThreadController) FindById(ginCtx *gin.Context) {
+	threadID, err := strconv.Atoi(ginCtx.Param("threadID"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "無効なIDです"})
+		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": "無効なIDです"})
 		return
 	}
 
 	var qs request.ThreadFindByIdRequest
 
-	if err := c.ShouldBindQuery(&qs); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := ginCtx.ShouldBindQuery(&qs); err != nil {
+		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	qs.Limit = c.GetInt("limit")
-	qs.Offset = c.GetInt("offset")
+	qs.Limit = ginCtx.GetInt("limit")
+	qs.Offset = ginCtx.GetInt("offset")
 
-	thread, err := ctrl.threadApplicationService.FindById(context.Background(), id, qs)
+	thread, err := ctrl.threadApplicationService.FindByID(service.ThreadApplicationServiceFindByIDParams{
+		Ctx:      context.Background(),
+		ThreadID: threadID,
+		Qs:       qs,
+	})
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "スレッドの取得に失敗しました: " + err.Error()})
+		ginCtx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, thread)
+	ginCtx.JSON(http.StatusOK, thread)
 }
 
 func (ctrl *ThreadController) Create(ginCtx *gin.Context) {
@@ -71,7 +78,12 @@ func (ctrl *ThreadController) Create(ginCtx *gin.Context) {
 		return
 	}
 
-	threads, err := ctrl.threadApplicationService.Create(context.Background(), ginCtx, body)
+	threads, err := ctrl.threadApplicationService.Create(service.ThreadApplicationServiceCreateParams{
+		Ctx:    context.Background(),
+		GinCtx: ginCtx,
+		Body:   body,
+	})
+
 	if err != nil {
 		ginCtx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

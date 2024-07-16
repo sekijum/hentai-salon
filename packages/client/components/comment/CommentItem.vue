@@ -84,7 +84,7 @@
               rel="noopener"
             >
               <v-icon small>mdi-comment</v-icon>
-              <span class="interaction-text">{{ comment.totalReplies }}</span>
+              <span class="interaction-text">{{ comment.replyCount }}</span>
             </nuxt-link>
             <nuxt-link
               :to="`/threads/${threadId}/comments/${comment.id}`"

@@ -114,7 +114,7 @@ async function fetchLoadThreads(offset: number) {
     await router.push({ ...{ query: { ...route.query, ...{ queryCriteria: 'newest' } } } });
   }
 
-  const response = await $api.get<ThreadResponse>('/threads', {
+  const response = await $api.get<ThreadResponse>('/threads/', {
     params: {
       queryCriteria: [route.query.queryCriteria],
       threadIds: getThreadViewHistory(),

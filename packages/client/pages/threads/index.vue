@@ -124,7 +124,7 @@ async function fetchThreads() {
     await router.push({ ...{ query: { ...{ keyword: keyword.value }, ...{ queryCriteria: 'keyword' } } } });
   }
 
-  const response = await $api.get<ThreadResponse>('/threads', {
+  const response = await $api.get<ThreadResponse>('/threads/', {
     params: {
       queryCriteria: route.query.queryCriteria ? [route.query.queryCriteria] : ['popularity', 'newest'],
       threadIds: getThreadViewHistory(),

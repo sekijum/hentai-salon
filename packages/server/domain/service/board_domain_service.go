@@ -14,8 +14,16 @@ func NewBoardDomainService(boardDatasource *datasource.BoardDatasource) *BoardDo
 	return &BoardDomainService{boardDatasource: boardDatasource}
 }
 
-func (ds *BoardDomainService) IsTitleDuplicated(ctx context.Context, title string) (bool, error) {
-	boards, err := ds.boardDatasource.FindByTitle(ctx, title)
+type BoardDomainServiceIsTitleDuplicatedParams struct {
+	Ctx   context.Context
+	Title string
+}
+
+func (ds *BoardDomainService) IsTitleDuplicated(params BoardDomainServiceIsTitleDuplicatedParams) (bool, error) {
+	boards, err := ds.boardDatasource.FindByTitle(datasource.BoardDatasourceFindByTitleParams{
+		Ctx:   params.Ctx,
+		Title: params.Title,
+	})
 	if err != nil {
 		return false, err
 	}

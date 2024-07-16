@@ -127,7 +127,7 @@ async function fetchThreads() {
   if (getThreadViewHistory().length) {
     queryCriteria.push('history');
   }
-  const response = await $api.get<{ threadsByHistory: IThread[]; threadsByPopular: IThread[] }>('/threads', {
+  const response = await $api.get<{ threadsByHistory: IThread[]; threadsByPopular: IThread[] }>('/threads/', {
     params: {
       queryCriteria: queryCriteria,
       threadIds: getThreadViewHistory(),

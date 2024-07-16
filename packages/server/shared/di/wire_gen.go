@@ -53,6 +53,15 @@ func InitializeControllers() (*ControllersSet, func(), error) {
 	}
 	storageApplicationService := service2.NewStorageApplicationService(minioClient, s3Client)
 	storageController := controller.NewStorageController(storageApplicationService)
+	userAdminDatasource := datasource.NewUserAdminDatasource(client)
+	userAdminApplicationService := service2.NewUserAdminApplicationService(userAdminDatasource)
+	userAdminController := controller.NewUserAdminController(userAdminApplicationService)
+	boardAdminDatasource := datasource.NewBoardAdminDatasource(client)
+	boardAdminApplicationService := service2.NewBoardAdminApplicationService(boardAdminDatasource)
+	boardAdminController := controller.NewBoardAdminController(boardAdminApplicationService)
+	threadAdminDatasource := datasource.NewThreadAdminDatasource(client)
+	threadAdminApplicationService := service2.NewThreadAdminApplicationService(threadAdminDatasource)
+	threadAdminController := controller.NewThreadAdminController(threadAdminApplicationService)
 	controllersSet := &ControllersSet{
 		BoardController:         boardController,
 		UserController:          userController,
@@ -60,6 +69,9 @@ func InitializeControllers() (*ControllersSet, func(), error) {
 		ThreadCommentController: threadCommentController,
 		TagController:           tagController,
 		StorageController:       storageController,
+		UserAdminController:     userAdminController,
+		BoardAdminController:    boardAdminController,
+		ThreadAdminController:   threadAdminController,
 	}
 	return controllersSet, func() {
 		cleanup()
@@ -68,15 +80,15 @@ func InitializeControllers() (*ControllersSet, func(), error) {
 
 // wire.go:
 
-var controllerSet = wire.NewSet(controller.NewBoardController, controller.NewUserController, controller.NewThreadController, controller.NewThreadCommentController, controller.NewTagController, controller.NewStorageController)
+var externalServiceSet = wire.NewSet(ent.ProvideClient, aws.NewS3Client, minio.NewMinioClient)
 
-var applicationServiceSet = wire.NewSet(service2.NewBoardApplicationService, service2.NewUserApplicationService, service2.NewThreadApplicationService, service2.NewThreadCommentApplicationService, service2.NewTagApplicationService, service2.NewStorageApplicationService)
+var controllerSet = wire.NewSet(controller.NewBoardController, controller.NewUserController, controller.NewThreadController, controller.NewThreadCommentController, controller.NewTagController, controller.NewStorageController, controller.NewUserAdminController, controller.NewBoardAdminController, controller.NewThreadAdminController)
+
+var applicationServiceSet = wire.NewSet(service2.NewBoardApplicationService, service2.NewUserApplicationService, service2.NewThreadApplicationService, service2.NewThreadCommentApplicationService, service2.NewTagApplicationService, service2.NewStorageApplicationService, service2.NewUserAdminApplicationService, service2.NewBoardAdminApplicationService, service2.NewThreadAdminApplicationService)
 
 var domainServiceSet = wire.NewSet(service.NewBoardDomainService, service.NewUserDomainService, service.NewThreadDomainService)
 
-var externalServiceSet = wire.NewSet(ent.ProvideClient, aws.NewS3Client, minio.NewMinioClient)
-
-var datasourceSet = wire.NewSet(datasource.NewBoardDatasource, datasource.NewUserDatasource, datasource.NewThreadDatasource, datasource.NewThreadCommentDatasource, datasource.NewTagDatasource)
+var datasourceSet = wire.NewSet(datasource.NewBoardDatasource, datasource.NewUserDatasource, datasource.NewThreadDatasource, datasource.NewThreadCommentDatasource, datasource.NewTagDatasource, datasource.NewUserAdminDatasource, datasource.NewBoardAdminDatasource, datasource.NewThreadAdminDatasource)
 
 type ControllersSet struct {
 	BoardController         *controller.BoardController
@@ -85,4 +97,7 @@ type ControllersSet struct {
 	ThreadCommentController *controller.ThreadCommentController
 	TagController           *controller.TagController
 	StorageController       *controller.StorageController
+	UserAdminController     *controller.UserAdminController
+	BoardAdminController    *controller.BoardAdminController
+	ThreadAdminController   *controller.ThreadAdminController
 }

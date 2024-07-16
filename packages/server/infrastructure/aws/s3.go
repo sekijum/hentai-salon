@@ -32,11 +32,15 @@ func NewS3Client() (*S3Client, error) {
 	return &S3Client{Client: client}, nil
 }
 
-func (s *S3Client) GeneratePresignedURL(bucketName, objectName string) (string, error) {
+type S3ClientGeneratePresignedURL struct {
+	BucketName, ObjectName string
+}
+
+func (s *S3Client) GeneratePresignedURL(params S3ClientGeneratePresignedURL) (string, error) {
 	presignClient := s3.NewPresignClient(s.Client)
 	input := &s3.PutObjectInput{
-		Bucket: &bucketName,
-		Key:    &objectName,
+		Bucket: &params.BucketName,
+		Key:    &params.ObjectName,
 	}
 	req, err := presignClient.PresignPutObject(context.TODO(), input, s3.WithPresignExpires(S3PresignedURLDuration))
 	if err != nil {

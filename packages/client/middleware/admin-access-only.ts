@@ -1,13 +1,11 @@
 import { defineNuxtRouteMiddleware, navigateTo } from '#app';
 
 export default defineNuxtRouteMiddleware((to, from) => {
-  const nuxtApp = useNuxtApp;
-  const { $user } = nuxtApp;
+  const nuxtApp = useNuxtApp();
+  const { payload } = nuxtApp;
 
-  if ($user) {
-    const isAdmin = $user.role === 'admin';
-
-    if (!isAdmin) {
+  if (payload.isLoggedIn) {
+    if (!payload.isAdmin) {
       return navigateTo('/403');
     }
   } else {

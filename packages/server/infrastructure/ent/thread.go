@@ -26,9 +26,9 @@ type Thread struct {
 	// Title holds the value of the "title" field.
 	Title string `json:"title,omitempty"`
 	// Description holds the value of the "description" field.
-	Description string `json:"description,omitempty"`
+	Description *string `json:"description,omitempty"`
 	// ThumbnailURL holds the value of the "thumbnail_url" field.
-	ThumbnailURL string `json:"thumbnail_url,omitempty"`
+	ThumbnailURL *string `json:"thumbnail_url,omitempty"`
 	// スレッド作成者のIPアドレス
 	IPAddress string `json:"ip_address,omitempty"`
 	// 0: Open, 1: Pending, 2: Archived
@@ -207,13 +207,15 @@ func (t *Thread) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field description", values[i])
 			} else if value.Valid {
-				t.Description = value.String
+				t.Description = new(string)
+				*t.Description = value.String
 			}
 		case thread.FieldThumbnailURL:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field thumbnail_url", values[i])
 			} else if value.Valid {
-				t.ThumbnailURL = value.String
+				t.ThumbnailURL = new(string)
+				*t.ThumbnailURL = value.String
 			}
 		case thread.FieldIPAddress:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -329,11 +331,15 @@ func (t *Thread) String() string {
 	builder.WriteString("title=")
 	builder.WriteString(t.Title)
 	builder.WriteString(", ")
-	builder.WriteString("description=")
-	builder.WriteString(t.Description)
+	if v := t.Description; v != nil {
+		builder.WriteString("description=")
+		builder.WriteString(*v)
+	}
 	builder.WriteString(", ")
-	builder.WriteString("thumbnail_url=")
-	builder.WriteString(t.ThumbnailURL)
+	if v := t.ThumbnailURL; v != nil {
+		builder.WriteString("thumbnail_url=")
+		builder.WriteString(*v)
+	}
 	builder.WriteString(", ")
 	builder.WriteString("ip_address=")
 	builder.WriteString(t.IPAddress)

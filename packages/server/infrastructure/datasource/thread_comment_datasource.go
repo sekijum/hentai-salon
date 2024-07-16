@@ -2,15 +2,11 @@ package datasource
 
 import (
 	"context"
-	"errors"
 	"server/domain/model"
 	"server/infrastructure/ent"
-	"server/infrastructure/ent/thread"
 	"server/infrastructure/ent/threadcomment"
 	"server/infrastructure/ent/threadcommentattachment"
 )
-
-var ErrNotFound = errors.New("not found")
 
 type ThreadCommentDatasource struct {
 	client *ent.Client
@@ -20,119 +16,105 @@ func NewThreadCommentDatasource(client *ent.Client) *ThreadCommentDatasource {
 	return &ThreadCommentDatasource{client: client}
 }
 
-func (ds *ThreadCommentDatasource) getReplyCount(ctx context.Context, commentId int) (int, error) {
-	replyCount, err := ds.client.ThreadComment.Query().
-		Where(threadcomment.HasParentCommentWith(threadcomment.IDEQ(commentId))).
-		Count(ctx)
+type ThreadCommentDatasourceGetReplyCountCountParams struct {
+	Ctx             context.Context
+	ParentCommentID int
+}
+
+func (ds *ThreadCommentDatasource) GetReplyCountCount(params ThreadCommentDatasourceGetReplyCountCountParams) (int, error) {
+	replyCount, err := ds.client.ThreadComment.
+		Query().
+		Where(threadcomment.ParentCommentID(params.ParentCommentID)).
+		Count(params.Ctx)
 	if err != nil {
 		return 0, err
 	}
+
 	return replyCount, nil
 }
 
-func (ds *ThreadCommentDatasource) FindAll(ctx context.Context, threadId int) ([]*model.ThreadComment, error) {
-	comments, err := ds.client.ThreadComment.Query().
-		Where(threadcomment.ThreadIDEQ(threadId)).
-		WithReplies().
-		WithAttachments().
-		All(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	var modelComments []*model.ThreadComment
-	for _, entComment := range comments {
-		modelComments = append(modelComments, &model.ThreadComment{
-			EntThreadComment: entComment,
-		})
-	}
-
-	return modelComments, nil
+type ThreadCommentDatasourceFindByIDParams struct {
+	Ctx                      context.Context
+	CommentID, Limit, Offset int
 }
 
-func (ds *ThreadCommentDatasource) FindById(ctx context.Context, threadId, commentId, limit, offset int) (*model.ThreadComment, error) {
-	replyCount, err := ds.getReplyCount(ctx, commentId)
-	if err != nil {
-		return nil, err
-	}
-
-	allCommentIDs, err := ds.client.ThreadComment.Query().
-		Where(threadcomment.HasThreadWith(thread.IDEQ(threadId))).
-		Order(ent.Desc(threadcomment.FieldCreatedAt)).
-		IDs(ctx)
+func (ds *ThreadCommentDatasource) FindByID(params ThreadCommentDatasourceFindByIDParams) (*model.ThreadComment, error) {
+	replyCount, err := ds.GetReplyCountCount(ThreadCommentDatasourceGetReplyCountCountParams{
+		Ctx:             params.Ctx,
+		ParentCommentID: params.CommentID,
+	})
 	if err != nil {
 		return nil, err
 	}
 
 	comment, err := ds.client.ThreadComment.Query().
-		Where(threadcomment.IDEQ(commentId)).
+		Where(threadcomment.IDEQ(params.CommentID)).
 		WithAttachments().
 		WithThread().
 		WithAuthor().
 		WithParentComment(func(pq *ent.ThreadCommentQuery) {
 			pq.WithAuthor().
-				WithReplies()
+				WithReplies() // リプライ数は算出するために必須(以下同様)
 		}).
 		WithReplies(func(rq *ent.ThreadCommentQuery) {
 			rq.Order(ent.Desc(threadcomment.FieldCreatedAt)).
-				Limit(limit).
-				Offset(offset).
+				Limit(params.Limit).
+				Offset(params.Offset).
 				WithAuthor().
 				WithAttachments(func(aq *ent.ThreadCommentAttachmentQuery) {
 					aq.Order(ent.Asc(threadcommentattachment.FieldDisplayOrder))
 				}).
 				WithReplies()
 		}).
-		Only(ctx)
+		Only(params.Ctx)
 
 	if err != nil {
-		if ent.IsNotFound(err) {
-			return nil, ErrNotFound
-		}
 		return nil, err
 	}
 
-	return &model.ThreadComment{
-		EntThreadComment: comment,
-		ReplyCount:       replyCount,
-		RepliesIDs:       allCommentIDs,
-	}, nil
+	return &model.ThreadComment{EntThreadComment: comment, ReplyCount: replyCount}, nil
 }
 
-func (ds *ThreadCommentDatasource) Create(ctx context.Context, m *model.ThreadComment) (*model.ThreadComment, error) {
-	tx, err := ds.client.Tx(ctx)
+type ThreadCommentDatasourceCreateParams struct {
+	Ctx           context.Context
+	ThreadComment *model.ThreadComment
+}
+
+func (ds *ThreadCommentDatasource) Create(params ThreadCommentDatasourceCreateParams) (*model.ThreadComment, error) {
+	tx, err := ds.client.Tx(params.Ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	commentBuilder := tx.ThreadComment.Create().
-		SetThreadID(m.EntThreadComment.ThreadID).
-		SetContent(m.EntThreadComment.Content).
-		SetIPAddress(m.EntThreadComment.IPAddress).
-		SetStatus(m.EntThreadComment.Status)
-	if m.EntThreadComment.UserID != nil {
-		commentBuilder.SetUserID(*m.EntThreadComment.UserID)
+		SetThreadID(params.ThreadComment.EntThreadComment.ThreadID).
+		SetContent(params.ThreadComment.EntThreadComment.Content).
+		SetIPAddress(params.ThreadComment.EntThreadComment.IPAddress).
+		SetStatus(params.ThreadComment.EntThreadComment.Status)
+
+	if params.ThreadComment.EntThreadComment.UserID != nil {
+		commentBuilder.SetUserID(*params.ThreadComment.EntThreadComment.UserID)
 	}
-	if m.EntThreadComment.ParentCommentID != nil {
-		commentBuilder.SetParentCommentID(*m.EntThreadComment.ParentCommentID)
+	if params.ThreadComment.EntThreadComment.ParentCommentID != nil {
+		commentBuilder.SetParentCommentID(*params.ThreadComment.EntThreadComment.ParentCommentID)
 	}
-	if m.EntThreadComment.GuestName != nil {
-		commentBuilder.SetGuestName(*m.EntThreadComment.GuestName)
+	if params.ThreadComment.EntThreadComment.GuestName != nil {
+		commentBuilder.SetGuestName(*params.ThreadComment.EntThreadComment.GuestName)
 	}
 
-	savedComment, err := commentBuilder.Save(ctx)
+	savedComment, err := commentBuilder.Save(params.Ctx)
 	if err != nil {
 		tx.Rollback()
 		return nil, err
 	}
 
-	for _, attachment := range m.EntThreadComment.Edges.Attachments {
+	for _, attachment := range params.ThreadComment.EntThreadComment.Edges.Attachments {
 		_, err := tx.ThreadCommentAttachment.Create().
 			SetCommentID(savedComment.ID).
 			SetURL(attachment.URL).
 			SetDisplayOrder(attachment.DisplayOrder).
 			SetType(attachment.Type).
-			Save(ctx)
+			Save(params.Ctx)
 		if err != nil {
 			tx.Rollback()
 			return nil, err
@@ -143,7 +125,5 @@ func (ds *ThreadCommentDatasource) Create(ctx context.Context, m *model.ThreadCo
 		return nil, err
 	}
 
-	return &model.ThreadComment{
-		EntThreadComment: savedComment,
-	}, nil
+	return &model.ThreadComment{EntThreadComment: savedComment}, nil
 }

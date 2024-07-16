@@ -29,56 +29,78 @@ func NewBoardApplicationService(
 	}
 }
 
-func (svc *BoardApplicationService) FindAll(ctx context.Context) ([]*resource.BoardResource, error) {
-	boards, err := svc.boardDatasource.FindAll(ctx)
+type BoardApplicationServiceFindAllParams struct {
+	Ctx context.Context
+}
+
+func (svc *BoardApplicationService) FindAll(params BoardApplicationServiceFindAllParams) ([]*resource.BoardResource, error) {
+	boards, err := svc.boardDatasource.FindAll(datasource.BoardDatasourceFindAllParams{
+		Ctx: params.Ctx,
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	var boardResources []*resource.BoardResource
+	var listResource []*resource.BoardResource
 	for _, board := range boards {
-		boardResources = append(boardResources, resource.NewBoardResource(board))
+		listResource = append(listResource, resource.NewBoardResource(resource.NewBoardResourceParams{
+			Board: board,
+		}))
 	}
 
-	return boardResources, nil
+	return listResource, nil
 }
 
-func (svc *BoardApplicationService) Create(
-	ctx context.Context,
-	ginCtx *gin.Context,
-	body request.BoardCreateRequest,
-) error {
-	userId, exists := ginCtx.Get("user_id")
+type BoardApplicationServiceCreateParams struct {
+	Ctx    context.Context
+	GinCtx *gin.Context
+	Body   request.BoardCreateRequest
+}
+
+func (svc *BoardApplicationService) Create(params BoardApplicationServiceCreateParams) (*resource.BoardResource, error) {
+	userID, exists := params.GinCtx.Get("userID")
 	if !exists {
-		return errors.New("ユーザーIDがコンテキストに存在しません")
+		return nil, errors.New("ユーザーIDがコンテキストに存在しません")
 	}
 
-	if duplicated, err := svc.boardDomainService.IsTitleDuplicated(ctx, body.Title); err != nil || duplicated {
+	if duplicated, err := svc.boardDomainService.IsTitleDuplicated(domainService.BoardDomainServiceIsTitleDuplicatedParams{
+		Ctx:   params.Ctx,
+		Title: params.Body.Title,
+	}); err != nil || duplicated {
 		if err != nil {
-			return err
+			return nil, err
 		}
-		return errors.New("板タイトルが重複しています")
+		return nil, errors.New("板タイトルが重複しています")
 	}
 
 	board := &model.Board{
 		EntBoard: &ent.Board{
-			Title:       body.Title,
-			Description: *body.Description,
-			UserID:      userId.(int),
-			Status:      int(model.BoardStatusPublic),
-			CreatedAt:   time.Now(),
-			UpdatedAt:   time.Now(),
+			Title:     params.Body.Title,
+			UserID:    userID.(int),
+			Status:    int(model.BoardStatusPublic),
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
 		},
 	}
 
-	if body.ThumbnailUrl != nil {
-		board.EntBoard.ThumbnailURL = *body.ThumbnailUrl
+	if params.Body.Description != nil {
+		board.EntBoard.Description = params.Body.Description
+	}
+	if params.Body.ThumbnailURL != nil {
+		board.EntBoard.ThumbnailURL = params.Body.ThumbnailURL
 	}
 
-	_, err := svc.boardDatasource.Create(ctx, board)
+	board, err := svc.boardDatasource.Create(datasource.BoardDatasourceCreateParams{
+		Ctx:   params.Ctx,
+		Board: board,
+	})
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	resource := resource.NewBoardResource(resource.NewBoardResourceParams{
+		Board: board,
+	})
+
+	return resource, nil
 }

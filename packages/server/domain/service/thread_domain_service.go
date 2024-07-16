@@ -14,8 +14,16 @@ func NewThreadDomainService(threadDatasource *datasource.ThreadDatasource) *Thre
 	return &ThreadDomainService{threadDatasource: threadDatasource}
 }
 
-func (ds *ThreadDomainService) IsTitleDuplicated(ctx context.Context, title string) (bool, error) {
-	threads, err := ds.threadDatasource.FindByTitle(ctx, title)
+type ThreadDomainServiceTitleDuplicatedParams struct {
+	Ctx   context.Context
+	Title string
+}
+
+func (ds *ThreadDomainService) IsTitleDuplicated(params ThreadDomainServiceTitleDuplicatedParams) (bool, error) {
+	threads, err := ds.threadDatasource.FindByTitle(datasource.ThreadDatasourceFindByTitleParams{
+		Ctx:   params.Ctx,
+		Title: params.Title,
+	})
 	if err != nil {
 		return false, err
 	}

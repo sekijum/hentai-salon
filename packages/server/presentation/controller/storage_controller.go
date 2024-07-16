@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"context"
 	"net/http"
 	"server/application/service"
 
@@ -15,21 +16,24 @@ func NewStorageController(storageApplicationService *service.StorageApplicationS
 	return &StorageController{storageApplicationService: storageApplicationService}
 }
 
-func (ctrl *StorageController) GeneratePresignedURLs(c *gin.Context) {
+func (ctrl *StorageController) GeneratePresignedURLs(ginCtx *gin.Context) {
 	var request struct {
 		ObjectNames []string `json:"objectNames"`
 	}
 
-	if err := c.ShouldBindJSON(&request); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request: " + err.Error()})
+	if err := ginCtx.ShouldBindJSON(&request); err != nil {
+		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request: " + err.Error()})
 		return
 	}
 
-	urls, err := ctrl.storageApplicationService.GeneratePresignedURLs(request.ObjectNames)
+	urls, err := ctrl.storageApplicationService.GeneratePresignedURLs(service.StorageApplicationServiceGeneratePresignedURLs{
+		Ctx:         context.Background(),
+		ObjectNames: request.ObjectNames,
+	})
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ginCtx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"urls": urls})
+	ginCtx.JSON(http.StatusOK, gin.H{"urls": urls})
 }

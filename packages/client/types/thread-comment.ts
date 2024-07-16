@@ -18,5 +18,5 @@ export interface IThreadComment {
   parentCommentId: number;
   parentComment: IComment;
   replies: IListResource<IComment>;
-  totalReplies: number;
+  replyCount: number;
 }

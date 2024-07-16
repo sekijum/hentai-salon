@@ -2,10 +2,10 @@ package minio
 
 import (
 	"context"
-	"os"
-	"time"
 	"net/http"
 	"net/url"
+	"os"
+	"time"
 
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
@@ -27,24 +27,34 @@ func NewMinioClient() (*MinioClient, error) {
 	// プロキシを設定
 	proxyURL, err := url.Parse("http://" + MINIO_INTERNAL_ENDPOINT)
 	if err != nil {
-					return nil, err
+		return nil, err
 	}
 	transport := &http.Transport{
-					Proxy: http.ProxyURL(proxyURL),
+		Proxy: http.ProxyURL(proxyURL),
 	}
 	client, err := minio.New(MINIO_EXTERNAL_ENDPOINT, &minio.Options{
-					Creds:     credentials.NewStaticV4(MINIO_ROOT_USER, MINIO_ROOT_PASSWORD, ""),
-					Secure:    useSSL,
-					Transport: transport,
+		Creds:     credentials.NewStaticV4(MINIO_ROOT_USER, MINIO_ROOT_PASSWORD, ""),
+		Secure:    useSSL,
+		Transport: transport,
 	})
 	if err != nil {
-					return nil, err
+		return nil, err
 	}
 	return &MinioClient{Client: client}, nil
 }
 
-func (m *MinioClient) GeneratePresignedURL(bucketName, objectName string) (string, error) {
-	presignedURL, err := m.Client.PresignedPutObject(context.Background(), bucketName, objectName, MinioPresignedURLDuration)
+type MinioClientGeneratePresignedURL struct {
+	Ctx                    context.Context
+	BucketName, ObjectName string
+}
+
+func (m *MinioClient) GeneratePresignedURL(params MinioClientGeneratePresignedURL) (string, error) {
+	presignedURL, err := m.Client.PresignedPutObject(
+		params.Ctx,
+		params.BucketName,
+		params.ObjectName,
+		MinioPresignedURLDuration,
+	)
 	if err != nil {
 		return "", err
 	}

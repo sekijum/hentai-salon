@@ -3,18 +3,18 @@ package controller
 import (
 	"context"
 	"net/http"
-	applicationService "server/application/service"
-	request "server/presentation/request"
+	"server/application/service"
+	"server/presentation/request"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
 type UserController struct {
-	userApplicationService *applicationService.UserApplicationService
+	userApplicationService *service.UserApplicationService
 }
 
-func NewUserController(userApplicationService *applicationService.UserApplicationService) *UserController {
+func NewUserController(userApplicationService *service.UserApplicationService) *UserController {
 	return &UserController{userApplicationService: userApplicationService}
 }
 
@@ -25,7 +25,10 @@ func (ctrl *UserController) Signup(ginCtx *gin.Context) {
 		return
 	}
 
-	token, err := ctrl.userApplicationService.Signup(context.Background(), body)
+	token, err := ctrl.userApplicationService.Signup(service.UserApplicationServiceSignupParams{
+		Ctx:  context.Background(),
+		Body: body,
+	})
 	if err != nil {
 		ginCtx.JSON(http.StatusInternalServerError, gin.H{"error": "サインアップに失敗しました: " + err.Error()})
 		return
@@ -42,7 +45,11 @@ func (ctrl *UserController) Signin(ginCtx *gin.Context) {
 		return
 	}
 
-	token, err := ctrl.userApplicationService.Signin(context.Background(), body.Email, body.Password)
+	token, err := ctrl.userApplicationService.Signin(service.UserApplicationServiceSigninParams{
+		Ctx:      context.Background(),
+		Email:    body.Email,
+		Password: body.Password,
+	})
 	if err != nil {
 		ginCtx.JSON(http.StatusUnauthorized, gin.H{"error": "ログインに失敗しました: " + err.Error()})
 		return
@@ -62,7 +69,10 @@ func (ctrl *UserController) FindAuthenticatedUser(ginCtx *gin.Context) {
 	// Bearer プレフィックスを取り除く
 	token := strings.TrimPrefix(authHeader, "Bearer ")
 
-	user, err := ctrl.userApplicationService.GetAuthenticatedUser(context.Background(), token)
+	user, err := ctrl.userApplicationService.GetAuthenticatedUser(service.UserApplicationGetAuthenticatedUserParams{
+		Ctx:         context.Background(),
+		TokenString: token,
+	})
 	if err != nil {
 		ginCtx.JSON(http.StatusUnauthorized, gin.H{"error": "認証に失敗しました: " + err.Error()})
 		return

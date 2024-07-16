@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 	"server/application/service"
-	request "server/presentation/request"
+	"server/presentation/request"
 
 	"github.com/gin-gonic/gin"
 )
@@ -17,14 +17,16 @@ func NewBoardController(boardService *service.BoardApplicationService) *BoardCon
 	return &BoardController{boardService: boardService}
 }
 
-func (ctrl *BoardController) FindAll(c *gin.Context) {
-	boards, err := ctrl.boardService.FindAll(context.Background())
+func (ctrl *BoardController) FindAll(ginCtx *gin.Context) {
+	listResource, err := ctrl.boardService.FindAll(service.BoardApplicationServiceFindAllParams{
+		Ctx: context.Background(),
+	})
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "板の取得に失敗しました: " + err.Error()})
+		ginCtx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, boards)
+	ginCtx.JSON(http.StatusOK, listResource)
 }
 
 func (ctrl *BoardController) Create(ginCtx *gin.Context) {
@@ -34,11 +36,15 @@ func (ctrl *BoardController) Create(ginCtx *gin.Context) {
 		return
 	}
 
-	err := ctrl.boardService.Create(context.Background(), ginCtx, body)
+	resource, err := ctrl.boardService.Create(service.BoardApplicationServiceCreateParams{
+		Ctx:    context.Background(),
+		GinCtx: ginCtx,
+		Body:   body,
+	})
 	if err != nil {
 		ginCtx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	ginCtx.JSON(http.StatusOK, nil)
+	ginCtx.JSON(http.StatusOK, resource)
 }

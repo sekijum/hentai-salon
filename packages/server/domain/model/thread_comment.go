@@ -7,7 +7,6 @@ import (
 type ThreadComment struct {
 	EntThreadComment *ent.ThreadComment
 	ReplyCount       int
-	RepliesIDs       []int
 }
 
 type ThreadCommentStatus int
