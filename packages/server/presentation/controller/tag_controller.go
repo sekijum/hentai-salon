@@ -16,14 +16,15 @@ func NewTagController(tagApplicationService *service.TagApplicationService) *Tag
 	return &TagController{tagApplicationService: tagApplicationService}
 }
 
-func (ctrl *TagController) FindNameList(ginCtx *gin.Context) {
+func (ctrl *TagController) FindNameList(ctx *gin.Context) {
 	tagNameList, err := ctrl.tagApplicationService.FindNameList(service.TagApplicationServiceFindNameListParams{
 		Ctx: context.Background(),
 	})
+
 	if err != nil {
-		ginCtx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	ginCtx.JSON(http.StatusOK, tagNameList)
+	ctx.JSON(http.StatusOK, tagNameList)
 }

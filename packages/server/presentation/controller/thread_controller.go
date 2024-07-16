@@ -18,45 +18,45 @@ func NewThreadController(threadApplicationService *service.ThreadApplicationServ
 	return &ThreadController{threadApplicationService: threadApplicationService}
 }
 
-func (ctrl *ThreadController) FindAllList(ginCtx *gin.Context) {
+func (ctrl *ThreadController) FindAllList(ctx *gin.Context) {
 	var qs request.ThreadFindAllRequest
 
-	if err := ginCtx.ShouldBindQuery(&qs); err != nil {
-		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := ctx.ShouldBindQuery(&qs); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	qs.Limit = ginCtx.GetInt("limit")
-	qs.Offset = ginCtx.GetInt("offset")
+	qs.Limit = ctx.GetInt("limit")
+	qs.Offset = ctx.GetInt("offset")
 
 	dto, err := ctrl.threadApplicationService.FindAllList(service.ThreadApplicationServiceFindAllListParams{
 		Ctx: context.Background(),
 		Qs:  qs,
 	})
 	if err != nil {
-		ginCtx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	ginCtx.JSON(http.StatusOK, dto)
+	ctx.JSON(http.StatusOK, dto)
 }
 
-func (ctrl *ThreadController) FindById(ginCtx *gin.Context) {
-	threadID, err := strconv.Atoi(ginCtx.Param("threadID"))
+func (ctrl *ThreadController) FindById(ctx *gin.Context) {
+	threadID, err := strconv.Atoi(ctx.Param("threadID"))
 	if err != nil {
-		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": "無効なIDです"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "無効なIDです"})
 		return
 	}
 
 	var qs request.ThreadFindByIdRequest
 
-	if err := ginCtx.ShouldBindQuery(&qs); err != nil {
-		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := ctx.ShouldBindQuery(&qs); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	qs.Limit = ginCtx.GetInt("limit")
-	qs.Offset = ginCtx.GetInt("offset")
+	qs.Limit = ctx.GetInt("limit")
+	qs.Offset = ctx.GetInt("offset")
 
 	dto, err := ctrl.threadApplicationService.FindByID(service.ThreadApplicationServiceFindByIDParams{
 		Ctx:      context.Background(),
@@ -64,30 +64,37 @@ func (ctrl *ThreadController) FindById(ginCtx *gin.Context) {
 		Qs:       qs,
 	})
 	if err != nil {
-		ginCtx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	ginCtx.JSON(http.StatusOK, dto)
+	ctx.JSON(http.StatusOK, dto)
 }
 
-func (ctrl *ThreadController) Create(ginCtx *gin.Context) {
+func (ctrl *ThreadController) Create(ctx *gin.Context) {
 	var body request.ThreadCreateRequest
-	if err := ginCtx.ShouldBindJSON(&body); err != nil {
-		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	userID, exists := ctx.Get("userID")
+	if !exists {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "ユーザーIDがコンテキストに存在しません"})
 		return
 	}
 
 	dto, err := ctrl.threadApplicationService.Create(service.ThreadApplicationServiceCreateParams{
-		Ctx:    context.Background(),
-		GinCtx: ginCtx,
-		Body:   body,
+		Ctx:      context.Background(),
+		UserID:   userID.(int),
+		ClientIP: ctx.ClientIP(),
+		Body:     body,
 	})
 
 	if err != nil {
-		ginCtx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	ginCtx.JSON(http.StatusOK, dto)
+	ctx.JSON(http.StatusOK, dto)
 }

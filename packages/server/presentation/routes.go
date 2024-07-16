@@ -48,7 +48,13 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 	authGroup.Use(authMiddleware)
 	{
 		authGroup.POST("/threads", controllers.ThreadController.Create)
-		authGroup.GET("/whoami", controllers.UserController.FindAuthenticatedUser)
+
+		usersGroup := authGroup.Group("/users")
+		{
+			usersGroup.GET("/me", controllers.UserController.FindAuthenticatedUser)
+			usersGroup.PUT("/:userID", controllers.UserController.Update)
+			usersGroup.PATCH("/:userID/password", controllers.UserController.UpdatePassword)
+		}
 	}
 
 	// 管理者ルート
@@ -76,4 +82,5 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 			threadsGroup.PUT("/:threadID", controllers.ThreadAdminController.Update)
 		}
 	}
+
 }

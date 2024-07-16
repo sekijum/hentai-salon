@@ -16,13 +16,13 @@ func NewStorageController(storageApplicationService *service.StorageApplicationS
 	return &StorageController{storageApplicationService: storageApplicationService}
 }
 
-func (ctrl *StorageController) GeneratePresignedURLs(ginCtx *gin.Context) {
+func (ctrl *StorageController) GeneratePresignedURLs(ctx *gin.Context) {
 	var request struct {
 		ObjectNames []string `json:"objectNames"`
 	}
 
-	if err := ginCtx.ShouldBindJSON(&request); err != nil {
-		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request: " + err.Error()})
+	if err := ctx.ShouldBindJSON(&request); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request: " + err.Error()})
 		return
 	}
 
@@ -31,9 +31,9 @@ func (ctrl *StorageController) GeneratePresignedURLs(ginCtx *gin.Context) {
 		ObjectNames: request.ObjectNames,
 	})
 	if err != nil {
-		ginCtx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	ginCtx.JSON(http.StatusOK, gin.H{"urls": urls})
+	ctx.JSON(http.StatusOK, gin.H{"urls": urls})
 }

@@ -18,10 +18,10 @@ func NewUserController(userApplicationService *service.UserApplicationService) *
 	return &UserController{userApplicationService: userApplicationService}
 }
 
-func (ctrl *UserController) Signup(ginCtx *gin.Context) {
+func (ctrl *UserController) Signup(ctx *gin.Context) {
 	var body request.UserSignupRequest
-	if err := ginCtx.ShouldBindJSON(&body); err != nil {
-		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -30,18 +30,18 @@ func (ctrl *UserController) Signup(ginCtx *gin.Context) {
 		Body: body,
 	})
 	if err != nil {
-		ginCtx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	ginCtx.Header("Authorization", "Bearer "+token)
-	ginCtx.JSON(http.StatusOK, gin.H{"message": "サインアップが成功しました"})
+	ctx.Header("Authorization", "Bearer "+token)
+	ctx.JSON(http.StatusOK, gin.H{"message": "サインアップが成功しました"})
 }
 
-func (ctrl *UserController) Signin(ginCtx *gin.Context) {
+func (ctrl *UserController) Signin(ctx *gin.Context) {
 	var body request.UserSigninRequest
-	if err := ginCtx.ShouldBindJSON(&body); err != nil {
-		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -51,18 +51,18 @@ func (ctrl *UserController) Signin(ginCtx *gin.Context) {
 		Password: body.Password,
 	})
 	if err != nil {
-		ginCtx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return
 	}
 
-	ginCtx.Header("Authorization", "Bearer "+token)
-	ginCtx.JSON(http.StatusOK, gin.H{"message": "サインインが成功しました"})
+	ctx.Header("Authorization", "Bearer "+token)
+	ctx.JSON(http.StatusOK, gin.H{"message": "サインインが成功しました"})
 }
 
-func (ctrl *UserController) FindAuthenticatedUser(ginCtx *gin.Context) {
-	authHeader := ginCtx.GetHeader("Authorization")
+func (ctrl *UserController) FindAuthenticatedUser(ctx *gin.Context) {
+	authHeader := ctx.GetHeader("Authorization")
 	if authHeader == "" {
-		ginCtx.JSON(http.StatusUnauthorized, gin.H{"error": "トークンが必要です"})
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "トークンが必要です"})
 		return
 	}
 
@@ -74,9 +74,62 @@ func (ctrl *UserController) FindAuthenticatedUser(ginCtx *gin.Context) {
 		TokenString: token,
 	})
 	if err != nil {
-		ginCtx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return
 	}
 
-	ginCtx.JSON(http.StatusOK, user)
+	ctx.JSON(http.StatusOK, user)
+}
+
+func (ctrl *UserController) Update(ctx *gin.Context) {
+	var body request.UserUpdateRequest
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	userID, exists := ctx.Get("userID")
+	if !exists {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "ユーザーIDがコンテキストに存在しません"})
+		return
+	}
+
+	err := ctrl.userApplicationService.Update(service.UserApplicationServiceUpdateParams{
+		Ctx:    context.Background(),
+		UserID: userID.(int),
+		Body:   body,
+	})
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, "ユーザー情報を更新しました。")
+}
+
+func (ctrl *UserController) UpdatePassword(ctx *gin.Context) {
+	var body request.UserUpdatePasswordRequest
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	userID, exists := ctx.Get("userID")
+	if !exists {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "ユーザーIDがコンテキストに存在しません"})
+		return
+	}
+
+	err := ctrl.userApplicationService.UpdatePassword(service.UserApplicationServiceUpdatePasswordParams{
+		Ctx:         context.Background(),
+		UserID:      userID.(int),
+		OldPassword: body.OldPassword,
+		NewPassword: body.NewPassword,
+	})
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, "パスワードを更新しました。")
 }

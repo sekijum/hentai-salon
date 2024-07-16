@@ -21,7 +21,7 @@ func OptionalAuthMiddleware() gin.HandlerFunc {
 		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 		secretKey := os.Getenv("JWT_SECRET_KEY")
 		if secretKey == "" {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "サーバーエラー: 秘密鍵が設定されていません"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "秘密鍵が設定されていません"})
 			c.Abort()
 			return
 		}

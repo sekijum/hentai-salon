@@ -8,7 +8,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
 
   if (token) {
     try {
-      const response = await $api.get('/whoami');
+      const response = await $api.get('/users/me');
       const authenticatedUser = response.data;
       nuxtApp.payload.user = authenticatedUser;
       nuxtApp.payload.isLoggedIn = true;

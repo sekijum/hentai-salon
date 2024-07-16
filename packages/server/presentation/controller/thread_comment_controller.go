@@ -1,10 +1,9 @@
 package controller
 
 import (
-	"context"
 	"net/http"
 	"server/application/service"
-	request "server/presentation/request"
+	"server/presentation/request"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -18,94 +17,100 @@ func NewThreadCommentController(threadCommentApplicationService *service.ThreadC
 	return &ThreadCommentController{threadCommentApplicationService: threadCommentApplicationService}
 }
 
-func (ctrl *ThreadCommentController) FindById(ginCtx *gin.Context) {
-	commentID, err := strconv.Atoi(ginCtx.Param("commentID"))
+func (ctrl *ThreadCommentController) FindById(ctx *gin.Context) {
+	commentID, err := strconv.Atoi(ctx.Param("commentID"))
 	if err != nil {
-		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": "無効なコメントID"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "無効なコメントID"})
 		return
 	}
 
 	var qs request.ThreadFindByIdRequest
 
-	if err := ginCtx.ShouldBindQuery(&qs); err != nil {
-		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := ctx.ShouldBindQuery(&qs); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	qs.Limit = ginCtx.GetInt("limit")
-	qs.Offset = ginCtx.GetInt("offset")
+	qs.Limit = ctx.GetInt("limit")
+	qs.Offset = ctx.GetInt("offset")
 
 	dto, err := ctrl.threadCommentApplicationService.FindByID(service.ThreadCommentApplicationServiceFindByIDParams{
-		Ctx:       context.Background(),
+		Ctx:       ctx.Request.Context(),
 		CommentID: commentID,
 		Qs:        qs,
 	})
 	if err != nil {
-		ginCtx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	ginCtx.JSON(http.StatusOK, dto)
+	ctx.JSON(http.StatusOK, dto)
 }
 
-func (ctrl *ThreadCommentController) Create(ginCtx *gin.Context) {
-	threadID, err := strconv.Atoi(ginCtx.Param("threadID"))
+func (ctrl *ThreadCommentController) Create(ctx *gin.Context) {
+	threadID, err := strconv.Atoi(ctx.Param("threadID"))
 	if err != nil {
-		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": "無効なIDです"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "無効なIDです"})
 		return
 	}
 
 	var body request.ThreadCommentCreateRequest
-	if err := ginCtx.ShouldBindJSON(&body); err != nil {
-		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
+	userID, _ := ctx.Get("userID")
+
 	dto, err := ctrl.threadCommentApplicationService.Create(service.ThreadCommentApplicationServiceCreateParams{
-		Ctx:             context.Background(),
-		GinCtx:          ginCtx,
+		Ctx:             ctx.Request.Context(),
+		UserID:          userID.(int),
+		ClientIP:        ctx.ClientIP(),
 		ThreadID:        threadID,
 		ParentCommentID: nil,
 		Body:            body,
 	})
 	if err != nil {
-		ginCtx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	ginCtx.JSON(http.StatusOK, dto)
+	ctx.JSON(http.StatusOK, dto)
 }
 
-func (ctrl *ThreadCommentController) Reply(ginCtx *gin.Context) {
-	threadID, err := strconv.Atoi(ginCtx.Param("threadID"))
+func (ctrl *ThreadCommentController) Reply(ctx *gin.Context) {
+	threadID, err := strconv.Atoi(ctx.Param("threadID"))
 	if err != nil {
-		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": "無効なIDです"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "無効なIDです"})
 		return
 	}
 
-	parentCommentID, err := strconv.Atoi(ginCtx.Param("commentID"))
+	parentCommentID, err := strconv.Atoi(ctx.Param("commentID"))
 	if err != nil {
-		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": "無効なコメントIDです"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "無効なコメントIDです"})
 		return
 	}
 
 	var body request.ThreadCommentCreateRequest
-	if err := ginCtx.ShouldBindJSON(&body); err != nil {
-		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
+	userID, _ := ctx.Get("userID")
+
 	dto, err := ctrl.threadCommentApplicationService.Create(service.ThreadCommentApplicationServiceCreateParams{
-		Ctx:             context.Background(),
-		GinCtx:          ginCtx,
+		Ctx:             ctx.Request.Context(),
 		ThreadID:        threadID,
+		UserID:          userID.(int),
+		ClientIP:        ctx.ClientIP(),
 		ParentCommentID: &parentCommentID,
 		Body:            body,
 	})
 	if err != nil {
-		ginCtx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	ginCtx.JSON(http.StatusOK, dto)
+	ctx.JSON(http.StatusOK, dto)
 }

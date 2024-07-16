@@ -9,8 +9,6 @@ import (
 	request "server/presentation/request"
 	resource "server/presentation/resource"
 	"time"
-
-	"github.com/gin-gonic/gin"
 )
 
 type BoardApplicationService struct {
@@ -45,15 +43,11 @@ func (svc *BoardApplicationService) FindAll(params BoardApplicationServiceFindAl
 
 type BoardApplicationServiceCreateParams struct {
 	Ctx    context.Context
-	GinCtx *gin.Context
+	UserID int
 	Body   request.BoardCreateRequest
 }
 
 func (svc *BoardApplicationService) Create(params BoardApplicationServiceCreateParams) (*resource.BoardResource, error) {
-	userID, exists := params.GinCtx.Get("userID")
-	if !exists {
-		return nil, errors.New("ユーザーIDがコンテキストに存在しません")
-	}
 
 	boards, err := svc.boardDatasource.FindByTitle(datasource.BoardDatasourceFindByTitleParams{
 		Ctx:   params.Ctx,
@@ -69,7 +63,7 @@ func (svc *BoardApplicationService) Create(params BoardApplicationServiceCreateP
 	board := &model.Board{
 		EntBoard: &ent.Board{
 			Title:     params.Body.Title,
-			UserID:    userID.(int),
+			UserID:    params.UserID,
 			Status:    int(model.BoardStatusPublic),
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),

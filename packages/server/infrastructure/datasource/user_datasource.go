@@ -34,6 +34,27 @@ func (ds *UserDatasource) FindByID(params UserDatasourceFindByIDParams) (*model.
 	return modelUser, nil
 }
 
+type UserDatasourceIsEmailDuplicatedParams struct {
+	Ctx       context.Context
+	Email     string
+	ExcludeID *int // 更新時に現在のユーザーIDを除外するためのフィールド
+}
+
+func (ds *UserDatasource) IsEmailDuplicated(params UserDatasourceIsEmailDuplicatedParams) (bool, error) {
+	query := ds.client.User.Query().Where(user.EmailEQ(params.Email))
+	if params.ExcludeID != nil {
+		query = query.Where(user.IDNEQ(*params.ExcludeID))
+	}
+	_, err := query.First(params.Ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
+}
+
 type UserDatasourceFindByEmailParams struct {
 	Ctx   context.Context
 	Email string
@@ -42,6 +63,9 @@ type UserDatasourceFindByEmailParams struct {
 func (ds *UserDatasource) FindByEmail(params UserDatasourceFindByEmailParams) (*model.User, error) {
 	entUser, err := ds.client.User.Query().Where(user.EmailEQ(params.Email)).Only(params.Ctx)
 	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, nil
+		}
 		return nil, err
 	}
 
@@ -90,13 +114,13 @@ type UserDatasourceUpdateParams struct {
 	User model.User
 }
 
-func (ds *UserDatasource) Update(params UserDatasourceUpdateParams) (*ent.User, error) {
-	user, err := ds.client.User.Get(params.Ctx, params.User.EntUser.ID)
+func (ds *UserDatasource) Update(params UserDatasourceUpdateParams) (*model.User, error) {
+	entUser, err := ds.client.User.Get(params.Ctx, params.User.EntUser.ID)
 	if err != nil {
 		return nil, err
 	}
 
-	update := user.Update()
+	update := entUser.Update()
 
 	if params.User.EntUser.Name != "" {
 		update.SetName(params.User.EntUser.Name)
@@ -118,10 +142,30 @@ func (ds *UserDatasource) Update(params UserDatasourceUpdateParams) (*ent.User, 
 	}
 	update.SetUpdatedAt(time.Now())
 
-	user, err = update.Save(params.Ctx)
+	entUser, err = update.Save(params.Ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	return user, nil
+	return &model.User{EntUser: entUser}, nil
+}
+
+type UserDatasourceUpdatePasswordParams struct {
+	Ctx      context.Context
+	UserID   int
+	Password string
+}
+
+func (ds *UserDatasource) UpdatePassword(params UserDatasourceUpdatePasswordParams) (*model.User, error) {
+	entUser, err := ds.client.User.Get(params.Ctx, params.UserID)
+	if err != nil {
+		return nil, err
+	}
+
+	entUser, err = entUser.Update().SetPassword(params.Password).SetUpdatedAt(time.Now()).Save(params.Ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.User{EntUser: entUser}, nil
 }

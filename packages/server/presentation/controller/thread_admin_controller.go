@@ -18,45 +18,45 @@ func NewThreadAdminController(threadApplicationService *service.ThreadAdminAppli
 	return &ThreadAdminController{threadApplicationService: threadApplicationService}
 }
 
-func (ctrl *ThreadAdminController) FindAll(ginCtx *gin.Context) {
+func (ctrl *ThreadAdminController) FindAll(ctx *gin.Context) {
 	var qs request.ThreadAdminFindAllRequest
 
-	if err := ginCtx.ShouldBindQuery(&qs); err != nil {
-		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := ctx.ShouldBindQuery(&qs); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	qs.Limit = ginCtx.GetInt("limit")
-	qs.Offset = ginCtx.GetInt("offset")
+	qs.Limit = ctx.GetInt("limit")
+	qs.Offset = ctx.GetInt("offset")
 
 	listResource, err := ctrl.threadApplicationService.FindAll(service.ThreadAdminApplicationServiceFindAllParams{
 		Ctx: context.Background(),
 		Qs:  qs,
 	})
 	if err != nil {
-		ginCtx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	ginCtx.JSON(http.StatusOK, listResource)
+	ctx.JSON(http.StatusOK, listResource)
 }
 
-func (ctrl *ThreadAdminController) FindByID(ginCtx *gin.Context) {
-	threadID, err := strconv.Atoi(ginCtx.Param("threadId"))
+func (ctrl *ThreadAdminController) FindByID(ctx *gin.Context) {
+	threadID, err := strconv.Atoi(ctx.Param("threadId"))
 	if err != nil {
-		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid thread ID"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid thread ID"})
 		return
 	}
 
 	var qs request.ThreadAdminFindByIDRequest
 
-	if err := ginCtx.ShouldBindQuery(&qs); err != nil {
-		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := ctx.ShouldBindQuery(&qs); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	qs.Limit = ginCtx.GetInt("limit")
-	qs.Offset = ginCtx.GetInt("offset")
+	qs.Limit = ctx.GetInt("limit")
+	qs.Offset = ctx.GetInt("offset")
 
 	dto, err := ctrl.threadApplicationService.FindByID(service.ThreadAdminApplicationServiceFindByIDParams{
 		Ctx:      context.Background(),
@@ -64,24 +64,24 @@ func (ctrl *ThreadAdminController) FindByID(ginCtx *gin.Context) {
 		Qs:       qs,
 	})
 	if err != nil {
-		ginCtx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	ginCtx.JSON(http.StatusOK, dto)
+	ctx.JSON(http.StatusOK, dto)
 }
 
-func (ctrl *ThreadAdminController) Update(ginCtx *gin.Context) {
+func (ctrl *ThreadAdminController) Update(ctx *gin.Context) {
 	var body request.ThreadAdminUpdateRequest
 
-	threadID, err := strconv.Atoi(ginCtx.Param("threadId"))
+	threadID, err := strconv.Atoi(ctx.Param("threadId"))
 	if err != nil {
-		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid thread ID"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid thread ID"})
 		return
 	}
 
-	if err := ginCtx.ShouldBindJSON(&body); err != nil {
-		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -91,9 +91,9 @@ func (ctrl *ThreadAdminController) Update(ginCtx *gin.Context) {
 		Body:     body,
 	})
 	if err != nil {
-		ginCtx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	ginCtx.JSON(http.StatusOK, dto)
+	ctx.JSON(http.StatusOK, dto)
 }

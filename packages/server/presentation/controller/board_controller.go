@@ -17,34 +17,40 @@ func NewBoardController(boardService *service.BoardApplicationService) *BoardCon
 	return &BoardController{boardService: boardService}
 }
 
-func (ctrl *BoardController) FindAll(ginCtx *gin.Context) {
+func (ctrl *BoardController) FindAll(ctx *gin.Context) {
 	dto, err := ctrl.boardService.FindAll(service.BoardApplicationServiceFindAllParams{
 		Ctx: context.Background(),
 	})
 	if err != nil {
-		ginCtx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	ginCtx.JSON(http.StatusOK, dto)
+	ctx.JSON(http.StatusOK, dto)
 }
 
-func (ctrl *BoardController) Create(ginCtx *gin.Context) {
+func (ctrl *BoardController) Create(ctx *gin.Context) {
 	var body request.BoardCreateRequest
-	if err := ginCtx.ShouldBindJSON(&body); err != nil {
-		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	userID, exists := ctx.Get("userID")
+	if !exists {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "ユーザーIDがコンテキストに存在しません"})
 		return
 	}
 
 	dto, err := ctrl.boardService.Create(service.BoardApplicationServiceCreateParams{
 		Ctx:    context.Background(),
-		GinCtx: ginCtx,
+		UserID: userID.(int),
 		Body:   body,
 	})
 	if err != nil {
-		ginCtx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	ginCtx.JSON(http.StatusOK, dto)
+	ctx.JSON(http.StatusOK, dto)
 }

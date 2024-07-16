@@ -5,11 +5,9 @@ import (
 	"server/domain/model"
 	"server/infrastructure/datasource"
 	"server/infrastructure/ent"
-	request "server/presentation/request"
-	resource "server/presentation/resource"
+	"server/presentation/request"
+	"server/presentation/resource"
 	"time"
-
-	"github.com/gin-gonic/gin"
 )
 
 type ThreadCommentApplicationService struct {
@@ -48,20 +46,20 @@ func (svc *ThreadCommentApplicationService) FindByID(params ThreadCommentApplica
 
 type ThreadCommentApplicationServiceCreateParams struct {
 	Ctx             context.Context
-	GinCtx          *gin.Context
+	UserID          int
+	ClientIP        string
 	ThreadID        int
 	ParentCommentID *int
 	Body            request.ThreadCommentCreateRequest
 }
 
 func (svc *ThreadCommentApplicationService) Create(params ThreadCommentApplicationServiceCreateParams) (*resource.ThreadCommentResource, error) {
-	userID, exists := params.GinCtx.Get("userID")
 
 	comment := &model.ThreadComment{
 		EntThreadComment: &ent.ThreadComment{
 			ThreadID:  params.ThreadID,
 			Content:   params.Body.Content,
-			IPAddress: params.GinCtx.ClientIP(),
+			IPAddress: params.ClientIP,
 			Status:    int(model.ThreadCommentStatusVisible),
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
@@ -72,9 +70,8 @@ func (svc *ThreadCommentApplicationService) Create(params ThreadCommentApplicati
 		comment.EntThreadComment.GuestName = params.Body.GuestName
 	}
 
-	if exists {
-		userIdInt := userID.(int)
-		comment.EntThreadComment.UserID = &userIdInt
+	if params.UserID != 0 {
+		comment.EntThreadComment.UserID = &params.UserID
 		comment.EntThreadComment.GuestName = nil
 	}
 

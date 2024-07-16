@@ -9,8 +9,6 @@ import (
 	request "server/presentation/request"
 	resource "server/presentation/resource"
 	"time"
-
-	"github.com/gin-gonic/gin"
 )
 
 type ThreadApplicationService struct {
@@ -174,17 +172,13 @@ func (svc *ThreadApplicationService) FindByID(params ThreadApplicationServiceFin
 }
 
 type ThreadApplicationServiceCreateParams struct {
-	Ctx    context.Context
-	GinCtx *gin.Context
-	Body   request.ThreadCreateRequest
+	Ctx      context.Context
+	UserID   int
+	ClientIP string
+	Body     request.ThreadCreateRequest
 }
 
 func (svc *ThreadApplicationService) Create(params ThreadApplicationServiceCreateParams) (*resource.ThreadResource, error) {
-	userID, exists := params.GinCtx.Get("userID")
-	if !exists {
-		return nil, errors.New("ユーザーIDがコンテキストに存在しません")
-	}
-
 	threads, err := svc.threadDatasource.FindByTitle(datasource.ThreadDatasourceFindByTitleParams{
 		Ctx:   params.Ctx,
 		Title: params.Body.Title,
@@ -218,8 +212,8 @@ func (svc *ThreadApplicationService) Create(params ThreadApplicationServiceCreat
 		EntThread: &ent.Thread{
 			Title:     params.Body.Title,
 			BoardID:   params.Body.BoardId,
-			UserID:    userID.(int),
-			IPAddress: params.GinCtx.ClientIP(),
+			UserID:    params.UserID,
+			IPAddress: params.ClientIP,
 			Status:    int(model.ThreadStatusOpen),
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),

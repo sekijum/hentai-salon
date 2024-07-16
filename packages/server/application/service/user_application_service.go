@@ -29,14 +29,14 @@ type UserApplicationServiceSignupParams struct {
 }
 
 func (svc *UserApplicationService) Signup(params UserApplicationServiceSignupParams) (string, error) {
-	user, err := svc.userDatasource.FindByEmail(datasource.UserDatasourceFindByEmailParams{
+	isDuplicated, err := svc.userDatasource.IsEmailDuplicated(datasource.UserDatasourceIsEmailDuplicatedParams{
 		Ctx:   params.Ctx,
 		Email: params.Body.Email,
 	})
 	if err != nil {
 		return "", err
 	}
-	if user != nil {
+	if isDuplicated {
 		return "", errors.New("このメールアドレスは既に使用されています。")
 	}
 
@@ -45,7 +45,7 @@ func (svc *UserApplicationService) Signup(params UserApplicationServiceSignupPar
 		return "", err
 	}
 
-	user = &model.User{
+	user := &model.User{
 		EntUser: &ent.User{
 			Name:        params.Body.Name,
 			Email:       params.Body.Email,
@@ -59,7 +59,7 @@ func (svc *UserApplicationService) Signup(params UserApplicationServiceSignupPar
 		},
 	}
 
-	_, err = svc.userDatasource.Create(datasource.UserDatasourceCreateParams{
+	user, err = svc.userDatasource.Create(datasource.UserDatasourceCreateParams{
 		Ctx:  params.Ctx,
 		User: user,
 	})
@@ -67,16 +67,27 @@ func (svc *UserApplicationService) Signup(params UserApplicationServiceSignupPar
 		return "", err
 	}
 
-	token, err := svc.Signin(UserApplicationServiceSigninParams{
-		Ctx:      params.Ctx,
-		Email:    params.Body.Email,
-		Password: params.Body.Password,
-	})
+	err = util.ComparePassword(user.EntUser.Password, params.Body.Password)
 	if err != nil {
-		return "", err
+		return "", errors.New("認証情報が無効です")
 	}
 
-	return token, nil
+	jwtSecretKey := os.Getenv("JWT_SECRET_KEY")
+	if jwtSecretKey == "" {
+		return "", errors.New("秘密鍵が設定されていません")
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"userID": user.EntUser.ID,
+		"exp":    time.Now().AddDate(0, 1, 0).Unix(),
+	})
+
+	tokenString, err := token.SignedString([]byte(jwtSecretKey))
+	if err != nil {
+		return "", errors.New("トークンの生成に失敗しました")
+	}
+
+	return tokenString, nil
 }
 
 type UserApplicationServiceSigninParams struct {
@@ -92,14 +103,17 @@ func (svc *UserApplicationService) Signin(params UserApplicationServiceSigninPar
 	if err != nil {
 		return "", err
 	}
+	if user == nil {
+		return "", errors.New("ユーザーが登録されていません。")
+	}
 
 	err = util.ComparePassword(user.EntUser.Password, params.Password)
 	if err != nil {
-		return "", errors.New("認証情報が無効です")
+		return "", errors.New("パスワードが一致しません。")
 	}
 
-	secretKey := os.Getenv("JWT_SECRET_KEY")
-	if secretKey == "" {
+	jwtSecretKey := os.Getenv("JWT_SECRET_KEY")
+	if jwtSecretKey == "" {
 		return "", errors.New("秘密鍵が設定されていません")
 	}
 
@@ -108,7 +122,7 @@ func (svc *UserApplicationService) Signin(params UserApplicationServiceSigninPar
 		"exp":    time.Now().AddDate(0, 1, 0).Unix(),
 	})
 
-	tokenString, err := token.SignedString([]byte(secretKey))
+	tokenString, err := token.SignedString([]byte(jwtSecretKey))
 	if err != nil {
 		return "", errors.New("トークンの生成に失敗しました")
 	}
@@ -154,4 +168,80 @@ func (svc *UserApplicationService) GetAuthenticatedUser(params UserApplicationGe
 	} else {
 		return nil, errors.New("トークンが無効です")
 	}
+}
+
+type UserApplicationServiceUpdateParams struct {
+	Ctx    context.Context
+	UserID int
+	Body   request.UserUpdateRequest
+}
+
+func (svc *UserApplicationService) Update(params UserApplicationServiceUpdateParams) error {
+	isDuplicated, err := svc.userDatasource.IsEmailDuplicated(datasource.UserDatasourceIsEmailDuplicatedParams{
+		Ctx:       params.Ctx,
+		Email:     params.Body.Email,
+		ExcludeID: &params.UserID,
+	})
+	if err != nil {
+		return err
+	}
+	if isDuplicated {
+		return errors.New("このメールアドレスは既に使用されています。")
+	}
+
+	user := model.User{
+		EntUser: &ent.User{
+			ID:          params.UserID,
+			Name:        params.Body.Name,
+			Email:       params.Body.Email,
+			AvatarURL:   params.Body.AvatarURL,
+			ProfileLink: params.Body.ProfileLink,
+		},
+	}
+
+	_, err = svc.userDatasource.Update(datasource.UserDatasourceUpdateParams{
+		Ctx:  params.Ctx,
+		User: user,
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+type UserApplicationServiceUpdatePasswordParams struct {
+	Ctx                      context.Context
+	UserID                   int
+	OldPassword, NewPassword string
+}
+
+func (svc *UserApplicationService) UpdatePassword(params UserApplicationServiceUpdatePasswordParams) error {
+	user, err := svc.userDatasource.FindByID(datasource.UserDatasourceFindByIDParams{
+		Ctx:    params.Ctx,
+		UserID: params.UserID,
+	})
+	if err != nil {
+		return err
+	}
+
+	if err := util.ComparePassword(user.EntUser.Password, params.OldPassword); err != nil {
+		return errors.New("古いパスワードが一致しません")
+	}
+
+	hashedPassword, err := util.HashPassword(params.NewPassword)
+	if err != nil {
+		return err
+	}
+
+	_, err = svc.userDatasource.UpdatePassword(datasource.UserDatasourceUpdatePasswordParams{
+		Ctx:      params.Ctx,
+		UserID:   params.UserID,
+		Password: hashedPassword,
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -18,40 +18,40 @@ func NewBoardAdminController(boardApplicationService *service.BoardAdminApplicat
 	return &BoardAdminController{boardApplicationService: boardApplicationService}
 }
 
-func (ctrl *BoardAdminController) FindAll(ginCtx *gin.Context) {
+func (ctrl *BoardAdminController) FindAll(ctx *gin.Context) {
 	var qs request.BoardAdminFindAllRequest
 
-	if err := ginCtx.ShouldBindQuery(&qs); err != nil {
-		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := ctx.ShouldBindQuery(&qs); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	qs.Limit = ginCtx.GetInt("limit")
-	qs.Offset = ginCtx.GetInt("offset")
+	qs.Limit = ctx.GetInt("limit")
+	qs.Offset = ctx.GetInt("offset")
 
 	dto, err := ctrl.boardApplicationService.FindAll(service.BoardAdminApplicationServiceFindAllParams{
 		Ctx: context.Background(),
 		Qs:  qs,
 	})
 	if err != nil {
-		ginCtx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	ginCtx.JSON(http.StatusOK, dto)
+	ctx.JSON(http.StatusOK, dto)
 }
 
-func (ctrl *BoardAdminController) Update(ginCtx *gin.Context) {
+func (ctrl *BoardAdminController) Update(ctx *gin.Context) {
 	var body request.BoardAdminUpdateRequest
 
-	boardId, err := strconv.Atoi(ginCtx.Param("boardId"))
+	boardId, err := strconv.Atoi(ctx.Param("boardId"))
 	if err != nil {
-		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid board ID"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid board ID"})
 		return
 	}
 
-	if err := ginCtx.ShouldBindJSON(&body); err != nil {
-		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -61,9 +61,9 @@ func (ctrl *BoardAdminController) Update(ginCtx *gin.Context) {
 		Body:    body,
 	})
 	if err != nil {
-		ginCtx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	ginCtx.JSON(http.StatusOK, dto)
+	ctx.JSON(http.StatusOK, dto)
 }
