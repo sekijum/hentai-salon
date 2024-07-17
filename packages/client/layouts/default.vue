@@ -4,10 +4,13 @@
       <Header />
       <main><slot /></main>
     </v-container>
+
+    <MenuModal />
   </v-app>
 </template>
 
 <script setup lang="ts"></script>
+import MenuModal from '~/components/MenuModal.vue';
 
 <style scoped>
 .main-container {

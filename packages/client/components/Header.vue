@@ -11,9 +11,9 @@
         <h1 class="font-weight-regular header-title" @click="router.push('/')">変態サロン</h1>
       </v-col>
       <v-col cols="3" class="d-flex justify-end align-center">
-        <v-sheet class="menu-item" @click="router.push('/setting')">
+        <v-sheet class="menu-item" @click="openMenuModal">
           <v-icon class="menu-icon">mdi-cog</v-icon>
-          <span class="menu-title">設定</span>
+          <span class="menu-title">メニュー</span>
         </v-sheet>
       </v-col>
     </v-row>
@@ -25,23 +25,22 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router';
-
 const router = useRouter();
+
+const isMenuModal = useState('isMenuModal', () => false);
+
+function openMenuModal() {
+  isMenuModal.value = true;
+}
 </script>
 
 <style scoped>
 .menu-item {
   display: flex;
   align-items: center;
-  padding: 8px;
   cursor: pointer;
   border: none;
   box-shadow: none;
-}
-
-.menu-icon {
-  margin-right: 8px;
 }
 
 .header-title {
@@ -49,6 +48,6 @@ const router = useRouter();
 }
 
 .subtitle {
-  font-size: 12px;
+  font-size: 10px;
 }
 </style>

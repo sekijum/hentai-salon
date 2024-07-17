@@ -39,6 +39,7 @@ interface ThreadResponse {
 const router = useRouter();
 const nuxtApp = useNuxtApp();
 const { getThreadViewHistory } = useStorage();
+const isMenuModal = useState('isMenuModal', () => false);
 
 const { payload, $api } = nuxtApp;
 
@@ -57,6 +58,7 @@ const menuItems = [
   { title: 'スレ作成', clicked: () => router.push('/threads/new'), icon: 'mdi-forum' },
   { title: '板作成', clicked: () => router.push('/boards/new'), icon: 'mdi-forum' },
   { title: '管理画面', clicked: () => router.push('/admin'), icon: 'mdi-forum' },
+  { title: 'メニュー', clicked: () => (isMenuModal.value = true), icon: 'mdi-forum' },
 ];
 
 onMounted(async () => {

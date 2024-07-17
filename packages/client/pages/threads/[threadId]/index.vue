@@ -65,7 +65,7 @@
     <ThreadList
       title="閲覧履歴"
       :items="threadsByHistory"
-      :clicked="() => router.push({ path: '/threads', query: { queryCriteria: ['history'] } })"
+      :clicked="() => router.push({ path: '/threads', query: { queryCriteria: 'history' } })"
     />
   </div>
 
