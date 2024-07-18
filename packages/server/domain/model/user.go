@@ -5,7 +5,11 @@ import (
 )
 
 type User struct {
-	EntUser *ent.User
+	EntUser                    *ent.User
+	ThreadCommentCount         int         // コメント数
+	ThreadCount                int         // スレッド数
+	ThreadCommentCountMap      map[int]int // スレッド毎のコメント数
+	ThreadCommentReplyCountMap map[int]int // コメント毎のリプライ数
 }
 
 type UserStatus int
@@ -78,4 +82,8 @@ func (m *User) RoleToLabel() string {
 
 func (m *User) IsAdmin() bool {
 	return UserRole(m.EntUser.Role) == UserRoleAdmin
+}
+
+func (m *User) IsMember() bool {
+	return UserRole(m.EntUser.Role) == UserRoleMember
 }

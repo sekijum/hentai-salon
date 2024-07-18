@@ -1,5 +1,10 @@
 package request
 
+type UserFindByIdRequest struct {
+	Limit  int `form:"limit"`
+	Offset int `form:"offset"`
+}
+
 type UserSignupRequest struct {
 	Name        string  `json:"name" binding:"required,max=20"`
 	Email       string  `json:"email" binding:"required,email,max=254"`

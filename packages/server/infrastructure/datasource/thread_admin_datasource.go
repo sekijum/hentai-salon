@@ -121,7 +121,7 @@ func (ds *ThreadAdminDatasource) FindByID(params ThreadAdminDatasourceFindByIDPa
 		return nil, err
 	}
 
-	return &model.Thread{EntThread: entThread, CommentCount: commentCount}, nil
+	return &model.Thread{EntThread: entThread, ThreadCommentCount: commentCount}, nil
 }
 
 type ThreadAdminDatasourceUpdateParams struct {

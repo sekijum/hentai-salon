@@ -35,7 +35,7 @@ func (svc *UserAdminApplicationService) FindAll(params UserAdminApplicationServi
 		return nil, err
 	}
 
-	totalCount, err := svc.userAdminDatasource.GetUserCount(datasource.UserAdminDatasourceGetUserCountParams{
+	userCount, err := svc.userAdminDatasource.GetUserCount(datasource.UserAdminDatasourceGetUserCountParams{
 		Ctx:     params.Ctx,
 		Keyword: params.Qs.Keyword,
 		Role:    params.Qs.Role,
@@ -44,18 +44,18 @@ func (svc *UserAdminApplicationService) FindAll(params UserAdminApplicationServi
 		return nil, err
 	}
 
-	var userAdminResources []*resource.UserAdminResource
+	var userAdminResourceList []*resource.UserAdminResource
 	for _, user := range users {
-		userAdminResources = append(userAdminResources, resource.NewUserAdminResource(resource.NewUserAdminResourceParams{
+		userAdminResourceList = append(userAdminResourceList, resource.NewUserAdminResource(resource.NewUserAdminResourceParams{
 			User: user,
 		}))
 	}
 
 	dto := &resource.ListResource[*resource.UserAdminResource]{
-		TotalCount: totalCount,
+		TotalCount: userCount,
 		Limit:      params.Qs.Limit,
 		Offset:     params.Qs.Offset,
-		Data:       userAdminResources,
+		Data:       userAdminResourceList,
 	}
 
 	return dto, nil

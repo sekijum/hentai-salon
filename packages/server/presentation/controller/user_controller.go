@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"server/application/service"
 	"server/presentation/request"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -16,6 +17,36 @@ type UserController struct {
 
 func NewUserController(userApplicationService *service.UserApplicationService) *UserController {
 	return &UserController{userApplicationService: userApplicationService}
+}
+
+func (ctrl *UserController) FindByID(ctx *gin.Context) {
+	UserID, err := strconv.Atoi(ctx.Param("userID"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "無効なIDです"})
+		return
+	}
+
+	var qs request.UserFindByIdRequest
+
+	if err := ctx.ShouldBindQuery(&qs); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	qs.Limit = ctx.GetInt("limit")
+	qs.Offset = ctx.GetInt("offset")
+
+	dto, err := ctrl.userApplicationService.FindByID(service.UserApplicationServiceFindByIDParams{
+		Ctx:    context.Background(),
+		UserID: UserID,
+		Qs:     qs,
+	})
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, dto)
 }
 
 func (ctrl *UserController) Signup(ctx *gin.Context) {

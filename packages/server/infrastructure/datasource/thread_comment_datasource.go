@@ -16,45 +16,19 @@ func NewThreadCommentDatasource(client *ent.Client) *ThreadCommentDatasource {
 	return &ThreadCommentDatasource{client: client}
 }
 
-type ThreadCommentDatasourceGetReplyCountCountParams struct {
-	Ctx             context.Context
-	ParentCommentID int
-}
-
-func (ds *ThreadCommentDatasource) GetReplyCountCount(params ThreadCommentDatasourceGetReplyCountCountParams) (int, error) {
-	replyCount, err := ds.client.ThreadComment.
-		Query().
-		Where(threadcomment.ParentCommentID(params.ParentCommentID)).
-		Count(params.Ctx)
-	if err != nil {
-		return 0, err
-	}
-
-	return replyCount, nil
-}
-
 type ThreadCommentDatasourceFindByIDParams struct {
 	Ctx                      context.Context
 	CommentID, Limit, Offset int
 }
 
 func (ds *ThreadCommentDatasource) FindByID(params ThreadCommentDatasourceFindByIDParams) (*model.ThreadComment, error) {
-	replyCount, err := ds.GetReplyCountCount(ThreadCommentDatasourceGetReplyCountCountParams{
-		Ctx:             params.Ctx,
-		ParentCommentID: params.CommentID,
-	})
-	if err != nil {
-		return nil, err
-	}
-
 	comment, err := ds.client.ThreadComment.Query().
 		Where(threadcomment.IDEQ(params.CommentID)).
 		WithAttachments().
 		WithThread().
 		WithAuthor().
 		WithParentComment(func(pq *ent.ThreadCommentQuery) {
-			pq.WithAuthor().
-				WithReplies() // リプライ数は算出するために必須(以下同様)
+			pq.WithAuthor()
 		}).
 		WithReplies(func(rq *ent.ThreadCommentQuery) {
 			rq.Order(ent.Desc(threadcomment.FieldCreatedAt)).
@@ -63,11 +37,18 @@ func (ds *ThreadCommentDatasource) FindByID(params ThreadCommentDatasourceFindBy
 				WithAuthor().
 				WithAttachments(func(aq *ent.ThreadCommentAttachmentQuery) {
 					aq.Order(ent.Asc(threadcommentattachment.FieldDisplayOrder))
-				}).
-				WithReplies()
+				})
 		}).
 		Only(params.Ctx)
 
+	if err != nil {
+		return nil, err
+	}
+
+	replyCount, err := ds.client.ThreadComment.
+		Query().
+		Where(threadcomment.ParentCommentID(params.CommentID)).
+		Count(params.Ctx)
 	if err != nil {
 		return nil, err
 	}

@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 	"server/domain/model"
 	"server/infrastructure/datasource"
 	"server/infrastructure/ent"
@@ -137,7 +138,7 @@ func (svc *ThreadApplicationService) FindAllList(params ThreadApplicationService
 
 	for key, threads := range threadsByCriteria {
 		for _, thread := range threads {
-			resource := resource.NewThreadResource(resource.NewThreadResourceParams{Thread: thread})
+			resource := resource.NewThreadResource(resource.NewThreadResourceParams{Thread: thread, ThreadCommentCount: thread.ThreadCommentCount})
 			dto[key] = append(dto[key], resource)
 		}
 	}
@@ -163,10 +164,13 @@ func (svc *ThreadApplicationService) FindByID(params ThreadApplicationServiceFin
 		return nil, err
 	}
 
+	fmt.Print("ThreadCommentReplyCountMap", thread.ThreadCommentReplyCountMap)
 	dto := resource.NewThreadResource(resource.NewThreadResourceParams{
-		Thread: thread,
-		Limit:  params.Qs.Limit,
-		Offset: params.Qs.Offset,
+		Thread:                     thread,
+		Limit:                      params.Qs.Limit,
+		Offset:                     params.Qs.Offset,
+		ThreadCommentCount:         thread.ThreadCommentCount,
+		ThreadCommentReplyCountMap: thread.ThreadCommentReplyCountMap,
 	})
 	return dto, nil
 }

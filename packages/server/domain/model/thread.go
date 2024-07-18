@@ -7,10 +7,11 @@ import (
 )
 
 type Thread struct {
-	EntThread    *ent.Thread
-	Popularity   int
-	CommentCount int
-	CommentIDs   []int
+	EntThread                  *ent.Thread
+	Popularity                 int
+	ThreadCommentCount         int
+	CommentIDs                 []int
+	ThreadCommentReplyCountMap map[int]int // コメント毎のリプライ数
 }
 
 type ThreadStatus int

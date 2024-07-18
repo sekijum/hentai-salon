@@ -35,6 +35,7 @@ type NewThreadCommentResourceParams struct {
 	CommentIDs    []int
 	Limit, Offset int
 	IDx           *int
+	ReplyCount    int
 }
 
 func NewThreadCommentResource(params NewThreadCommentResourceParams) *ThreadCommentResource {
@@ -91,7 +92,7 @@ func NewThreadCommentResource(params NewThreadCommentResourceParams) *ThreadComm
 	}
 
 	replyList := ListResource[*ThreadCommentResource]{
-		TotalCount: params.ThreadComment.ReplyCount,
+		TotalCount: params.ReplyCount,
 		Limit:      params.Limit,
 		Offset:     params.Offset,
 		Data:       replies,
@@ -128,7 +129,7 @@ func NewThreadCommentResource(params NewThreadCommentResourceParams) *ThreadComm
 		UpdatedAt:        params.ThreadComment.EntThreadComment.UpdatedAt.Format(time.RFC3339),
 		Thread:           thread,
 		Attachments:      attachments,
-		ReplyCount:       len(params.ThreadComment.EntThreadComment.Edges.Replies),
+		ReplyCount:       params.ReplyCount,
 		Replies:          replyList,
 	}
 }

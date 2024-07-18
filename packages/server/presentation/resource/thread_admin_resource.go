@@ -61,7 +61,7 @@ func NewThreadAdminResource(params NewThreadAdminResourceParams) *ThreadAdminRes
 	}
 
 	comments := &ListResource[*ThreadCommentAdminResource]{
-		TotalCount: params.Thread.CommentCount,
+		TotalCount: params.Thread.ThreadCommentCount,
 		Limit:      params.Limit,
 		Offset:     params.Offset,
 		Data:       threadCommentAdminResource,

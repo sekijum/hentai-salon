@@ -19,8 +19,9 @@ type ThreadResource struct {
 }
 
 type NewThreadResourceParams struct {
-	Thread        *model.Thread
-	Limit, Offset int
+	Thread                            *model.Thread
+	ThreadCommentCount, Limit, Offset int
+	ThreadCommentReplyCountMap        map[int]int
 }
 
 func NewThreadResource(params NewThreadResourceParams) *ThreadResource {
@@ -40,11 +41,17 @@ func NewThreadResource(params NewThreadResourceParams) *ThreadResource {
 	var comments []*ThreadCommentResource
 	var attachments []*ThreadCommentAttachmentResource
 	for i, comment := range params.Thread.EntThread.Edges.Comments {
+		commentReplyCount := 0
+		if count, ok := params.ThreadCommentReplyCountMap[comment.ID]; ok {
+			commentReplyCount = count
+		}
+
 		commentResource := NewThreadCommentResource(NewThreadCommentResourceParams{
 			ThreadComment: &model.ThreadComment{EntThreadComment: comment},
 			CommentIDs:    params.Thread.CommentIDs,
 			Offset:        params.Offset,
 			IDx:           &i,
+			ReplyCount:    commentReplyCount,
 		})
 		comments = append(comments, commentResource)
 
@@ -61,7 +68,7 @@ func NewThreadResource(params NewThreadResourceParams) *ThreadResource {
 	}
 
 	commentsList := ListResource[*ThreadCommentResource]{
-		TotalCount: params.Thread.CommentCount,
+		TotalCount: params.ThreadCommentCount,
 		Limit:      params.Limit,
 		Offset:     params.Offset,
 		Data:       comments,
@@ -84,7 +91,7 @@ func NewThreadResource(params NewThreadResourceParams) *ThreadResource {
 		ThumbnailURL: thumbnailURL,
 		TagNameList:  tagNameList,
 		CreatedAt:    params.Thread.EntThread.CreatedAt.Format(time.RFC3339),
-		CommentCount: params.Thread.CommentCount,
+		CommentCount: params.ThreadCommentCount,
 		Comments:     commentsList,
 		Attachments:  attachments,
 	}

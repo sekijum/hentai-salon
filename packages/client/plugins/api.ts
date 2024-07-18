@@ -30,10 +30,10 @@ function API(): AxiosInstance {
       return response;
     },
     error => {
-      if (error.response && error.response.status === 401) {
-        $storage.removeItem('access_token');
-        window.location.href = '/signin';
-      }
+      // if (error.response && error.response.status === 401) {
+      //   $storage.removeItem('access_token');
+      //   window.location.href = '/signin';
+      // }
       return Promise.reject(error);
     },
   );

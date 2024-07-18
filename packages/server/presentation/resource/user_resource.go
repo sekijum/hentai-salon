@@ -6,18 +6,23 @@ import (
 )
 
 type UserResource struct {
-	ID          int     `json:"id"`
-	Name        string  `json:"name"`
-	Email       string  `json:"email"`
-	AvatarURL   *string `json:"avatarUrl,omitempty"`
-	ProfileLink *string `json:"profileLink,omitempty"`
-	Role        string  `json:"role"`
-	CreatedAt   string  `json:"createdAt"`
-	UpdatedAt   string  `json:"updatedAt"`
+	ID          int                                  `json:"id"`
+	Name        string                               `json:"name"`
+	Email       string                               `json:"email"`
+	AvatarURL   *string                              `json:"avatarUrl,omitempty"`
+	ProfileLink *string                              `json:"profileLink,omitempty"`
+	Role        string                               `json:"role"`
+	RoleLabel   string                               `json:"roleLabel"`
+	CreatedAt   string                               `json:"createdAt"`
+	UpdatedAt   string                               `json:"updatedAt"`
+	Comments    ListResource[*ThreadCommentResource] `json:"comments"`
+	Attachments []*ThreadCommentAttachmentResource   `json:"attachments"`
+	Threads     ListResource[*ThreadResource]        `json:"threads,omitempty"`
 }
 
 type NewUserResourceParams struct {
-	User *model.User
+	User          *model.User
+	Limit, Offset int
 }
 
 func NewUserResource(params NewUserResourceParams) *UserResource {
@@ -30,6 +35,65 @@ func NewUserResource(params NewUserResourceParams) *UserResource {
 		profileLink = params.User.EntUser.ProfileLink
 	}
 
+	var commentResourceList []*ThreadCommentResource
+	var attachments []*ThreadCommentAttachmentResource
+	for i, comment := range params.User.EntUser.Edges.Comments {
+		commentReplyCount := 0
+		if count, ok := params.User.ThreadCommentReplyCountMap[comment.ID]; ok {
+			commentReplyCount = count
+		}
+
+		commentResource := NewThreadCommentResource(NewThreadCommentResourceParams{
+			ThreadComment: &model.ThreadComment{EntThreadComment: comment},
+			CommentIDs:    nil,
+			Offset:        params.Offset,
+			IDx:           &i,
+			ReplyCount:    commentReplyCount,
+		})
+		commentResourceList = append(commentResourceList, commentResource)
+
+		for _, attachment := range comment.Edges.Attachments {
+			threadCommentAttachment := &model.ThreadCommentAttachment{EntAttachment: attachment}
+			attachments = append(attachments, &ThreadCommentAttachmentResource{
+				Url:          threadCommentAttachment.EntAttachment.URL,
+				DisplayOrder: threadCommentAttachment.EntAttachment.DisplayOrder,
+				Type:         threadCommentAttachment.TypeToString(),
+				CommentID:    comment.ID,
+				IDx:          commentResource.IDx,
+			})
+		}
+	}
+
+	comments := ListResource[*ThreadCommentResource]{
+		TotalCount: params.User.ThreadCommentCount,
+		Limit:      params.Limit,
+		Offset:     params.Offset,
+		Data:       commentResourceList,
+	}
+
+	var threads []*ThreadResource
+	for _, thread := range params.User.EntUser.Edges.Threads {
+		threadCommentCount := 0
+		if count, ok := params.User.ThreadCommentCountMap[thread.ID]; ok {
+			threadCommentCount = count
+		}
+
+		threadResource := NewThreadResource(NewThreadResourceParams{
+			Thread:             &model.Thread{EntThread: thread},
+			Limit:              params.Limit,
+			Offset:             params.Offset,
+			ThreadCommentCount: threadCommentCount,
+		})
+		threads = append(threads, threadResource)
+	}
+
+	threadList := ListResource[*ThreadResource]{
+		TotalCount: params.User.ThreadCount,
+		Limit:      params.Limit,
+		Offset:     params.Offset,
+		Data:       threads,
+	}
+
 	return &UserResource{
 		ID:          params.User.EntUser.ID,
 		Name:        params.User.EntUser.Name,
@@ -37,7 +101,11 @@ func NewUserResource(params NewUserResourceParams) *UserResource {
 		AvatarURL:   avatarURL,
 		ProfileLink: profileLink,
 		Role:        params.User.RoleToString(),
+		RoleLabel:   params.User.RoleToLabel(),
 		CreatedAt:   params.User.EntUser.CreatedAt.Format(time.RFC3339),
 		UpdatedAt:   params.User.EntUser.UpdatedAt.Format(time.RFC3339),
+		Comments:    comments,
+		Attachments: attachments,
+		Threads:     threadList,
 	}
 }

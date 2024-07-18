@@ -23,6 +23,28 @@ func NewUserApplicationService(userDatasource *datasource.UserDatasource) *UserA
 	return &UserApplicationService{userDatasource: userDatasource}
 }
 
+type UserApplicationServiceFindByIDParams struct {
+	Ctx    context.Context
+	UserID int
+	Qs     request.UserFindByIdRequest
+}
+
+func (svc *UserApplicationService) FindByID(params UserApplicationServiceFindByIDParams) (any, error) {
+	user, err := svc.userDatasource.FindByID(datasource.UserDatasourceFindByIDParams{
+		Ctx:    params.Ctx,
+		UserID: params.UserID,
+		Limit:  params.Qs.Limit,
+		Offset: params.Qs.Offset,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	dto := resource.NewUserResource(resource.NewUserResourceParams{User: user, Limit: params.Qs.Limit, Offset: params.Qs.Offset})
+
+	return dto, nil
+}
+
 type UserApplicationServiceSignupParams struct {
 	Ctx  context.Context
 	Body request.UserSignupRequest
@@ -162,9 +184,9 @@ func (svc *UserApplicationService) GetAuthenticatedUser(params UserApplicationGe
 			return nil, errors.New("ユーザーの取得に失敗しました")
 		}
 
-		resource := resource.NewUserResource(resource.NewUserResourceParams{User: user})
+		dto := resource.NewUserResource(resource.NewUserResourceParams{User: user})
 
-		return resource, nil
+		return dto, nil
 	} else {
 		return nil, errors.New("トークンが無効です")
 	}

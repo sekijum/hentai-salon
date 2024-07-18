@@ -44,9 +44,9 @@ func (svc *BoardAdminApplicationService) FindAll(params BoardAdminApplicationSer
 		return nil, err
 	}
 
-	var boardAdminResources []*resource.BoardAdminResource
+	var boardAdminResourceList []*resource.BoardAdminResource
 	for _, board := range boards {
-		boardAdminResources = append(boardAdminResources, resource.NewBoardAdminResource(resource.NewBoardAdminResourceParams{
+		boardAdminResourceList = append(boardAdminResourceList, resource.NewBoardAdminResource(resource.NewBoardAdminResourceParams{
 			Board: board,
 		}))
 	}
@@ -55,7 +55,7 @@ func (svc *BoardAdminApplicationService) FindAll(params BoardAdminApplicationSer
 		TotalCount: totalCount,
 		Limit:      params.Qs.Limit,
 		Offset:     params.Qs.Offset,
-		Data:       boardAdminResources,
+		Data:       boardAdminResourceList,
 	}
 
 	return dto, nil

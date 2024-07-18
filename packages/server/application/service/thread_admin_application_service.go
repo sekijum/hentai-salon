@@ -48,24 +48,24 @@ func (svc *ThreadAdminApplicationService) FindAll(params ThreadAdminApplicationS
 		return nil, err
 	}
 
-	var threadResources []*resource.ThreadAdminResource
+	var threadResourceList []*resource.ThreadAdminResource
 	for _, thread := range threads {
 		threadResource := resource.NewThreadAdminResource(resource.NewThreadAdminResourceParams{
 			Thread: thread,
 			Limit:  params.Qs.Limit,
 			Offset: params.Qs.Offset,
 		})
-		threadResources = append(threadResources, threadResource)
+		threadResourceList = append(threadResourceList, threadResource)
 	}
 
-	listResource := &resource.ListResource[*resource.ThreadAdminResource]{
+	dto := &resource.ListResource[*resource.ThreadAdminResource]{
 		TotalCount: totalCount,
 		Limit:      params.Qs.Limit,
 		Offset:     params.Qs.Offset,
-		Data:       threadResources,
+		Data:       threadResourceList,
 	}
 
-	return listResource, nil
+	return dto, nil
 }
 
 type ThreadAdminApplicationServiceFindByIDParams struct {

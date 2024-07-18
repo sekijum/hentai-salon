@@ -177,7 +177,6 @@ async function submit(): Promise<void> {
   if (confirm('本当に書き込みますか？')) {
     isLoading.value = true;
     try {
-      if (!payload.isLoggedIn) setLastCommentTime();
       if (attachmentFiles.value && attachmentFiles.value.length > 0) {
         const uploadedAttachments = await uploadFilesToImgur(attachmentFiles.value);
         form.value.attachments = uploadedAttachments;
@@ -193,6 +192,7 @@ async function submit(): Promise<void> {
         await $api.post(`/threads/${route.params.threadId}/comments/`, form.value);
         alert('書き込みに成功しました。');
       }
+      if (!payload.isLoggedIn) setLastCommentTime();
       router.go(0);
     } catch (error) {
       alert('書き込み中にエラーが発生しました。');

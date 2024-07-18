@@ -5,6 +5,8 @@ import (
 	"errors"
 	"server/domain/model"
 	"server/infrastructure/ent"
+	"server/infrastructure/ent/thread"
+	"server/infrastructure/ent/threadcomment"
 	"server/infrastructure/ent/user"
 	"strings"
 	"time"
@@ -19,17 +21,100 @@ func NewUserDatasource(client *ent.Client) *UserDatasource {
 }
 
 type UserDatasourceFindByIDParams struct {
-	Ctx    context.Context
-	UserID int
+	Ctx                   context.Context
+	UserID, Limit, Offset int
+}
+
+type ThreadCommentCount struct {
+	ThreadID int `json:"thread_id"`
+	Count    int `json:"count"`
+}
+
+type ThreadCommentReplyCount struct {
+	ParentCommentID int `json:"parent_comment_id"`
+	Count           int `json:"count"`
 }
 
 func (ds *UserDatasource) FindByID(params UserDatasourceFindByIDParams) (*model.User, error) {
-	entUser, err := ds.client.User.Get(params.Ctx, params.UserID)
+	entUser, err := ds.client.User.Query().
+		Where(user.ID(params.UserID)).
+		WithComments(func(q *ent.ThreadCommentQuery) {
+			q.WithAttachments().
+				WithAuthor().
+				WithParentComment().
+				Order(ent.Desc(threadcomment.FieldID)).
+				Limit(params.Limit).
+				Offset(params.Offset)
+		}).
+		WithThreads(func(q *ent.ThreadQuery) {
+			q.WithBoard()
+		}).
+		Only(params.Ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	modelUser := &model.User{EntUser: entUser}
+	var threadIDs []int
+	for _, thread := range entUser.Edges.Threads {
+		threadIDs = append(threadIDs, thread.ID)
+	}
+
+	var threadCommentCountList []ThreadCommentCount
+	err = ds.client.ThreadComment.Query().
+		Where(threadcomment.ThreadIDIn(threadIDs...)).
+		GroupBy(threadcomment.FieldThreadID).
+		Aggregate(ent.Count()).
+		Scan(params.Ctx, &threadCommentCountList)
+	if err != nil {
+		return nil, err
+	}
+
+	commentIDs := make([]int, 0)
+	for _, comment := range entUser.Edges.Comments {
+		commentIDs = append(commentIDs, comment.ID)
+	}
+
+	var threadCommentReplyCountList []ThreadCommentReplyCount
+	err = ds.client.ThreadComment.Query().
+		Where(threadcomment.ParentCommentIDIn(commentIDs...)).
+		GroupBy(threadcomment.FieldParentCommentID).
+		Aggregate(ent.Count()).
+		Scan(params.Ctx, &threadCommentReplyCountList)
+	if err != nil {
+		return nil, err
+	}
+
+	threadCommentCountMap := make(map[int]int)
+	for _, count := range threadCommentCountList {
+		threadCommentCountMap[count.ThreadID] = count.Count
+	}
+
+	threadCommentReplyCountMap := make(map[int]int)
+	for _, count := range threadCommentReplyCountList {
+		threadCommentReplyCountMap[count.ParentCommentID] = count.Count
+	}
+
+	threadCommentCount, err := ds.client.ThreadComment.Query().
+		Where(threadcomment.UserIDEQ(params.UserID)).
+		Count(params.Ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	threadCount, err := ds.client.Thread.Query().
+		Where(thread.UserIDEQ(params.UserID)).
+		Count(params.Ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	modelUser := &model.User{
+		EntUser:                    entUser,
+		ThreadCommentCountMap:      threadCommentCountMap,
+		ThreadCommentReplyCountMap: threadCommentReplyCountMap,
+		ThreadCommentCount:         threadCommentCount,
+		ThreadCount:                threadCount,
+	}
 
 	return modelUser, nil
 }

@@ -26,6 +26,7 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 
 	r.GET("/tags/name", controllers.TagController.FindNameList)
 	r.GET("/boards", controllers.BoardController.FindAll)
+	r.GET("/users/:userID", controllers.UserController.FindByID)
 	r.POST("/files/urls-for-upload", controllers.StorageController.GeneratePresignedURLs)
 
 	threadGroup := r.Group("/threads")
