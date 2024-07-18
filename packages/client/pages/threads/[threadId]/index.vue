@@ -153,7 +153,6 @@ async function fetchThread() {
       sortOrder: getCommentSortOrder(),
     },
   });
-  console.log(response);
   thread.value = response.data;
   isLoading.value = false;
 }

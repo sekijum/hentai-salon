@@ -1,5 +1,11 @@
 package request
 
+type ThreadRequest struct {
+	Limit     int    `form:"limit"`
+	Offset    int    `form:"offset"`
+	SortOrder string `form:"sortOrder"`
+}
+
 type ThreadFindByIdRequest struct {
 	Limit     int    `form:"limit"`
 	Offset    int    `form:"offset"`

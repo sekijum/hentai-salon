@@ -53,8 +53,9 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 		usersGroup := authGroup.Group("/users")
 		{
 			usersGroup.GET("/me", controllers.UserController.FindAuthenticatedUser)
-			usersGroup.PUT("/:userID", controllers.UserController.Update)
-			usersGroup.PATCH("/:userID/password", controllers.UserController.UpdatePassword)
+			usersGroup.GET("/me/comments", controllers.ThreadCommentController.FindAllByUserID)
+			usersGroup.PUT("/me", controllers.UserController.Update)
+			usersGroup.PATCH("/me/password", controllers.UserController.UpdatePassword)
 		}
 	}
 

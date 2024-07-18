@@ -18,10 +18,44 @@ func NewThreadCommentApplicationService(threadCommentDatasource *datasource.Thre
 	return &ThreadCommentApplicationService{threadCommentDatasource: threadCommentDatasource}
 }
 
+type ThreadCommentApplicationServiceFindByUserIDParams struct {
+	Ctx    context.Context
+	UserID int
+	Qs     request.ThreadCommentFindAllByUserIDRequest
+}
+
+func (svc *ThreadCommentApplicationService) FindAllByUserID(params ThreadCommentApplicationServiceFindByUserIDParams) (*resource.ListResource[*resource.ThreadCommentResource], error) {
+	comments, commentCount, err := svc.threadCommentDatasource.FindAllByUserID(datasource.ThreadCommentDatasourceFindAllByUserIDParams{
+		Ctx:    params.Ctx,
+		UserID: params.UserID,
+		Limit:  params.Qs.Limit,
+		Offset: params.Qs.Offset,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var threadCommentResourceList []*resource.ThreadCommentResource
+	for _, comment := range comments {
+		threadCommentResourceList = append(threadCommentResourceList, resource.NewThreadCommentResource(resource.NewThreadCommentResourceParams{
+			ThreadComment: comment,
+		}))
+	}
+
+	dto := &resource.ListResource[*resource.ThreadCommentResource]{
+		TotalCount: commentCount,
+		Limit:      params.Qs.Limit,
+		Offset:     params.Qs.Offset,
+		Data:       threadCommentResourceList,
+	}
+
+	return dto, nil
+}
+
 type ThreadCommentApplicationServiceFindByIDParams struct {
 	Ctx       context.Context
 	CommentID int
-	Qs        request.ThreadFindByIdRequest
+	Qs        request.ThreadCommentFindByIDRequest
 }
 
 func (svc *ThreadCommentApplicationService) FindByID(params ThreadCommentApplicationServiceFindByIDParams) (*resource.ThreadCommentResource, error) {

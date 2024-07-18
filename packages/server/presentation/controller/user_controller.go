@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"server/application/service"
 	"server/presentation/request"
-	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -20,9 +19,9 @@ func NewUserController(userApplicationService *service.UserApplicationService) *
 }
 
 func (ctrl *UserController) FindByID(ctx *gin.Context) {
-	UserID, err := strconv.Atoi(ctx.Param("userID"))
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "無効なIDです"})
+	userID, exists := ctx.Get("userID")
+	if !exists {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "ユーザーIDがコンテキストに存在しません"})
 		return
 	}
 
@@ -38,7 +37,7 @@ func (ctrl *UserController) FindByID(ctx *gin.Context) {
 
 	dto, err := ctrl.userApplicationService.FindByID(service.UserApplicationServiceFindByIDParams{
 		Ctx:    context.Background(),
-		UserID: UserID,
+		UserID: userID.(int),
 		Qs:     qs,
 	})
 	if err != nil {

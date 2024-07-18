@@ -1,16 +1,17 @@
 <template>
-  <v-app>
-    <v-container class="main-container">
-      <Header />
-      <main><slot /></main>
-    </v-container>
+  <v-app class="main-container">
+    <Header />
+
+    <main><slot /></main>
 
     <MenuModal />
   </v-app>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
 import MenuModal from '~/components/MenuModal.vue';
+import Header from '~/components/Header.vue';
+</script>
 
 <style scoped>
 .main-container {

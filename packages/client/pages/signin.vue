@@ -78,7 +78,8 @@ async function submit() {
     $storage.setItem('access_token', token);
     alert('サインインしました。');
     router.push('/');
-  } catch (error) {
+  } catch (err) {
+    alert(err.response.data.error);
     console.error('通信中にエラーが発生しました:', error);
   }
 }

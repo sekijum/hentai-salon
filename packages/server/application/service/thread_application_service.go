@@ -31,12 +31,15 @@ func NewThreadApplicationService(
 }
 
 type ThreadApplicationServiceFindAllListParams struct {
-	Ctx context.Context
-	Qs  request.ThreadFindAllRequest
+	Ctx    context.Context
+	Qs     request.ThreadFindAllRequest
+	UserID int
 }
 
 func (svc *ThreadApplicationService) FindAllList(params ThreadApplicationServiceFindAllListParams) (map[string][]*resource.ThreadResource, error) {
 	threadsByCriteria := make(map[string][]*model.Thread)
+
+	fmt.Printf("params.UserID", params.UserID)
 
 	for _, criteria := range params.Qs.QueryCriteria {
 		switch criteria {
@@ -125,6 +128,20 @@ func (svc *ThreadApplicationService) FindAllList(params ThreadApplicationService
 				return nil, err
 			}
 			threadsByCriteria["threadsByBoard"] = threads
+		case "owner":
+			if params.UserID == 0 {
+				return nil, errors.New("UserIDが必要です")
+			}
+			threads, err := svc.threadDatasource.FindByUserID(datasource.ThreadDatasourceFindByUserIDParams{
+				Ctx:    params.Ctx,
+				UserID: params.UserID,
+				Limit:  params.Qs.Limit,
+				Offset: params.Qs.Offset,
+			})
+			if err != nil {
+				return nil, err
+			}
+			threadsByCriteria["threadsByOwner"] = threads
 		}
 	}
 
@@ -135,6 +152,7 @@ func (svc *ThreadApplicationService) FindAllList(params ThreadApplicationService
 	dto["threadsByKeyword"] = []*resource.ThreadResource{}
 	dto["threadsByRelated"] = []*resource.ThreadResource{}
 	dto["threadsByBoard"] = []*resource.ThreadResource{}
+	dto["threadsByOwner"] = []*resource.ThreadResource{}
 
 	for key, threads := range threadsByCriteria {
 		for _, thread := range threads {

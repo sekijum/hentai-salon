@@ -42,6 +42,7 @@ func (ds *UserDatasource) FindByID(params UserDatasourceFindByIDParams) (*model.
 			q.WithAttachments().
 				WithAuthor().
 				WithParentComment().
+				WithThread().
 				Order(ent.Desc(threadcomment.FieldID)).
 				Limit(params.Limit).
 				Offset(params.Offset)

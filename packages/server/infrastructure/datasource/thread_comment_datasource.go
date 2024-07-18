@@ -16,6 +16,67 @@ func NewThreadCommentDatasource(client *ent.Client) *ThreadCommentDatasource {
 	return &ThreadCommentDatasource{client: client}
 }
 
+type ThreadCommentDatasourceFindAllByUserIDParams struct {
+	Ctx                   context.Context
+	UserID, Limit, Offset int
+}
+
+func (ds *ThreadCommentDatasource) FindAllByUserID(params ThreadCommentDatasourceFindAllByUserIDParams) ([]*model.ThreadComment, int, error) {
+	comments, err := ds.client.ThreadComment.
+		Query().
+		Where(threadcomment.UserID(params.UserID)).
+		Limit(params.Limit).
+		Offset(params.Offset).
+		All(params.Ctx)
+
+	if err != nil {
+		return nil, 0, err
+	}
+
+	commentIDs := make([]int, 0)
+	for _, comment := range comments {
+		commentIDs = append(commentIDs, comment.ID)
+	}
+
+	var replyCountList []ThreadCommentReplyCount
+	err = ds.client.ThreadComment.Query().
+		Where(threadcomment.ParentCommentIDIn(commentIDs...)).
+		GroupBy(threadcomment.FieldParentCommentID).
+		Aggregate(ent.Count()).
+		Scan(params.Ctx, &replyCountList)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	threadCommentReplyCountMap := make(map[int]int)
+	for _, count := range replyCountList {
+		threadCommentReplyCountMap[count.ParentCommentID] = count.Count
+	}
+
+	commentCount, err := ds.client.ThreadComment.Query().
+		Where(threadcomment.UserID(params.UserID)).
+		Count(params.Ctx)
+
+	if err != nil {
+		return nil, 0, err
+	}
+
+	var modelThreadCommentList []*model.ThreadComment
+	for _, comment := range comments {
+		replyCount := 0
+		if count, ok := threadCommentReplyCountMap[comment.ID]; ok {
+			replyCount = count
+		}
+
+		modelThreadCommentList = append(modelThreadCommentList, &model.ThreadComment{
+			EntThreadComment: comment,
+			ReplyCount:       replyCount,
+		})
+	}
+
+	return modelThreadCommentList, commentCount, nil
+}
+
 type ThreadCommentDatasourceFindByIDParams struct {
 	Ctx                      context.Context
 	CommentID, Limit, Offset int

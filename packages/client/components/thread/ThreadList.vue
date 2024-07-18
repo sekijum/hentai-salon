@@ -25,7 +25,7 @@
                   {{ truncateTitle(item.title) }}
                 </p>
                 <div class="item-details">
-                  <small> {{ item.board?.title }} {{ item.commentCount }} <v-icon small>mdi-comment</v-icon> </small>
+                  <small>{{ item.board?.title }}<v-icon small>mdi-comment</v-icon>{{ item.commentCount }}</small>
                 </div>
               </v-col>
             </v-row>
@@ -51,7 +51,7 @@
                 {{ truncateTitle(item.title) }}
               </p>
               <div class="item-details">
-                <small> {{ item.board?.title }} {{ item.commentCount }} <v-icon small>mdi-comment</v-icon> </small>
+                <small>{{ item.board?.title }}<v-icon small>mdi-comment</v-icon>{{ item.commentCount }}</small>
               </div>
             </v-col>
           </v-row>
@@ -72,10 +72,11 @@ import type { IThread } from '~/types/thread';
 const nuxtApp = useNuxtApp();
 
 const props = defineProps<{
-  title: String;
+  title?: String;
   items: IThread[];
   clicked?: () => void;
   isInfiniteScroll?: boolean;
+  queryCriteria?: string;
 }>();
 
 const router = useRouter();
@@ -93,6 +94,7 @@ interface ThreadResponse {
   threadsByKeyword: IThread[];
   threadsByRelated: IThread[];
   threadsByBoard: IThread[];
+  threadsByOwner: IThread[];
 }
 
 function truncateTitle(title: string) {
@@ -111,7 +113,7 @@ async function load({ done }: { done: (status: 'loading' | 'error' | 'empty' | '
 
 async function fetchLoadThreads(offset: number) {
   if (!route.query.queryCriteria) {
-    await router.push({ ...{ query: { ...route.query, ...{ queryCriteria: 'newest' } } } });
+    await router.push({ ...{ query: { ...route.query, ...{ queryCriteria: props.queryCriteria || 'newest' } } } });
   }
 
   const response = await $api.get<ThreadResponse>('/threads/', {
@@ -145,6 +147,10 @@ async function fetchLoadThreads(offset: number) {
     canNextLoad = true;
     props.items.push(item);
   });
+  response.data.threadsByOwner.map(item => {
+    canNextLoad = true;
+    props.items.push(item);
+  });
 
   return {
     canNextLoad:
@@ -152,7 +158,8 @@ async function fetchLoadThreads(offset: number) {
       response.data.threadsByBoard.length >= threadLimit ||
       response.data.threadsByRelated.length >= threadLimit ||
       response.data.threadsByNewest.length >= threadLimit ||
-      response.data.threadsByHistory.length >= threadLimit,
+      response.data.threadsByHistory.length >= threadLimit ||
+      response.data.threadsByOwner.length >= threadLimit,
   };
 }
 

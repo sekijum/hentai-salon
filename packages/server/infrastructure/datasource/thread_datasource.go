@@ -36,6 +36,41 @@ func (ds *ThreadDatasource) GetCommentCount(params ThreadDatasourceGetCommentCou
 	return commentCount, nil
 }
 
+type ThreadDatasourceFindByUserIDParams struct {
+	Ctx                   context.Context
+	UserID, Limit, Offset int
+}
+
+func (ds *ThreadDatasource) FindByUserID(params ThreadDatasourceFindByUserIDParams) ([]*model.Thread, error) {
+	threads, err := ds.client.Thread.Query().
+		Where(thread.UserIDEQ(params.UserID)).
+		Limit(params.Limit).
+		Offset(params.Offset).
+		WithTags().
+		WithBoard().
+		All(params.Ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var modelThreads []*model.Thread
+	for _, entThread := range threads {
+		commentCount, err := ds.GetCommentCount(ThreadDatasourceGetCommentCountParams{
+			Ctx:      params.Ctx,
+			ThreadID: entThread.ID,
+		})
+		if err != nil {
+			return nil, err
+		}
+		modelThreads = append(modelThreads, &model.Thread{
+			EntThread:          entThread,
+			ThreadCommentCount: commentCount,
+		})
+	}
+
+	return modelThreads, nil
+}
+
 type ThreadDatasourceFindByBoardIDParams struct {
 	Ctx                    context.Context
 	BoardID, Limit, Offset int

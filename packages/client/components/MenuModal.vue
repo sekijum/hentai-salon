@@ -22,6 +22,9 @@ const isMenuModal = useState('isMenuModal', () => false);
 
 const router = useRouter();
 const route = useRoute();
+const nuxtApp = useNuxtApp();
+
+const { payload } = nuxtApp;
 
 const menuItems = [
   { title: 'お知らせ', clicked: () => router.push('/'), icon: 'mdi-update' },
@@ -35,7 +38,9 @@ const menuItems = [
   { title: '板作成', clicked: () => router.push('/boards/new'), icon: 'mdi-forum' },
   { title: '管理画面', clicked: () => router.push('/admin'), icon: 'mdi-forum' },
   { title: 'いいね', clicked: () => router.push('/admin'), icon: 'mdi-forum' },
-  { title: 'ユーザー', clicked: () => router.push('/admin'), icon: 'mdi-forum' },
+  { title: 'ユーザー情報', clicked: () => router.push('/users/me'), icon: 'mdi-update' },
+  { title: 'マイスレ', clicked: () => router.push('/users/me/threads'), icon: 'mdi-new-box' },
+  { title: 'マイレス', clicked: () => router.push('/users/me/comments'), icon: 'mdi-format-list-bulleted' },
 ];
 
 function closeMenuModal() {

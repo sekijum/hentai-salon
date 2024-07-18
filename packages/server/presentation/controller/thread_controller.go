@@ -26,12 +26,15 @@ func (ctrl *ThreadController) FindAllList(ctx *gin.Context) {
 		return
 	}
 
+	userID, _ := ctx.Get("userID")
+
 	qs.Limit = ctx.GetInt("limit")
 	qs.Offset = ctx.GetInt("offset")
 
 	dto, err := ctrl.threadApplicationService.FindAllList(service.ThreadApplicationServiceFindAllListParams{
-		Ctx: context.Background(),
-		Qs:  qs,
+		Ctx:    context.Background(),
+		Qs:     qs,
+		UserID: userID.(int),
 	})
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

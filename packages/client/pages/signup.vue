@@ -78,7 +78,7 @@
         </Field>
       </div>
 
-      <div class="field">
+      <!-- <div class="field">
         <v-file-input
           show-size
           truncate-length="25"
@@ -90,7 +90,7 @@
           accept="image/*"
           @change="handleAvatarChange"
         />
-      </div>
+      </div> -->
 
       <v-btn type="submit" color="primary" block :disabled="!meta.valid" class="mt-5">サインアップ</v-btn>
     </Form>
