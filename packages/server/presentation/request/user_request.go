@@ -20,12 +20,12 @@ type UserSigninRequest struct {
 
 type UserUpdateRequest struct {
 	Name        string  `json:"name"`
-	Email       string  `json:"email"`
+	Email       string  `json:"email" binding:"required,max=254"`
 	AvatarURL   *string `json:"avatarUrl"`
 	ProfileLink *string `json:"profileLink"`
 }
 
 type UserUpdatePasswordRequest struct {
-	OldPassword string `json:"oldPassword"`
-	NewPassword string `json:"newPassword"`
+	OldPassword string `json:"oldPassword" binding:"required,min=6"`
+	NewPassword string `json:"newPassword" binding:"required,min=6"`
 }

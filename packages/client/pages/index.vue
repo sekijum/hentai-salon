@@ -4,7 +4,7 @@
       v-if="payload.isLoggedIn"
       :text="`*${payload?.user?.name}*さん、あなたのアカウントにログインしています。`"
       prominent
-      class="small-text"
+      class="small-text text-center"
     />
 
     <Menu :items="menuItems" />
@@ -57,7 +57,7 @@ const menuItems = [
   { title: 'サインアウト', clicked: () => router.push('/signup'), icon: 'mdi-logout' },
   { title: 'スレ作成', clicked: () => router.push('/threads/new'), icon: 'mdi-forum' },
   { title: '板作成', clicked: () => router.push('/boards/new'), icon: 'mdi-forum' },
-  { title: '管理画面', clicked: () => router.push('/admin'), icon: 'mdi-forum' },
+  { title: '管理者画面', clicked: () => router.push('/admin'), icon: 'mdi-forum' },
   { title: 'メニュー', clicked: () => (isMenuModal.value = true), icon: 'mdi-forum' },
 ];
 

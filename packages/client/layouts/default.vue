@@ -2,7 +2,7 @@
   <v-app class="main-container">
     <Header />
 
-    <main><slot /></main>
+    <main><NuxtPage /></main>
 
     <MenuModal />
   </v-app>

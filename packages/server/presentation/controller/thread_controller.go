@@ -26,7 +26,10 @@ func (ctrl *ThreadController) FindAllList(ctx *gin.Context) {
 		return
 	}
 
-	userID, _ := ctx.Get("userID")
+	userID, exists := ctx.Get("userID")
+	if !exists {
+		userID = 0
+	}
 
 	qs.Limit = ctx.GetInt("limit")
 	qs.Offset = ctx.GetInt("offset")

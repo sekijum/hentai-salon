@@ -79,7 +79,10 @@ definePageMeta({
   layout: 'admin',
 });
 
-import { ref } from 'vue';
+const router = useRouter();
+const nuxtApp = useNuxtApp();
+
+const { payload, $api } = nuxtApp;
 
 const dialog = ref(false);
 const dialogDelete = ref(false);
@@ -170,5 +173,16 @@ const save = () => {
   close();
 };
 
-onMounted(initialize);
+onMounted(() => {
+  initialize;
+});
+
+onMounted(async () => {
+  await fetchUsers();
+});
+
+async function fetchUsers() {
+  const response = await $api.get('/admin/users/');
+  console.log(response);
+}
 </script>

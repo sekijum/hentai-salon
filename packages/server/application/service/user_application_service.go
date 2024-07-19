@@ -248,7 +248,7 @@ func (svc *UserApplicationService) UpdatePassword(params UserApplicationServiceU
 	}
 
 	if err := util.ComparePassword(user.EntUser.Password, params.OldPassword); err != nil {
-		return errors.New("古いパスワードが一致しません")
+		return errors.New("現在のパスワードが一致しません")
 	}
 
 	hashedPassword, err := util.HashPassword(params.NewPassword)

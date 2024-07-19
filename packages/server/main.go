@@ -33,8 +33,8 @@ func main() {
 	r := gin.Default()
 
 	config := cors.Config{
-		AllowOrigins: []string{"http://127.0.0.1:3000"},
-		AllowMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowOrigins: []string{"*"},
+		AllowMethods: []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowHeaders: []string{
 			"Access-Control-Allow-Credentials",
 			"Access-Control-Allow-Headers",

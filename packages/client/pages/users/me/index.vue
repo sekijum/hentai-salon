@@ -57,38 +57,33 @@
 
     <Form @submit="updatePassword" :validation-schema="passwordSchema" class="mx-2 mb-2" v-slot="{ meta }">
       <div class="field">
-        <Field name="password" v-slot="{ field, errorMessage }">
+        <Field v-model="form.oldPassword" name="oldPassword" v-slot="{ errors }">
           <v-text-field
-            v-model="form.password"
-            v-bind="field"
-            label="パスワード"
+            v-model="form.oldPassword"
+            label="現在のパスワード"
             type="password"
             variant="outlined"
             density="compact"
-            :error-messages="errorMessage ? [errorMessage] : []"
+            :error-messages="errors"
           />
         </Field>
       </div>
 
       <div class="field">
-        <Field name="confirmPassword" v-slot="{ field, errorMessage }">
+        <Field v-model="form.newPassword" name="newPassword" v-slot="{ errors }">
           <v-text-field
-            v-bind="field"
-            label="パスワード確認"
+            v-model="form.newPassword"
+            label="新しいパスワード"
             type="password"
             variant="outlined"
             density="compact"
-            :error-messages="errorMessage ? [errorMessage] : []"
+            :error-messages="errors"
           />
         </Field>
       </div>
 
       <v-btn type="submit" color="primary" block :disabled="!meta.valid">パスワード更新</v-btn>
     </Form>
-
-    <v-divider class="border-opacity-100" />
-
-    <v-btn type="submit" color="error" block class="mt-5">退会</v-btn>
   </div>
 </template>
 
@@ -126,11 +121,8 @@ const schema = yup.object({
 });
 
 const passwordSchema = yup.object({
-  password: yup.string().min(6, '6文字以上で入力してください').required('必須項目です'),
-  confirmPassword: yup
-    .string()
-    .oneOf([yup.ref('password')], 'パスワードが一致しません')
-    .required('必須項目です'),
+  oldPassword: yup.string().min(6, '6文字以上で入力してください').required('必須項目です'),
+  newPassword: yup.string().min(6, '6文字以上で入力してください').required('必須項目です'),
 });
 
 const router = useRouter();
@@ -143,8 +135,9 @@ const user = ref<IUser>({});
 const form = ref({
   name: user.value.name,
   email: user.value.email,
-  profileLink: user.value.profileLink,
-  password: '',
+  profileLink: user.value.profileLink || null,
+  oldPassword: '',
+  newPassword: '',
 });
 
 interface IUser {
@@ -172,6 +165,38 @@ async function fetchUser() {
   form.value.profileLink = data.profileLink;
 }
 
-async function update() {}
-async function updatePassword() {}
+async function update() {
+  if (confirm('ユーザー情報を更新しますか？')) {
+    try {
+      // 空文字列をnullに変換
+      if (form.value.profileLink === '') {
+        form.value.profileLink = null;
+      }
+
+      await $api.put('/users/me', {
+        name: form.value.name,
+        email: form.value.email,
+        profileLink: form.value.profileLink,
+      });
+      router.go(0);
+    } catch (err) {
+      alert(err.response.data.error);
+    }
+  }
+}
+async function updatePassword() {
+  if (confirm('パスワードを更新しますか？')) {
+    try {
+      const response = await $api.patch('/users/me/password', {
+        oldPassword: form.value.oldPassword,
+        newPassword: form.value.newPassword,
+      });
+      console.log(response);
+      // router.go(0);
+    } catch (err) {
+      console.log(err);
+      alert(err.response.data.error);
+    }
+  }
+}
 </script>
