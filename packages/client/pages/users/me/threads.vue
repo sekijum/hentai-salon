@@ -4,7 +4,7 @@
 
     <Menu :items="menuItems" />
 
-    <ThreadList :items="threads" :isInfiniteScroll="true" queryCriteria="owner" />
+    <ThreadList v-if="threads.length" queryCriteria="owner" :items="threads" :isInfiniteScroll="true" />
   </div>
 </template>
 
@@ -17,6 +17,7 @@ const router = useRouter();
 const route = useRoute();
 const nuxtApp = useNuxtApp();
 const { $api } = nuxtApp;
+const { getThreadViewHistory } = useStorage();
 
 const menuItems = [
   { title: 'ユーザー情報', clicked: () => router.push('/users/me'), icon: 'mdi-update' },
@@ -31,12 +32,14 @@ onMounted(async () => {
 });
 
 async function fetchThreads() {
-  const { data } = await $api.get<{ threadsByOwner: IThread[] }>('/threads/', {
+  const response = await $api.get<IThread[]>('/threads/', {
     params: {
-      queryCriteria: ['owner'],
+      queryCriteria: 'owner',
+      threadIds: getThreadViewHistory(),
       limit: 10,
     },
   });
-  threads.value = data.threadsByOwner;
+  console.log(response);
+  threads.value = response.data;
 }
 </script>

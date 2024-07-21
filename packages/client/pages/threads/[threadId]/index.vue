@@ -34,7 +34,7 @@
       </v-btn>
     </template>
     <template v-else>
-      <CommentForm @submit="fetchThread" :showReplyForm="true" />
+      <CommentForm @submit="fetchThread" :showReplyForm="true" :threadId="thread.id" />
 
       <v-divider />
 
@@ -47,7 +47,7 @@
       />
       <div id="comment-bottom" />
 
-      <CommentForm @submit="fetchThread" :showReplyForm="true" />
+      <CommentForm @submit="fetchThread" :showReplyForm="true" :threadId="thread.id" />
 
       <v-btn icon large color="primary" class="fab fab-top" @click="scrollToCommentTop">
         <v-icon>mdi-arrow-up</v-icon>

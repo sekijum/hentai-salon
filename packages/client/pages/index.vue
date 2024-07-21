@@ -7,7 +7,7 @@
       class="small-text text-center"
     />
 
-    <Menu :items="menuItems" />
+    <Menu :items="guestMenuItems" />
 
     <ThreadList
       v-if="threads.threadsByHistory.length"
@@ -57,19 +57,41 @@ const threads = ref<{
   threadsByHistory: [],
 });
 
-const menuItems = [
-  { title: 'スレ一覧', clicked: () => router.push('/threads'), icon: 'mdi-new-box' },
-  { title: '板一覧', clicked: () => router.push('/boards'), icon: 'mdi-format-list-bulleted' },
-  { title: '設定', clicked: () => router.push('/setting'), icon: 'mdi-cog' },
-  { title: 'サインイン', clicked: () => router.push('/signin'), icon: 'mdi-login' },
-  { title: 'サインアップ', clicked: () => router.push('/signup'), icon: 'mdi-account-plus' },
-  { title: 'サインアウト', clicked: () => router.push('/signup'), icon: 'mdi-logout' },
-  { title: 'スレ作成', clicked: () => router.push('/threads/new'), icon: 'mdi-forum' },
-  { title: '板作成', clicked: () => router.push('/boards/new'), icon: 'mdi-forum' },
-  { title: '管理者画面', clicked: () => router.push('/admin'), icon: 'mdi-forum' },
-  { title: 'メニュー', clicked: () => (isMenuModal.value = true), icon: 'mdi-forum' },
-  { title: 'adminer', clicked: () => open('http://localhost:8081', '_blank'), icon: 'mdi-forum' },
-];
+const guestMenuItems = computed(() => {
+  let items: { title: string; clicked: () => any; icon: string }[] = [
+    { title: 'スレ一覧', clicked: () => router.push('/threads'), icon: 'mdi-new-box' },
+    { title: '板一覧', clicked: () => router.push('/boards'), icon: 'mdi-format-list-bulleted' },
+    { title: '設定', clicked: () => router.push('/setting'), icon: 'mdi-cog' },
+    { title: 'メニュー', clicked: () => (isMenuModal.value = true), icon: 'mdi-forum' },
+  ];
+
+  if (!payload.isLoggedIn) {
+    items = items.concat([
+      { title: 'サインイン', clicked: () => router.push('/signin'), icon: 'mdi-login' },
+      { title: 'サインアップ', clicked: () => router.push('/signup'), icon: 'mdi-account-plus' },
+    ]);
+  }
+
+  if (payload.isMember || payload.isAdmin) {
+    items = items.concat([
+      { title: 'スレ作成', clicked: () => router.push('/threads/new'), icon: 'mdi-forum' },
+      { title: 'ユーザー情報', clicked: () => router.push('/users/me'), icon: 'mdi-update' },
+      { title: 'マイスレ', clicked: () => router.push('/users/me/threads'), icon: 'mdi-new-box' },
+      { title: 'マイレス', clicked: () => router.push('/users/me/comments'), icon: 'mdi-format-list-bulleted' },
+    ]);
+  }
+
+  if (payload.isAdmin) {
+    items = items.concat([
+      { title: '板作成', clicked: () => router.push('/boards/new'), icon: 'mdi-forum' },
+      { title: 'adminer', clicked: () => open('http://localhost:8081', '_blank'), icon: 'mdi-forum' },
+    ]);
+  }
+
+  return items;
+});
+
+console.log(payload);
 
 onMounted(async () => {
   await fetchThreads();

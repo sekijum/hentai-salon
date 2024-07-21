@@ -25,6 +25,10 @@ func (ds *ThreadCommentDatasource) FindAllByUserID(params ThreadCommentDatasourc
 	comments, err := ds.client.ThreadComment.
 		Query().
 		Where(threadcomment.UserID(params.UserID)).
+		WithReplies().
+		WithAttachments().
+		WithThread().
+		WithAuthor().
 		Limit(params.Limit).
 		Offset(params.Offset).
 		All(params.Ctx)
@@ -69,8 +73,9 @@ func (ds *ThreadCommentDatasource) FindAllByUserID(params ThreadCommentDatasourc
 		}
 
 		modelThreadCommentList = append(modelThreadCommentList, &model.ThreadComment{
-			EntThreadComment: comment,
-			ReplyCount:       replyCount,
+			EntThreadComment:           comment,
+			ReplyCount:                 replyCount,
+			ThreadCommentReplyCountMap: threadCommentReplyCountMap,
 		})
 	}
 

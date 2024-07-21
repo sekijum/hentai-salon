@@ -94,7 +94,7 @@ interface FormState {
   attachments: Attachment[];
 }
 
-const props = defineProps<{ title?: string; parentCommentId?: number; showReplyForm?: boolean }>();
+const props = defineProps<{ title?: string; parentCommentId?: number; showReplyForm?: boolean; threadId: number }>();
 
 const nuxtApp = useNuxtApp();
 const router = useRouter();
@@ -184,12 +184,12 @@ async function submit(): Promise<void> {
       }
 
       if (props.parentCommentId) {
-        await $api.post(`/threads/${route.params.threadId}/comments/${props.parentCommentId}/reply`, {
+        await $api.post(`/threads/${props.threadId}/comments/${props.parentCommentId}/reply`, {
           ...form.value,
           parentCommentId: props.parentCommentId,
         });
       } else {
-        await $api.post(`/threads/${route.params.threadId}/comments/`, form.value);
+        await $api.post(`/threads/${props.threadId}/comments/`, form.value);
       }
       if (!payload.isLoggedIn) setLastCommentTime();
       snackbar.value.isSnackbar = true;

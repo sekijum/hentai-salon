@@ -99,6 +99,7 @@
       </div>
       <div v-if="showReplyForm" class="reply-form">
         <CommentForm
+          :threadId="threadId"
           :title="'返信 >> ' + comment.id"
           :parentCommentId="comment.id"
           @submit="

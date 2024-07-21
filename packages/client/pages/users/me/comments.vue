@@ -6,8 +6,14 @@
 
     <v-infinite-scroll height="100%" :items="comments" :onLoad="loadComment">
       <template v-for="comment in comments?.data" :key="comment.id">
-        <CommentItem :comment="comment" :commentLimit="commentLimit" :threadId="0" />
+        <CommentItem
+          :comment="comment"
+          :commentLimit="commentLimit"
+          :threadId="comment.thread.id"
+          @replied="fetchComments"
+        />
       </template>
+      <template v-slot:empty>これ以上ありません</template>
     </v-infinite-scroll>
   </div>
 </template>
@@ -45,17 +51,21 @@ async function loadComment({ done }: { done: (status: 'loading' | 'error' | 'emp
 }
 
 async function fetchComments(offset: number = 0) {
-  const { data } = await $api.get<IListResource<IThreadComment>>('/users/me/comments', {
+  const response = await $api.get<IListResource<IThreadComment>>('/users/me/comments', {
     params: { offset, limit: commentLimit },
   });
-  if (offset) {
-    data.data?.map(comment => {
-      comments.value?.data.push(comment);
-    });
-  } else {
-    comments.value = data;
+
+  console.log(response);
+  if (!response.data.data || response.data.data.length > commentLimit) {
+    return { canNextLoad: false };
   }
 
-  return { canNextLoad: data.data ? data.data.length >= commentLimit : false };
+  if (offset) {
+    response.data.data.map(item => comments.value?.data.push(item));
+  } else {
+    comments.value = response.data;
+  }
+
+  return { canNextLoad: true };
 }
 </script>

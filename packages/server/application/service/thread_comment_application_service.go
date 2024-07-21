@@ -39,6 +39,7 @@ func (svc *ThreadCommentApplicationService) FindAllByUserID(params ThreadComment
 	for _, comment := range comments {
 		threadCommentResourceList = append(threadCommentResourceList, resource.NewThreadCommentResource(resource.NewThreadCommentResourceParams{
 			ThreadComment: comment,
+			ReplyCount:    comment.ReplyCount,
 		}))
 	}
 
