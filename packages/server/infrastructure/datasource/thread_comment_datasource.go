@@ -114,7 +114,27 @@ func (ds *ThreadCommentDatasource) FindByID(params ThreadCommentDatasourceFindBy
 		return nil, err
 	}
 
-	return &model.ThreadComment{EntThreadComment: comment, ReplyCount: replyCount}, nil
+	replyIDs := make([]int, 0)
+	for _, reply := range comment.Edges.Replies {
+		replyIDs = append(replyIDs, reply.ID)
+	}
+
+	var threadCommentReplyCountList []ThreadCommentReplyCount
+	err = ds.client.ThreadComment.Query().
+		Where(threadcomment.ParentCommentIDIn(replyIDs...)).
+		GroupBy(threadcomment.FieldParentCommentID).
+		Aggregate(ent.Count()).
+		Scan(params.Ctx, &threadCommentReplyCountList)
+	if err != nil {
+		return nil, err
+	}
+
+	threadCommentReplyCountMap := make(map[int]int)
+	for _, count := range threadCommentReplyCountList {
+		threadCommentReplyCountMap[count.ParentCommentID] = count.Count
+	}
+
+	return &model.ThreadComment{EntThreadComment: comment, ReplyCount: replyCount, ThreadCommentReplyCountMap: threadCommentReplyCountMap}, nil
 }
 
 type ThreadCommentDatasourceCreateParams struct {

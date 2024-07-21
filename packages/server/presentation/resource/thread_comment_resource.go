@@ -83,10 +83,16 @@ func NewThreadCommentResource(params NewThreadCommentResourceParams) *ThreadComm
 
 	var replies []*ThreadCommentResource
 	for i, reply := range params.ThreadComment.EntThreadComment.Edges.Replies {
+		commentReplyCount := 0
+		if count, ok := params.ThreadComment.ThreadCommentReplyCountMap[reply.ID]; ok {
+			commentReplyCount = count
+		}
+
 		commentResource := NewThreadCommentResource(NewThreadCommentResourceParams{
 			ThreadComment: &model.ThreadComment{EntThreadComment: reply},
 			Offset:        params.Offset,
 			IDx:           &i,
+			ReplyCount:    commentReplyCount,
 		})
 		replies = append(replies, commentResource)
 	}

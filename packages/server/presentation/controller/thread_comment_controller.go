@@ -130,7 +130,10 @@ func (ctrl *ThreadCommentController) Reply(ctx *gin.Context) {
 		return
 	}
 
-	userID, _ := ctx.Get("userID")
+	userID, exists := ctx.Get("userID")
+	if !exists {
+		userID = 0
+	}
 
 	dto, err := ctrl.threadCommentApplicationService.Create(service.ThreadCommentApplicationServiceCreateParams{
 		Ctx:             ctx.Request.Context(),

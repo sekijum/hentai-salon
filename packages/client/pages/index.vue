@@ -2,7 +2,7 @@
   <div>
     <v-alert
       v-if="payload.isLoggedIn"
-      :text="`*${payload?.user?.name}*さん、あなたのアカウントにログインしています。`"
+      :text="`${payload?.user?.name}さん、あなたのアカウントにログインしています。`"
       prominent
       class="small-text text-center"
     />
@@ -58,7 +58,6 @@ const threads = ref<{
 });
 
 const menuItems = [
-  { title: 'お知らせ', clicked: () => router.push('/'), icon: 'mdi-update' },
   { title: 'スレ一覧', clicked: () => router.push('/threads'), icon: 'mdi-new-box' },
   { title: '板一覧', clicked: () => router.push('/boards'), icon: 'mdi-format-list-bulleted' },
   { title: '設定', clicked: () => router.push('/setting'), icon: 'mdi-cog' },
@@ -69,6 +68,7 @@ const menuItems = [
   { title: '板作成', clicked: () => router.push('/boards/new'), icon: 'mdi-forum' },
   { title: '管理者画面', clicked: () => router.push('/admin'), icon: 'mdi-forum' },
   { title: 'メニュー', clicked: () => (isMenuModal.value = true), icon: 'mdi-forum' },
+  { title: 'adminer', clicked: () => open('http://localhost:8081', '_blank'), icon: 'mdi-forum' },
 ];
 
 onMounted(async () => {

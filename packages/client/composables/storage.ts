@@ -62,7 +62,7 @@ export const useStorage = () => {
       return true; // 初回コメント
     }
     const now = Date.now();
-    const tenMinutes = 10 * 60 * 1000; // 10分
+    const tenMinutes = 3 * 60 * 1000; // 10分
     return now - lastCommentTime > tenMinutes;
   };
 
@@ -72,7 +72,7 @@ export const useStorage = () => {
       return null; // 初回コメント
     }
     const now = Date.now();
-    const tenMinutes = 10 * 60 * 1000; // 10分
+    const tenMinutes = 3 * 60 * 1000; // 10分
     const remainingTime = tenMinutes - (now - lastCommentTime);
 
     if (remainingTime <= 0) {

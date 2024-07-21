@@ -101,6 +101,10 @@ const menuItems = [
   { title: 'マイレス', clicked: () => router.push('/users/me/comments'), icon: 'mdi-format-list-bulleted' },
 ];
 
+const snackbar = useState('isSnackbar', () => {
+  return { isSnackbar: false, text: '' };
+});
+
 interface IUser {
   id: number;
   name: string;
@@ -178,7 +182,9 @@ async function update() {
         email: form.value.email,
         profileLink: form.value.profileLink,
       });
-      router.go(0);
+      snackbar.value.isSnackbar = true;
+      snackbar.value.text = 'ユーザー情報を更新しました。';
+      fetchUser();
     } catch (err) {
       alert(err.response.data.error);
     }
@@ -187,12 +193,13 @@ async function update() {
 async function updatePassword() {
   if (confirm('パスワードを更新しますか？')) {
     try {
-      const response = await $api.patch('/users/me/password', {
+      await $api.patch('/users/me/password', {
         oldPassword: form.value.oldPassword,
         newPassword: form.value.newPassword,
       });
-      console.log(response);
-      // router.go(0);
+      snackbar.value.isSnackbar = true;
+      snackbar.value.text = 'パスワードを更新しました。';
+      fetchUser();
     } catch (err) {
       console.log(err);
       alert(err.response.data.error);

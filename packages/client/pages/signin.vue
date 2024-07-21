@@ -9,35 +9,33 @@
     <br />
 
     <Form @submit="submit" :validation-schema="schema" class="mx-2 mb-2" v-slot="{ meta, errors }">
-      <div class="field">
-        <Field name="email" v-slot="{ field, errorMessage }">
+      <div class="field mb-2">
+        <Field name="email" v-model="form.email" v-slot="{ errors }">
           <v-text-field
             v-model="form.email"
-            v-bind="field"
             label="メールアドレス"
             type="email"
             variant="outlined"
             density="compact"
-            :error-messages="errorMessage ? [errorMessage] : []"
+            :error-messages="errors"
           />
         </Field>
       </div>
 
-      <div class="field">
-        <Field name="password" v-slot="{ field, errorMessage }">
+      <div class="field mb-2">
+        <Field name="password" v-model="form.password" v-slot="{ errors }">
           <v-text-field
             v-model="form.password"
-            v-bind="field"
             label="パスワード"
             type="password"
             variant="outlined"
             density="compact"
-            :error-messages="errorMessage ? [errorMessage] : []"
+            :error-messages="errors"
           />
         </Field>
       </div>
 
-      <v-btn type="submit" color="primary" block :disabled="!meta.valid" class="mt-5">サインイン</v-btn>
+      <v-btn type="submit" color="primary" block :disabled="!meta.valid">サインイン</v-btn>
     </Form>
   </div>
 </template>
@@ -52,6 +50,10 @@ const nuxtApp = useNuxtApp();
 const router = useRouter();
 
 const { $storage, $api } = nuxtApp;
+
+const snackbar = useState('isSnackbar', () => {
+  return { isSnackbar: false, text: '' };
+});
 
 const form = ref({
   email: '',
@@ -76,7 +78,8 @@ async function submit() {
     const authHeader = response.headers.authorization;
     const token = authHeader.split(' ')[1];
     $storage.setItem('access_token', token);
-    alert('サインインしました。');
+    snackbar.value.isSnackbar = true;
+    snackbar.value.text = 'サインインしました。';
     router.push('/');
   } catch (err) {
     alert(err.response.data.error);

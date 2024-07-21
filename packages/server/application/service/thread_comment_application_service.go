@@ -73,6 +73,7 @@ func (svc *ThreadCommentApplicationService) FindByID(params ThreadCommentApplica
 		ThreadComment: comment,
 		Limit:         params.Qs.Limit,
 		Offset:        params.Qs.Offset,
+		ReplyCount:    comment.ReplyCount,
 	})
 
 	return dto, nil

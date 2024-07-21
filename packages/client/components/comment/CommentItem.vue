@@ -152,8 +152,8 @@ function closeModalMedia() {
 }
 
 function username() {
-  const name = props.comment?.user?.name || props.comment?.guestName || '名無し';
-  return `*${name}*`;
+  const name = props.comment?.user?.name || props.comment?.guestName || '匿名';
+  return `${name}`;
 }
 
 function toParentComment(parentCommentIdx: number): {

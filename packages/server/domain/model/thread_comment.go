@@ -5,8 +5,9 @@ import (
 )
 
 type ThreadComment struct {
-	EntThreadComment *ent.ThreadComment
-	ReplyCount       int
+	EntThreadComment           *ent.ThreadComment
+	ReplyCount                 int
+	ThreadCommentReplyCountMap map[int]int // リプライ毎のリプライ数
 }
 
 type ThreadCommentStatus int

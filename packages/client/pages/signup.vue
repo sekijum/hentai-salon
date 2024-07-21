@@ -9,71 +9,67 @@
     <br />
 
     <Form @submit="submit" :validation-schema="schema" class="mx-2 mb-2" v-slot="{ meta, errors }">
-      <div class="field">
-        <Field name="name" v-slot="{ field, errorMessage }">
+      <div class="field mb-2">
+        <Field name="name" v-model="form.name" v-slot="{ errors }">
           <v-text-field
             v-model="form.name"
-            v-bind="field"
             label="名前(コメントの表示名になります)"
             type="text"
             variant="outlined"
             density="compact"
-            :error-messages="errorMessage ? [errorMessage] : []"
+            :error-messages="errors"
           />
         </Field>
       </div>
 
-      <div class="field">
-        <Field name="email" v-slot="{ field, errorMessage }">
+      <div class="field mb-2">
+        <Field name="email" v-model="form.email" v-slot="{ errors }">
           <v-text-field
             v-model="form.email"
-            v-bind="field"
             label="メールアドレス"
             type="email"
             variant="outlined"
             density="compact"
-            :error-messages="errorMessage ? [errorMessage] : []"
+            :error-messages="errors"
           />
         </Field>
       </div>
 
-      <div class="field">
-        <Field name="password" v-slot="{ field, errorMessage }">
+      <div class="field mb-2">
+        <Field name="password" v-model="form.password" v-slot="{ errors }">
           <v-text-field
             v-model="form.password"
-            v-bind="field"
             label="パスワード"
             type="password"
             variant="outlined"
             density="compact"
-            :error-messages="errorMessage ? [errorMessage] : []"
+            :error-messages="errors"
           />
         </Field>
       </div>
 
-      <div class="field">
-        <Field name="confirmPassword" v-slot="{ field, errorMessage }">
+      <div class="field mb-2">
+        <Field name="confirmPassword" v-model="form.confirmPassword" v-slot="{ errors }">
           <v-text-field
-            v-bind="field"
+            v-model="form.confirmPassword"
             label="パスワード確認"
             type="password"
             variant="outlined"
             density="compact"
-            :error-messages="errorMessage ? [errorMessage] : []"
+            :error-messages="errors"
           />
         </Field>
       </div>
 
-      <div class="field">
-        <Field name="profileLink" v-slot="{ field, errorMessage }">
+      <div class="field mb-2">
+        <Field name="profileLink" v-model="form.profileLink" v-slot="{ errors }">
           <v-text-field
             v-model="form.profileLink"
-            v-bind="field"
             label="プロフィールリンク"
             type="url"
             variant="outlined"
             density="compact"
-            :error-messages="errorMessage ? [errorMessage] : []"
+            :error-messages="errors"
           />
         </Field>
       </div>
@@ -92,7 +88,7 @@
         />
       </div> -->
 
-      <v-btn type="submit" color="primary" block :disabled="!meta.valid" class="mt-5">サインアップ</v-btn>
+      <v-btn type="submit" color="primary" block :disabled="!meta.valid">サインアップ</v-btn>
     </Form>
   </div>
 </template>
@@ -111,10 +107,15 @@ const { $storage, $api } = nuxtApp;
 
 const avatarFile = ref<File>();
 
+const snackbar = useState('isSnackbar', () => {
+  return { isSnackbar: false, text: '' };
+});
+
 const form = ref({
   name: '',
   email: '',
   password: '',
+  confirmPassword: '',
   avatarUrl: null as null | string,
   profileLink: '' as null | string,
 });
@@ -132,7 +133,7 @@ const schema = yup.object({
     .string()
     .oneOf([yup.ref('password')], 'パスワードが一致しません')
     .required('必須項目です'),
-  profileLink: yup.string().url('有効なURLを入力してください').nullable(),
+  profileLink: yup.string().url('有効なURLを入力してください').optional(),
 });
 
 function handleAvatarChange(event: Event) {
@@ -160,7 +161,8 @@ async function submit() {
     const authHeader = response.headers.authorization;
     const token = authHeader.split(' ')[1];
     $storage.setItem('access_token', token);
-    alert('サインアップしました。');
+    snackbar.value.isSnackbar = true;
+    snackbar.value.text = 'サインアップしました。';
     router.push('/');
   } catch (err) {
     alert(err.response.data.error);
