@@ -26,7 +26,6 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 
 	r.GET("/tags/name", controllers.TagController.FindNameList)
 	r.GET("/boards", controllers.BoardController.FindAll)
-	r.GET("/users/:userID", controllers.UserController.FindByID)
 	r.POST("/files/urls-for-upload", controllers.StorageController.GeneratePresignedURLs)
 
 	threadGroup := r.Group("/threads")
@@ -52,6 +51,7 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 
 		usersGroup := authGroup.Group("/users")
 		{
+			usersGroup.GET("/:userID", controllers.UserController.FindByID)
 			usersGroup.GET("/me", controllers.UserController.FindAuthenticatedUser)
 			usersGroup.GET("/me/comments", controllers.ThreadCommentController.FindAllByUserID)
 			usersGroup.PUT("/me", controllers.UserController.Update)
