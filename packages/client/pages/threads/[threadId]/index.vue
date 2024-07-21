@@ -34,15 +34,20 @@
       </v-btn>
     </template>
     <template v-else>
-      <CommentForm />
+      <CommentForm @submit="fetchThread" :showReplyForm="true" />
 
       <v-divider />
 
       <div id="comment-top" />
-      <CommentList :comments="thread?.comments.data" :commentLimit="commentLimit" :threadId="thread.id" />
+      <CommentList
+        :comments="thread?.comments.data"
+        :commentLimit="commentLimit"
+        :threadId="thread.id"
+        @replied="fetchThread"
+      />
       <div id="comment-bottom" />
 
-      <CommentForm />
+      <CommentForm @submit="fetchThread" :showReplyForm="true" />
 
       <v-btn icon large color="primary" class="fab fab-top" @click="scrollToCommentTop">
         <v-icon>mdi-arrow-up</v-icon>
@@ -56,6 +61,7 @@
     <v-divider />
 
     <Pagination :totalCount="thread.comments.totalCount" :limit="commentLimit" />
+
     <ThreadList
       v-if="threads.threadsByRelated.length"
       queryCriteria="related"
@@ -64,8 +70,6 @@
       :isInfiniteScroll="true"
     />
   </div>
-
-  <OverlayLoagind :isLoading="isLoading" title="読込中" />
 </template>
 
 <script setup lang="ts">
@@ -74,7 +78,6 @@ import CommentForm from '~/components/comment/CommentForm.vue';
 import Menu from '~/components/Menu.vue';
 import PageTitle from '~/components/PageTitle.vue';
 import Pagination from '~/components/Pagination.vue';
-import OverlayLoagind from '~/components/OverlayLoagind.vue';
 import MediaGallery from '~/components/MediaGallery.vue';
 import ThreadList from '~/components/thread/ThreadList.vue';
 import type { IThread } from '~/types/thread';
@@ -86,8 +89,11 @@ const { setThreadViewHistory, getThreadViewHistory, getCommentLimit, getCommentS
 
 const { $api } = nuxtApp;
 
+const snackbar = useState('isSnackbar', () => {
+  return { isSnackbar: false, text: '' };
+});
+
 const commentLimit = getCommentLimit();
-const isLoading = ref(true);
 const thread = ref<IThread>();
 
 const threads = ref<{
@@ -144,7 +150,6 @@ onMounted(async () => {
 });
 
 async function fetchThread() {
-  isLoading.value = true;
   const threadId = route.params.threadId;
   const response = await $api.get<IThread>(`/threads/${threadId}`, {
     params: {
@@ -154,7 +159,6 @@ async function fetchThread() {
     },
   });
   thread.value = response.data;
-  isLoading.value = false;
 }
 
 async function fetchThreads() {

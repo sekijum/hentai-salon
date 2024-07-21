@@ -22,9 +22,6 @@ const isMenuModal = useState('isMenuModal', () => false);
 
 const router = useRouter();
 const route = useRoute();
-const nuxtApp = useNuxtApp();
-
-const { payload } = nuxtApp;
 
 const menuItems = [
   { title: 'お知らせ', clicked: () => router.push('/'), icon: 'mdi-update' },

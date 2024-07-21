@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="showReplyForm">
     <p class="form-title">{{ title ?? '書き込み' }}</p>
 
     <Form @submit="submit" :validation-schema="schema" v-slot="{ meta }">
@@ -16,7 +16,7 @@
             dense
             density="compact"
             :error-messages="errors"
-            :disabled="payload.isLoggedIn"
+            :readonly="payload.isLoggedIn"
           />
         </Field>
       </div>
@@ -75,15 +75,12 @@
 
       <p class="note">＊書き込み反映には時間が掛かる場合があります＊</p>
     </Form>
-
-    <OverlayLoagind :isLoading="isLoading" title="書き込み中" />
   </div>
 </template>
 
 <script setup lang="ts">
 import * as yup from 'yup';
 import { Form, Field } from 'vee-validate';
-import OverlayLoagind from '~/components/OverlayLoagind.vue';
 
 interface Attachment {
   url: string;
@@ -97,7 +94,7 @@ interface FormState {
   attachments: Attachment[];
 }
 
-const props = defineProps<{ title?: string; parentCommentId?: number }>();
+const props = defineProps<{ title?: string; parentCommentId?: number; showReplyForm?: boolean }>();
 
 const nuxtApp = useNuxtApp();
 const router = useRouter();
@@ -108,10 +105,15 @@ const { setLastCommentTime, canComment, timeUntilNextComment } = useStorage();
 const { $api, payload } = nuxtApp;
 
 const fileInput = ref<InstanceType<typeof HTMLInputElement>>();
-const isLoading = ref(false);
 const attachmentFiles = ref<File[] | null>(null);
 const canCommentState = ref(canComment());
 const remainingTime = ref<{ minutes: number; seconds: number } | null>(null);
+
+const emit = defineEmits(['submit']);
+
+const snackbar = useState('isSnackbar', () => {
+  return { isSnackbar: false, text: '' };
+});
 
 const form = ref<FormState>({
   guestName: payload.isLoggedIn ? payload?.user?.name || '' : '',
@@ -175,7 +177,6 @@ function handleAttachmentsChange(event: Event): void {
 
 async function submit(): Promise<void> {
   if (confirm('本当に書き込みますか？')) {
-    isLoading.value = true;
     try {
       if (attachmentFiles.value && attachmentFiles.value.length > 0) {
         const uploadedAttachments = await uploadFilesToImgur(attachmentFiles.value);
@@ -187,17 +188,21 @@ async function submit(): Promise<void> {
           ...form.value,
           parentCommentId: props.parentCommentId,
         });
-        alert('返信に成功しました。');
       } else {
         await $api.post(`/threads/${route.params.threadId}/comments/`, form.value);
-        alert('書き込みに成功しました。');
       }
       if (!payload.isLoggedIn) setLastCommentTime();
-      router.go(0);
+      snackbar.value.isSnackbar = true;
+      snackbar.value.text = '書き込みに成功しました。';
+      form.value.content = '';
+      attachmentFiles.value = null;
+      if (fileInput.value) {
+        fileInput.value.value = '';
+      }
+      emit('submit');
     } catch (error) {
       alert('書き込み中にエラーが発生しました。');
     }
-    isLoading.value = false;
   }
 }
 

@@ -5,12 +5,14 @@
     <main><NuxtPage /></main>
 
     <MenuModal />
+    <Snackbar />
   </v-app>
 </template>
 
 <script setup lang="ts">
-import MenuModal from '~/components/MenuModal.vue';
 import Header from '~/components/Header.vue';
+import MenuModal from '~/components/MenuModal.vue';
+import Snackbar from '~/components/Snackbar.vue';
 </script>
 
 <style scoped>

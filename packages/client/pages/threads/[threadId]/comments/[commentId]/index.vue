@@ -16,6 +16,7 @@
       :comments="threadComment?.replies.data"
       :commentLimit="commentLimit"
       :threadId="threadComment.thread.id"
+      @replied="fetchComment"
     />
     <div id="comment-bottom" />
 
@@ -31,31 +32,20 @@
 
     <v-divider />
 
-    <!-- <Pagination :totalCount="threadComment.replies.totalReplies" :limit="commentLimit" /> -->
     <ThreadList
-      title="人気"
-      :items="threadsByPopular"
-      :clicked="() => router.push({ path: '/threads' })"
-      :isInfiniteScroll="false"
-    />
-    <ThreadList
-      title="閲覧履歴"
-      :items="threadsByHistory"
-      :clicked="() => router.push({ path: '/threads', query: { queryCriteria: ['history'] } })"
+      v-if="threads.threadsByRelated.length"
+      queryCriteria="related"
+      title="関連"
+      :items="threads?.threadsByRelated"
+      :isInfiniteScroll="true"
     />
   </div>
-
-  <OverlayLoagind :isLoading="isLoading" title="読込中" />
 </template>
 
 <script setup lang="ts">
 import CommentList from '~/components/comment/CommentList.vue';
-import CommentForm from '~/components/comment/CommentForm.vue';
-import Menu from '~/components/Menu.vue';
 import PageTitle from '~/components/PageTitle.vue';
 import Pagination from '~/components/Pagination.vue';
-import OverlayLoagind from '~/components/OverlayLoagind.vue';
-import MediaGallery from '~/components/MediaGallery.vue';
 import ThreadList from '~/components/thread/ThreadList.vue';
 import type { IThread } from '~/types/thread';
 import type { IThreadComment } from '~/types/thread-comment';
@@ -63,28 +53,18 @@ import type { IThreadComment } from '~/types/thread-comment';
 const router = useRouter();
 const route = useRoute();
 const nuxtApp = useNuxtApp();
-const { setThreadViewHistory, getThreadViewHistory } = useStorage();
+const { getThreadViewHistory, getCommentLimit } = useStorage();
 
 const { $api } = nuxtApp;
 
-const commentLimit = 100;
-const isLoading = ref(true);
-const threadsByHistory = ref<IThread[]>([]);
-const threadsByPopular = ref<IThread[]>([]);
+const commentLimit = getCommentLimit();
 const threadComment = ref<IThreadComment>();
 
-const menuItems = [
-  {
-    title: 'コメント一覧',
-    clicked: () => router.replace({ query: {} }),
-    icon: 'mdi-fire',
-  },
-  {
-    title: 'メディア',
-    clicked: () => router.replace({ query: { tab: 'media' } }),
-    icon: 'mdi-update',
-  },
-];
+const threads = ref<{
+  threadsByRelated: IThread[];
+}>({
+  threadsByRelated: [],
+});
 
 function scrollToCommentTop() {
   const commentTop = document.getElementById('comment-top');
@@ -106,7 +86,6 @@ onMounted(async () => {
 });
 
 async function fetchComment() {
-  isLoading.value = true;
   const threadId = route.params.threadId;
   const commentId = route.params.commentId;
   const response = await $api.get<IThreadComment>(`/threads/${threadId}/comments/${commentId}`, {
@@ -116,23 +95,23 @@ async function fetchComment() {
     },
   });
   threadComment.value = response.data;
-  isLoading.value = false;
 }
 
 async function fetchThreads() {
-  const queryCriteria = ['popularity'];
-  if (getThreadViewHistory().length) {
-    queryCriteria.push('history');
-  }
-  const response = await $api.get<{ threadsByHistory: IThread[]; threadsByPopular: IThread[] }>('/threads/', {
-    params: {
-      queryCriteria: queryCriteria,
-      threadIds: getThreadViewHistory(),
-      limit: 10,
-    },
-  });
-  threadsByHistory.value = response.data.threadsByHistory;
-  threadsByPopular.value = response.data.threadsByPopular;
+  await Promise.all(
+    ['related'].map(async queryCriteria => {
+      const response = await $api.get<IThread[]>('/threads/', {
+        params: {
+          queryCriteria,
+          threadIds: getThreadViewHistory(),
+          limit: 10,
+        },
+      });
+      if (queryCriteria === 'related') {
+        threads.value.threadsByRelated = response.data;
+      }
+    }),
+  );
 }
 
 watchEffect(() => {

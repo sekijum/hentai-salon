@@ -98,7 +98,17 @@
         </v-row>
       </div>
       <div v-if="showReplyForm" class="reply-form">
-        <CommentForm :title="'返信 >> ' + comment.id" :parentCommentId="comment.id" />
+        <CommentForm
+          :title="'返信 >> ' + comment.id"
+          :parentCommentId="comment.id"
+          @submit="
+            () => {
+              toggleReplyForm();
+              emit('replied');
+            }
+          "
+          :showReplyForm="showReplyForm"
+        />
       </div>
     </v-list-item>
     <v-divider />
@@ -127,6 +137,7 @@ const { $formatDate, payload } = nuxtApp;
 
 const selectedAttachment = ref<IThreadCommentAttachment | null>();
 const showReplyForm = ref(false);
+const emit = defineEmits(['replied']);
 
 function toggleReplyForm() {
   showReplyForm.value = !showReplyForm.value;
