@@ -57,15 +57,11 @@
 
     <Pagination :totalCount="thread.comments.totalCount" :limit="commentLimit" />
     <ThreadList
-      title="人気"
-      :items="threadsByPopular"
-      :clicked="() => router.push({ path: '/threads' })"
-      :isInfiniteScroll="false"
-    />
-    <ThreadList
-      title="閲覧履歴"
-      :items="threadsByHistory"
-      :clicked="() => router.push({ path: '/threads', query: { queryCriteria: 'history' } })"
+      v-if="threads.threadsByRelated.length"
+      queryCriteria="related"
+      title="関連"
+      :items="threads?.threadsByRelated"
+      :isInfiniteScroll="true"
     />
   </div>
 
@@ -93,8 +89,12 @@ const { $api } = nuxtApp;
 const commentLimit = getCommentLimit();
 const isLoading = ref(true);
 const thread = ref<IThread>();
-const threadsByHistory = ref<IThread[]>([]);
-const threadsByPopular = ref<IThread[]>([]);
+
+const threads = ref<{
+  threadsByRelated: IThread[];
+}>({
+  threadsByRelated: [],
+});
 
 const menuItems = [
   {
@@ -158,19 +158,20 @@ async function fetchThread() {
 }
 
 async function fetchThreads() {
-  const queryCriteria = ['popularity'];
-  if (getThreadViewHistory().length) {
-    queryCriteria.push('history');
-  }
-  const response = await $api.get<{ threadsByHistory: IThread[]; threadsByPopular: IThread[] }>('/threads/', {
-    params: {
-      queryCriteria: queryCriteria,
-      threadIds: getThreadViewHistory(),
-      limit: 10,
-    },
-  });
-  threadsByHistory.value = response.data.threadsByHistory;
-  threadsByPopular.value = response.data.threadsByPopular;
+  await Promise.all(
+    ['related'].map(async queryCriteria => {
+      const response = await $api.get<IThread[]>('/threads/', {
+        params: {
+          queryCriteria,
+          threadIds: getThreadViewHistory(),
+          limit: 10,
+        },
+      });
+      if (queryCriteria === 'related') {
+        threads.value.threadsByRelated = response.data;
+      }
+    }),
+  );
 }
 
 watchEffect(() => {

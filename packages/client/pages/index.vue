@@ -10,18 +10,28 @@
     <Menu :items="menuItems" />
 
     <ThreadList
+      v-if="threads.threadsByHistory.length"
+      queryCriteria="history"
       title="スレッド閲覧履歴"
-      :items="threadsByHistory"
+      :items="threads.threadsByHistory"
       :clicked="() => router.push({ path: '/threads', query: { queryCriteria: 'history' } })"
       :isInfiniteScroll="false"
     />
     <ThreadList
+      v-if="threads.threadsByPopular.length"
+      queryCriteria="popularity"
       title="人気"
-      :items="threadsByPopular"
+      :items="threads.threadsByPopular"
       :clicked="() => router.push({ path: '/threads' })"
       :isInfiniteScroll="false"
     />
-    <ThreadList title="新着" :items="threadsByNewest" :isInfiniteScroll="true" />
+    <ThreadList
+      v-if="threads.threadsByNewest.length"
+      queryCriteria="newest"
+      title="新着"
+      :items="threads.threadsByNewest"
+      :isInfiniteScroll="true"
+    />
   </div>
 </template>
 
@@ -30,12 +40,6 @@ import Menu from '~/components/Menu.vue';
 import ThreadList from '~/components/thread/ThreadList.vue';
 import type { IThread } from '~/types/thread';
 
-interface ThreadResponse {
-  threadsByPopular: IThread[];
-  threadsByNewest: IThread[];
-  threadsByHistory: IThread[];
-}
-
 const router = useRouter();
 const nuxtApp = useNuxtApp();
 const { getThreadViewHistory } = useStorage();
@@ -43,9 +47,15 @@ const isMenuModal = useState('isMenuModal', () => false);
 
 const { payload, $api } = nuxtApp;
 
-const threadsByPopular = ref<IThread[]>([]);
-const threadsByNewest = ref<IThread[]>([]);
-const threadsByHistory = ref<IThread[]>([]);
+const threads = ref<{
+  threadsByPopular: IThread[];
+  threadsByNewest: IThread[];
+  threadsByHistory: IThread[];
+}>({
+  threadsByPopular: [],
+  threadsByNewest: [],
+  threadsByHistory: [],
+});
 
 const menuItems = [
   { title: 'お知らせ', clicked: () => router.push('/'), icon: 'mdi-update' },
@@ -66,20 +76,24 @@ onMounted(async () => {
 });
 
 async function fetchThreads() {
-  const queryCriteria = ['newest', 'popularity'];
-  if (getThreadViewHistory().length) {
-    queryCriteria.push('history');
-  }
-  const response = await $api.get<ThreadResponse>('/threads/', {
-    params: {
-      queryCriteria,
-      threadIds: getThreadViewHistory(),
-      limit: 10,
-    },
-  });
-  threadsByPopular.value = response.data.threadsByPopular;
-  threadsByNewest.value = response.data.threadsByNewest;
-  threadsByHistory.value = response.data.threadsByHistory;
+  await Promise.all(
+    ['history', 'newest', 'popularity'].map(async queryCriteria => {
+      const response = await $api.get<IThread[]>('/threads/', {
+        params: {
+          queryCriteria,
+          threadIds: getThreadViewHistory(),
+          limit: 10,
+        },
+      });
+      if (queryCriteria === 'popularity') {
+        threads.value.threadsByNewest = response.data;
+      } else if (queryCriteria === 'newest') {
+        threads.value.threadsByPopular = response.data;
+      } else if (queryCriteria === 'history') {
+        threads.value.threadsByHistory = response.data;
+      }
+    }),
+  );
 }
 </script>
 

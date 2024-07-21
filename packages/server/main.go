@@ -50,11 +50,9 @@ func main() {
 
 	r.Use(cors.New(config))
 
-	r.SetTrustedProxies([]string{"127.0.0.1"})
-
 	presentation.SetupRouter(r, controllers)
 
-	if err := r.Run(":8080"); err != nil {
+	if err := r.Run("0.0.0.0:8080"); err != nil {
 		log.Fatalf("failed to run server: %v", err)
 	}
 }

@@ -34,7 +34,7 @@ func (ctrl *ThreadController) FindAllList(ctx *gin.Context) {
 	qs.Limit = ctx.GetInt("limit")
 	qs.Offset = ctx.GetInt("offset")
 
-	dto, err := ctrl.threadApplicationService.FindAllList(service.ThreadApplicationServiceFindAllListParams{
+	dto, err := ctrl.threadApplicationService.FindAll(service.ThreadApplicationServiceFindAllParams{
 		Ctx:    context.Background(),
 		Qs:     qs,
 		UserID: userID.(int),

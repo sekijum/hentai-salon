@@ -20,36 +20,49 @@
     <v-btn type="submit" color="primary" block @click="search">全板検索</v-btn>
 
     <ThreadList
-      v-if="threads?.threadsByHistory"
+      v-if="route.query.queryCriteria === 'history' && threads.threadsByHistory.length"
+      queryCriteria="history"
       title="閲覧履歴"
       :items="threads?.threadsByHistory"
       :isInfiniteScroll="true"
     />
     <ThreadList
-      v-if="threads?.threadsByPopular"
+      v-if="
+        (route.query.queryCriteria === 'popularity' || !route.query.queryCriteria) && threads.threadsByPopular.length
+      "
+      queryCriteria="popularity"
       title="人気"
       :items="threads?.threadsByPopular"
       :isInfiniteScroll="false"
     />
     <ThreadList
-      v-if="threads?.threadsByNewest"
+      v-if="(route.query.queryCriteria === 'newest' || !route.query.queryCriteria) && threads.threadsByNewest.length"
+      queryCriteria="newest"
       title="新着"
       :items="threads?.threadsByNewest"
       :isInfiniteScroll="true"
     />
     <ThreadList
-      v-if="threads?.threadsByKeyword"
+      v-if="route.query.queryCriteria === 'keyword' && threads.threadsByKeyword.length"
+      queryCriteria="keyword"
       title="全板検索"
       :items="threads?.threadsByKeyword"
       :isInfiniteScroll="true"
     />
     <ThreadList
-      v-if="threads?.threadsByRelated"
+      v-if="route.query.queryCriteria === 'related' && threads.threadsByRelated.length"
+      queryCriteria="related"
       title="関連"
       :items="threads?.threadsByRelated"
       :isInfiniteScroll="true"
     />
-    <ThreadList v-if="threads?.threadsByBoard" title="板" :items="threads?.threadsByBoard" :isInfiniteScroll="true" />
+    <ThreadList
+      v-if="route.query.queryCriteria === 'board' && threads.threadsByBoard.length"
+      queryCriteria="board"
+      title="板"
+      :items="threads?.threadsByBoard"
+      :isInfiniteScroll="true"
+    />
   </div>
 </template>
 
@@ -59,15 +72,6 @@ import Menu from '~/components/Menu.vue';
 import PageTitle from '~/components/PageTitle.vue';
 import type { IThread } from '~/types/thread';
 
-interface ThreadResponse {
-  threadsByPopular: IThread[];
-  threadsByNewest: IThread[];
-  threadsByHistory: IThread[];
-  threadsByKeyword: IThread[];
-  threadsByRelated: IThread[];
-  threadsByBoard: IThread[];
-}
-
 const route = useRoute();
 const router = useRouter();
 const nuxtApp = useNuxtApp();
@@ -76,7 +80,21 @@ const { getThreadViewHistory } = useStorage();
 const { $api } = nuxtApp;
 
 const keyword = ref(route.query.keyword ?? '');
-const threads = ref<ThreadResponse>();
+const threads = ref<{
+  threadsByPopular: IThread[];
+  threadsByNewest: IThread[];
+  threadsByHistory: IThread[];
+  threadsByKeyword: IThread[];
+  threadsByRelated: IThread[];
+  threadsByBoard: IThread[];
+}>({
+  threadsByPopular: [],
+  threadsByNewest: [],
+  threadsByHistory: [],
+  threadsByKeyword: [],
+  threadsByRelated: [],
+  threadsByBoard: [],
+});
 const threadLimit = 10;
 
 const menuItems = [
@@ -117,23 +135,49 @@ onMounted(async () => {
 });
 
 async function fetchThreads() {
-  if (route.query.boardId) {
-    await router.push({ ...{ query: { ...{ boardId: route.query.boardId }, ...{ queryCriteria: 'board' } } } });
+  if (route.query.queryCriteria) {
+    const response = await $api.get<IThread[]>('/threads/', {
+      params: {
+        queryCriteria: route.query.queryCriteria,
+        threadIds: getThreadViewHistory(),
+        keyword: keyword.value,
+        boardId: route.query.boardId,
+        limit: threadLimit,
+      },
+    });
+    if (route.query.queryCriteria === 'history') {
+      threads.value.threadsByHistory = response.data;
+    } else if (route.query.queryCriteria === 'popularity') {
+      threads.value.threadsByPopular = response.data;
+    } else if (route.query.queryCriteria === 'newest') {
+      threads.value.threadsByNewest = response.data;
+    } else if (route.query.queryCriteria === 'keyword') {
+      threads.value.threadsByKeyword = response.data;
+    } else if (route.query.queryCriteria === 'related') {
+      threads.value.threadsByRelated = response.data;
+    } else if (route.query.queryCriteria === 'board') {
+      threads.value.threadsByBoard = response.data;
+    }
+  } else {
+    await Promise.all(
+      ['newest', 'popularity'].map(async queryCriteria => {
+        const response = await $api.get<IThread[]>('/threads/', {
+          params: {
+            queryCriteria,
+            threadIds: getThreadViewHistory(),
+            keyword: keyword.value,
+            boardId: route.query.boardId,
+            limit: threadLimit,
+          },
+        });
+        if (queryCriteria === 'popularity') {
+          threads.value.threadsByPopular = response.data;
+        } else if (queryCriteria === 'newest') {
+          threads.value.threadsByNewest = response.data;
+        }
+      }),
+    );
   }
-  if (route.query.keyword) {
-    await router.push({ ...{ query: { ...{ keyword: keyword.value }, ...{ queryCriteria: 'keyword' } } } });
-  }
-
-  const response = await $api.get<ThreadResponse>('/threads/', {
-    params: {
-      queryCriteria: route.query.queryCriteria ? [route.query.queryCriteria] : ['popularity', 'newest'],
-      threadIds: getThreadViewHistory(),
-      keyword: keyword.value,
-      boardId: route.query.boardId,
-      limit: threadLimit,
-    },
-  });
-  threads.value = response.data;
 }
 
 watch(

@@ -30,6 +30,7 @@
               </v-col>
             </v-row>
           </div>
+          <template v-slot:empty>これ以上ありません</template>
         </v-infinite-scroll>
       </template>
       <template v-else>
@@ -72,11 +73,11 @@ import type { IThread } from '~/types/thread';
 const nuxtApp = useNuxtApp();
 
 const props = defineProps<{
-  title?: String;
+  title?: string;
   items: IThread[];
   clicked?: () => void;
   isInfiniteScroll?: boolean;
-  queryCriteria?: string;
+  queryCriteria: string;
 }>();
 
 const router = useRouter();
@@ -86,16 +87,7 @@ const { $api } = nuxtApp;
 const { getThreadViewHistory } = useStorage();
 const threadLimit = 10;
 const offset = ref(0);
-
-interface ThreadResponse {
-  threadsByPopular: IThread[];
-  threadsByNewest: IThread[];
-  threadsByHistory: IThread[];
-  threadsByKeyword: IThread[];
-  threadsByRelated: IThread[];
-  threadsByBoard: IThread[];
-  threadsByOwner: IThread[];
-}
+const items = ref<IThread[]>([...props.items]);
 
 function truncateTitle(title: string) {
   return title.length > 50 ? title.slice(0, 50) + '...' : title;
@@ -112,13 +104,9 @@ async function load({ done }: { done: (status: 'loading' | 'error' | 'empty' | '
 }
 
 async function fetchLoadThreads(offset: number) {
-  if (!route.query.queryCriteria) {
-    await router.push({ ...{ query: { ...route.query, ...{ queryCriteria: props.queryCriteria || 'newest' } } } });
-  }
-
-  const response = await $api.get<ThreadResponse>('/threads/', {
+  const response = await $api.get<IThread[]>('/threads/', {
     params: {
-      queryCriteria: [route.query.queryCriteria],
+      queryCriteria: props.queryCriteria,
       threadIds: getThreadViewHistory(),
       keyword: route.query.keyword,
       boardId: route.query.boardId,
@@ -126,46 +114,21 @@ async function fetchLoadThreads(offset: number) {
       offset: offset || 0,
     },
   });
-  let canNextLoad = false;
-  response.data.threadsByKeyword.map(item => {
-    canNextLoad = true;
-    props.items.push(item);
-  });
-  response.data.threadsByBoard.map(item => {
-    canNextLoad = true;
-    props.items.push(item);
-  });
-  response.data.threadsByRelated.map(item => {
-    canNextLoad = true;
-    props.items.push(item);
-  });
-  response.data.threadsByNewest.map(item => {
-    canNextLoad = true;
-    props.items.push(item);
-  });
-  response.data.threadsByHistory.map(item => {
-    canNextLoad = true;
-    props.items.push(item);
-  });
-  response.data.threadsByOwner.map(item => {
-    canNextLoad = true;
-    props.items.push(item);
-  });
 
-  return {
-    canNextLoad:
-      response.data.threadsByKeyword.length >= threadLimit ||
-      response.data.threadsByBoard.length >= threadLimit ||
-      response.data.threadsByRelated.length >= threadLimit ||
-      response.data.threadsByNewest.length >= threadLimit ||
-      response.data.threadsByHistory.length >= threadLimit ||
-      response.data.threadsByOwner.length >= threadLimit,
-  };
+  if (!response.data || response.data.length > threadLimit) {
+    return { canNextLoad: false };
+  }
+  items.value = [...items.value, ...response.data];
+  return { canNextLoad: true };
 }
 
 watch(
   () => route.query.keyword,
-  () => (offset.value = 0),
+  () => {
+    offset.value = 0;
+    items.value = [];
+    fetchLoadThreads(0);
+  },
 );
 </script>
 

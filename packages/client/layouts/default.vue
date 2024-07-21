@@ -15,9 +15,6 @@ import Header from '~/components/Header.vue';
 
 <style scoped>
 .main-container {
-  border: 1px solid #e0e0e0;
-  max-width: 100%;
-  overflow-x: hidden;
-  padding: 0;
+  overflow: hidden;
 }
 </style>
