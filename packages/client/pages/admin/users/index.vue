@@ -176,13 +176,4 @@ const save = () => {
 onMounted(() => {
   initialize;
 });
-
-onMounted(async () => {
-  await fetchUsers();
-});
-
-async function fetchUsers() {
-  const response = await $api.get('/admin/users/');
-  console.log(response);
-}
 </script>
