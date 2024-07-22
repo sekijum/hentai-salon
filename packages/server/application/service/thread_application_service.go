@@ -53,7 +53,7 @@ func (svc *ThreadApplicationService) FindAll(params ThreadApplicationServiceFind
 		}
 	case "related":
 		if len(params.Qs.ThreadIDs) == 0 {
-			return nil, errors.New("関連順のためにthreadIdsが必要です")
+			return nil, nil
 		}
 		threads, err = svc.threadDatasource.FindByRelatedTag(datasource.ThreadDatasourceFindByRelatedTagParams{
 			Ctx:       params.Ctx,
@@ -79,7 +79,7 @@ func (svc *ThreadApplicationService) FindAll(params ThreadApplicationServiceFind
 		}
 	case "history":
 		if len(params.Qs.ThreadIDs) == 0 {
-			return nil, errors.New("History順のためにthreadIdsが必要です")
+			return nil, nil
 		}
 		threads, err = svc.threadDatasource.FindAll(datasource.ThreadDatasourceFindAllParams{
 			Ctx:       params.Ctx,
@@ -90,6 +90,21 @@ func (svc *ThreadApplicationService) FindAll(params ThreadApplicationServiceFind
 		if err != nil {
 			return nil, err
 		}
+
+		// 手動で並び替え
+		threadMap := make(map[int]*model.Thread)
+		for _, thread := range threads {
+			threadMap[thread.EntThread.ID] = thread
+		}
+
+		var sortedThreads []*model.Thread
+		for _, id := range params.Qs.ThreadIDs {
+			if thread, ok := threadMap[id]; ok {
+				sortedThreads = append(sortedThreads, thread)
+			}
+		}
+
+		threads = sortedThreads
 	case "board":
 		if params.Qs.BoardID == 0 {
 			return nil, errors.New("BoardIDが必要です")

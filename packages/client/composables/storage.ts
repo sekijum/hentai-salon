@@ -36,10 +36,10 @@ export const useStorage = () => {
   };
 
   const setThreadViewHistory = (threadId: number): void => {
-    const history = getThreadViewHistory() || [];
-    const index = history.indexOf(threadId);
-    if (index > -1) {
-      history.splice(index, 1);
+    let history = getThreadViewHistory() || [];
+    const existingIndex = history.indexOf(threadId);
+    if (existingIndex !== -1) {
+      history.splice(existingIndex, 1);
     }
     history.unshift(threadId);
     $storage.setItem(THREAD_VIEW_HISTORY_KEY, history);

@@ -10,7 +10,7 @@
     <Menu :items="guestMenuItems" />
 
     <ThreadList
-      v-if="threads.threadsByHistory.length"
+      v-if="threads.threadsByHistory?.length"
       queryCriteria="history"
       title="スレッド閲覧履歴"
       :items="threads.threadsByHistory"
@@ -18,7 +18,7 @@
       :isInfiniteScroll="false"
     />
     <ThreadList
-      v-if="threads.threadsByPopular.length"
+      v-if="threads.threadsByPopular?.length"
       queryCriteria="popularity"
       title="人気"
       :items="threads.threadsByPopular"
@@ -26,7 +26,7 @@
       :isInfiniteScroll="false"
     />
     <ThreadList
-      v-if="threads.threadsByNewest.length"
+      v-if="threads.threadsByNewest?.length"
       queryCriteria="newest"
       title="新着"
       :items="threads.threadsByNewest"
@@ -90,8 +90,6 @@ const guestMenuItems = computed(() => {
 
   return items;
 });
-
-console.log(payload);
 
 onMounted(async () => {
   await fetchThreads();

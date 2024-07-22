@@ -63,7 +63,7 @@
     <Pagination :totalCount="thread.comments.totalCount" :limit="commentLimit" />
 
     <ThreadList
-      v-if="threads.threadsByRelated.length"
+      v-if="threads.threadsByRelated?.length"
       queryCriteria="related"
       title="関連"
       :items="threads?.threadsByRelated"
