@@ -46,6 +46,8 @@ import PageTitle from '~/components/PageTitle.vue';
 import Menu from '~/components/Menu.vue';
 import * as yup from 'yup';
 
+definePageMeta({ middleware: ['unauthentication-only'] });
+
 const nuxtApp = useNuxtApp();
 const router = useRouter();
 
@@ -86,4 +88,8 @@ async function submit() {
     console.error('通信中にエラーが発生しました:', error);
   }
 }
+
+useHead({
+  title: '変態サロン | サインイン',
+});
 </script>

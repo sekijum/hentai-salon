@@ -193,7 +193,7 @@ async function submit(): Promise<void> {
       }
       if (!payload.isLoggedIn) setLastCommentTime();
       snackbar.value.isSnackbar = true;
-      snackbar.value.text = '書き込みに成功しました。';
+      snackbar.value.text = '書き込みました。';
       form.value.content = '';
       attachmentFiles.value = null;
       if (fileInput.value) {

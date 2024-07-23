@@ -99,6 +99,8 @@ import PageTitle from '~/components/PageTitle.vue';
 import Menu from '~/components/Menu.vue';
 import * as yup from 'yup';
 
+definePageMeta({ middleware: ['unauthentication-only'] });
+
 const nuxtApp = useNuxtApp();
 const router = useRouter();
 const { fetchListPresignedUrl, uploadFilesToS3 } = useActions();
@@ -168,4 +170,8 @@ async function submit() {
     alert(err.response.data.error);
   }
 }
+
+useHead({
+  title: '変態サロン | サインアップ',
+});
 </script>

@@ -2,7 +2,11 @@
   <div v-if="thread">
     <PageTitle :title="thread.title" />
 
-    <h2 class="font-weight-regular page-description">{{ thread.description }}</h2>
+    <h2 class="font-weight-regular page-description">
+      <span v-for="(line, index) in thread.description.split('\n')" :key="index">
+        {{ line }}<br v-if="index < thread.description.split('\n').length - 1" />
+      </span>
+    </h2>
 
     <v-chip-group v-if="thread.tagNameList" active-class="primary--text" column>
       <v-chip size="x-small" v-for="tagName in thread.tagNameList" :key="tagName">
@@ -89,29 +93,25 @@ const { setThreadViewHistory, getThreadViewHistory, getCommentLimit, getCommentS
 
 const { $api } = nuxtApp;
 
+const commentLimit = getCommentLimit();
+const thread = ref<IThread>();
+
 const snackbar = useState('isSnackbar', () => {
   return { isSnackbar: false, text: '' };
 });
 
-const commentLimit = getCommentLimit();
-const thread = ref<IThread>();
-
-const threads = ref<{
-  threadsByRelated: IThread[];
-}>({
-  threadsByRelated: [],
-});
+const threads = ref<{ threadsByRelated: IThread[] }>({ threadsByRelated: [] });
 
 const menuItems = [
   {
     title: 'コメント一覧',
     clicked: () => router.replace({ query: {} }),
-    icon: 'mdi-fire',
+    icon: 'mdi-comment-text',
   },
   {
     title: 'メディア',
     clicked: () => router.replace({ query: { tab: 'media' } }),
-    icon: 'mdi-update',
+    icon: 'mdi-folder-multiple-image',
   },
 ];
 
@@ -144,9 +144,13 @@ function scrollToCommentBottom() {
 }
 
 onMounted(async () => {
+  snackbar.value.isSnackbar = true;
+  snackbar.value.text = '読み込み中です。';
   await fetchThread();
   await fetchThreads();
   setThreadViewHistory(parseInt(route.params.threadId.toString(), 10));
+  snackbar.value.isSnackbar = false;
+  snackbar.value.text = '';
 });
 
 async function fetchThread() {
@@ -162,26 +166,41 @@ async function fetchThread() {
 }
 
 async function fetchThreads() {
-  await Promise.all(
-    ['related'].map(async queryCriteria => {
-      const response = await $api.get<IThread[]>('/threads/', {
-        params: {
-          queryCriteria,
-          threadIds: getThreadViewHistory(),
-          limit: 10,
-        },
-      });
-      if (queryCriteria === 'related') {
-        threads.value.threadsByRelated = response.data;
-      }
-    }),
-  );
+  const response = await $api.get<IThread[]>('/threads/', {
+    params: {
+      queryCriteria: 'related',
+      threadIds: getThreadViewHistory(),
+      limit: 10,
+    },
+  });
+  threads.value.threadsByRelated = response.data;
 }
 
-watchEffect(() => {
-  if (route.query.limit) {
-    fetchThread();
-  }
+useHead({
+  title: thread.value?.title,
+  meta: [
+    { name: 'description', content: thread.value?.description },
+    {
+      property: 'og:title',
+      content: thread.value?.title,
+    },
+    {
+      property: 'og:description',
+      content: thread.value?.description,
+    },
+    {
+      property: 'og:image',
+      content: thread.value?.thumbnailUrl,
+    },
+    {
+      property: 'og:url',
+      content: location.href,
+    },
+  ],
+});
+
+useHead({
+  title: '変態サロン | スレ一覧',
 });
 </script>
 

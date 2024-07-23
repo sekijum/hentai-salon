@@ -18,7 +18,7 @@
       </v-col>
     </v-row>
     <div class="d-flex justify-center">
-      <span class="subtitle">心も体も解放される、禁断のエクスタシー。</span>
+      <span class="subtitle">変態に特化したサロン。</span>
     </div>
     <v-divider />
   </div>

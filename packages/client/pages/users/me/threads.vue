@@ -4,7 +4,7 @@
 
     <Menu :items="menuItems" />
 
-    <ThreadList v-if="threads.length" queryCriteria="owner" :items="threads" :isInfiniteScroll="true" />
+    <ThreadList v-if="threads?.length" queryCriteria="owner" :items="threads" :isInfiniteScroll="true" />
   </div>
 </template>
 
@@ -13,6 +13,8 @@ import PageTitle from '~/components/PageTitle.vue';
 import ThreadList from '~/components/thread/ThreadList.vue';
 import type { IThread } from '~/types/thread';
 
+definePageMeta({ middleware: ['logged-in-access-only'] });
+
 const router = useRouter();
 const route = useRoute();
 const nuxtApp = useNuxtApp();
@@ -20,9 +22,9 @@ const { $api } = nuxtApp;
 const { getThreadViewHistory } = useStorage();
 
 const menuItems = [
-  { title: 'ユーザー情報', clicked: () => router.push('/users/me'), icon: 'mdi-update' },
-  { title: 'マイスレ', clicked: () => router.push('/users/me/threads'), icon: 'mdi-new-box' },
-  { title: 'マイレス', clicked: () => router.push('/users/me/comments'), icon: 'mdi-format-list-bulleted' },
+  { title: 'ユーザー情報', clicked: () => router.push('/users/me'), icon: 'mdi-account' },
+  { title: 'マイスレ', clicked: () => router.push('/users/me/threads'), icon: 'mdi-note' },
+  { title: 'マイレス', clicked: () => router.push('/users/me/comments'), icon: 'mdi-comment' },
 ];
 
 const threads = ref<IThread[]>([]);
@@ -39,7 +41,6 @@ async function fetchThreads() {
       limit: 10,
     },
   });
-  console.log(response);
   threads.value = response.data;
 }
 </script>

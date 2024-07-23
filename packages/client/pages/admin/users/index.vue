@@ -77,6 +77,7 @@
 <script setup>
 definePageMeta({
   layout: 'admin',
+  middleware: ['admin-access-only'],
 });
 
 const router = useRouter();

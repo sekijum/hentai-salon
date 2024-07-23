@@ -4,7 +4,7 @@
 
     <Menu :items="menuItems" />
 
-    <v-infinite-scroll height="100%" :items="comments" :onLoad="loadComment">
+    <v-infinite-scroll :items="comments" :onLoad="loadComment">
       <template v-for="comment in comments?.data" :key="comment.id">
         <CommentItem
           :comment="comment"
@@ -13,7 +13,7 @@
           @replied="fetchComments"
         />
       </template>
-      <template v-slot:empty>これ以上ありません</template>
+      <template v-slot:empty />
     </v-infinite-scroll>
   </div>
 </template>
@@ -24,6 +24,8 @@ import type { IThreadComment } from '~/types/thread-comment';
 import type { IListResource } from '~/types/list-resource';
 import CommentItem from '~/components/comment/CommentItem.vue';
 
+definePageMeta({ middleware: ['logged-in-access-only'] });
+
 const router = useRouter();
 const route = useRoute();
 const nuxtApp = useNuxtApp();
@@ -31,9 +33,9 @@ const { $api } = nuxtApp;
 const { getCommentLimit } = useStorage();
 
 const menuItems = [
-  { title: 'ユーザー情報', clicked: () => router.push('/users/me'), icon: 'mdi-update' },
-  { title: 'マイスレ', clicked: () => router.push('/users/me/threads'), icon: 'mdi-new-box' },
-  { title: 'マイレス', clicked: () => router.push('/users/me/comments'), icon: 'mdi-format-list-bulleted' },
+  { title: 'ユーザー情報', clicked: () => router.push('/users/me'), icon: 'mdi-account' },
+  { title: 'マイスレ', clicked: () => router.push('/users/me/threads'), icon: 'mdi-note' },
+  { title: 'マイレス', clicked: () => router.push('/users/me/comments'), icon: 'mdi-comment' },
 ];
 
 const comments = ref<IListResource<IThreadComment>>();
@@ -55,7 +57,6 @@ async function fetchComments(offset: number = 0) {
     params: { offset, limit: commentLimit },
   });
 
-  console.log(response);
   if (!response.data.data || response.data.data.length > commentLimit) {
     return { canNextLoad: false };
   }

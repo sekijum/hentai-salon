@@ -60,6 +60,7 @@
                 class="media-item"
                 contain
                 referrerpolicy="no-referrer"
+                :alt="comment.content"
               >
                 <template v-slot:placeholder>
                   <v-row align="center" class="fill-height ma-0" justify="center">

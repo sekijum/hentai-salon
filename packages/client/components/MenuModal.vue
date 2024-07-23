@@ -1,18 +1,19 @@
 <template>
-  <v-row justify="center">
-    <v-dialog v-model="isMenuModal" fullscreen hide-overlay transition="dialog-bottom-transition">
-      <v-card>
-        <v-toolbar dark>
-          <v-btn icon dark @click="isMenuModal = false">
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
-          <v-toolbar-title>メニュー</v-toolbar-title>
-          <v-spacer></v-spacer>
-        </v-toolbar>
-        <Menu :items="menuItems" />
-      </v-card>
-    </v-dialog>
-  </v-row>
+  <v-dialog v-model="isMenuModal" fullscreen hide-overlay transition="dialog-bottom-transition">
+    <v-card flat>
+      <v-toolbar density="compact">
+        <v-toolbar-title>メニュー</v-toolbar-title>
+
+        <v-spacer></v-spacer>
+
+        <v-btn icon @click="isMenuModal = false">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+      </v-toolbar>
+
+      <Menu :items="guestMenuItems" />
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup lang="ts">
@@ -22,23 +23,54 @@ const isMenuModal = useState('isMenuModal', () => false);
 
 const router = useRouter();
 const route = useRoute();
+const nuxtApp = useNuxtApp();
+const { $storage } = useNuxtApp();
 
-const menuItems = [
-  { title: 'お知らせ', clicked: () => router.push('/'), icon: 'mdi-update' },
-  { title: 'スレ一覧', clicked: () => router.push('/threads'), icon: 'mdi-new-box' },
-  { title: '板一覧', clicked: () => router.push('/boards'), icon: 'mdi-format-list-bulleted' },
-  { title: '設定', clicked: () => router.push('/setting'), icon: 'mdi-cog' },
-  { title: 'サインイン', clicked: () => router.push('/signin'), icon: 'mdi-login' },
-  { title: 'サインアップ', clicked: () => router.push('/signup'), icon: 'mdi-account-plus' },
-  { title: 'サインアウト', clicked: () => router.push('/signup'), icon: 'mdi-logout' },
-  { title: 'スレ作成', clicked: () => router.push('/threads/new'), icon: 'mdi-forum' },
-  { title: '板作成', clicked: () => router.push('/boards/new'), icon: 'mdi-forum' },
-  { title: '管理画面', clicked: () => router.push('/admin'), icon: 'mdi-forum' },
-  { title: 'いいね', clicked: () => router.push('/admin'), icon: 'mdi-forum' },
-  { title: 'ユーザー情報', clicked: () => router.push('/users/me'), icon: 'mdi-update' },
-  { title: 'マイスレ', clicked: () => router.push('/users/me/threads'), icon: 'mdi-new-box' },
-  { title: 'マイレス', clicked: () => router.push('/users/me/comments'), icon: 'mdi-format-list-bulleted' },
-];
+const { payload } = nuxtApp;
+
+const guestMenuItems = computed(() => {
+  let items: { title: string; clicked: () => any; icon: string }[] = [
+    { title: 'スレ一覧', clicked: () => router.push('/threads'), icon: 'mdi-format-list-bulleted' },
+    { title: '板一覧', clicked: () => router.push('/boards'), icon: 'mdi-view-list' },
+    { title: '設定', clicked: () => router.push('/setting'), icon: 'mdi-cog' },
+  ];
+
+  if (!payload.isLoggedIn) {
+    items = items.concat([
+      { title: 'サインイン', clicked: () => router.push('/signin'), icon: 'mdi-login' },
+      { title: 'サインアップ', clicked: () => router.push('/signup'), icon: 'mdi-account-plus' },
+    ]);
+  } else {
+    items = items.concat([
+      {
+        title: 'サインアウト',
+        clicked: () => {
+          $storage.removeItem('access_token');
+          router.go(0);
+        },
+        icon: 'mdi-logout',
+      },
+    ]);
+  }
+
+  if (payload.isMember || payload.isAdmin) {
+    items = items.concat([
+      { title: 'スレ作成', clicked: () => router.push('/threads/new'), icon: 'mdi-pencil' },
+      { title: 'ユーザー情報', clicked: () => router.push('/users/me'), icon: 'mdi-account' },
+      { title: 'マイスレ', clicked: () => router.push('/users/me/threads'), icon: 'mdi-note' },
+      { title: 'マイレス', clicked: () => router.push('/users/me/comments'), icon: 'mdi-comment' },
+    ]);
+  }
+
+  if (payload.isAdmin) {
+    items = items.concat([
+      { title: '板作成', clicked: () => router.push('/boards/new'), icon: 'mdi-plus-box' },
+      { title: 'adminer', clicked: () => open('http://localhost:8081', '_blank'), icon: 'mdi-database' },
+    ]);
+  }
+
+  return items;
+});
 
 function closeMenuModal() {
   isMenuModal.value = false;

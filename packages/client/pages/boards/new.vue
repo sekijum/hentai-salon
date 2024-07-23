@@ -57,6 +57,8 @@ import PageTitle from '~/components/PageTitle.vue';
 import { Form, Field } from 'vee-validate';
 import * as yup from 'yup';
 
+definePageMeta({ middleware: ['admin-access-only'] });
+
 const router = useRouter();
 const nuxtApp = useNuxtApp();
 const { fetchListPresignedUrl, uploadFilesToS3 } = useActions();
@@ -96,6 +98,10 @@ async function submit() {
     console.error('通信中にエラーが発生しました:', error);
   }
 }
+
+useHead({
+  title: '変態サロン | 板作成',
+});
 </script>
 
 <style scoped>

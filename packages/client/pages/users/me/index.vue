@@ -95,10 +95,12 @@ import type { IThread } from '~/types/thread';
 import type { IThreadComment } from '~/types/thread-comment';
 import type { IListResource } from '~/types/list-resource';
 
+definePageMeta({ middleware: ['logged-in-access-only'] });
+
 const menuItems = [
-  { title: 'ユーザー情報', clicked: () => router.push('/users/me'), icon: 'mdi-update' },
-  { title: 'マイスレ', clicked: () => router.push('/users/me/threads'), icon: 'mdi-new-box' },
-  { title: 'マイレス', clicked: () => router.push('/users/me/comments'), icon: 'mdi-format-list-bulleted' },
+  { title: 'ユーザー情報', clicked: () => router.push('/users/me'), icon: 'mdi-account' },
+  { title: 'マイスレ', clicked: () => router.push('/users/me/threads'), icon: 'mdi-note' },
+  { title: 'マイレス', clicked: () => router.push('/users/me/comments'), icon: 'mdi-comment' },
 ];
 
 const snackbar = useState('isSnackbar', () => {

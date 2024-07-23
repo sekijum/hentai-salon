@@ -101,12 +101,12 @@ const menuItems = [
   {
     title: 'トップ',
     clicked: () => router.push({ query: {} }),
-    icon: 'mdi-format-list-bulleted',
+    icon: 'mdi-home',
   },
   {
     title: '関連',
     clicked: () => router.push({ query: { queryCriteria: 'related' } }),
-    icon: 'mdi-format-list-bulleted',
+    icon: 'mdi-link-variant',
   },
   {
     title: '人気',
@@ -116,7 +116,7 @@ const menuItems = [
   {
     title: '関連履歴',
     clicked: () => router.push({ query: { queryCriteria: 'history' } }),
-    icon: 'mdi-earth',
+    icon: 'mdi-history',
   },
   {
     title: '新着',
@@ -184,4 +184,18 @@ watch(
   () => route.query.queryCriteria,
   () => fetchThreads(),
 );
+
+useHead({
+  title: '変態サロン | スレ一覧',
+  meta: [
+    {
+      property: 'og:title',
+      content: '変態サロン | スレ一覧',
+    },
+    {
+      property: 'og:url',
+      content: location.href,
+    },
+  ],
+});
 </script>

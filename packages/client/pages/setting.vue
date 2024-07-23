@@ -84,6 +84,10 @@ const menuItems = [
   { name: 'コメント', type: 'header' },
   { name: '昇順/降順', key: 'comment-sort-order' },
 ];
+
+useHead({
+  title: '変態サロン | 設定',
+});
 </script>
 
 <style scoped>

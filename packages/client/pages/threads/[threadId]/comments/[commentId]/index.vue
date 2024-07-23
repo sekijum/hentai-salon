@@ -55,7 +55,6 @@ import ThreadList from '~/components/thread/ThreadList.vue';
 import type { IThread } from '~/types/thread';
 import type { IThreadComment } from '~/types/thread-comment';
 
-const router = useRouter();
 const route = useRoute();
 const nuxtApp = useNuxtApp();
 const { getThreadViewHistory, getCommentLimit } = useStorage();
@@ -123,6 +122,29 @@ watchEffect(() => {
   if (route.query.limit) {
     fetchComment();
   }
+});
+
+useHead({
+  title: threadComment.value?.content,
+  meta: [
+    { name: 'description', content: threadComment.value?.content },
+    {
+      property: 'og:title',
+      content: threadComment.value?.content,
+    },
+    {
+      property: 'og:description',
+      content: threadComment.value?.content,
+    },
+    {
+      property: 'og:image',
+      content: threadComment.value?.attachments[0].url || '',
+    },
+    {
+      property: 'og:url',
+      content: location.href,
+    },
+  ],
 });
 </script>
 

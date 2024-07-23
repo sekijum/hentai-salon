@@ -33,7 +33,19 @@ export default defineNuxtConfig({
     },
   },
 
+  app: {
+    head: {
+      titleTemplate: '変態サロン',
+      meta: [
+        {
+          name: 'description',
+          content: '変態に特化したサロン。',
+        },
+      ],
+    },
+  },
+
   compatibilityDate: '2024-07-07',
 
-  plugins: ['~/plugins/storage', '~/plugins/api', '~/plugins/vuetify'],
+  plugins: ['~/plugins/storage'],
 });

@@ -40,6 +40,7 @@ import Menu from '~/components/Menu.vue';
 import ThreadList from '~/components/thread/ThreadList.vue';
 import type { IThread } from '~/types/thread';
 
+const route = useRoute();
 const router = useRouter();
 const nuxtApp = useNuxtApp();
 const { getThreadViewHistory } = useStorage();
@@ -59,10 +60,10 @@ const threads = ref<{
 
 const guestMenuItems = computed(() => {
   let items: { title: string; clicked: () => any; icon: string }[] = [
-    { title: 'スレ一覧', clicked: () => router.push('/threads'), icon: 'mdi-new-box' },
-    { title: '板一覧', clicked: () => router.push('/boards'), icon: 'mdi-format-list-bulleted' },
+    { title: 'スレ一覧', clicked: () => router.push('/threads'), icon: 'mdi-format-list-bulleted' },
+    { title: '板一覧', clicked: () => router.push('/boards'), icon: 'mdi-view-list' },
     { title: '設定', clicked: () => router.push('/setting'), icon: 'mdi-cog' },
-    { title: 'メニュー', clicked: () => (isMenuModal.value = true), icon: 'mdi-forum' },
+    { title: 'メニュー', clicked: () => (isMenuModal.value = true), icon: 'mdi-menu' },
   ];
 
   if (!payload.isLoggedIn) {
@@ -74,17 +75,17 @@ const guestMenuItems = computed(() => {
 
   if (payload.isMember || payload.isAdmin) {
     items = items.concat([
-      { title: 'スレ作成', clicked: () => router.push('/threads/new'), icon: 'mdi-forum' },
-      { title: 'ユーザー情報', clicked: () => router.push('/users/me'), icon: 'mdi-update' },
-      { title: 'マイスレ', clicked: () => router.push('/users/me/threads'), icon: 'mdi-new-box' },
-      { title: 'マイレス', clicked: () => router.push('/users/me/comments'), icon: 'mdi-format-list-bulleted' },
+      { title: 'スレ作成', clicked: () => router.push('/threads/new'), icon: 'mdi-pencil' },
+      { title: 'ユーザー情報', clicked: () => router.push('/users/me'), icon: 'mdi-account' },
+      { title: 'マイスレ', clicked: () => router.push('/users/me/threads'), icon: 'mdi-note' },
+      { title: 'マイレス', clicked: () => router.push('/users/me/comments'), icon: 'mdi-comment' },
     ]);
   }
 
   if (payload.isAdmin) {
     items = items.concat([
-      { title: '板作成', clicked: () => router.push('/boards/new'), icon: 'mdi-forum' },
-      { title: 'adminer', clicked: () => open('http://localhost:8081', '_blank'), icon: 'mdi-forum' },
+      { title: '板作成', clicked: () => router.push('/boards/new'), icon: 'mdi-plus-box' },
+      { title: 'adminer', clicked: () => open('http://localhost:8081', '_blank'), icon: 'mdi-database' },
     ]);
   }
 
@@ -115,6 +116,29 @@ async function fetchThreads() {
     }),
   );
 }
+
+useHead({
+  title: '変態サロン',
+  meta: [
+    { name: 'description', content: '変態に特化したサロン。' },
+    {
+      property: 'og:title',
+      content: '変態サロン',
+    },
+    {
+      property: 'og:description',
+      content: '変態に特化したサロン。',
+    },
+    {
+      property: 'og:image',
+      content: '/hentai-salon-logo/logo_transparent.png',
+    },
+    {
+      property: 'og:url',
+      content: location.href,
+    },
+  ],
+});
 </script>
 
 <style scoped>

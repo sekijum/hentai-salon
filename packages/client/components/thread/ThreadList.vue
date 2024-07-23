@@ -6,7 +6,7 @@
 
     <div class="thread-section">
       <template v-if="isInfiniteScroll">
-        <v-infinite-scroll height="100%" :onLoad="load">
+        <v-infinite-scroll :onLoad="load">
           <div
             v-for="(item, index) in items"
             :key="item.id"
@@ -30,7 +30,7 @@
               </v-col>
             </v-row>
           </div>
-          <template v-slot:empty>これ以上ありません</template>
+          <template v-slot:empty />
         </v-infinite-scroll>
       </template>
       <template v-else>

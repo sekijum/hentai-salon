@@ -1,9 +1,6 @@
 <template>
   <div>
-    <v-infinite-scroll height="100%" :items="items" :onLoad="load">
-      <template #empty>
-        <div></div>
-      </template>
+    <v-infinite-scroll :items="items" :onLoad="load">
       <v-row class="pa-0 ma-0">
         <v-col v-for="item in items" :key="item.commentId" class="d-flex child-flex pa-0 ma-0" cols="6">
           <v-img
@@ -36,6 +33,7 @@
           </div>
         </v-col>
       </v-row>
+      <template v-slot:empty />
     </v-infinite-scroll>
 
     <MediaModal

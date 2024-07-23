@@ -90,6 +90,8 @@ import { Form, Field } from 'vee-validate';
 import PageTitle from '~/components/PageTitle.vue';
 import type { IBoard } from '~/types/board';
 
+definePageMeta({ middleware: ['logged-in-access-only'] });
+
 const router = useRouter();
 const route = useRoute();
 const nuxtApp = useNuxtApp();
@@ -163,6 +165,10 @@ async function submit() {
     console.error('通信中にエラーが発生しました:', error);
   }
 }
+
+useHead({
+  title: '変態サロン | スレ作成',
+});
 </script>
 
 <style scoped>
