@@ -21,6 +21,7 @@ import Menu from '~/components/Menu.vue';
 
 const isMenuModal = useState('isMenuModal', () => false);
 
+const config = useRuntimeConfig();
 const router = useRouter();
 const route = useRoute();
 const nuxtApp = useNuxtApp();
@@ -65,7 +66,7 @@ const guestMenuItems = computed(() => {
   if (payload.isAdmin) {
     items = items.concat([
       { title: '板作成', clicked: () => router.push('/boards/new'), icon: 'mdi-plus-box' },
-      { title: 'adminer', clicked: () => open('http://localhost:8081', '_blank'), icon: 'mdi-database' },
+      { title: 'adminer', clicked: () => open(config.public.adminerUrl, '_blank'), icon: 'mdi-database' },
     ]);
   }
 

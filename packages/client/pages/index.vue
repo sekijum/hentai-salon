@@ -40,6 +40,7 @@ import Menu from '~/components/Menu.vue';
 import ThreadList from '~/components/thread/ThreadList.vue';
 import type { IThread } from '~/types/thread';
 
+const config = useRuntimeConfig();
 const route = useRoute();
 const router = useRouter();
 const nuxtApp = useNuxtApp();
@@ -85,7 +86,7 @@ const guestMenuItems = computed(() => {
   if (payload.isAdmin) {
     items = items.concat([
       { title: '板作成', clicked: () => router.push('/boards/new'), icon: 'mdi-plus-box' },
-      { title: 'adminer', clicked: () => open('http://localhost:8081', '_blank'), icon: 'mdi-database' },
+      { title: 'adminer', clicked: () => open(config.public.adminerUrl, '_blank'), icon: 'mdi-database' },
     ]);
   }
 

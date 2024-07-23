@@ -9,6 +9,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL,
+      adminerUrl: process.env.NUXT_PUBLIC_ADMINER_URL,
       clientId: process.env.IMGUR_CLIENT_ID,
     },
   },
@@ -35,17 +36,22 @@ export default defineNuxtConfig({
 
   app: {
     head: {
-      titleTemplate: '変態サロン',
+      title: '変態サロン',
       meta: [
         {
           name: 'description',
           content: '変態に特化したサロン。',
         },
       ],
+      link: [
+        { rel: 'icon', type: 'image/x-icon', href: '/hentai-salon-logo/logo_transparent.png' },
+        { rel: 'apple-touch-icon', sizes: '180x180', href: '/hentai-salon-logo/logo_transparent.png' },
+        { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/hentai-salon-logo/logo_transparent.png' },
+        { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/hentai-salon-logo/logo_transparent.png' },
+        { rel: 'manifest', href: '/site.webmanifest' },
+      ],
     },
   },
-
-  compatibilityDate: '2024-07-07',
 
   plugins: ['~/plugins/storage'],
 });
