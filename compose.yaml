@@ -4,15 +4,13 @@ services:
     build:
       context: .
       dockerfile: docker/server/Dockerfile
-    ports:
-      - 8080:8080
     depends_on:
       - mysql
       - minio
     volumes:
       - ./packages/server:/server
     networks:
-        - hentai_salon
+      - hentai_salon
 
   client:
     container_name: hentai-salon-client
@@ -22,15 +20,12 @@ services:
     restart: always
     tty: true
     init: true
-    ports:
-      - 3000:3000
     depends_on:
       - server
-      - mysql
     volumes:
       - ./packages/client:/client
     networks:
-        - hentai_salon
+      - hentai_salon
 
   mysql:
     image: mysql:8.0
@@ -49,7 +44,7 @@ services:
       - 3306:3306
     restart: always
     networks:
-        - hentai_salon
+      - hentai_salon
 
   adminer:
     image: adminer
@@ -62,7 +57,7 @@ services:
     ports:
       - 8081:8080
     networks:
-        - hentai_salon
+      - hentai_salon
 
   minio:
     image: minio/minio
@@ -78,22 +73,32 @@ services:
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     command: server /export --console-address ":9001"
     networks:
-        - hentai_salon
+      - hentai_salon
 
-  # infra:
-  #   container_name: hentai-salon-infra
-  #   platform: linux/x86_64
-  #   build:
-  #     context: .
-  #     dockerfile: docker/infra/Dockerfile
-  #   ports:
-  #     - 22:22
-  #   volumes:
-  #     - ./:/infra
-  #     - ~/.aws:/root/.aws:ro
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #   tty: true
+  nginx-client:
+    image: nginx:1.20
+    container_name: hentai-salon-nginx-client
+    ports:
+      - 3000:80
+    volumes:
+      - ./docker/nginx/client/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - client
+    networks:
+      - hentai_salon
+
+  nginx-server:
+    image: nginx:1.20
+    container_name: hentai-salon-nginx-server
+    ports:
+      - 8080:80
+    volumes:
+      - ./docker/nginx/server/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - server
+    networks:
+      - hentai_salon
 
 networks:
   hentai_salon:
-    external: true  
+    external: true
