@@ -42,7 +42,7 @@
         </template>
       </div>
       <v-list-item-title class="comment-content">
-        <p>{{ comment.content }}</p>
+        <OEmbedContent :text="comment.content" />
       </v-list-item-title>
       <template v-if="comment.attachments && comment.attachments.length">
         <v-row dense>
@@ -127,6 +127,7 @@
 import { useRoute } from 'vue-router';
 import MediaModal from '~/components/MediaModal.vue';
 import CommentForm from '~/components/comment/CommentForm.vue';
+import OEmbedContent from '~/components/OEmbedContent.vue';
 import type { IThreadComment } from '~/types/thread';
 import type { IThreadCommentAttachment } from '~/types/thread-comment-attachment';
 
