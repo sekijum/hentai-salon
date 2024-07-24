@@ -1,20 +1,21 @@
 <template>
-  <div>
+  <div v-if="comment">
     <PageTitle title="マイレス" />
 
     <Menu :items="menuItems" />
 
-    <v-infinite-scroll :items="comments" :onLoad="loadComment">
-      <template v-for="comment in comments?.data" :key="comment.id">
-        <CommentItem
-          :comment="comment"
-          :commentLimit="commentLimit"
-          :threadId="comment.thread.id"
-          @replied="fetchComments"
-        />
-      </template>
-      <template v-slot:empty />
-    </v-infinite-scroll>
+    <Pagination :totalCount="comment?.totalCount" :limit="commentLimit" />
+
+    <template v-for="comment in comment?.data" :key="comment.id">
+      <CommentItem
+        :comment="comment"
+        :commentLimit="commentLimit"
+        :threadId="comment.thread.id"
+        @replied="fetchComments"
+      />
+    </template>
+
+    <Pagination :totalCount="comment.totalCount" :limit="commentLimit" />
   </div>
 </template>
 
@@ -23,6 +24,7 @@ import PageTitle from '~/components/PageTitle.vue';
 import type { IThreadComment } from '~/types/thread-comment';
 import type { IListResource } from '~/types/list-resource';
 import CommentItem from '~/components/comment/CommentItem.vue';
+import Pagination from '~/components/Pagination.vue';
 
 definePageMeta({ middleware: ['logged-in-access-only'] });
 
@@ -38,35 +40,18 @@ const menuItems = [
   { title: 'マイレス', clicked: () => router.push('/users/me/comments'), icon: 'mdi-comment' },
 ];
 
-const comments = ref<IListResource<IThreadComment>>();
+const comment = ref<IListResource<IThreadComment>>();
 const commentLimit = getCommentLimit();
-const offset = ref(0);
 
 onMounted(async () => {
   await fetchComments();
 });
 
-async function loadComment({ done }: { done: (status: 'loading' | 'error' | 'empty' | 'ok') => void }) {
-  offset.value += commentLimit;
-  const { canNextLoad } = await fetchComments(offset.value);
-  canNextLoad ? done('ok') : done('empty');
-}
-
-async function fetchComments(offset: number = 0) {
+async function fetchComments() {
   const response = await $api.get<IListResource<IThreadComment>>('/users/me/comments', {
-    params: { offset, limit: commentLimit },
+    params: { offset: route.query.offset, limit: commentLimit },
   });
 
-  if (!response.data.data || response.data.data.length > commentLimit) {
-    return { canNextLoad: false };
-  }
-
-  if (offset) {
-    response.data.data.map(item => comments.value?.data.push(item));
-  } else {
-    comments.value = response.data;
-  }
-
-  return { canNextLoad: true };
+  comment.value = response.data;
 }
 </script>

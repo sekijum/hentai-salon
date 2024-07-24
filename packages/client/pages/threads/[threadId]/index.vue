@@ -1,5 +1,5 @@
 <template>
-  <div v-if="thread">
+  <div>
     <PageTitle :title="thread.title" />
 
     <h2 class="font-weight-regular page-description">
@@ -94,7 +94,17 @@ const { setThreadViewHistory, getThreadViewHistory, getCommentLimit, getCommentS
 const { $api } = nuxtApp;
 
 const commentLimit = getCommentLimit();
-const thread = ref<IThread>();
+const thread = ref<IThread>({
+  id: 0,
+  title: '',
+  description: '',
+  thumbnailUrl: '',
+  tagNameList: [],
+  createdAt: '',
+  commentCount: 0,
+  comments: { totalCount: 0, limit: 0, offset: 0, data: [] },
+  attachments: [],
+});
 
 const snackbar = useState('isSnackbar', () => {
   return { isSnackbar: false, text: '' };
@@ -105,12 +115,19 @@ const threads = ref<{ threadsByRelated: IThread[] }>({ threadsByRelated: [] });
 const menuItems = [
   {
     title: 'コメント一覧',
-    clicked: () => router.replace({ query: {} }),
+    clicked: () => {
+      const newQuery = { ...route.query };
+      delete newQuery.tab;
+      router.push({ query: newQuery });
+    },
     icon: 'mdi-comment-text',
   },
   {
     title: 'メディア',
-    clicked: () => router.replace({ query: { tab: 'media' } }),
+    clicked: () => {
+      const newQuery = { ...route.query, tab: 'media' };
+      router.push({ query: newQuery });
+    },
     icon: 'mdi-folder-multiple-image',
   },
 ];
@@ -157,7 +174,7 @@ async function fetchThread() {
   const threadId = route.params.threadId;
   const response = await $api.get<IThread>(`/threads/${threadId}`, {
     params: {
-      limit: route.query.limit || commentLimit,
+      limit: commentLimit,
       offset: route.query.offset,
       sortOrder: getCommentSortOrder(),
     },

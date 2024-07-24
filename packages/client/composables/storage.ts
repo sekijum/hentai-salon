@@ -16,7 +16,7 @@ export const useStorage = () => {
   };
 
   const getCommentLimit = (): number => {
-    return $storage.getItem<number>(COMMENT_LIMIT) || 100;
+    return $storage.getItem<number>(COMMENT_LIMIT) || 50;
   };
 
   const setCommentLimit = (limit: number): void => {

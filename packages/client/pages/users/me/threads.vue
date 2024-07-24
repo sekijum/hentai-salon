@@ -1,10 +1,14 @@
 <template>
-  <div>
+  <div v-if="threads">
     <PageTitle title="マイスレ" />
 
     <Menu :items="menuItems" />
 
-    <ThreadList v-if="threads?.length" queryCriteria="owner" :items="threads" :isInfiniteScroll="true" />
+    <Pagination :totalCount="threads.totalCount" :limit="limit" />
+
+    <ThreadList queryCriteria="owner" :items="threads.data" :isInfiniteScroll="false" />
+
+    <Pagination :totalCount="threads.totalCount" :limit="limit" />
   </div>
 </template>
 
@@ -12,6 +16,7 @@
 import PageTitle from '~/components/PageTitle.vue';
 import ThreadList from '~/components/thread/ThreadList.vue';
 import type { IThread } from '~/types/thread';
+import type { IListResource } from '~/types/list-resource';
 
 definePageMeta({ middleware: ['logged-in-access-only'] });
 
@@ -20,6 +25,7 @@ const route = useRoute();
 const nuxtApp = useNuxtApp();
 const { $api } = nuxtApp;
 const { getThreadViewHistory } = useStorage();
+const limit = 10;
 
 const menuItems = [
   { title: 'ユーザー情報', clicked: () => router.push('/users/me'), icon: 'mdi-account' },
@@ -27,18 +33,17 @@ const menuItems = [
   { title: 'マイレス', clicked: () => router.push('/users/me/comments'), icon: 'mdi-comment' },
 ];
 
-const threads = ref<IThread[]>([]);
+const threads = ref<IListResource<IThread>>();
 
 onMounted(async () => {
   await fetchThreads();
 });
 
 async function fetchThreads() {
-  const response = await $api.get<IThread[]>('/threads/', {
+  const response = await $api.get<IListResource<IThread>>('/users/me/threads', {
     params: {
-      queryCriteria: 'owner',
       threadIds: getThreadViewHistory(),
-      limit: 10,
+      limit,
     },
   });
   threads.value = response.data;

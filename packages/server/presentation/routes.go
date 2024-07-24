@@ -54,6 +54,7 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 			usersGroup.GET("/:userID", controllers.UserController.FindByID)
 			usersGroup.GET("/me", controllers.UserController.FindAuthenticatedUser)
 			usersGroup.GET("/me/comments", controllers.ThreadCommentController.FindAllByUserID)
+			usersGroup.GET("/me/threads", controllers.ThreadController.FindByUserID)
 			usersGroup.PUT("/me", controllers.UserController.Update)
 			usersGroup.PATCH("/me/password", controllers.UserController.UpdatePassword)
 		}

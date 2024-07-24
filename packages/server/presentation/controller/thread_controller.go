@@ -77,6 +77,36 @@ func (ctrl *ThreadController) FindById(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, dto)
 }
 
+func (ctrl *ThreadController) FindByUserID(ctx *gin.Context) {
+	userID, exists := ctx.Get("userID")
+	if !exists {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "ユーザーIDがコンテキストに存在しません"})
+		return
+	}
+
+	var qs request.ThreadFindAllByUserIDRequest
+
+	if err := ctx.ShouldBindQuery(&qs); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	qs.Limit = ctx.GetInt("limit")
+	qs.Offset = ctx.GetInt("offset")
+
+	dto, err := ctrl.threadApplicationService.FindByUserID(service.ThreadApplicationServiceFindByUserIDParams{
+		Ctx:    context.Background(),
+		UserID: userID.(int),
+		Qs:     qs,
+	})
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, dto)
+}
+
 func (ctrl *ThreadController) Create(ctx *gin.Context) {
 	var body request.ThreadCreateRequest
 	if err := ctx.ShouldBindJSON(&body); err != nil {

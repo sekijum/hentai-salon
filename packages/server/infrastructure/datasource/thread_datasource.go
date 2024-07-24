@@ -143,6 +143,38 @@ func (ds *ThreadDatasource) FindByPopularity(params ThreadDatasourceFindByPopula
 	return modelThreads, nil
 }
 
+type ThreadDatasourceFindAllByUserIDParams struct {
+	Ctx    context.Context
+	UserID int
+}
+
+func (ds *ThreadDatasource) FindAllByUserID(params ThreadDatasourceFindAllByUserIDParams) ([]*model.Thread, int, error) {
+	threads, err := ds.client.Thread.Query().
+		Where(thread.UserIDEQ(params.UserID)).
+		WithTags().
+		WithComments().
+		All(params.Ctx)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	threadCount, err := ds.client.Thread.Query().
+		Where(thread.UserID(params.UserID)).
+		Count(params.Ctx)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	var modelThreads []*model.Thread
+	for _, entThread := range threads {
+		modelThreads = append(modelThreads, &model.Thread{
+			EntThread: entThread,
+		})
+	}
+
+	return modelThreads, threadCount, nil
+}
+
 type ThreadDatasourceFindByTitleParams struct {
 	Ctx   context.Context
 	Title string

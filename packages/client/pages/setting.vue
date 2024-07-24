@@ -29,12 +29,12 @@
                 @change="setCommentSortOrder(commentSortOrder ? 'desc' : 'asc')"
               ></v-switch>
               <v-switch
-                v-else-if="item.key === 'display-first-50-comments'"
-                v-model="displayFirst50Comments"
+                v-else-if="item.key === 'display-first-100-comments'"
+                v-model="displayFirst100Comments"
                 flat
                 small
                 class="centered-switch"
-                @change="setCommentLimit(displayFirst50Comments ? 50 : 0)"
+                @change="setCommentLimit(displayFirst100Comments ? 100 : 0)"
               ></v-switch>
               <v-switch
                 v-else-if="item.key === 'theme'"
@@ -73,14 +73,14 @@ const {
 
 const theme = ref(getTheme() === 'light' ? true : false);
 const commentSortOrder = ref(getCommentSortOrder() === 'desc' ? true : false);
-const displayFirst50Comments = ref(getCommentLimit() === 50 ? true : false);
+const displayFirst100Comments = ref(getCommentLimit() === 100 ? true : false);
 
 const menuItems = [
   { name: '表示', type: 'header' },
   { name: 'ダークモード', key: 'theme' },
   { name: 'スレッド', type: 'header' },
   { name: '閲覧履歴', key: 'thread-history-delete' },
-  { name: '50レスのみ表示', key: 'display-first-50-comments' },
+  { name: '100レス表示', key: 'display-first-100-comments' },
   { name: 'コメント', type: 'header' },
   { name: '昇順/降順', key: 'comment-sort-order' },
 ];

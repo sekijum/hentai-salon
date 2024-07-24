@@ -6,6 +6,12 @@ type ThreadRequest struct {
 	SortOrder string `form:"sortOrder"`
 }
 
+type ThreadFindAllByUserIDRequest struct {
+	Limit     int    `form:"limit"`
+	Offset    int    `form:"offset"`
+	SortOrder string `form:"sortOrder"`
+}
+
 type ThreadFindByIdRequest struct {
 	Limit     int    `form:"limit"`
 	Offset    int    `form:"offset"`

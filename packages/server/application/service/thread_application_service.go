@@ -165,6 +165,38 @@ func (svc *ThreadApplicationService) FindAll(params ThreadApplicationServiceFind
 	return dto, nil
 }
 
+type ThreadApplicationServiceFindByUserIDParams struct {
+	Ctx    context.Context
+	UserID int
+	Qs     request.ThreadFindAllByUserIDRequest
+}
+
+func (svc *ThreadApplicationService) FindByUserID(params ThreadApplicationServiceFindByUserIDParams) (*resource.ListResource[*resource.ThreadResource], error) {
+	var threads, threadCount, err = svc.threadDatasource.FindAllByUserID(datasource.ThreadDatasourceFindAllByUserIDParams{
+		Ctx:    params.Ctx,
+		UserID: params.UserID,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var threadResourceList []*resource.ThreadResource
+	for _, thread := range threads {
+		threadResourceList = append(threadResourceList, resource.NewThreadResource(resource.NewThreadResourceParams{
+			Thread:       thread,
+			CommentCount: len(thread.EntThread.Edges.Comments),
+		}))
+	}
+
+	dto := &resource.ListResource[*resource.ThreadResource]{
+		TotalCount: threadCount,
+		Limit:      params.Qs.Limit,
+		Offset:     params.Qs.Offset,
+		Data:       threadResourceList,
+	}
+	return dto, nil
+}
+
 type ThreadApplicationServiceFindByIDParams struct {
 	Ctx      context.Context
 	ThreadID int

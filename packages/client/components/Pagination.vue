@@ -21,7 +21,6 @@ const props = defineProps<{
   totalCount: number;
 }>();
 
-console.log(props);
 const route = useRoute();
 const router = useRouter();
 

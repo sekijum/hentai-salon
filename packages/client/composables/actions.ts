@@ -64,48 +64,5 @@ export const useActions = () => {
     return uploadedAttachments;
   }
 
-  async function uploadFilesToVimeo(files: File[]): Promise<IThreadCommentAttachment[]> {
-    const config = useRuntimeConfig();
-    const uploadedAttachments: IThreadCommentAttachment[] = [];
-    const accessToken = config.public.vimeoAccessToken;
-
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      const formData = new FormData();
-      formData.append('file_data', file);
-
-      const type = file.type.startsWith('video') ? 'Video' : 'Image';
-
-      try {
-        const createResponse = await axios.post('https://api.vimeo.com/me/videos', null, {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-            'Accept': 'application/vnd.vimeo.*+json;version=3.4',
-          },
-        });
-
-        const uploadLink = createResponse.data.upload.upload_link;
-        await axios.put(uploadLink, file, {
-          headers: {
-            'Content-Type': file.type,
-          },
-        });
-
-        const videoUrl = createResponse.data.link;
-
-        uploadedAttachments.push({
-          url: videoUrl,
-          displayOrder: i,
-          type: type,
-        });
-      } catch (error) {
-        console.error('Vimeo upload error:', error);
-      }
-    }
-
-    return uploadedAttachments;
-  }
-
-  return { fetchListPresignedUrl, uploadFilesToS3, uploadFilesToImgur, uploadFilesToVimeo };
+  return { fetchListPresignedUrl, uploadFilesToS3, uploadFilesToImgur };
 };
