@@ -5,6 +5,7 @@ import (
 	"server/domain/model"
 	"server/infrastructure/ent"
 	"server/infrastructure/ent/tag"
+	"server/infrastructure/ent/thread"
 )
 
 type TagDatasource struct {
@@ -13,6 +14,31 @@ type TagDatasource struct {
 
 func NewTagDatasource(client *ent.Client) *TagDatasource {
 	return &TagDatasource{client: client}
+}
+
+type TagDatasourceFindAllIDsParams struct {
+	Ctx       context.Context
+	ThreadIDs []int
+}
+
+func (ds *TagDatasource) FindAllIDs(params TagDatasourceFindAllIDsParams) ([]int, error) {
+	query := ds.client.Tag.Query()
+
+	if len(params.ThreadIDs) > 0 {
+		query = query.Where(tag.HasThreadsWith(thread.IDIn(params.ThreadIDs...)))
+	}
+
+	tags, err := query.Select(tag.FieldID).All(params.Ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var tagIDs []int
+	for _, tag := range tags {
+		tagIDs = append(tagIDs, tag.ID)
+	}
+
+	return tagIDs, nil
 }
 
 type TagDatasourceFindAllParams struct {

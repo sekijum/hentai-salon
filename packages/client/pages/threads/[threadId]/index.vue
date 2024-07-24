@@ -202,6 +202,11 @@ useHead({
 useHead({
   title: '変態サロン | スレ一覧',
 });
+
+watch(
+  () => route.query.offset,
+  () => fetchThread(),
+);
 </script>
 
 <style scoped>

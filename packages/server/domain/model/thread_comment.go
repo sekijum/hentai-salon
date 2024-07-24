@@ -5,9 +5,7 @@ import (
 )
 
 type ThreadComment struct {
-	EntThreadComment           *ent.ThreadComment
-	ReplyCount                 int
-	ThreadCommentReplyCountMap map[int]int // リプライ毎のリプライ数
+	EntThreadComment *ent.ThreadComment
 }
 
 type ThreadCommentStatus int
@@ -37,14 +35,4 @@ func (m *ThreadComment) ThreadCommentToLabel() string {
 	default:
 		return "不明なステータス"
 	}
-}
-
-// リプライIDリストから特定のリプライIDのインデックスを計算するヘルパー関数
-func FindCommentIndexByID(repliesIDs []int, id int) int {
-	for i, repliesID := range repliesIDs {
-		if repliesID == id {
-			return i
-		}
-	}
-	return 1
 }

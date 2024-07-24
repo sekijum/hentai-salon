@@ -37,18 +37,11 @@ func NewUserResource(params NewUserResourceParams) *UserResource {
 
 	var commentResourceList []*ThreadCommentResource
 	var attachments []*ThreadCommentAttachmentResource
-	for i, comment := range params.User.EntUser.Edges.Comments {
-		commentReplyCount := 0
-		if count, ok := params.User.ThreadCommentReplyCountMap[comment.ID]; ok {
-			commentReplyCount = count
-		}
-
+	for _, comment := range params.User.EntUser.Edges.Comments {
 		commentResource := NewThreadCommentResource(NewThreadCommentResourceParams{
 			ThreadComment: &model.ThreadComment{EntThreadComment: comment},
 			CommentIDs:    nil,
 			Offset:        params.Offset,
-			IDx:           &i,
-			ReplyCount:    commentReplyCount,
 		})
 		commentResourceList = append(commentResourceList, commentResource)
 
@@ -59,7 +52,6 @@ func NewUserResource(params NewUserResourceParams) *UserResource {
 				DisplayOrder: threadCommentAttachment.EntAttachment.DisplayOrder,
 				Type:         threadCommentAttachment.TypeToString(),
 				CommentID:    comment.ID,
-				IDx:          commentResource.IDx,
 			})
 		}
 	}
@@ -73,16 +65,10 @@ func NewUserResource(params NewUserResourceParams) *UserResource {
 
 	var threads []*ThreadResource
 	for _, thread := range params.User.EntUser.Edges.Threads {
-		threadCommentCount := 0
-		if count, ok := params.User.ThreadCommentCountMap[thread.ID]; ok {
-			threadCommentCount = count
-		}
-
 		threadResource := NewThreadResource(NewThreadResourceParams{
-			Thread:             &model.Thread{EntThread: thread},
-			Limit:              params.Limit,
-			Offset:             params.Offset,
-			ThreadCommentCount: threadCommentCount,
+			Thread: &model.Thread{EntThread: thread},
+			Limit:  params.Limit,
+			Offset: params.Offset,
 		})
 		threads = append(threads, threadResource)
 	}

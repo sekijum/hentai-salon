@@ -37,26 +37,6 @@ func (ds *ThreadCommentDatasource) FindAllByUserID(params ThreadCommentDatasourc
 		return nil, 0, err
 	}
 
-	commentIDs := make([]int, 0)
-	for _, comment := range comments {
-		commentIDs = append(commentIDs, comment.ID)
-	}
-
-	var replyCountList []ThreadCommentReplyCount
-	err = ds.client.ThreadComment.Query().
-		Where(threadcomment.ParentCommentIDIn(commentIDs...)).
-		GroupBy(threadcomment.FieldParentCommentID).
-		Aggregate(ent.Count()).
-		Scan(params.Ctx, &replyCountList)
-	if err != nil {
-		return nil, 0, err
-	}
-
-	threadCommentReplyCountMap := make(map[int]int)
-	for _, count := range replyCountList {
-		threadCommentReplyCountMap[count.ParentCommentID] = count.Count
-	}
-
 	commentCount, err := ds.client.ThreadComment.Query().
 		Where(threadcomment.UserID(params.UserID)).
 		Count(params.Ctx)
@@ -67,15 +47,8 @@ func (ds *ThreadCommentDatasource) FindAllByUserID(params ThreadCommentDatasourc
 
 	var modelThreadCommentList []*model.ThreadComment
 	for _, comment := range comments {
-		replyCount := 0
-		if count, ok := threadCommentReplyCountMap[comment.ID]; ok {
-			replyCount = count
-		}
-
 		modelThreadCommentList = append(modelThreadCommentList, &model.ThreadComment{
-			EntThreadComment:           comment,
-			ReplyCount:                 replyCount,
-			ThreadCommentReplyCountMap: threadCommentReplyCountMap,
+			EntThreadComment: comment,
 		})
 	}
 
@@ -111,35 +84,7 @@ func (ds *ThreadCommentDatasource) FindByID(params ThreadCommentDatasourceFindBy
 		return nil, err
 	}
 
-	replyCount, err := ds.client.ThreadComment.
-		Query().
-		Where(threadcomment.ParentCommentID(params.CommentID)).
-		Count(params.Ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	replyIDs := make([]int, 0)
-	for _, reply := range comment.Edges.Replies {
-		replyIDs = append(replyIDs, reply.ID)
-	}
-
-	var threadCommentReplyCountList []ThreadCommentReplyCount
-	err = ds.client.ThreadComment.Query().
-		Where(threadcomment.ParentCommentIDIn(replyIDs...)).
-		GroupBy(threadcomment.FieldParentCommentID).
-		Aggregate(ent.Count()).
-		Scan(params.Ctx, &threadCommentReplyCountList)
-	if err != nil {
-		return nil, err
-	}
-
-	threadCommentReplyCountMap := make(map[int]int)
-	for _, count := range threadCommentReplyCountList {
-		threadCommentReplyCountMap[count.ParentCommentID] = count.Count
-	}
-
-	return &model.ThreadComment{EntThreadComment: comment, ReplyCount: replyCount, ThreadCommentReplyCountMap: threadCommentReplyCountMap}, nil
+	return &model.ThreadComment{EntThreadComment: comment}, nil
 }
 
 type ThreadCommentDatasourceCreateParams struct {

@@ -10,39 +10,30 @@ type ThreadCommentAttachmentResource struct {
 	DisplayOrder int    `json:"displayOrder"`
 	Type         string `json:"type"`
 	CommentID    int    `json:"commentId"`
-	IDx          int    `json:"idx"`
 }
 
 type ThreadCommentResource struct {
-	ID               int                                  `json:"id"`
-	IDx              int                                  `json:"idx,omitempty"`
-	User             *UserResource                        `json:"user,omitempty"`
-	GuestName        *string                              `json:"guestName,omitempty"`
-	Content          string                               `json:"content"`
-	ParentCommentID  int                                  `json:"parentCommentId"`
-	ParentCommentIDx int                                  `json:"parentCommentIdx,omitempty"`
-	CreatedAt        string                               `json:"createdAt"`
-	UpdatedAt        string                               `json:"updatedAt"`
-	Thread           *ThreadResource                      `json:"thread,omitempty"`
-	ParentComment    *ThreadCommentResource               `json:"parentComment"`
-	Attachments      []*ThreadCommentAttachmentResource   `json:"attachments"`
-	ReplyCount       int                                  `json:"replyCount"`
-	Replies          ListResource[*ThreadCommentResource] `json:"replies"`
+	ID              int                                  `json:"id"`
+	User            *UserResource                        `json:"user,omitempty"`
+	GuestName       *string                              `json:"guestName,omitempty"`
+	Content         string                               `json:"content"`
+	ParentCommentID *int                                 `json:"parentCommentId"`
+	CreatedAt       string                               `json:"createdAt"`
+	UpdatedAt       string                               `json:"updatedAt"`
+	Thread          *ThreadResource                      `json:"thread,omitempty"`
+	ParentComment   *ThreadCommentResource               `json:"parentComment"`
+	Attachments     []*ThreadCommentAttachmentResource   `json:"attachments"`
+	ReplyCount      int                                  `json:"replyCount"`
+	Replies         ListResource[*ThreadCommentResource] `json:"replies"`
 }
 
 type NewThreadCommentResourceParams struct {
-	ThreadComment *model.ThreadComment
-	CommentIDs    []int
-	Limit, Offset int
-	IDx           *int
-	ReplyCount    int
+	ThreadComment             *model.ThreadComment
+	CommentIDs                []int
+	ReplyCount, Limit, Offset int
 }
 
 func NewThreadCommentResource(params NewThreadCommentResourceParams) *ThreadCommentResource {
-	var IDx int
-	if params.IDx != nil {
-		IDx = params.Offset + *params.IDx + 1
-	}
 
 	var user *UserResource
 	if params.ThreadComment.EntThreadComment.Edges.Author != nil {
@@ -50,17 +41,6 @@ func NewThreadCommentResource(params NewThreadCommentResourceParams) *ThreadComm
 			ID:          params.ThreadComment.EntThreadComment.Edges.Author.ID,
 			Name:        params.ThreadComment.EntThreadComment.Edges.Author.Name,
 			ProfileLink: params.ThreadComment.EntThreadComment.Edges.Author.ProfileLink,
-		}
-	}
-
-	var parentCommentID int
-	var parentCommentIDx int
-	if params.ThreadComment.EntThreadComment.ParentCommentID != nil {
-		parentCommentID = *params.ThreadComment.EntThreadComment.ParentCommentID
-		if len(params.CommentIDs) > 0 {
-			parentCommentIDx = model.FindCommentIndexByID(params.CommentIDs, parentCommentID) + 1
-		} else {
-			parentCommentIDx = 0
 		}
 	}
 
@@ -82,17 +62,10 @@ func NewThreadCommentResource(params NewThreadCommentResourceParams) *ThreadComm
 	}
 
 	var replies []*ThreadCommentResource
-	for i, reply := range params.ThreadComment.EntThreadComment.Edges.Replies {
-		commentReplyCount := 0
-		if count, ok := params.ThreadComment.ThreadCommentReplyCountMap[reply.ID]; ok {
-			commentReplyCount = count
-		}
-
+	for _, reply := range params.ThreadComment.EntThreadComment.Edges.Replies {
 		commentResource := NewThreadCommentResource(NewThreadCommentResourceParams{
 			ThreadComment: &model.ThreadComment{EntThreadComment: reply},
 			Offset:        params.Offset,
-			IDx:           &i,
-			ReplyCount:    commentReplyCount,
 		})
 		replies = append(replies, commentResource)
 	}
@@ -123,19 +96,17 @@ func NewThreadCommentResource(params NewThreadCommentResourceParams) *ThreadComm
 	}
 
 	return &ThreadCommentResource{
-		ID:               params.ThreadComment.EntThreadComment.ID,
-		IDx:              IDx,
-		User:             user,
-		GuestName:        guestName,
-		Content:          params.ThreadComment.EntThreadComment.Content,
-		ParentCommentID:  parentCommentID,
-		ParentCommentIDx: parentCommentIDx,
-		ParentComment:    parentComment,
-		CreatedAt:        params.ThreadComment.EntThreadComment.CreatedAt.Format(time.RFC3339),
-		UpdatedAt:        params.ThreadComment.EntThreadComment.UpdatedAt.Format(time.RFC3339),
-		Thread:           thread,
-		Attachments:      attachments,
-		ReplyCount:       params.ReplyCount,
-		Replies:          replyList,
+		ID:              params.ThreadComment.EntThreadComment.ID,
+		User:            user,
+		GuestName:       guestName,
+		Content:         params.ThreadComment.EntThreadComment.Content,
+		ParentCommentID: params.ThreadComment.EntThreadComment.ParentCommentID,
+		ParentComment:   parentComment,
+		CreatedAt:       params.ThreadComment.EntThreadComment.CreatedAt.Format(time.RFC3339),
+		UpdatedAt:       params.ThreadComment.EntThreadComment.UpdatedAt.Format(time.RFC3339),
+		Thread:          thread,
+		Attachments:     attachments,
+		ReplyCount:      params.ReplyCount,
+		Replies:         replyList,
 	}
 }

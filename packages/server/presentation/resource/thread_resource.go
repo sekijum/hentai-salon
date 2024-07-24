@@ -19,9 +19,8 @@ type ThreadResource struct {
 }
 
 type NewThreadResourceParams struct {
-	Thread                            *model.Thread
-	ThreadCommentCount, Limit, Offset int
-	ThreadCommentReplyCountMap        map[int]int
+	Thread                      *model.Thread
+	CommentCount, Limit, Offset int
 }
 
 func NewThreadResource(params NewThreadResourceParams) *ThreadResource {
@@ -40,18 +39,12 @@ func NewThreadResource(params NewThreadResourceParams) *ThreadResource {
 
 	var comments []*ThreadCommentResource
 	var attachments []*ThreadCommentAttachmentResource
-	for i, comment := range params.Thread.EntThread.Edges.Comments {
-		commentReplyCount := 0
-		if count, ok := params.ThreadCommentReplyCountMap[comment.ID]; ok {
-			commentReplyCount = count
-		}
+	for _, comment := range params.Thread.EntThread.Edges.Comments {
 
 		commentResource := NewThreadCommentResource(NewThreadCommentResourceParams{
 			ThreadComment: &model.ThreadComment{EntThreadComment: comment},
-			CommentIDs:    params.Thread.CommentIDs,
 			Offset:        params.Offset,
-			IDx:           &i,
-			ReplyCount:    commentReplyCount,
+			ReplyCount:    len(comment.Edges.Replies),
 		})
 		comments = append(comments, commentResource)
 
@@ -62,13 +55,12 @@ func NewThreadResource(params NewThreadResourceParams) *ThreadResource {
 				DisplayOrder: threadCommentAttachment.EntAttachment.DisplayOrder,
 				Type:         threadCommentAttachment.TypeToString(),
 				CommentID:    comment.ID,
-				IDx:          commentResource.IDx,
 			})
 		}
 	}
 
 	commentsList := ListResource[*ThreadCommentResource]{
-		TotalCount: params.ThreadCommentCount,
+		TotalCount: params.CommentCount,
 		Limit:      params.Limit,
 		Offset:     params.Offset,
 		Data:       comments,
@@ -91,7 +83,7 @@ func NewThreadResource(params NewThreadResourceParams) *ThreadResource {
 		ThumbnailURL: thumbnailURL,
 		TagNameList:  tagNameList,
 		CreatedAt:    params.Thread.EntThread.CreatedAt.Format(time.RFC3339),
-		CommentCount: params.ThreadCommentCount,
+		CommentCount: params.CommentCount,
 		Comments:     commentsList,
 		Attachments:  attachments,
 	}

@@ -1,9 +1,8 @@
 <template>
-  <div class="comment-item" :id="'comments-' + comment.idx">
+  <div class="comment-item">
     <v-list-item class="comment-list-item">
       <div class="comment-header">
         <div class="comment-header-text">
-          {{ comment.idx }}
           <template v-if="comment?.user?.id && comment?.user?.profileLink">
             <nuxt-link :to="comment.user.profileLink" class="username-link" target="_blank" rel="noopener">
               {{ username() }}
@@ -16,18 +15,14 @@
         </div>
       </div>
       <div v-if="comment.parentCommentId" class="reply-indication">
-        <template v-if="comment.parentCommentIdx">
+        <template v-if="comment.parentCommentId">
           <nuxt-link
             class="reply-link"
             target="_blank"
             rel="noopener"
-            :to="{
-              path: toParentComment(comment.parentCommentIdx).path,
-              query: toParentComment(comment.parentCommentIdx).query,
-              hash: toParentComment(comment.parentCommentIdx).hash,
-            }"
+            :to="`/threads/${threadId}/comments/${comment.parentCommentId}`"
           >
-            >> {{ comment.parentCommentIdx }}
+            >> {{ comment.parentCommentId }}
           </nuxt-link>
         </template>
         <template v-else-if="comment.parentCommentId">
@@ -157,20 +152,6 @@ function closeModalMedia() {
 function username() {
   const name = props.comment?.user?.name || props.comment?.guestName || '匿名';
   return `${name}`;
-}
-
-function toParentComment(parentCommentIdx: number): {
-  path: string;
-  query: { offset: number; limit: number };
-  hash: string;
-} {
-  const limit = route.query.limit ? parseInt(route.query.limit as string, 10) : props.commentLimit;
-  const newOffset = Math.floor((parentCommentIdx - 1) / limit) * limit;
-  return {
-    path: `/threads/${props.threadId}`,
-    query: { offset: newOffset, limit },
-    hash: `#comments-${parentCommentIdx}`,
-  };
 }
 </script>
 

@@ -5,7 +5,6 @@ import (
 	"server/domain/model"
 	"server/infrastructure/ent"
 	"server/infrastructure/ent/thread"
-	"server/infrastructure/ent/threadcomment"
 	"time"
 )
 
@@ -111,17 +110,12 @@ func (ds *ThreadAdminDatasource) FindByID(params ThreadAdminDatasourceFindByIDPa
 			q.Limit(params.Limit).Offset(params.Offset)
 		}).
 		WithBoard().
+		WithComments().
 		Only(params.Ctx)
 	if err != nil {
 		return nil, err
 	}
-
-	commentCount, err := ds.client.ThreadComment.Query().Where(threadcomment.ThreadIDEQ(params.ThreadID)).Count(params.Ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	return &model.Thread{EntThread: entThread, ThreadCommentCount: commentCount}, nil
+	return &model.Thread{EntThread: entThread}, nil
 }
 
 type ThreadAdminDatasourceUpdateParams struct {

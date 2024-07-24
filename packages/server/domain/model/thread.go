@@ -1,17 +1,11 @@
 package model
 
 import (
-	"math"
 	"server/infrastructure/ent"
-	"time"
 )
 
 type Thread struct {
-	EntThread                  *ent.Thread
-	Popularity                 int
-	ThreadCommentCount         int
-	CommentIDs                 []int
-	ThreadCommentReplyCountMap map[int]int // コメント毎のリプライ数
+	EntThread *ent.Thread
 }
 
 type ThreadStatus int
@@ -46,24 +40,4 @@ func (m *Thread) StatusToLabel() string {
 	default:
 		return "不明なステータス"
 	}
-}
-
-func (m *Thread) CalculatePopularity() {
-	var totalPopularity float64
-	currentTime := time.Now()
-
-	for _, comment := range m.EntThread.Edges.Comments {
-		timeDiff := currentTime.Sub(comment.CreatedAt).Hours() + 1
-		totalPopularity += 1 / timeDiff
-	}
-
-	if m.EntThread.Title != "" {
-		totalPopularity += 10
-	}
-	if m.EntThread.Description != nil {
-		totalPopularity += 5
-	}
-
-	scaledPopularity := int(math.Min(totalPopularity, 100))
-	m.Popularity = scaledPopularity
 }

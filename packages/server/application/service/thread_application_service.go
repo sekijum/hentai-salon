@@ -55,11 +55,20 @@ func (svc *ThreadApplicationService) FindAll(params ThreadApplicationServiceFind
 		if len(params.Qs.ThreadIDs) == 0 {
 			return nil, nil
 		}
+		var tagIDs, err = svc.tagDatasource.FindAllIDs(datasource.TagDatasourceFindAllIDsParams{
+			Ctx:       params.Ctx,
+			ThreadIDs: params.Qs.ThreadIDs,
+		})
+		if err != nil {
+			return nil, err
+		}
+
 		threads, err = svc.threadDatasource.FindByRelatedTag(datasource.ThreadDatasourceFindByRelatedTagParams{
 			Ctx:       params.Ctx,
 			ThreadIDs: params.Qs.ThreadIDs,
 			Limit:     params.Qs.Limit,
 			Offset:    params.Qs.Offset,
+			TagIds:    tagIDs,
 		})
 		if err != nil {
 			return nil, err
@@ -147,8 +156,8 @@ func (svc *ThreadApplicationService) FindAll(params ThreadApplicationServiceFind
 	var dto []*resource.ThreadResource
 	for _, thread := range threads {
 		resource := resource.NewThreadResource(resource.NewThreadResourceParams{
-			Thread:             thread,
-			ThreadCommentCount: thread.ThreadCommentCount,
+			Thread:       thread,
+			CommentCount: len(thread.EntThread.Edges.Comments),
 		})
 		dto = append(dto, resource)
 	}
@@ -163,7 +172,7 @@ type ThreadApplicationServiceFindByIDParams struct {
 }
 
 func (svc *ThreadApplicationService) FindByID(params ThreadApplicationServiceFindByIDParams) (*resource.ThreadResource, error) {
-	thread, err := svc.threadDatasource.FindById(datasource.ThreadDatasourceFindByIDParams{
+	thread, commentCount, err := svc.threadDatasource.FindById(datasource.ThreadDatasourceFindByIDParams{
 		Ctx:       params.Ctx,
 		SortOrder: params.Qs.SortOrder,
 		Limit:     params.Qs.Limit,
@@ -175,11 +184,10 @@ func (svc *ThreadApplicationService) FindByID(params ThreadApplicationServiceFin
 	}
 
 	dto := resource.NewThreadResource(resource.NewThreadResourceParams{
-		Thread:                     thread,
-		Limit:                      params.Qs.Limit,
-		Offset:                     params.Qs.Offset,
-		ThreadCommentCount:         thread.ThreadCommentCount,
-		ThreadCommentReplyCountMap: thread.ThreadCommentReplyCountMap,
+		Thread:       thread,
+		CommentCount: commentCount,
+		Limit:        params.Qs.Limit,
+		Offset:       params.Qs.Offset,
 	})
 	return dto, nil
 }
