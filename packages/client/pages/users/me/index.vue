@@ -98,8 +98,8 @@ import type { IListResource } from '~/types/list-resource';
 definePageMeta({ middleware: ['logged-in-access-only'] });
 
 const menuItems = [
-  { title: 'ユーザー情報', clicked: () => router.push('/users/me'), icon: 'mdi-account' },
   { title: 'マイスレ', clicked: () => router.push('/users/me/threads'), icon: 'mdi-note' },
+  { title: 'ユーザー情報', clicked: () => router.push('/users/me'), icon: 'mdi-account' },
   { title: 'マイレス', clicked: () => router.push('/users/me/comments'), icon: 'mdi-comment' },
 ];
 

@@ -28,8 +28,8 @@ const { getThreadViewHistory } = useStorage();
 const limit = 10;
 
 const menuItems = [
-  { title: 'ユーザー情報', clicked: () => router.push('/users/me'), icon: 'mdi-account' },
   { title: 'マイスレ', clicked: () => router.push('/users/me/threads'), icon: 'mdi-note' },
+  { title: 'ユーザー情報', clicked: () => router.push('/users/me'), icon: 'mdi-account' },
   { title: 'マイレス', clicked: () => router.push('/users/me/comments'), icon: 'mdi-comment' },
 ];
 
