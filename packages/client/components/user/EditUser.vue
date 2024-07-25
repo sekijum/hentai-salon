@@ -100,7 +100,6 @@ interface IUser {
   name: string;
   role: string;
   email: string;
-  avatarUrl: string;
   profileLink: string;
   createdAt: string;
   updatedAt: string;
@@ -136,7 +135,6 @@ interface IUser {
   name: string;
   role: string;
   email: string;
-  avatarUrl: string;
   profileLink: string;
   createdAt: string;
   updatedAt: string;

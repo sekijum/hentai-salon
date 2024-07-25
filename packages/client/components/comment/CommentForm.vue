@@ -99,13 +99,13 @@ const props = defineProps<{ title?: string; parentCommentId?: number; showReplyF
 const nuxtApp = useNuxtApp();
 const router = useRouter();
 const route = useRoute();
-const { uploadFilesToImgur } = useActions();
+const { uploadFilesToImgur, fetchListPresignedUrl, uploadFilesToS3 } = useActions();
 const { setLastCommentTime, canComment, timeUntilNextComment } = useStorage();
 
 const { $api, payload } = nuxtApp;
 
 const fileInput = ref<InstanceType<typeof HTMLInputElement>>();
-const attachmentFiles = ref<File[] | null>(null);
+const attachmentFiles = ref<File[]>([]);
 const canCommentState = ref(canComment());
 const remainingTime = ref<{ minutes: number; seconds: number } | null>(null);
 
@@ -136,23 +136,13 @@ const remainingTimeText = computed(() => {
 const schema = yup.object({
   guestName: yup.string().optional(),
   content: yup.string().required('コメントは必須項目です'),
-  attachments: yup
-    .array()
-    .of(
-      yup.object({
-        url: yup.string().required(),
-        displayOrder: yup.number().required(),
-        type: yup.mixed<'Video' | 'Image'>().oneOf(['Video', 'Image']).required(),
-      }),
-    )
-    .optional(),
 });
 
 function clearForm(): void {
   if (confirm('本当にクリアしますか？')) {
     form.value.guestName = '';
     form.value.content = '';
-    attachmentFiles.value = null;
+    attachmentFiles.value = [];
     if (fileInput.value) {
       fileInput.value.value = '';
     }
@@ -165,7 +155,7 @@ function handleAttachmentsChange(event: Event): void {
     const files = Array.from(input.files);
     if (files.length > 4) {
       alert('ファイルの最大枚数は4枚です');
-      attachmentFiles.value = null;
+      attachmentFiles.value = [];
       if (fileInput.value) {
         fileInput.value.value = '';
       }
@@ -179,7 +169,17 @@ async function submit(): Promise<void> {
   if (confirm('本当に書き込みますか？')) {
     try {
       if (attachmentFiles.value && attachmentFiles.value.length > 0) {
-        const uploadedAttachments = await uploadFilesToImgur(attachmentFiles.value);
+        const presignedUrls = await fetchListPresignedUrl(attachmentFiles.value.map(file => file.name));
+        const uploadedAttachments = await Promise.all(
+          presignedUrls.map((url: string, idx: number) => {
+            return uploadFilesToS3(url, attachmentFiles.value[idx]).then(uploadedUrl => ({
+              url: uploadedUrl,
+              displayOrder: idx,
+              type: attachmentFiles.value[idx].type.startsWith('video') ? 'Video' : ('Image' as 'Video' | 'Image'),
+            }));
+          }),
+        );
+
         form.value.attachments = uploadedAttachments;
       }
 
@@ -195,7 +195,7 @@ async function submit(): Promise<void> {
       snackbar.value.isSnackbar = true;
       snackbar.value.text = '書き込みました。';
       form.value.content = '';
-      attachmentFiles.value = null;
+      attachmentFiles.value = [];
       if (fileInput.value) {
         fileInput.value.value = '';
       }

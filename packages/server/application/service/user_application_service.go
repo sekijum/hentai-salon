@@ -72,7 +72,6 @@ func (svc *UserApplicationService) Signup(params UserApplicationServiceSignupPar
 			Name:        params.Body.Name,
 			Email:       params.Body.Email,
 			Password:    hashedPassword,
-			AvatarURL:   params.Body.AvatarURL,
 			ProfileLink: params.Body.ProfileLink,
 			Status:      int(model.UserStatusActive),
 			Role:        int(model.UserRoleMember),
@@ -216,7 +215,6 @@ func (svc *UserApplicationService) Update(params UserApplicationServiceUpdatePar
 			ID:          params.UserID,
 			Name:        params.Body.Name,
 			Email:       params.Body.Email,
-			AvatarURL:   params.Body.AvatarURL,
 			ProfileLink: params.Body.ProfileLink,
 		},
 	}

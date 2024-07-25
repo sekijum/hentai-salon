@@ -9,7 +9,6 @@ type UserResource struct {
 	ID          int                                  `json:"id"`
 	Name        string                               `json:"name"`
 	Email       string                               `json:"email"`
-	AvatarURL   *string                              `json:"avatarUrl,omitempty"`
 	ProfileLink *string                              `json:"profileLink,omitempty"`
 	Role        string                               `json:"role"`
 	RoleLabel   string                               `json:"roleLabel"`
@@ -26,10 +25,6 @@ type NewUserResourceParams struct {
 }
 
 func NewUserResource(params NewUserResourceParams) *UserResource {
-	var avatarURL *string
-	if params.User.EntUser.AvatarURL != nil {
-		avatarURL = params.User.EntUser.AvatarURL
-	}
 	var profileLink *string
 	if params.User.EntUser.ProfileLink != nil {
 		profileLink = params.User.EntUser.ProfileLink
@@ -84,7 +79,6 @@ func NewUserResource(params NewUserResourceParams) *UserResource {
 		ID:          params.User.EntUser.ID,
 		Name:        params.User.EntUser.Name,
 		Email:       params.User.EntUser.Email,
-		AvatarURL:   avatarURL,
 		ProfileLink: profileLink,
 		Role:        params.User.RoleToString(),
 		RoleLabel:   params.User.RoleToLabel(),

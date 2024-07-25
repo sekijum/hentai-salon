@@ -22,8 +22,6 @@ const (
 	FieldPassword = "password"
 	// FieldProfileLink holds the string denoting the profile_link field in the database.
 	FieldProfileLink = "profile_link"
-	// FieldAvatarURL holds the string denoting the avatar_url field in the database.
-	FieldAvatarURL = "avatar_url"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
 	// FieldRole holds the string denoting the role field in the database.
@@ -134,7 +132,6 @@ var Columns = []string{
 	FieldEmail,
 	FieldPassword,
 	FieldProfileLink,
-	FieldAvatarURL,
 	FieldStatus,
 	FieldRole,
 	FieldCreatedAt,
@@ -209,11 +206,6 @@ func ByPassword(opts ...sql.OrderTermOption) OrderOption {
 // ByProfileLink orders the results by the profile_link field.
 func ByProfileLink(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldProfileLink, opts...).ToFunc()
-}
-
-// ByAvatarURL orders the results by the avatar_url field.
-func ByAvatarURL(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldAvatarURL, opts...).ToFunc()
 }
 
 // ByStatus orders the results by the status field.

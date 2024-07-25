@@ -19,7 +19,6 @@ func (User) Fields() []ent.Field {
 		field.String("email").Unique().MaxLen(254),
 		field.String("password"),
 		field.String("profile_link").Optional().Nillable(),
-		field.String("avatar_url").Optional().Nillable(),
 		field.Int("status").Default(0).Comment("0: Active, 1: Withdrawn, 2: Suspended, 2: Inactive"),
 		field.Int("role").Default(0).Comment("0: Member, 1: Admin"),
 		field.Time("created_at").Default(time.Now),

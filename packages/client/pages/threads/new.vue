@@ -102,7 +102,7 @@ const { $api } = nuxtApp;
 const tagSuggestions = ref<string[]>([]);
 const boardSuggestions = ref<{ id: number; title: string }[]>([]);
 
-const avatarFile = ref<File>();
+const thumbnailFile = ref<File>();
 
 const form = ref({
   boardId: route.query.board_id,
@@ -147,20 +147,21 @@ async function fetchBoardSuggestions() {
 function handleThumbnailChange(event: Event) {
   const input = event.target as HTMLInputElement;
   if (input.files && input.files[0]) {
-    avatarFile.value = input.files[0];
+    thumbnailFile.value = input.files[0];
   }
 }
 
 async function submit() {
   try {
-    if (avatarFile.value) {
-      const presignedUrls = await fetchListPresignedUrl([avatarFile.value.name]);
-      const thumbnailUrl = await uploadFilesToS3(presignedUrls[0], avatarFile.value);
-      form.value.thumbnailUrl = thumbnailUrl;
+    if (confirm('スレッドを作成しますか？')) {
+      if (thumbnailFile.value) {
+        const presignedUrls = await fetchListPresignedUrl([thumbnailFile.value.name]);
+        const thumbnailUrl = await uploadFilesToS3(presignedUrls[0], thumbnailFile.value);
+        form.value.thumbnailUrl = thumbnailUrl;
+      }
+      await $api.post('/threads', form.value);
+      router.push('/');
     }
-    await $api.post('/threads', form.value);
-    alert('スレッドが正常に作成されました。');
-    router.push('/');
   } catch (error) {
     console.error('通信中にエラーが発生しました:', error);
   }

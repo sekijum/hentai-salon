@@ -60,7 +60,6 @@ func seed(ctx context.Context, client *ent.Client) error {
 	users := make([]*ent.User, 100)
 	for i := 0; i < 90; i++ {
 		name := "ユーザー" + uuid.New().String()[:8]
-		avatarURL := randomImageURL(i)
 		profileLink := randomProfileLink(i)
 		createUser := tx.User.Create().
 			SetName(name).
@@ -68,9 +67,6 @@ func seed(ctx context.Context, client *ent.Client) error {
 			SetPassword("pass1234").
 			SetCreatedAt(time.Now()).
 			SetUpdatedAt(time.Now())
-		if rand.Intn(1000) >= 100 { // 1000件ほどnullにする
-			createUser.SetAvatarURL(avatarURL)
-		}
 		if rand.Intn(1000) >= 100 { // 1000件ほどnullにする
 			createUser.SetProfileLink(profileLink)
 		}
@@ -80,7 +76,6 @@ func seed(ctx context.Context, client *ent.Client) error {
 	// Create Admin Users
 	for i := 90; i < 100; i++ {
 		name := "管理者" + uuid.New().String()[:8]
-		avatarURL := randomImageURL(i)
 		profileLink := randomProfileLink(i)
 		createAdmin := tx.User.Create().
 			SetName(name).
@@ -89,9 +84,6 @@ func seed(ctx context.Context, client *ent.Client) error {
 			SetRole(1). // 管理者の役割を設定
 			SetCreatedAt(time.Now()).
 			SetUpdatedAt(time.Now())
-		if rand.Intn(1000) >= 100 { // 1000件ほどnullにする
-			createAdmin.SetAvatarURL(avatarURL)
-		}
 		if rand.Intn(1000) >= 100 { // 1000件ほどnullにする
 			createAdmin.SetProfileLink(profileLink)
 		}

@@ -55,20 +55,6 @@ func (uc *UserCreate) SetNillableProfileLink(s *string) *UserCreate {
 	return uc
 }
 
-// SetAvatarURL sets the "avatar_url" field.
-func (uc *UserCreate) SetAvatarURL(s string) *UserCreate {
-	uc.mutation.SetAvatarURL(s)
-	return uc
-}
-
-// SetNillableAvatarURL sets the "avatar_url" field if the given value is not nil.
-func (uc *UserCreate) SetNillableAvatarURL(s *string) *UserCreate {
-	if s != nil {
-		uc.SetAvatarURL(*s)
-	}
-	return uc
-}
-
 // SetStatus sets the "status" field.
 func (uc *UserCreate) SetStatus(i int) *UserCreate {
 	uc.mutation.SetStatus(i)
@@ -369,10 +355,6 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	if value, ok := uc.mutation.ProfileLink(); ok {
 		_spec.SetField(user.FieldProfileLink, field.TypeString, value)
 		_node.ProfileLink = &value
-	}
-	if value, ok := uc.mutation.AvatarURL(); ok {
-		_spec.SetField(user.FieldAvatarURL, field.TypeString, value)
-		_node.AvatarURL = &value
 	}
 	if value, ok := uc.mutation.Status(); ok {
 		_spec.SetField(user.FieldStatus, field.TypeInt, value)

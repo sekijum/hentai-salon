@@ -87,7 +87,7 @@ const { $api } = nuxtApp;
 const { getThreadViewHistory } = useStorage();
 const threadLimit = 10;
 const offset = ref(0);
-const items = ref<IThread[]>([...props.items]);
+const items = ref<IThread[]>([...props?.items]);
 
 function truncateTitle(title: string) {
   return title.length > 50 ? title.slice(0, 50) + '...' : title;

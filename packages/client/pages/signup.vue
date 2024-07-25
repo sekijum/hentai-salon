@@ -74,20 +74,6 @@
         </Field>
       </div>
 
-      <!-- <div class="field">
-        <v-file-input
-          show-size
-          truncate-length="25"
-          prepend-icon=""
-          label="アバターを選択"
-          variant="outlined"
-          density="compact"
-          hide-details
-          accept="image/*"
-          @change="handleAvatarChange"
-        />
-      </div> -->
-
       <v-btn type="submit" color="primary" block :disabled="!meta.valid">サインアップ</v-btn>
     </Form>
   </div>
@@ -107,8 +93,6 @@ const { fetchListPresignedUrl, uploadFilesToS3 } = useActions();
 
 const { $storage, $api } = nuxtApp;
 
-const avatarFile = ref<File>();
-
 const snackbar = useState('isSnackbar', () => {
   return { isSnackbar: false, text: '' };
 });
@@ -118,7 +102,6 @@ const form = ref({
   email: '',
   password: '',
   confirmPassword: '',
-  avatarUrl: null as null | string,
   profileLink: '' as null | string,
 });
 
@@ -138,13 +121,6 @@ const schema = yup.object({
   profileLink: yup.string().url('有効なURLを入力してください').optional(),
 });
 
-function handleAvatarChange(event: Event) {
-  const input = event.target as HTMLInputElement;
-  if (input.files && input.files[0]) {
-    avatarFile.value = input.files[0];
-  }
-}
-
 async function submit() {
   try {
     // 空文字列をnullに変換
@@ -152,13 +128,6 @@ async function submit() {
       form.value.profileLink = null;
     }
 
-    if (avatarFile.value) {
-      const presignedUrls = await fetchListPresignedUrl([avatarFile.value.name]);
-      const thumbnailUrl = await uploadFilesToS3(presignedUrls[0], avatarFile.value);
-      form.value.avatarUrl = thumbnailUrl;
-    } else {
-      form.value.avatarUrl = null;
-    }
     const response = await $api.post('/signup', form.value);
     const authHeader = response.headers.authorization;
     const token = authHeader.split(' ')[1];

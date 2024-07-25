@@ -93,26 +93,6 @@ func (uu *UserUpdate) ClearProfileLink() *UserUpdate {
 	return uu
 }
 
-// SetAvatarURL sets the "avatar_url" field.
-func (uu *UserUpdate) SetAvatarURL(s string) *UserUpdate {
-	uu.mutation.SetAvatarURL(s)
-	return uu
-}
-
-// SetNillableAvatarURL sets the "avatar_url" field if the given value is not nil.
-func (uu *UserUpdate) SetNillableAvatarURL(s *string) *UserUpdate {
-	if s != nil {
-		uu.SetAvatarURL(*s)
-	}
-	return uu
-}
-
-// ClearAvatarURL clears the value of the "avatar_url" field.
-func (uu *UserUpdate) ClearAvatarURL() *UserUpdate {
-	uu.mutation.ClearAvatarURL()
-	return uu
-}
-
 // SetStatus sets the "status" field.
 func (uu *UserUpdate) SetStatus(i int) *UserUpdate {
 	uu.mutation.ResetStatus()
@@ -509,12 +489,6 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if uu.mutation.ProfileLinkCleared() {
 		_spec.ClearField(user.FieldProfileLink, field.TypeString)
-	}
-	if value, ok := uu.mutation.AvatarURL(); ok {
-		_spec.SetField(user.FieldAvatarURL, field.TypeString, value)
-	}
-	if uu.mutation.AvatarURLCleared() {
-		_spec.ClearField(user.FieldAvatarURL, field.TypeString)
 	}
 	if value, ok := uu.mutation.Status(); ok {
 		_spec.SetField(user.FieldStatus, field.TypeInt, value)
@@ -979,26 +953,6 @@ func (uuo *UserUpdateOne) ClearProfileLink() *UserUpdateOne {
 	return uuo
 }
 
-// SetAvatarURL sets the "avatar_url" field.
-func (uuo *UserUpdateOne) SetAvatarURL(s string) *UserUpdateOne {
-	uuo.mutation.SetAvatarURL(s)
-	return uuo
-}
-
-// SetNillableAvatarURL sets the "avatar_url" field if the given value is not nil.
-func (uuo *UserUpdateOne) SetNillableAvatarURL(s *string) *UserUpdateOne {
-	if s != nil {
-		uuo.SetAvatarURL(*s)
-	}
-	return uuo
-}
-
-// ClearAvatarURL clears the value of the "avatar_url" field.
-func (uuo *UserUpdateOne) ClearAvatarURL() *UserUpdateOne {
-	uuo.mutation.ClearAvatarURL()
-	return uuo
-}
-
 // SetStatus sets the "status" field.
 func (uuo *UserUpdateOne) SetStatus(i int) *UserUpdateOne {
 	uuo.mutation.ResetStatus()
@@ -1425,12 +1379,6 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	}
 	if uuo.mutation.ProfileLinkCleared() {
 		_spec.ClearField(user.FieldProfileLink, field.TypeString)
-	}
-	if value, ok := uuo.mutation.AvatarURL(); ok {
-		_spec.SetField(user.FieldAvatarURL, field.TypeString, value)
-	}
-	if uuo.mutation.AvatarURLCleared() {
-		_spec.ClearField(user.FieldAvatarURL, field.TypeString)
 	}
 	if value, ok := uuo.mutation.Status(); ok {
 		_spec.SetField(user.FieldStatus, field.TypeInt, value)

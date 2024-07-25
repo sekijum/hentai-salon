@@ -86,14 +86,15 @@ function handleThumbnailChange(event: Event) {
 
 async function submit() {
   try {
-    if (thumbnailFile.value) {
-      const presignedUrls = await fetchListPresignedUrl([thumbnailFile.value.name]);
-      const thumbnailUrl = await uploadFilesToS3(presignedUrls[0], thumbnailFile.value);
-      form.value.thumbnailUrl = thumbnailUrl;
+    if (confirm('板を作成しますか？')) {
+      if (thumbnailFile.value) {
+        const presignedUrls = await fetchListPresignedUrl([thumbnailFile.value.name]);
+        const thumbnailUrl = await uploadFilesToS3(presignedUrls[0], thumbnailFile.value);
+        form.value.thumbnailUrl = thumbnailUrl;
+      }
+      await $api.post('/admin/boards', form.value);
+      router.push('/');
     }
-    await $api.post('/admin/boards', form.value);
-    alert('板が正常に作成されました。');
-    router.push('/');
   } catch (error) {
     console.error('通信中にエラーが発生しました:', error);
   }

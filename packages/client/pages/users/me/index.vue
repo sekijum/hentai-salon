@@ -91,9 +91,7 @@
 import { Form, Field } from 'vee-validate';
 import PageTitle from '~/components/PageTitle.vue';
 import * as yup from 'yup';
-import type { IThread } from '~/types/thread';
-import type { IThreadComment } from '~/types/thread-comment';
-import type { IListResource } from '~/types/list-resource';
+import type { IUser } from '~/types/user';
 
 definePageMeta({ middleware: ['logged-in-access-only'] });
 
@@ -106,19 +104,6 @@ const menuItems = [
 const snackbar = useState('isSnackbar', () => {
   return { isSnackbar: false, text: '' };
 });
-
-interface IUser {
-  id: number;
-  name: string;
-  role: string;
-  email: string;
-  avatarUrl: string;
-  profileLink: string;
-  createdAt: string;
-  updatedAt: string;
-  threads: IListResource<IThread>;
-  comments: IListResource<IThreadComment>;
-}
 
 const schema = yup.object({
   name: yup.string().required('必須項目です'),
@@ -145,19 +130,6 @@ const form = ref({
   oldPassword: '',
   newPassword: '',
 });
-
-interface IUser {
-  id: number;
-  name: string;
-  role: string;
-  email: string;
-  avatarUrl: string;
-  profileLink: string;
-  createdAt: string;
-  updatedAt: string;
-  threads: IListResource<IThread>;
-  comments: IListResource<IThreadComment>;
-}
 
 onMounted(async () => {
   await fetchUser();

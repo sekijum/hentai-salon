@@ -114,9 +114,6 @@ func (ds *UserDatasource) Create(params UserDatasourceCreateParams) (*model.User
 		SetStatus(params.User.EntUser.Status).
 		SetRole(params.User.EntUser.Role)
 
-	if params.User.EntUser.AvatarURL != nil {
-		userBuilder.SetAvatarURL(*params.User.EntUser.AvatarURL)
-	}
 	if params.User.EntUser.ProfileLink != nil {
 		userBuilder.SetProfileLink(*params.User.EntUser.ProfileLink)
 	}
@@ -160,9 +157,6 @@ func (ds *UserDatasource) Update(params UserDatasourceUpdateParams) (*model.User
 	}
 	if params.User.EntUser.ProfileLink != nil {
 		update.SetProfileLink(*params.User.EntUser.ProfileLink)
-	}
-	if params.User.EntUser.AvatarURL != nil {
-		update.SetAvatarURL(*params.User.EntUser.AvatarURL)
 	}
 	if params.User.EntUser.Status != 0 {
 		update.SetStatus(params.User.EntUser.Status)

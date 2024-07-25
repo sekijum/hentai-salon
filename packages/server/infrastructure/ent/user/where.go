@@ -75,11 +75,6 @@ func ProfileLink(v string) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldProfileLink, v))
 }
 
-// AvatarURL applies equality check predicate on the "avatar_url" field. It's identical to AvatarURLEQ.
-func AvatarURL(v string) predicate.User {
-	return predicate.User(sql.FieldEQ(FieldAvatarURL, v))
-}
-
 // Status applies equality check predicate on the "status" field. It's identical to StatusEQ.
 func Status(v int) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldStatus, v))
@@ -368,81 +363,6 @@ func ProfileLinkEqualFold(v string) predicate.User {
 // ProfileLinkContainsFold applies the ContainsFold predicate on the "profile_link" field.
 func ProfileLinkContainsFold(v string) predicate.User {
 	return predicate.User(sql.FieldContainsFold(FieldProfileLink, v))
-}
-
-// AvatarURLEQ applies the EQ predicate on the "avatar_url" field.
-func AvatarURLEQ(v string) predicate.User {
-	return predicate.User(sql.FieldEQ(FieldAvatarURL, v))
-}
-
-// AvatarURLNEQ applies the NEQ predicate on the "avatar_url" field.
-func AvatarURLNEQ(v string) predicate.User {
-	return predicate.User(sql.FieldNEQ(FieldAvatarURL, v))
-}
-
-// AvatarURLIn applies the In predicate on the "avatar_url" field.
-func AvatarURLIn(vs ...string) predicate.User {
-	return predicate.User(sql.FieldIn(FieldAvatarURL, vs...))
-}
-
-// AvatarURLNotIn applies the NotIn predicate on the "avatar_url" field.
-func AvatarURLNotIn(vs ...string) predicate.User {
-	return predicate.User(sql.FieldNotIn(FieldAvatarURL, vs...))
-}
-
-// AvatarURLGT applies the GT predicate on the "avatar_url" field.
-func AvatarURLGT(v string) predicate.User {
-	return predicate.User(sql.FieldGT(FieldAvatarURL, v))
-}
-
-// AvatarURLGTE applies the GTE predicate on the "avatar_url" field.
-func AvatarURLGTE(v string) predicate.User {
-	return predicate.User(sql.FieldGTE(FieldAvatarURL, v))
-}
-
-// AvatarURLLT applies the LT predicate on the "avatar_url" field.
-func AvatarURLLT(v string) predicate.User {
-	return predicate.User(sql.FieldLT(FieldAvatarURL, v))
-}
-
-// AvatarURLLTE applies the LTE predicate on the "avatar_url" field.
-func AvatarURLLTE(v string) predicate.User {
-	return predicate.User(sql.FieldLTE(FieldAvatarURL, v))
-}
-
-// AvatarURLContains applies the Contains predicate on the "avatar_url" field.
-func AvatarURLContains(v string) predicate.User {
-	return predicate.User(sql.FieldContains(FieldAvatarURL, v))
-}
-
-// AvatarURLHasPrefix applies the HasPrefix predicate on the "avatar_url" field.
-func AvatarURLHasPrefix(v string) predicate.User {
-	return predicate.User(sql.FieldHasPrefix(FieldAvatarURL, v))
-}
-
-// AvatarURLHasSuffix applies the HasSuffix predicate on the "avatar_url" field.
-func AvatarURLHasSuffix(v string) predicate.User {
-	return predicate.User(sql.FieldHasSuffix(FieldAvatarURL, v))
-}
-
-// AvatarURLIsNil applies the IsNil predicate on the "avatar_url" field.
-func AvatarURLIsNil() predicate.User {
-	return predicate.User(sql.FieldIsNull(FieldAvatarURL))
-}
-
-// AvatarURLNotNil applies the NotNil predicate on the "avatar_url" field.
-func AvatarURLNotNil() predicate.User {
-	return predicate.User(sql.FieldNotNull(FieldAvatarURL))
-}
-
-// AvatarURLEqualFold applies the EqualFold predicate on the "avatar_url" field.
-func AvatarURLEqualFold(v string) predicate.User {
-	return predicate.User(sql.FieldEqualFold(FieldAvatarURL, v))
-}
-
-// AvatarURLContainsFold applies the ContainsFold predicate on the "avatar_url" field.
-func AvatarURLContainsFold(v string) predicate.User {
-	return predicate.User(sql.FieldContainsFold(FieldAvatarURL, v))
 }
 
 // StatusEQ applies the EQ predicate on the "status" field.

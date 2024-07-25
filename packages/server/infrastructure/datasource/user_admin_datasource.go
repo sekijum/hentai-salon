@@ -136,9 +136,6 @@ func (ds *UserAdminDatasource) Update(params UserAdminDatasourceUpdateParams) (*
 	if params.User.EntUser.ProfileLink != nil {
 		update = update.SetProfileLink(*params.User.EntUser.ProfileLink)
 	}
-	if params.User.EntUser.AvatarURL != nil {
-		update = update.SetAvatarURL(*params.User.EntUser.AvatarURL)
-	}
 	if params.User.EntUser.Status != 0 {
 		update = update.SetStatus(params.User.EntUser.Status)
 	}

@@ -2,11 +2,7 @@
   <v-app>
     <v-navigation-drawer permanent expand-on-hover rail>
       <v-list>
-        <v-list-item
-          :prepend-avatar="payload.user?.avatarUrl || '/no-image.jpg'"
-          :subtitle="payload.user?.email"
-          :title="payload.user?.name"
-        />
+        <v-list-item prepend-avatar="/no-image.jpg" :subtitle="payload.user?.email" :title="payload.user?.name" />
       </v-list>
 
       <v-divider />
