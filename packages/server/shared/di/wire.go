@@ -8,6 +8,7 @@ import (
 	"server/infrastructure/aws"
 	"server/infrastructure/datasource"
 	"server/infrastructure/ent"
+	"server/infrastructure/mailpit"
 	"server/infrastructure/minio"
 	"server/presentation/controller"
 
@@ -18,6 +19,7 @@ var externalServiceSet = wire.NewSet(
 	ent.ProvideClient,
 	aws.NewS3Client,
 	minio.NewMinioClient,
+	mailpit.NewMailpitClient,
 )
 
 var controllerSet = wire.NewSet(

@@ -27,3 +27,15 @@ type UserUpdatePasswordRequest struct {
 	OldPassword string `json:"oldPassword" binding:"required,min=6"`
 	NewPassword string `json:"newPassword" binding:"required,min=6"`
 }
+
+type UserForgotPasswordRequest struct {
+	Email string `json:"email" binding:"required,email,max=254"`
+}
+
+type UserResetPasswordRequest struct {
+	Password string `json:"password" binding:"required,min=6"`
+}
+
+type UserVerifyResetPasswordTokenRequest struct {
+	Token string `json:"token" binding:"required"`
+}

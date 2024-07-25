@@ -3,6 +3,8 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
+	"net/url"
 	"os"
 	"server/domain/lib/util"
 	"server/domain/model"
@@ -12,15 +14,18 @@ import (
 	"server/presentation/resource"
 	"time"
 
+	mailpit "server/infrastructure/mailpit"
+
 	"github.com/dgrijalva/jwt-go"
 )
 
 type UserApplicationService struct {
 	userDatasource *datasource.UserDatasource
+	mailpitClient  *mailpit.MailpitClient
 }
 
-func NewUserApplicationService(userDatasource *datasource.UserDatasource) *UserApplicationService {
-	return &UserApplicationService{userDatasource: userDatasource}
+func NewUserApplicationService(userDatasource *datasource.UserDatasource, mailpitClient *mailpit.MailpitClient) *UserApplicationService {
+	return &UserApplicationService{userDatasource: userDatasource, mailpitClient: mailpitClient}
 }
 
 type UserApplicationServiceFindByIDParams struct {
@@ -231,9 +236,9 @@ func (svc *UserApplicationService) Update(params UserApplicationServiceUpdatePar
 }
 
 type UserApplicationServiceUpdatePasswordParams struct {
-	Ctx                      context.Context
-	UserID                   int
-	OldPassword, NewPassword string
+	Ctx    context.Context
+	UserID int
+	Body   request.UserUpdatePasswordRequest
 }
 
 func (svc *UserApplicationService) UpdatePassword(params UserApplicationServiceUpdatePasswordParams) error {
@@ -245,13 +250,120 @@ func (svc *UserApplicationService) UpdatePassword(params UserApplicationServiceU
 		return err
 	}
 
-	if err := util.ComparePassword(user.EntUser.Password, params.OldPassword); err != nil {
+	if err := util.ComparePassword(user.EntUser.Password, params.Body.OldPassword); err != nil {
 		return errors.New("現在のパスワードが一致しません")
 	}
 
-	hashedPassword, err := util.HashPassword(params.NewPassword)
+	hashedPassword, err := util.HashPassword(params.Body.NewPassword)
 	if err != nil {
 		return err
+	}
+
+	_, err = svc.userDatasource.UpdatePassword(datasource.UserDatasourceUpdatePasswordParams{
+		Ctx:      params.Ctx,
+		UserID:   params.UserID,
+		Password: hashedPassword,
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+type UserApplicationServiceForgotPasswordParams struct {
+	Ctx  context.Context
+	Body request.UserForgotPasswordRequest
+}
+
+func (svc *UserApplicationService) ForgotPassword(params UserApplicationServiceForgotPasswordParams) error {
+	user, err := svc.userDatasource.FindByEmail(datasource.UserDatasourceFindByEmailParams{
+		Ctx:   params.Ctx,
+		Email: params.Body.Email,
+	})
+	if err != nil {
+		return err
+	}
+	if user == nil {
+		return errors.New("ユーザーが見つかりません。")
+	}
+
+	jwtSecretKey := os.Getenv("JWT_SECRET_KEY")
+	if jwtSecretKey == "" {
+		return errors.New("秘密鍵が設定されていません")
+	}
+
+	resetToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"userID": user.EntUser.ID,
+		"exp":    time.Now().Add(1 * time.Hour).Unix(),
+	})
+
+	tokenString, err := resetToken.SignedString([]byte(jwtSecretKey))
+	if err != nil {
+		return fmt.Errorf("トークンの生成に失敗しました: %v", err)
+	}
+
+	resetURL := fmt.Sprintf("http://example.com/reset-password?token=%s", url.QueryEscape(tokenString))
+
+	emailSubject := "パスワードリセットのリクエスト"
+	emailBody := fmt.Sprintf("以下のリンクを使用してパスワードをリセットしてください：\n\n%s\n\nこのリンクは1時間以内に有効です。", resetURL)
+
+	err = svc.mailpitClient.SendEmail(params.Body.Email, emailSubject, emailBody)
+	if err != nil {
+		return fmt.Errorf("メールの送信に失敗しました: %v", err)
+	}
+
+	return nil
+}
+
+type TokenClaims struct {
+	UserID int `json:"userID"`
+	jwt.StandardClaims
+}
+
+type UserVerifyResetPasswordTokenRequestParams struct {
+	Ctx  context.Context
+	Body request.UserVerifyResetPasswordTokenRequest
+}
+
+func (svc *UserApplicationService) VerifyResetPasswordToken(params UserVerifyResetPasswordTokenRequestParams) error {
+	jwtSecretKey := os.Getenv("JWT_SECRET_KEY")
+	if jwtSecretKey == "" {
+		return errors.New("秘密鍵が設定されていません")
+	}
+
+	token, err := jwt.ParseWithClaims(params.Body.Token, &TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, errors.New("予期しない署名方法です")
+		}
+		return []byte(jwtSecretKey), nil
+	})
+
+	if err != nil {
+		return errors.New("トークンの解析に失敗しました")
+	}
+
+	if claims, ok := token.Claims.(*TokenClaims); ok && token.Valid {
+		if claims.ExpiresAt < time.Now().Unix() {
+			return errors.New("トークンの有効期限が切れています")
+		}
+		return nil
+	} else {
+		return errors.New("トークンが無効です")
+	}
+}
+
+type UserResetPasswordRequestParams struct {
+	Ctx    context.Context
+	UserID int
+	Body   request.UserResetPasswordRequest
+}
+
+func (svc *UserApplicationService) ResetPassword(params UserResetPasswordRequestParams) error {
+
+	hashedPassword, err := util.HashPassword(params.Body.Password)
+	if err != nil {
+		return fmt.Errorf("パスワードのハッシュ化に失敗しました: %v", err)
 	}
 
 	_, err = svc.userDatasource.UpdatePassword(datasource.UserDatasourceUpdatePasswordParams{

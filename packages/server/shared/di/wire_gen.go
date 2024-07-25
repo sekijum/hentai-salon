@@ -12,6 +12,7 @@ import (
 	"server/infrastructure/aws"
 	"server/infrastructure/datasource"
 	"server/infrastructure/ent"
+	"server/infrastructure/mailpit"
 	"server/infrastructure/minio"
 	"server/presentation/controller"
 )
@@ -27,7 +28,8 @@ func InitializeControllers() (*ControllersSet, func(), error) {
 	boardApplicationService := service.NewBoardApplicationService(boardDatasource)
 	boardController := controller.NewBoardController(boardApplicationService)
 	userDatasource := datasource.NewUserDatasource(client)
-	userApplicationService := service.NewUserApplicationService(userDatasource)
+	mailpitClient := mailpit.NewMailpitClient()
+	userApplicationService := service.NewUserApplicationService(userDatasource, mailpitClient)
 	userController := controller.NewUserController(userApplicationService)
 	threadDatasource := datasource.NewThreadDatasource(client)
 	tagDatasource := datasource.NewTagDatasource(client)
@@ -77,7 +79,7 @@ func InitializeControllers() (*ControllersSet, func(), error) {
 
 // wire.go:
 
-var externalServiceSet = wire.NewSet(ent.ProvideClient, aws.NewS3Client, minio.NewMinioClient)
+var externalServiceSet = wire.NewSet(ent.ProvideClient, aws.NewS3Client, minio.NewMinioClient, mailpit.NewMailpitClient)
 
 var controllerSet = wire.NewSet(controller.NewBoardController, controller.NewUserController, controller.NewThreadController, controller.NewThreadCommentController, controller.NewTagController, controller.NewStorageController, controller.NewUserAdminController, controller.NewBoardAdminController, controller.NewThreadAdminController)
 

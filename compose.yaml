@@ -99,6 +99,15 @@ services:
     networks:
       - hentai_salon
 
+  mailpit:
+    image: axllent/mailpit
+    container_name: hentai-salon-mailpit
+    ports:
+      - 1025:1025
+      - 8025:8025
+    networks:
+      - hentai_salon
+
 networks:
   hentai_salon:
     external: true

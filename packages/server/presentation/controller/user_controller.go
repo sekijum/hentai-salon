@@ -151,10 +151,9 @@ func (ctrl *UserController) UpdatePassword(ctx *gin.Context) {
 	}
 
 	err := ctrl.userApplicationService.UpdatePassword(service.UserApplicationServiceUpdatePasswordParams{
-		Ctx:         context.Background(),
-		UserID:      userID.(int),
-		OldPassword: body.OldPassword,
-		NewPassword: body.NewPassword,
+		Ctx:    context.Background(),
+		UserID: userID.(int),
+		Body:   body,
 	})
 	if err != nil {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
@@ -162,4 +161,61 @@ func (ctrl *UserController) UpdatePassword(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, "パスワードを更新しました。")
+}
+
+func (ctrl *UserController) ForgotPassword(ctx *gin.Context) {
+	var body request.UserForgotPasswordRequest
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	err := ctrl.userApplicationService.ForgotPassword(service.UserApplicationServiceForgotPasswordParams{
+		Ctx:  context.Background(),
+		Body: body,
+	})
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, "パスワード変更URLを送信しました。")
+}
+
+func (ctrl *UserController) VerifyResetPasswordToken(ctx *gin.Context) {
+	var body request.UserVerifyResetPasswordTokenRequest
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	err := ctrl.userApplicationService.VerifyResetPasswordToken(service.UserVerifyResetPasswordTokenRequestParams{
+		Ctx:  context.Background(),
+		Body: body,
+	})
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, "パスワード変更URLを送信しました。")
+}
+
+func (ctrl *UserController) ResetPassword(ctx *gin.Context) {
+	var body request.UserResetPasswordRequest
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	err := ctrl.userApplicationService.ResetPassword(service.UserResetPasswordRequestParams{
+		Ctx:  context.Background(),
+		Body: body,
+	})
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, "パスワード変更URLを送信しました。")
 }
