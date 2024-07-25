@@ -48,7 +48,6 @@ export default defineNuxtConfig({
         { rel: 'apple-touch-icon', sizes: '180x180', href: '/hentai-salon-logo/logo_transparent.png' },
         { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/hentai-salon-logo/logo_transparent.png' },
         { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/hentai-salon-logo/logo_transparent.png' },
-        { rel: 'manifest', href: '/site.webmanifest' },
       ],
     },
   },
