@@ -59,7 +59,7 @@
 
       <v-row class="no-gutters">
         <v-col cols="6">
-          <v-btn class="clear-button" block @click="clearForm">クリア</v-btn>
+          <v-btn class="clear-button" block @click="() => fileInput!.reset()" type="reset">クリア</v-btn>
         </v-col>
         <v-col cols="6">
           <template v-if="canCommentState || payload.isLoggedIn">
@@ -99,7 +99,7 @@ const props = defineProps<{ title?: string; parentCommentId?: number; showReplyF
 const nuxtApp = useNuxtApp();
 const router = useRouter();
 const route = useRoute();
-const { uploadFilesToImgur, fetchListPresignedUrl, uploadFilesToS3 } = useActions();
+const { fetchListPresignedUrl, uploadFilesToS3 } = useActions();
 const { setLastCommentTime, canComment, timeUntilNextComment } = useStorage();
 
 const { $api, payload } = nuxtApp;
@@ -138,30 +138,45 @@ const schema = yup.object({
   content: yup.string().required('コメントは必須項目です'),
 });
 
-function clearForm(): void {
-  if (confirm('本当にクリアしますか？')) {
-    form.value.guestName = '';
-    form.value.content = '';
-    attachmentFiles.value = [];
-    if (fileInput.value) {
-      fileInput.value.value = '';
-    }
-  }
-}
-
 function handleAttachmentsChange(event: Event): void {
   const input = event.target as HTMLInputElement;
   if (input.files) {
     const files = Array.from(input.files);
+    const invalidFiles = files.filter(
+      file => !['image/jpeg', 'image/png', 'image/gif'].includes(file.type) || file.size > 1 * 1024 * 1024,
+    );
+
+    if (invalidFiles.length > 0) {
+      const messages: string[] = [];
+      invalidFiles.forEach(file => {
+        if (!['image/jpeg', 'image/png', 'image/gif'].includes(file.type)) {
+          messages.push(
+            `${file.name}は無効なファイルタイプです。許可されているタイプはimage/jpeg, image/png, image/gifです。`,
+          );
+        }
+        if (file.size > 1 * 1024 * 1024) {
+          messages.push(`${file.name}は1MBを超えています。ファイルサイズの最大は1MBです。`);
+        }
+      });
+
+      alert(messages.join('\n'));
+      attachmentFiles.value = [];
+      if (fileInput.value) {
+        fileInput.value.reset();
+      }
+      return;
+    }
+
     if (files.length > 4) {
       alert('ファイルの最大枚数は4枚です');
       attachmentFiles.value = [];
       if (fileInput.value) {
-        fileInput.value.value = '';
+        fileInput.value.reset();
       }
-    } else {
-      attachmentFiles.value = files;
+      return;
     }
+
+    attachmentFiles.value = files;
   }
 }
 
@@ -197,7 +212,7 @@ async function submit(): Promise<void> {
       form.value.content = '';
       attachmentFiles.value = [];
       if (fileInput.value) {
-        fileInput.value.value = '';
+        fileInput.value.reset();
       }
       emit('submit');
     } catch (error) {
