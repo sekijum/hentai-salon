@@ -164,6 +164,7 @@ async function update() {
     }
   }
 }
+
 async function updatePassword() {
   if (confirm('パスワードを更新しますか？')) {
     try {
@@ -175,8 +176,7 @@ async function updatePassword() {
       snackbar.value.text = 'パスワードを更新しました。';
       fetchUser();
     } catch (err) {
-      console.log(err);
-      alert(err.response.data.error);
+      alert('通信中にエラーが発生しました');
     }
   }
 }

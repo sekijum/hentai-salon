@@ -74,6 +74,9 @@ func (ds *ThreadCommentDatasource) FindByID(params ThreadCommentDatasourceFindBy
 				Limit(params.Limit).
 				Offset(params.Offset).
 				WithAuthor().
+				WithReplies(func(rq *ent.ThreadCommentQuery) {
+					rq.Select(threadcomment.FieldID)
+				}).
 				WithAttachments(func(aq *ent.ThreadCommentAttachmentQuery) {
 					aq.Order(ent.Asc(threadcommentattachment.FieldDisplayOrder))
 				})

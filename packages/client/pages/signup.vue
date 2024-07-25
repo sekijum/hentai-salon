@@ -136,7 +136,7 @@ async function submit() {
     snackbar.value.text = 'サインアップしました。';
     router.push('/');
   } catch (err) {
-    alert(err.response.data.error);
+    alert('通信中にエラーが発生しました');
   }
 }
 

@@ -1,40 +1,37 @@
 <template>
   <div>
-    <v-infinite-scroll :items="items" :onLoad="load">
-      <v-row class="pa-0 ma-0">
-        <v-col v-for="item in items" :key="item.commentId" class="d-flex child-flex pa-0 ma-0" cols="6">
-          <v-img
-            v-if="item.type !== 'Video'"
-            :lazy-src="item.url"
+    <v-row class="pa-0 ma-0">
+      <v-col v-for="item in attachments" :key="item.commentId" class="d-flex child-flex pa-0 ma-0" cols="6">
+        <v-img
+          v-if="item.type !== 'Video'"
+          :lazy-src="item.url"
+          :src="item.url"
+          aspect-ratio="1"
+          class="bg-grey-lighten-2"
+          cover
+          @click="openModalMedia(item)"
+          referrerpolicy="no-referrer"
+        >
+          <template v-slot:placeholder>
+            <v-row align="center" class="fill-height ma-0" justify="center">
+              <v-progress-circular color="grey-lighten-5" indeterminate></v-progress-circular>
+            </v-row>
+          </template>
+        </v-img>
+        <div v-else class="video-container" @click="openModalMedia(item)">
+          <video
+            ref="video"
             :src="item.url"
-            aspect-ratio="1"
-            class="bg-grey-lighten-2"
-            cover
-            @click="openModalMedia(item)"
+            @loadedmetadata="updateVideoMeta(item)"
+            muted
+            class="video-thumbnail"
             referrerpolicy="no-referrer"
-          >
-            <template v-slot:placeholder>
-              <v-row align="center" class="fill-height ma-0" justify="center">
-                <v-progress-circular color="grey-lighten-5" indeterminate></v-progress-circular>
-              </v-row>
-            </template>
-          </v-img>
-          <div v-else class="video-container" @click="openModalMedia(item)">
-            <video
-              ref="video"
-              :src="item.url"
-              @loadedmetadata="updateVideoMeta(item)"
-              muted
-              class="video-thumbnail"
-              referrerpolicy="no-referrer"
-            />
-            <v-icon class="play-icon">mdi-play-circle</v-icon>
-            <div v-if="item.duration" class="time-label">{{ formatTime(item.duration) }}</div>
-          </div>
-        </v-col>
-      </v-row>
-      <template v-slot:empty />
-    </v-infinite-scroll>
+          />
+          <v-icon class="play-icon">mdi-play-circle</v-icon>
+          <div v-if="item.duration" class="time-label">{{ formatTime(item.duration) }}</div>
+        </div>
+      </v-col>
+    </v-row>
 
     <MediaModal
       v-if="selectedAttachment"
@@ -58,8 +55,6 @@ const props = defineProps<{
 
 const route = useRoute();
 
-const items = ref<IThreadCommentAttachmentForThread[]>(props.attachments.slice(0, 10));
-const currentIndex = ref(10);
 const selectedAttachment = ref<IThreadCommentAttachment | null>();
 const selectedAttachmentMeta = ref<{ to: string } | null>();
 
@@ -67,7 +62,7 @@ function openModalMedia(attachment: IThreadCommentAttachmentForThread) {
   const limit = route.query.limit ? parseInt(route.query.limit as string, 10) : props.commentLimit;
   const newOffset = Math.floor((attachment.idx - 1) / limit) * limit;
   selectedAttachmentMeta.value = {
-    to: `/threads/${props.threadId}?offset=${newOffset}&limit=${limit}#comments-${attachment.idx}`,
+    to: `/threads/${props.threadId}/comments/${attachment.commentId}`,
   };
   selectedAttachment.value = { url: attachment.url, type: attachment.type, displayOrder: attachment.displayOrder };
 }
@@ -75,18 +70,6 @@ function openModalMedia(attachment: IThreadCommentAttachmentForThread) {
 function closeModalMedia() {
   selectedAttachmentMeta.value = null;
   selectedAttachment.value = null;
-}
-
-async function load({ done }: { done: (status: 'loading' | 'error' | 'empty' | 'ok') => void }) {
-  if (currentIndex.value >= props.attachments.length) {
-    done('empty');
-    return;
-  }
-
-  const nextItems = props.attachments.slice(currentIndex.value, currentIndex.value + 10);
-  items.value.push(...nextItems);
-  currentIndex.value += 10;
-  done('ok');
 }
 
 function formatTime(seconds: number): string {
@@ -102,14 +85,6 @@ function updateVideoMeta(item: IThreadCommentAttachmentForThread) {
     item.duration = videoElement.duration;
   };
 }
-
-watch(
-  () => props.attachments,
-  newAttachments => {
-    items.value = newAttachments.slice(0, 10);
-    currentIndex.value = 10;
-  },
-);
 </script>
 
 <style scoped>

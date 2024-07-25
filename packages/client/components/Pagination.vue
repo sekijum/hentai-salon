@@ -24,14 +24,13 @@ const props = defineProps<{
 const route = useRoute();
 const router = useRouter();
 
-const limit = ref(parseInt(route.query.limit as string) || props.limit);
 const offset = ref(Number.isNaN(parseInt(route.query.offset as string)) ? 0 : parseInt(route.query.offset as string));
-const page = ref(Math.floor(offset.value / limit.value) + 1);
+const page = ref(Math.floor(offset.value / props.limit) + 1);
 
-const totalPages = computed(() => Math.ceil(props.totalCount / limit.value));
+const totalPages = computed(() => Math.ceil(props.totalCount / props.limit));
 
 const onPageChange = (page: number) => {
-  const newOffset = (page - 1) * limit.value;
-  router.push({ query: { ...route.query, offset: newOffset, limit: limit.value } });
+  const newOffset = (page - 1) * props.limit;
+  router.push({ query: { ...route.query, offset: newOffset, limit: props.limit } });
 };
 </script>

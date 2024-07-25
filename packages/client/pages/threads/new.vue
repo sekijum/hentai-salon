@@ -123,25 +123,17 @@ const schema = yup.object({
 });
 
 async function fetchTagSuggestions() {
-  try {
-    const response = await $api.get<string[]>('/tags/name');
-    tagSuggestions.value = response.data;
-  } catch (error) {
-    console.error('通信中にエラーが発生しました:', error);
-  }
+  const response = await $api.get<string[]>('/tags/name');
+  tagSuggestions.value = response.data;
 }
 
 async function fetchBoardSuggestions() {
-  try {
-    const response = await $api.get<IBoard[]>('/boards');
+  const response = await $api.get<IBoard[]>('/boards');
 
-    boardSuggestions.value = response.data.map(board => ({
-      id: board.id,
-      title: board.title,
-    }));
-  } catch (error) {
-    console.error('通信中にエラーが発生しました:', error);
-  }
+  boardSuggestions.value = response.data.map(board => ({
+    id: board.id,
+    title: board.title,
+  }));
 }
 
 function handleThumbnailChange(event: Event) {
@@ -163,7 +155,7 @@ async function submit() {
       router.push('/');
     }
   } catch (error) {
-    console.error('通信中にエラーが発生しました:', error);
+    alert('通信中にエラーが発生しました');
   }
 }
 

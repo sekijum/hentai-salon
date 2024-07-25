@@ -66,6 +66,7 @@ func NewThreadCommentResource(params NewThreadCommentResourceParams) *ThreadComm
 		commentResource := NewThreadCommentResource(NewThreadCommentResourceParams{
 			ThreadComment: &model.ThreadComment{EntThreadComment: reply},
 			Offset:        params.Offset,
+			ReplyCount:    len(reply.Edges.Replies),
 		})
 		replies = append(replies, commentResource)
 	}

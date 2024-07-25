@@ -96,7 +96,7 @@ async function submit() {
       router.push('/');
     }
   } catch (error) {
-    console.error('通信中にエラーが発生しました:', error);
+    alert('通信中にエラーが発生しました');
   }
 }
 

@@ -63,7 +63,13 @@ func (ds *ThreadDatasource) FindAll(params ThreadDatasourceFindAllParams) ([]*mo
 		query = query.Order(orderFunc(thread.FieldCreatedAt))
 	}
 
-	query = query.Limit(params.Limit).Offset(params.Offset).WithTags().WithBoard().WithComments()
+	query = query.
+		Limit(params.Limit).
+		Offset(params.Offset).
+		WithTags().WithBoard().
+		WithComments(func(rq *ent.ThreadCommentQuery) {
+			rq.Select(threadcomment.FieldID)
+		})
 
 	threads, err := query.All(params.Ctx)
 	if err != nil {
@@ -100,7 +106,9 @@ func (ds *ThreadDatasource) FindByRelatedTag(params ThreadDatasourceFindByRelate
 		Offset(params.Offset).
 		WithTags().
 		WithBoard().
-		WithComments().
+		WithComments(func(rq *ent.ThreadCommentQuery) {
+			rq.Select(threadcomment.FieldID)
+		}).
 		All(params.Ctx)
 	if err != nil {
 		return nil, err
@@ -126,8 +134,10 @@ func (ds *ThreadDatasource) FindByPopularity(params ThreadDatasourceFindByPopula
 	threads, err := ds.client.Thread.Query().
 		WithTags().
 		WithBoard().
+		WithComments(func(rq *ent.ThreadCommentQuery) {
+			rq.Select(threadcomment.FieldID)
+		}).
 		Order(thread.ByCommentsCount(sql.OrderDesc())).
-		WithComments().
 		All(params.Ctx)
 	if err != nil {
 		return nil, err

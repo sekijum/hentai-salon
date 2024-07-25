@@ -9,7 +9,7 @@
     </h2>
 
     <v-chip-group v-if="thread.tagNameList" active-class="primary--text" column>
-      <v-chip size="x-small" v-for="tagName in thread.tagNameList" :key="tagName">
+      <v-chip size="x-small" v-for="(tagName, index) in thread.tagNameList" :key="`tag-${index}`">
         {{ tagName }}
       </v-chip>
     </v-chip-group>
