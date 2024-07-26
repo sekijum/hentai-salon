@@ -89,13 +89,8 @@ definePageMeta({ middleware: ['unauthentication-only'] });
 
 const nuxtApp = useNuxtApp();
 const router = useRouter();
-const { fetchListPresignedUrl, uploadFilesToS3 } = useActions();
 
 const { $storage, $api } = nuxtApp;
-
-const snackbar = useState('isSnackbar', () => {
-  return { isSnackbar: false, text: '' };
-});
 
 const form = ref({
   name: '',
@@ -132,8 +127,7 @@ async function submit() {
     const authHeader = response.headers.authorization;
     const token = authHeader.split(' ')[1];
     $storage.setItem('access_token', token);
-    snackbar.value.isSnackbar = true;
-    snackbar.value.text = 'サインアップしました。';
+    alert('サインアップしました。');
     router.push('/');
   } catch (err) {
     alert('通信中にエラーが発生しました');

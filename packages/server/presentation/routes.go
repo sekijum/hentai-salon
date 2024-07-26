@@ -26,7 +26,7 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 
 	r.POST("/forgot-password", controllers.UserController.ForgotPassword)
 	r.POST("/verify-reset-password-token", controllers.UserController.VerifyResetPasswordToken)
-	r.POST("/reset-password", controllers.UserController.ResetPassword)
+	r.PATCH("/reset-password", controllers.UserController.ResetPassword)
 
 	r.GET("/tags/name", controllers.TagController.FindNameList)
 	r.GET("/boards", controllers.BoardController.FindAll)

@@ -22,7 +22,8 @@ func NewMailpitClient() *MailpitClient {
 }
 
 func (c *MailpitClient) SendEmail(to, subject, body string) error {
-	from := "no-reply@example.com" // 送信者アドレスを適切に設定
+	mailFromAddress := os.Getenv("MAIL_FROM_ADDRESS")
+	from := mailFromAddress
 	msg := "From: " + from + "\n" +
 		"To: " + to + "\n" +
 		"Subject: " + subject + "\n\n" +

@@ -16,7 +16,7 @@ type Tag struct {
 func (Tag) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("id").Unique().Immutable(),
-		field.String("name").Unique().MaxLen(20),
+		field.String("name").Unique().MaxLen(50),
 		field.Time("created_at").Default(time.Now),
 	}
 }

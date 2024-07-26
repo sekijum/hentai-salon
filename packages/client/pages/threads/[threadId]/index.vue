@@ -228,7 +228,7 @@ watch(
 
 <style scoped>
 .page-description {
-  font-size: 1rem;
+  font-size: 12px;
 }
 
 .fab {

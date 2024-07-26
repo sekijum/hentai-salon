@@ -134,7 +134,7 @@ func (ctrl *UserController) Update(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, "ユーザー情報を更新しました。")
+	ctx.JSON(http.StatusOK, "ユーザー情報を更新しました")
 }
 
 func (ctrl *UserController) UpdatePassword(ctx *gin.Context) {
@@ -160,7 +160,7 @@ func (ctrl *UserController) UpdatePassword(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, "パスワードを更新しました。")
+	ctx.JSON(http.StatusOK, "パスワードを更新しました")
 }
 
 func (ctrl *UserController) ForgotPassword(ctx *gin.Context) {
@@ -179,7 +179,7 @@ func (ctrl *UserController) ForgotPassword(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, "パスワード変更URLを送信しました。")
+	ctx.JSON(http.StatusOK, "パスワード変更URLを送信しました")
 }
 
 func (ctrl *UserController) VerifyResetPasswordToken(ctx *gin.Context) {
@@ -198,7 +198,7 @@ func (ctrl *UserController) VerifyResetPasswordToken(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, "パスワード変更URLを送信しました。")
+	ctx.JSON(http.StatusOK, "トークンが有効です")
 }
 
 func (ctrl *UserController) ResetPassword(ctx *gin.Context) {
@@ -208,7 +208,7 @@ func (ctrl *UserController) ResetPassword(ctx *gin.Context) {
 		return
 	}
 
-	err := ctrl.userApplicationService.ResetPassword(service.UserResetPasswordRequestParams{
+	var err = ctrl.userApplicationService.ResetPassword(service.UserResetPasswordRequestParams{
 		Ctx:  context.Background(),
 		Body: body,
 	})
@@ -217,5 +217,5 @@ func (ctrl *UserController) ResetPassword(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, "パスワード変更URLを送信しました。")
+	ctx.JSON(http.StatusOK, "パスワードを変更しました")
 }

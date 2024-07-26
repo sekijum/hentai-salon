@@ -27,10 +27,6 @@ func init() {
 	boardDescTitle := boardFields[2].Descriptor()
 	// board.TitleValidator is a validator for the "title" field. It is called by the builders before save.
 	board.TitleValidator = boardDescTitle.Validators[0].(func(string) error)
-	// boardDescDescription is the schema descriptor for description field.
-	boardDescDescription := boardFields[3].Descriptor()
-	// board.DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
-	board.DescriptionValidator = boardDescDescription.Validators[0].(func(string) error)
 	// boardDescStatus is the schema descriptor for status field.
 	boardDescStatus := boardFields[5].Descriptor()
 	// board.DefaultStatus holds the default value on creation for the status field.
@@ -61,10 +57,6 @@ func init() {
 	threadDescTitle := threadFields[3].Descriptor()
 	// thread.TitleValidator is a validator for the "title" field. It is called by the builders before save.
 	thread.TitleValidator = threadDescTitle.Validators[0].(func(string) error)
-	// threadDescDescription is the schema descriptor for description field.
-	threadDescDescription := threadFields[4].Descriptor()
-	// thread.DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
-	thread.DescriptionValidator = threadDescDescription.Validators[0].(func(string) error)
 	// threadDescIPAddress is the schema descriptor for ip_address field.
 	threadDescIPAddress := threadFields[6].Descriptor()
 	// thread.IPAddressValidator is a validator for the "ip_address" field. It is called by the builders before save.

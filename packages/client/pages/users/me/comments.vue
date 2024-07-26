@@ -54,4 +54,9 @@ async function fetchComments() {
 
   comment.value = response.data;
 }
+
+watch(
+  () => route.query.offset,
+  () => fetchComments(),
+);
 </script>

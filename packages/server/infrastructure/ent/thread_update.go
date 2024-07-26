@@ -389,11 +389,6 @@ func (tu *ThreadUpdate) check() error {
 			return &ValidationError{Name: "title", err: fmt.Errorf(`ent: validator failed for field "Thread.title": %w`, err)}
 		}
 	}
-	if v, ok := tu.mutation.Description(); ok {
-		if err := thread.DescriptionValidator(v); err != nil {
-			return &ValidationError{Name: "description", err: fmt.Errorf(`ent: validator failed for field "Thread.description": %w`, err)}
-		}
-	}
 	if v, ok := tu.mutation.IPAddress(); ok {
 		if err := thread.IPAddressValidator(v); err != nil {
 			return &ValidationError{Name: "ip_address", err: fmt.Errorf(`ent: validator failed for field "Thread.ip_address": %w`, err)}
@@ -1100,11 +1095,6 @@ func (tuo *ThreadUpdateOne) check() error {
 	if v, ok := tuo.mutation.Title(); ok {
 		if err := thread.TitleValidator(v); err != nil {
 			return &ValidationError{Name: "title", err: fmt.Errorf(`ent: validator failed for field "Thread.title": %w`, err)}
-		}
-	}
-	if v, ok := tuo.mutation.Description(); ok {
-		if err := thread.DescriptionValidator(v); err != nil {
-			return &ValidationError{Name: "description", err: fmt.Errorf(`ent: validator failed for field "Thread.description": %w`, err)}
 		}
 	}
 	if v, ok := tuo.mutation.IPAddress(); ok {

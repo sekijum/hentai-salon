@@ -198,11 +198,6 @@ func (bc *BoardCreate) check() error {
 			return &ValidationError{Name: "title", err: fmt.Errorf(`ent: validator failed for field "Board.title": %w`, err)}
 		}
 	}
-	if v, ok := bc.mutation.Description(); ok {
-		if err := board.DescriptionValidator(v); err != nil {
-			return &ValidationError{Name: "description", err: fmt.Errorf(`ent: validator failed for field "Board.description": %w`, err)}
-		}
-	}
 	if _, ok := bc.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Board.status"`)}
 	}

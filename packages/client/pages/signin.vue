@@ -37,6 +37,8 @@
 
       <v-btn type="submit" color="primary" block :disabled="!meta.valid">サインイン</v-btn>
     </Form>
+
+    <nuxt-link to="/forgot-password" class="d-block text-center mt-4">パスワードを忘れた方</nuxt-link>
   </div>
 </template>
 
@@ -52,10 +54,6 @@ const nuxtApp = useNuxtApp();
 const router = useRouter();
 
 const { $storage, $api } = nuxtApp;
-
-const snackbar = useState('isSnackbar', () => {
-  return { isSnackbar: false, text: '' };
-});
 
 const form = ref({
   email: '',
@@ -80,8 +78,7 @@ async function submit() {
     const authHeader = response.headers.authorization;
     const token = authHeader.split(' ')[1];
     $storage.setItem('access_token', token);
-    snackbar.value.isSnackbar = true;
-    snackbar.value.text = 'サインインしました。';
+    alert('サインインしました。');
     router.push('/');
   } catch (err) {
     alert(err.response.data.error);

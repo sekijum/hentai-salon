@@ -11,8 +11,8 @@ var (
 	// BoardsColumns holds the columns for the "boards" table.
 	BoardsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "title", Type: field.TypeString, Unique: true, Size: 50},
-		{Name: "description", Type: field.TypeString, Nullable: true, Size: 255},
+		{Name: "title", Type: field.TypeString, Unique: true, Size: 255},
+		{Name: "description", Type: field.TypeString, Nullable: true, Size: 2147483647},
 		{Name: "thumbnail_url", Type: field.TypeString, Nullable: true},
 		{Name: "status", Type: field.TypeInt, Default: 0},
 		{Name: "created_at", Type: field.TypeTime},
@@ -43,7 +43,7 @@ var (
 	// TagsColumns holds the columns for the "tags" table.
 	TagsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "name", Type: field.TypeString, Unique: true, Size: 20},
+		{Name: "name", Type: field.TypeString, Unique: true, Size: 50},
 		{Name: "created_at", Type: field.TypeTime},
 	}
 	// TagsTable holds the schema information for the "tags" table.
@@ -62,8 +62,8 @@ var (
 	// ThreadsColumns holds the columns for the "threads" table.
 	ThreadsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "title", Type: field.TypeString, Unique: true, Size: 50},
-		{Name: "description", Type: field.TypeString, Nullable: true, Size: 255},
+		{Name: "title", Type: field.TypeString, Unique: true, Size: 255},
+		{Name: "description", Type: field.TypeString, Nullable: true, Size: 2147483647},
 		{Name: "thumbnail_url", Type: field.TypeString, Nullable: true},
 		{Name: "ip_address", Type: field.TypeString, Size: 64},
 		{Name: "status", Type: field.TypeInt, Default: 0},

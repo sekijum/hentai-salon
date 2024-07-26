@@ -33,6 +33,7 @@ type UserForgotPasswordRequest struct {
 }
 
 type UserResetPasswordRequest struct {
+	Token    string `json:"token" binding:"required"`
 	Password string `json:"password" binding:"required,min=6"`
 }
 

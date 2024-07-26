@@ -265,11 +265,6 @@ func (tc *ThreadCreate) check() error {
 			return &ValidationError{Name: "title", err: fmt.Errorf(`ent: validator failed for field "Thread.title": %w`, err)}
 		}
 	}
-	if v, ok := tc.mutation.Description(); ok {
-		if err := thread.DescriptionValidator(v); err != nil {
-			return &ValidationError{Name: "description", err: fmt.Errorf(`ent: validator failed for field "Thread.description": %w`, err)}
-		}
-	}
 	if _, ok := tc.mutation.IPAddress(); !ok {
 		return &ValidationError{Name: "ip_address", err: errors.New(`ent: missing required field "Thread.ip_address"`)}
 	}

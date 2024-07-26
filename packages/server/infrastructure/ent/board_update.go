@@ -240,11 +240,6 @@ func (bu *BoardUpdate) check() error {
 			return &ValidationError{Name: "title", err: fmt.Errorf(`ent: validator failed for field "Board.title": %w`, err)}
 		}
 	}
-	if v, ok := bu.mutation.Description(); ok {
-		if err := board.DescriptionValidator(v); err != nil {
-			return &ValidationError{Name: "description", err: fmt.Errorf(`ent: validator failed for field "Board.description": %w`, err)}
-		}
-	}
 	if _, ok := bu.mutation.OwnerID(); bu.mutation.OwnerCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Board.owner"`)
 	}
@@ -605,11 +600,6 @@ func (buo *BoardUpdateOne) check() error {
 	if v, ok := buo.mutation.Title(); ok {
 		if err := board.TitleValidator(v); err != nil {
 			return &ValidationError{Name: "title", err: fmt.Errorf(`ent: validator failed for field "Board.title": %w`, err)}
-		}
-	}
-	if v, ok := buo.mutation.Description(); ok {
-		if err := board.DescriptionValidator(v); err != nil {
-			return &ValidationError{Name: "description", err: fmt.Errorf(`ent: validator failed for field "Board.description": %w`, err)}
 		}
 	}
 	if _, ok := buo.mutation.OwnerID(); buo.mutation.OwnerCleared() && !ok {

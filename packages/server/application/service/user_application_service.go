@@ -295,7 +295,7 @@ func (svc *UserApplicationService) ForgotPassword(params UserApplicationServiceF
 
 	resetToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"userID": user.EntUser.ID,
-		"exp":    time.Now().Add(1 * time.Hour).Unix(),
+		"exp":    time.Now().Add(24 * time.Hour).Unix(), // 有効期限24時間
 	})
 
 	tokenString, err := resetToken.SignedString([]byte(jwtSecretKey))
@@ -303,10 +303,24 @@ func (svc *UserApplicationService) ForgotPassword(params UserApplicationServiceF
 		return fmt.Errorf("トークンの生成に失敗しました: %v", err)
 	}
 
-	resetURL := fmt.Sprintf("http://example.com/reset-password?token=%s", url.QueryEscape(tokenString))
+	clientURL := os.Getenv("CLIENT_URL")
+	resetURL := fmt.Sprintf("%s/reset-password?token=%s", clientURL, url.QueryEscape(tokenString))
 
 	emailSubject := "パスワードリセットのリクエスト"
-	emailBody := fmt.Sprintf("以下のリンクを使用してパスワードをリセットしてください：\n\n%s\n\nこのリンクは1時間以内に有効です。", resetURL)
+	emailBody := fmt.Sprintf(`
+%sさん
+
+メルカリをご利用いただきありがとうございます。
+パスワードの再設定は以下のリンクからお願いします。
+このリンクの有効期限は24時間です。
+
+パスワードの再設定
+%s
+
+Webページを開く
+%s
+
+※このメールは返信しても届きません。`, user.EntUser.Name, resetURL, clientURL)
 
 	err = svc.mailpitClient.SendEmail(params.Body.Email, emailSubject, emailBody)
 	if err != nil {
@@ -354,12 +368,36 @@ func (svc *UserApplicationService) VerifyResetPasswordToken(params UserVerifyRes
 }
 
 type UserResetPasswordRequestParams struct {
-	Ctx    context.Context
-	UserID int
-	Body   request.UserResetPasswordRequest
+	Ctx  context.Context
+	Body request.UserResetPasswordRequest
 }
 
 func (svc *UserApplicationService) ResetPassword(params UserResetPasswordRequestParams) error {
+	jwtSecretKey := os.Getenv("JWT_SECRET_KEY")
+	if jwtSecretKey == "" {
+		return errors.New("秘密鍵が設定されていません")
+	}
+
+	token, err := jwt.ParseWithClaims(params.Body.Token, &TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, errors.New("予期しない署名方法です")
+		}
+		return []byte(jwtSecretKey), nil
+	})
+
+	if err != nil {
+		return errors.New("トークンの解析に失敗しました")
+	}
+
+	var userID int
+	if claims, ok := token.Claims.(*TokenClaims); ok && token.Valid {
+		if claims.ExpiresAt < time.Now().Unix() {
+			return errors.New("トークンの有効期限が切れています")
+		}
+		userID = claims.UserID
+	} else {
+		return errors.New("トークンが無効です")
+	}
 
 	hashedPassword, err := util.HashPassword(params.Body.Password)
 	if err != nil {
@@ -368,7 +406,7 @@ func (svc *UserApplicationService) ResetPassword(params UserResetPasswordRequest
 
 	_, err = svc.userDatasource.UpdatePassword(datasource.UserDatasourceUpdatePasswordParams{
 		Ctx:      params.Ctx,
-		UserID:   params.UserID,
+		UserID:   userID,
 		Password: hashedPassword,
 	})
 	if err != nil {

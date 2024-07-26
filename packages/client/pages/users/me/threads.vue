@@ -4,11 +4,13 @@
 
     <Menu :items="menuItems" />
 
-    <Pagination :totalCount="threads.totalCount" :limit="limit" />
+    <template v-if="threads.data">
+      <Pagination :totalCount="threads.totalCount" :limit="limit" />
 
-    <ThreadList queryCriteria="owner" :items="threads.data" :isInfiniteScroll="false" />
+      <ThreadList queryCriteria="owner" :items="threads.data" :isInfiniteScroll="false" />
 
-    <Pagination :totalCount="threads.totalCount" :limit="limit" />
+      <Pagination :totalCount="threads.totalCount" :limit="limit" />
+    </template>
   </div>
 </template>
 
