@@ -32,10 +32,10 @@ func InitializeControllers() (*ControllersSet, func(), error) {
 	userApplicationService := service.NewUserApplicationService(userDatasource, mailpitClient)
 	userController := controller.NewUserController(userApplicationService)
 	threadDatasource := datasource.NewThreadDatasource(client)
-	tagDatasource := datasource.NewTagDatasource(client)
-	threadApplicationService := service.NewThreadApplicationService(client, threadDatasource, tagDatasource)
-	threadController := controller.NewThreadController(threadApplicationService)
 	threadCommentDatasource := datasource.NewThreadCommentDatasource(client)
+	tagDatasource := datasource.NewTagDatasource(client)
+	threadApplicationService := service.NewThreadApplicationService(client, threadDatasource, threadCommentDatasource, tagDatasource)
+	threadController := controller.NewThreadController(threadApplicationService)
 	threadCommentApplicationService := service.NewThreadCommentApplicationService(threadCommentDatasource)
 	threadCommentController := controller.NewThreadCommentController(threadCommentApplicationService)
 	tagApplicationService := service.NewTagApplicationService(tagDatasource)
@@ -61,6 +61,9 @@ func InitializeControllers() (*ControllersSet, func(), error) {
 	threadAdminDatasource := datasource.NewThreadAdminDatasource(client)
 	threadAdminApplicationService := service.NewThreadAdminApplicationService(threadAdminDatasource)
 	threadAdminController := controller.NewThreadAdminController(threadAdminApplicationService)
+	contactDatasource := datasource.NewContactDatasource(client)
+	contactApplicationService := service.NewContactApplicationService(contactDatasource)
+	contactController := controller.NewContactController(contactApplicationService)
 	controllersSet := &ControllersSet{
 		BoardController:         boardController,
 		UserController:          userController,
@@ -71,6 +74,7 @@ func InitializeControllers() (*ControllersSet, func(), error) {
 		UserAdminController:     userAdminController,
 		BoardAdminController:    boardAdminController,
 		ThreadAdminController:   threadAdminController,
+		ContactController:       contactController,
 	}
 	return controllersSet, func() {
 		cleanup()
@@ -81,11 +85,11 @@ func InitializeControllers() (*ControllersSet, func(), error) {
 
 var externalServiceSet = wire.NewSet(ent.ProvideClient, aws.NewS3Client, minio.NewMinioClient, mailpit.NewMailpitClient)
 
-var controllerSet = wire.NewSet(controller.NewBoardController, controller.NewUserController, controller.NewThreadController, controller.NewThreadCommentController, controller.NewTagController, controller.NewStorageController, controller.NewUserAdminController, controller.NewBoardAdminController, controller.NewThreadAdminController)
+var controllerSet = wire.NewSet(controller.NewBoardController, controller.NewUserController, controller.NewThreadController, controller.NewThreadCommentController, controller.NewTagController, controller.NewStorageController, controller.NewUserAdminController, controller.NewBoardAdminController, controller.NewThreadAdminController, controller.NewContactController)
 
-var serviceSet = wire.NewSet(service.NewBoardApplicationService, service.NewUserApplicationService, service.NewThreadApplicationService, service.NewThreadCommentApplicationService, service.NewTagApplicationService, service.NewStorageApplicationService, service.NewUserAdminApplicationService, service.NewBoardAdminApplicationService, service.NewThreadAdminApplicationService)
+var serviceSet = wire.NewSet(service.NewBoardApplicationService, service.NewUserApplicationService, service.NewThreadApplicationService, service.NewThreadCommentApplicationService, service.NewTagApplicationService, service.NewStorageApplicationService, service.NewUserAdminApplicationService, service.NewBoardAdminApplicationService, service.NewThreadAdminApplicationService, service.NewContactApplicationService)
 
-var datasourceSet = wire.NewSet(datasource.NewBoardDatasource, datasource.NewUserDatasource, datasource.NewThreadDatasource, datasource.NewThreadCommentDatasource, datasource.NewTagDatasource, datasource.NewUserAdminDatasource, datasource.NewBoardAdminDatasource, datasource.NewThreadAdminDatasource)
+var datasourceSet = wire.NewSet(datasource.NewBoardDatasource, datasource.NewUserDatasource, datasource.NewThreadDatasource, datasource.NewThreadCommentDatasource, datasource.NewTagDatasource, datasource.NewUserAdminDatasource, datasource.NewBoardAdminDatasource, datasource.NewThreadAdminDatasource, datasource.NewContactDatasource)
 
 type ControllersSet struct {
 	BoardController         *controller.BoardController
@@ -97,4 +101,5 @@ type ControllersSet struct {
 	UserAdminController     *controller.UserAdminController
 	BoardAdminController    *controller.BoardAdminController
 	ThreadAdminController   *controller.ThreadAdminController
+	ContactController       *controller.ContactController
 }

@@ -4,6 +4,7 @@ package ent
 
 import (
 	"server/infrastructure/ent/board"
+	"server/infrastructure/ent/contact"
 	"server/infrastructure/ent/schema"
 	"server/infrastructure/ent/tag"
 	"server/infrastructure/ent/thread"
@@ -11,9 +12,7 @@ import (
 	"server/infrastructure/ent/threadcommentattachment"
 	"server/infrastructure/ent/user"
 	"server/infrastructure/ent/usercommentlike"
-	"server/infrastructure/ent/usercommentsubscription"
 	"server/infrastructure/ent/userthreadlike"
-	"server/infrastructure/ent/userthreadsubscription"
 	"time"
 )
 
@@ -41,6 +40,34 @@ func init() {
 	board.DefaultUpdatedAt = boardDescUpdatedAt.Default.(func() time.Time)
 	// board.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	board.UpdateDefaultUpdatedAt = boardDescUpdatedAt.UpdateDefault.(func() time.Time)
+	contactFields := schema.Contact{}.Fields()
+	_ = contactFields
+	// contactDescEmail is the schema descriptor for email field.
+	contactDescEmail := contactFields[1].Descriptor()
+	// contact.EmailValidator is a validator for the "email" field. It is called by the builders before save.
+	contact.EmailValidator = contactDescEmail.Validators[0].(func(string) error)
+	// contactDescSubject is the schema descriptor for subject field.
+	contactDescSubject := contactFields[2].Descriptor()
+	// contact.SubjectValidator is a validator for the "subject" field. It is called by the builders before save.
+	contact.SubjectValidator = contactDescSubject.Validators[0].(func(string) error)
+	// contactDescIPAddress is the schema descriptor for ip_address field.
+	contactDescIPAddress := contactFields[4].Descriptor()
+	// contact.IPAddressValidator is a validator for the "ip_address" field. It is called by the builders before save.
+	contact.IPAddressValidator = contactDescIPAddress.Validators[0].(func(string) error)
+	// contactDescStatus is the schema descriptor for status field.
+	contactDescStatus := contactFields[5].Descriptor()
+	// contact.DefaultStatus holds the default value on creation for the status field.
+	contact.DefaultStatus = contactDescStatus.Default.(int)
+	// contactDescCreatedAt is the schema descriptor for created_at field.
+	contactDescCreatedAt := contactFields[6].Descriptor()
+	// contact.DefaultCreatedAt holds the default value on creation for the created_at field.
+	contact.DefaultCreatedAt = contactDescCreatedAt.Default.(func() time.Time)
+	// contactDescUpdatedAt is the schema descriptor for updated_at field.
+	contactDescUpdatedAt := contactFields[7].Descriptor()
+	// contact.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	contact.DefaultUpdatedAt = contactDescUpdatedAt.Default.(func() time.Time)
+	// contact.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	contact.UpdateDefaultUpdatedAt = contactDescUpdatedAt.UpdateDefault.(func() time.Time)
 	tagFields := schema.Tag{}.Fields()
 	_ = tagFields
 	// tagDescName is the schema descriptor for name field.
@@ -147,38 +174,10 @@ func init() {
 	usercommentlikeDescLikedAt := usercommentlikeFields[2].Descriptor()
 	// usercommentlike.DefaultLikedAt holds the default value on creation for the liked_at field.
 	usercommentlike.DefaultLikedAt = usercommentlikeDescLikedAt.Default.(func() time.Time)
-	usercommentsubscriptionFields := schema.UserCommentSubscription{}.Fields()
-	_ = usercommentsubscriptionFields
-	// usercommentsubscriptionDescIsNotified is the schema descriptor for is_notified field.
-	usercommentsubscriptionDescIsNotified := usercommentsubscriptionFields[2].Descriptor()
-	// usercommentsubscription.DefaultIsNotified holds the default value on creation for the is_notified field.
-	usercommentsubscription.DefaultIsNotified = usercommentsubscriptionDescIsNotified.Default.(bool)
-	// usercommentsubscriptionDescIsChecked is the schema descriptor for is_checked field.
-	usercommentsubscriptionDescIsChecked := usercommentsubscriptionFields[3].Descriptor()
-	// usercommentsubscription.DefaultIsChecked holds the default value on creation for the is_checked field.
-	usercommentsubscription.DefaultIsChecked = usercommentsubscriptionDescIsChecked.Default.(bool)
-	// usercommentsubscriptionDescSubscribedAt is the schema descriptor for subscribed_at field.
-	usercommentsubscriptionDescSubscribedAt := usercommentsubscriptionFields[4].Descriptor()
-	// usercommentsubscription.DefaultSubscribedAt holds the default value on creation for the subscribed_at field.
-	usercommentsubscription.DefaultSubscribedAt = usercommentsubscriptionDescSubscribedAt.Default.(func() time.Time)
 	userthreadlikeFields := schema.UserThreadLike{}.Fields()
 	_ = userthreadlikeFields
 	// userthreadlikeDescLikedAt is the schema descriptor for liked_at field.
 	userthreadlikeDescLikedAt := userthreadlikeFields[2].Descriptor()
 	// userthreadlike.DefaultLikedAt holds the default value on creation for the liked_at field.
 	userthreadlike.DefaultLikedAt = userthreadlikeDescLikedAt.Default.(func() time.Time)
-	userthreadsubscriptionFields := schema.UserThreadSubscription{}.Fields()
-	_ = userthreadsubscriptionFields
-	// userthreadsubscriptionDescIsNotified is the schema descriptor for is_notified field.
-	userthreadsubscriptionDescIsNotified := userthreadsubscriptionFields[2].Descriptor()
-	// userthreadsubscription.DefaultIsNotified holds the default value on creation for the is_notified field.
-	userthreadsubscription.DefaultIsNotified = userthreadsubscriptionDescIsNotified.Default.(bool)
-	// userthreadsubscriptionDescIsChecked is the schema descriptor for is_checked field.
-	userthreadsubscriptionDescIsChecked := userthreadsubscriptionFields[3].Descriptor()
-	// userthreadsubscription.DefaultIsChecked holds the default value on creation for the is_checked field.
-	userthreadsubscription.DefaultIsChecked = userthreadsubscriptionDescIsChecked.Default.(bool)
-	// userthreadsubscriptionDescSubscribedAt is the schema descriptor for subscribed_at field.
-	userthreadsubscriptionDescSubscribedAt := userthreadsubscriptionFields[4].Descriptor()
-	// userthreadsubscription.DefaultSubscribedAt holds the default value on creation for the subscribed_at field.
-	userthreadsubscription.DefaultSubscribedAt = userthreadsubscriptionDescSubscribedAt.Default.(func() time.Time)
 }

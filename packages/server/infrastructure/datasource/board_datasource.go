@@ -20,17 +20,17 @@ type BoardDatasourceFindAllParams struct {
 }
 
 func (ds *BoardDatasource) FindAll(params BoardDatasourceFindAllParams) ([]*model.Board, error) {
-	boards, err := ds.client.Board.Query().WithThreads().All(params.Ctx)
+	entBoards, err := ds.client.Board.Query().WithThreads().All(params.Ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	var modelBoards []*model.Board
-	for _, entBoard := range boards {
-		modelBoards = append(modelBoards, &model.Board{EntBoard: entBoard})
+	var boards []*model.Board
+	for _, entBoard_i := range entBoards {
+		boards = append(boards, model.NewBoard(model.NewBoardParams{EntBoard: entBoard_i}))
 	}
 
-	return modelBoards, nil
+	return boards, nil
 }
 
 type BoardDatasourceFindByTitleParams struct {
@@ -39,17 +39,17 @@ type BoardDatasourceFindByTitleParams struct {
 }
 
 func (ds *BoardDatasource) FindByTitle(params BoardDatasourceFindByTitleParams) ([]*model.Board, error) {
-	boards, err := ds.client.Board.Query().Where(board.TitleEQ(params.Title)).WithThreads().All(params.Ctx)
+	entBoards, err := ds.client.Board.Query().Where(board.TitleEQ(params.Title)).WithThreads().All(params.Ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	var modelBoards []*model.Board
-	for _, entBoard := range boards {
-		modelBoards = append(modelBoards, &model.Board{EntBoard: entBoard})
+	var boards []*model.Board
+	for _, entBoard_i := range entBoards {
+		boards = append(boards, model.NewBoard(model.NewBoardParams{EntBoard: entBoard_i}))
 	}
 
-	return modelBoards, nil
+	return boards, nil
 }
 
 type BoardDatasourceCreateParams struct {
@@ -58,24 +58,24 @@ type BoardDatasourceCreateParams struct {
 }
 
 func (ds *BoardDatasource) Create(params BoardDatasourceCreateParams) (*model.Board, error) {
-
-	boardBuilder := ds.client.Board.Create().
+	q := ds.client.Board.Create().
 		SetUserID(params.Board.EntBoard.UserID).
 		SetTitle(params.Board.EntBoard.Title).
 		SetStatus(params.Board.EntBoard.Status)
 
 	if params.Board.EntBoard.Description != nil {
-		boardBuilder.SetDescription(*params.Board.EntBoard.Description)
+		q.SetDescription(*params.Board.EntBoard.Description)
 	}
 	if params.Board.EntBoard.ThumbnailURL != nil {
-		boardBuilder.SetThumbnailURL(*params.Board.EntBoard.ThumbnailURL)
+		q.SetThumbnailURL(*params.Board.EntBoard.ThumbnailURL)
 	}
 
-	savedBoard, err := boardBuilder.Save(params.Ctx)
-
+	entBoard, err := q.Save(params.Ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	return &model.Board{EntBoard: savedBoard}, nil
+	contact := model.NewBoard(model.NewBoardParams{EntBoard: entBoard})
+
+	return contact, nil
 }

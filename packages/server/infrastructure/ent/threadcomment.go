@@ -57,15 +57,11 @@ type ThreadCommentEdges struct {
 	Attachments []*ThreadCommentAttachment `json:"attachments,omitempty"`
 	// LikedUsers holds the value of the liked_users edge.
 	LikedUsers []*User `json:"liked_users,omitempty"`
-	// SubscribedUsers holds the value of the subscribed_users edge.
-	SubscribedUsers []*User `json:"subscribed_users,omitempty"`
 	// UserCommentLike holds the value of the user_comment_like edge.
 	UserCommentLike []*UserCommentLike `json:"user_comment_like,omitempty"`
-	// UserCommentSubscription holds the value of the user_comment_subscription edge.
-	UserCommentSubscription []*UserCommentSubscription `json:"user_comment_subscription,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [9]bool
+	loadedTypes [7]bool
 }
 
 // ThreadOrErr returns the Thread value or an error if the edge
@@ -128,31 +124,13 @@ func (e ThreadCommentEdges) LikedUsersOrErr() ([]*User, error) {
 	return nil, &NotLoadedError{edge: "liked_users"}
 }
 
-// SubscribedUsersOrErr returns the SubscribedUsers value or an error if the edge
-// was not loaded in eager-loading.
-func (e ThreadCommentEdges) SubscribedUsersOrErr() ([]*User, error) {
-	if e.loadedTypes[6] {
-		return e.SubscribedUsers, nil
-	}
-	return nil, &NotLoadedError{edge: "subscribed_users"}
-}
-
 // UserCommentLikeOrErr returns the UserCommentLike value or an error if the edge
 // was not loaded in eager-loading.
 func (e ThreadCommentEdges) UserCommentLikeOrErr() ([]*UserCommentLike, error) {
-	if e.loadedTypes[7] {
+	if e.loadedTypes[6] {
 		return e.UserCommentLike, nil
 	}
 	return nil, &NotLoadedError{edge: "user_comment_like"}
-}
-
-// UserCommentSubscriptionOrErr returns the UserCommentSubscription value or an error if the edge
-// was not loaded in eager-loading.
-func (e ThreadCommentEdges) UserCommentSubscriptionOrErr() ([]*UserCommentSubscription, error) {
-	if e.loadedTypes[8] {
-		return e.UserCommentSubscription, nil
-	}
-	return nil, &NotLoadedError{edge: "user_comment_subscription"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -287,19 +265,9 @@ func (tc *ThreadComment) QueryLikedUsers() *UserQuery {
 	return NewThreadCommentClient(tc.config).QueryLikedUsers(tc)
 }
 
-// QuerySubscribedUsers queries the "subscribed_users" edge of the ThreadComment entity.
-func (tc *ThreadComment) QuerySubscribedUsers() *UserQuery {
-	return NewThreadCommentClient(tc.config).QuerySubscribedUsers(tc)
-}
-
 // QueryUserCommentLike queries the "user_comment_like" edge of the ThreadComment entity.
 func (tc *ThreadComment) QueryUserCommentLike() *UserCommentLikeQuery {
 	return NewThreadCommentClient(tc.config).QueryUserCommentLike(tc)
-}
-
-// QueryUserCommentSubscription queries the "user_comment_subscription" edge of the ThreadComment entity.
-func (tc *ThreadComment) QueryUserCommentSubscription() *UserCommentSubscriptionQuery {
-	return NewThreadCommentClient(tc.config).QueryUserCommentSubscription(tc)
 }
 
 // Update returns a builder for updating this ThreadComment.

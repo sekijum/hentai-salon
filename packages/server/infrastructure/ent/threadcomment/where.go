@@ -643,29 +643,6 @@ func HasLikedUsersWith(preds ...predicate.User) predicate.ThreadComment {
 	})
 }
 
-// HasSubscribedUsers applies the HasEdge predicate on the "subscribed_users" edge.
-func HasSubscribedUsers() predicate.ThreadComment {
-	return predicate.ThreadComment(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, SubscribedUsersTable, SubscribedUsersPrimaryKey...),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasSubscribedUsersWith applies the HasEdge predicate on the "subscribed_users" edge with a given conditions (other predicates).
-func HasSubscribedUsersWith(preds ...predicate.User) predicate.ThreadComment {
-	return predicate.ThreadComment(func(s *sql.Selector) {
-		step := newSubscribedUsersStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
 // HasUserCommentLike applies the HasEdge predicate on the "user_comment_like" edge.
 func HasUserCommentLike() predicate.ThreadComment {
 	return predicate.ThreadComment(func(s *sql.Selector) {
@@ -681,29 +658,6 @@ func HasUserCommentLike() predicate.ThreadComment {
 func HasUserCommentLikeWith(preds ...predicate.UserCommentLike) predicate.ThreadComment {
 	return predicate.ThreadComment(func(s *sql.Selector) {
 		step := newUserCommentLikeStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasUserCommentSubscription applies the HasEdge predicate on the "user_comment_subscription" edge.
-func HasUserCommentSubscription() predicate.ThreadComment {
-	return predicate.ThreadComment(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, UserCommentSubscriptionTable, UserCommentSubscriptionColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasUserCommentSubscriptionWith applies the HasEdge predicate on the "user_comment_subscription" edge with a given conditions (other predicates).
-func HasUserCommentSubscriptionWith(preds ...predicate.UserCommentSubscription) predicate.ThreadComment {
-	return predicate.ThreadComment(func(s *sql.Selector) {
-		step := newUserCommentSubscriptionStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

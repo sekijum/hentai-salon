@@ -15,7 +15,6 @@ import (
 	"server/infrastructure/ent/threadtag"
 	"server/infrastructure/ent/user"
 	"server/infrastructure/ent/userthreadlike"
-	"server/infrastructure/ent/userthreadsubscription"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -25,19 +24,17 @@ import (
 // ThreadQuery is the builder for querying Thread entities.
 type ThreadQuery struct {
 	config
-	ctx                        *QueryContext
-	order                      []thread.OrderOption
-	inters                     []Interceptor
-	predicates                 []predicate.Thread
-	withBoard                  *BoardQuery
-	withOwner                  *UserQuery
-	withComments               *ThreadCommentQuery
-	withTags                   *TagQuery
-	withLikedUsers             *UserQuery
-	withSubscribedUsers        *UserQuery
-	withThreadTags             *ThreadTagQuery
-	withUserThreadLike         *UserThreadLikeQuery
-	withUserThreadSubscription *UserThreadSubscriptionQuery
+	ctx                *QueryContext
+	order              []thread.OrderOption
+	inters             []Interceptor
+	predicates         []predicate.Thread
+	withBoard          *BoardQuery
+	withOwner          *UserQuery
+	withComments       *ThreadCommentQuery
+	withTags           *TagQuery
+	withLikedUsers     *UserQuery
+	withThreadTags     *ThreadTagQuery
+	withUserThreadLike *UserThreadLikeQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -184,28 +181,6 @@ func (tq *ThreadQuery) QueryLikedUsers() *UserQuery {
 	return query
 }
 
-// QuerySubscribedUsers chains the current query on the "subscribed_users" edge.
-func (tq *ThreadQuery) QuerySubscribedUsers() *UserQuery {
-	query := (&UserClient{config: tq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := tq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := tq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(thread.Table, thread.FieldID, selector),
-			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, thread.SubscribedUsersTable, thread.SubscribedUsersPrimaryKey...),
-		)
-		fromU = sqlgraph.SetNeighbors(tq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
 // QueryThreadTags chains the current query on the "thread_tags" edge.
 func (tq *ThreadQuery) QueryThreadTags() *ThreadTagQuery {
 	query := (&ThreadTagClient{config: tq.config}).Query()
@@ -243,28 +218,6 @@ func (tq *ThreadQuery) QueryUserThreadLike() *UserThreadLikeQuery {
 			sqlgraph.From(thread.Table, thread.FieldID, selector),
 			sqlgraph.To(userthreadlike.Table, userthreadlike.ThreadColumn),
 			sqlgraph.Edge(sqlgraph.O2M, true, thread.UserThreadLikeTable, thread.UserThreadLikeColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(tq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryUserThreadSubscription chains the current query on the "user_thread_subscription" edge.
-func (tq *ThreadQuery) QueryUserThreadSubscription() *UserThreadSubscriptionQuery {
-	query := (&UserThreadSubscriptionClient{config: tq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := tq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := tq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(thread.Table, thread.FieldID, selector),
-			sqlgraph.To(userthreadsubscription.Table, userthreadsubscription.ThreadColumn),
-			sqlgraph.Edge(sqlgraph.O2M, true, thread.UserThreadSubscriptionTable, thread.UserThreadSubscriptionColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(tq.driver.Dialect(), step)
 		return fromU, nil
@@ -459,20 +412,18 @@ func (tq *ThreadQuery) Clone() *ThreadQuery {
 		return nil
 	}
 	return &ThreadQuery{
-		config:                     tq.config,
-		ctx:                        tq.ctx.Clone(),
-		order:                      append([]thread.OrderOption{}, tq.order...),
-		inters:                     append([]Interceptor{}, tq.inters...),
-		predicates:                 append([]predicate.Thread{}, tq.predicates...),
-		withBoard:                  tq.withBoard.Clone(),
-		withOwner:                  tq.withOwner.Clone(),
-		withComments:               tq.withComments.Clone(),
-		withTags:                   tq.withTags.Clone(),
-		withLikedUsers:             tq.withLikedUsers.Clone(),
-		withSubscribedUsers:        tq.withSubscribedUsers.Clone(),
-		withThreadTags:             tq.withThreadTags.Clone(),
-		withUserThreadLike:         tq.withUserThreadLike.Clone(),
-		withUserThreadSubscription: tq.withUserThreadSubscription.Clone(),
+		config:             tq.config,
+		ctx:                tq.ctx.Clone(),
+		order:              append([]thread.OrderOption{}, tq.order...),
+		inters:             append([]Interceptor{}, tq.inters...),
+		predicates:         append([]predicate.Thread{}, tq.predicates...),
+		withBoard:          tq.withBoard.Clone(),
+		withOwner:          tq.withOwner.Clone(),
+		withComments:       tq.withComments.Clone(),
+		withTags:           tq.withTags.Clone(),
+		withLikedUsers:     tq.withLikedUsers.Clone(),
+		withThreadTags:     tq.withThreadTags.Clone(),
+		withUserThreadLike: tq.withUserThreadLike.Clone(),
 		// clone intermediate query.
 		sql:  tq.sql.Clone(),
 		path: tq.path,
@@ -534,17 +485,6 @@ func (tq *ThreadQuery) WithLikedUsers(opts ...func(*UserQuery)) *ThreadQuery {
 	return tq
 }
 
-// WithSubscribedUsers tells the query-builder to eager-load the nodes that are connected to
-// the "subscribed_users" edge. The optional arguments are used to configure the query builder of the edge.
-func (tq *ThreadQuery) WithSubscribedUsers(opts ...func(*UserQuery)) *ThreadQuery {
-	query := (&UserClient{config: tq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	tq.withSubscribedUsers = query
-	return tq
-}
-
 // WithThreadTags tells the query-builder to eager-load the nodes that are connected to
 // the "thread_tags" edge. The optional arguments are used to configure the query builder of the edge.
 func (tq *ThreadQuery) WithThreadTags(opts ...func(*ThreadTagQuery)) *ThreadQuery {
@@ -564,17 +504,6 @@ func (tq *ThreadQuery) WithUserThreadLike(opts ...func(*UserThreadLikeQuery)) *T
 		opt(query)
 	}
 	tq.withUserThreadLike = query
-	return tq
-}
-
-// WithUserThreadSubscription tells the query-builder to eager-load the nodes that are connected to
-// the "user_thread_subscription" edge. The optional arguments are used to configure the query builder of the edge.
-func (tq *ThreadQuery) WithUserThreadSubscription(opts ...func(*UserThreadSubscriptionQuery)) *ThreadQuery {
-	query := (&UserThreadSubscriptionClient{config: tq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	tq.withUserThreadSubscription = query
 	return tq
 }
 
@@ -656,16 +585,14 @@ func (tq *ThreadQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Threa
 	var (
 		nodes       = []*Thread{}
 		_spec       = tq.querySpec()
-		loadedTypes = [9]bool{
+		loadedTypes = [7]bool{
 			tq.withBoard != nil,
 			tq.withOwner != nil,
 			tq.withComments != nil,
 			tq.withTags != nil,
 			tq.withLikedUsers != nil,
-			tq.withSubscribedUsers != nil,
 			tq.withThreadTags != nil,
 			tq.withUserThreadLike != nil,
-			tq.withUserThreadSubscription != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -719,13 +646,6 @@ func (tq *ThreadQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Threa
 			return nil, err
 		}
 	}
-	if query := tq.withSubscribedUsers; query != nil {
-		if err := tq.loadSubscribedUsers(ctx, query, nodes,
-			func(n *Thread) { n.Edges.SubscribedUsers = []*User{} },
-			func(n *Thread, e *User) { n.Edges.SubscribedUsers = append(n.Edges.SubscribedUsers, e) }); err != nil {
-			return nil, err
-		}
-	}
 	if query := tq.withThreadTags; query != nil {
 		if err := tq.loadThreadTags(ctx, query, nodes,
 			func(n *Thread) { n.Edges.ThreadTags = []*ThreadTag{} },
@@ -737,15 +657,6 @@ func (tq *ThreadQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Threa
 		if err := tq.loadUserThreadLike(ctx, query, nodes,
 			func(n *Thread) { n.Edges.UserThreadLike = []*UserThreadLike{} },
 			func(n *Thread, e *UserThreadLike) { n.Edges.UserThreadLike = append(n.Edges.UserThreadLike, e) }); err != nil {
-			return nil, err
-		}
-	}
-	if query := tq.withUserThreadSubscription; query != nil {
-		if err := tq.loadUserThreadSubscription(ctx, query, nodes,
-			func(n *Thread) { n.Edges.UserThreadSubscription = []*UserThreadSubscription{} },
-			func(n *Thread, e *UserThreadSubscription) {
-				n.Edges.UserThreadSubscription = append(n.Edges.UserThreadSubscription, e)
-			}); err != nil {
 			return nil, err
 		}
 	}
@@ -962,67 +873,6 @@ func (tq *ThreadQuery) loadLikedUsers(ctx context.Context, query *UserQuery, nod
 	}
 	return nil
 }
-func (tq *ThreadQuery) loadSubscribedUsers(ctx context.Context, query *UserQuery, nodes []*Thread, init func(*Thread), assign func(*Thread, *User)) error {
-	edgeIDs := make([]driver.Value, len(nodes))
-	byID := make(map[int]*Thread)
-	nids := make(map[int]map[*Thread]struct{})
-	for i, node := range nodes {
-		edgeIDs[i] = node.ID
-		byID[node.ID] = node
-		if init != nil {
-			init(node)
-		}
-	}
-	query.Where(func(s *sql.Selector) {
-		joinT := sql.Table(thread.SubscribedUsersTable)
-		s.Join(joinT).On(s.C(user.FieldID), joinT.C(thread.SubscribedUsersPrimaryKey[0]))
-		s.Where(sql.InValues(joinT.C(thread.SubscribedUsersPrimaryKey[1]), edgeIDs...))
-		columns := s.SelectedColumns()
-		s.Select(joinT.C(thread.SubscribedUsersPrimaryKey[1]))
-		s.AppendSelect(columns...)
-		s.SetDistinct(false)
-	})
-	if err := query.prepareQuery(ctx); err != nil {
-		return err
-	}
-	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
-		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
-			assign := spec.Assign
-			values := spec.ScanValues
-			spec.ScanValues = func(columns []string) ([]any, error) {
-				values, err := values(columns[1:])
-				if err != nil {
-					return nil, err
-				}
-				return append([]any{new(sql.NullInt64)}, values...), nil
-			}
-			spec.Assign = func(columns []string, values []any) error {
-				outValue := int(values[0].(*sql.NullInt64).Int64)
-				inValue := int(values[1].(*sql.NullInt64).Int64)
-				if nids[inValue] == nil {
-					nids[inValue] = map[*Thread]struct{}{byID[outValue]: {}}
-					return assign(columns[1:], values[1:])
-				}
-				nids[inValue][byID[outValue]] = struct{}{}
-				return nil
-			}
-		})
-	})
-	neighbors, err := withInterceptors[[]*User](ctx, query, qr, query.inters)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected "subscribed_users" node returned %v`, n.ID)
-		}
-		for kn := range nodes {
-			assign(kn, n)
-		}
-	}
-	return nil
-}
 func (tq *ThreadQuery) loadThreadTags(ctx context.Context, query *ThreadTagQuery, nodes []*Thread, init func(*Thread), assign func(*Thread, *ThreadTag)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*Thread)
@@ -1068,36 +918,6 @@ func (tq *ThreadQuery) loadUserThreadLike(ctx context.Context, query *UserThread
 	}
 	query.Where(predicate.UserThreadLike(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(thread.UserThreadLikeColumn), fks...))
-	}))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		fk := n.ThreadID
-		node, ok := nodeids[fk]
-		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "thread_id" returned %v for node %v`, fk, n)
-		}
-		assign(node, n)
-	}
-	return nil
-}
-func (tq *ThreadQuery) loadUserThreadSubscription(ctx context.Context, query *UserThreadSubscriptionQuery, nodes []*Thread, init func(*Thread), assign func(*Thread, *UserThreadSubscription)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*Thread)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
-		}
-	}
-	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(userthreadsubscription.FieldThreadID)
-	}
-	query.Where(predicate.UserThreadSubscription(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(thread.UserThreadSubscriptionColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {

@@ -20,6 +20,26 @@ func NewThreadDatasource(client *ent.Client) *ThreadDatasource {
 	return &ThreadDatasource{client: client}
 }
 
+type ThreadDatasourceGetThreadCountParams struct {
+	Ctx      context.Context
+	UserID   *int
+	ThreadID *int
+}
+
+func (ds *ThreadDatasource) GetThreadCount(params ThreadDatasourceGetCommentCountParams) (int, error) {
+	q := ds.client.Thread.Query()
+
+	if params.UserID != nil {
+		q = q.Where(thread.UserID(*params.UserID))
+	}
+
+	count, err := q.Count(params.Ctx)
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
 type ThreadDatasourceFindAllParams struct {
 	Ctx       context.Context
 	UserID    int
@@ -32,18 +52,18 @@ type ThreadDatasourceFindAllParams struct {
 }
 
 func (ds *ThreadDatasource) FindAll(params ThreadDatasourceFindAllParams) ([]*model.Thread, error) {
-	query := ds.client.Thread.Query()
+	q := ds.client.Thread.Query()
 
 	if params.UserID != 0 {
-		query = query.Where(thread.UserIDEQ(params.UserID))
+		q = q.Where(thread.UserIDEQ(params.UserID))
 	}
 
 	if params.BoardID != 0 {
-		query = query.Where(thread.BoardIDEQ(params.BoardID))
+		q = q.Where(thread.BoardIDEQ(params.BoardID))
 	}
 
 	if params.Keyword != "" {
-		query = query.Where(
+		q = q.Where(
 			thread.Or(
 				thread.TitleContainsFold(params.Keyword),
 				thread.DescriptionContainsFold(params.Keyword),
@@ -52,7 +72,7 @@ func (ds *ThreadDatasource) FindAll(params ThreadDatasourceFindAllParams) ([]*mo
 	}
 
 	if len(params.ThreadIDs) > 0 {
-		query = query.Where(thread.IDIn(params.ThreadIDs...))
+		q = q.Where(thread.IDIn(params.ThreadIDs...))
 	}
 
 	if params.SortOrder != "" {
@@ -60,10 +80,10 @@ func (ds *ThreadDatasource) FindAll(params ThreadDatasourceFindAllParams) ([]*mo
 		if params.SortOrder == "asc" {
 			orderFunc = ent.Asc
 		}
-		query = query.Order(orderFunc(thread.FieldCreatedAt))
+		q = q.Order(orderFunc(thread.FieldCreatedAt))
 	}
 
-	query = query.
+	q = q.
 		Limit(params.Limit).
 		Offset(params.Offset).
 		WithTags().WithBoard().
@@ -71,19 +91,17 @@ func (ds *ThreadDatasource) FindAll(params ThreadDatasourceFindAllParams) ([]*mo
 			rq.Select(threadcomment.FieldID)
 		})
 
-	threads, err := query.All(params.Ctx)
+	entThreadList, err := q.All(params.Ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	var modelThreads []*model.Thread
-	for _, entThread := range threads {
-		modelThreads = append(modelThreads, &model.Thread{
-			EntThread: entThread,
-		})
+	var threads []*model.Thread
+	for _, entThread_i := range entThreadList {
+		threads = append(threads, model.NewThread(model.NewThreadParams{EntThread: entThread_i}))
 	}
 
-	return modelThreads, nil
+	return threads, nil
 }
 
 type ThreadDatasourceFindByRelatedTagParams struct {
@@ -91,14 +109,14 @@ type ThreadDatasourceFindByRelatedTagParams struct {
 	ThreadIDs []int
 	Limit     int
 	Offset    int
-	TagIds    []int
+	TagIDs    []int
 }
 
 func (ds *ThreadDatasource) FindByRelatedTag(params ThreadDatasourceFindByRelatedTagParams) ([]*model.Thread, error) {
-	threads, err := ds.client.Thread.Query().
+	entThreadList, err := ds.client.Thread.Query().
 		Where(
 			thread.And(
-				thread.HasTagsWith(tag.IDIn(params.TagIds...)),
+				thread.HasTagsWith(tag.IDIn(params.TagIDs...)),
 				thread.Not(thread.IDIn(params.ThreadIDs...)),
 			),
 		).
@@ -114,14 +132,12 @@ func (ds *ThreadDatasource) FindByRelatedTag(params ThreadDatasourceFindByRelate
 		return nil, err
 	}
 
-	var modelThreads []*model.Thread
-	for _, entThread := range threads {
-		modelThreads = append(modelThreads, &model.Thread{
-			EntThread: entThread,
-		})
+	var threads []*model.Thread
+	for _, entThread_i := range entThreadList {
+		threads = append(threads, model.NewThread(model.NewThreadParams{EntThread: entThread_i}))
 	}
 
-	return modelThreads, nil
+	return threads, nil
 }
 
 type ThreadDatasourceFindByPopularityParams struct {
@@ -131,7 +147,7 @@ type ThreadDatasourceFindByPopularityParams struct {
 }
 
 func (ds *ThreadDatasource) FindByPopularity(params ThreadDatasourceFindByPopularityParams) ([]*model.Thread, error) {
-	threads, err := ds.client.Thread.Query().
+	entThreadList, err := ds.client.Thread.Query().
 		WithTags().
 		WithBoard().
 		WithComments(func(rq *ent.ThreadCommentQuery) {
@@ -143,14 +159,12 @@ func (ds *ThreadDatasource) FindByPopularity(params ThreadDatasourceFindByPopula
 		return nil, err
 	}
 
-	var modelThreads []*model.Thread
-	for _, thread := range threads {
-		modelThreads = append(modelThreads, &model.Thread{
-			EntThread: thread,
-		})
+	var threads []*model.Thread
+	for _, entThread_i := range entThreadList {
+		threads = append(threads, model.NewThread(model.NewThreadParams{EntThread: entThread_i}))
 	}
 
-	return modelThreads, nil
+	return threads, nil
 }
 
 type ThreadDatasourceFindAllByUserIDParams struct {
@@ -158,31 +172,23 @@ type ThreadDatasourceFindAllByUserIDParams struct {
 	UserID int
 }
 
-func (ds *ThreadDatasource) FindAllByUserID(params ThreadDatasourceFindAllByUserIDParams) ([]*model.Thread, int, error) {
-	threads, err := ds.client.Thread.Query().
+func (ds *ThreadDatasource) FindAllByUserID(params ThreadDatasourceFindAllByUserIDParams) ([]*model.Thread, error) {
+	entThreadList, err := ds.client.Thread.Query().
 		Where(thread.UserIDEQ(params.UserID)).
 		WithTags().
 		WithComments().
 		All(params.Ctx)
 	if err != nil {
-		return nil, 0, err
+		return nil, err
 	}
 
-	threadCount, err := ds.client.Thread.Query().
-		Where(thread.UserID(params.UserID)).
-		Count(params.Ctx)
-	if err != nil {
-		return nil, 0, err
+	var threads []*model.Thread
+	for _, entThread_i := range entThreadList {
+		threads = append(threads, model.NewThread(model.NewThreadParams{EntThread: entThread_i}))
 	}
 
-	var modelThreads []*model.Thread
-	for _, entThread := range threads {
-		modelThreads = append(modelThreads, &model.Thread{
-			EntThread: entThread,
-		})
-	}
+	return threads, nil
 
-	return modelThreads, threadCount, nil
 }
 
 type ThreadDatasourceFindByTitleParams struct {
@@ -191,7 +197,7 @@ type ThreadDatasourceFindByTitleParams struct {
 }
 
 func (ds *ThreadDatasource) FindByTitle(params ThreadDatasourceFindByTitleParams) ([]*model.Thread, error) {
-	threads, err := ds.client.Thread.Query().
+	entThreadList, err := ds.client.Thread.Query().
 		Where(thread.TitleEQ(params.Title)).
 		WithTags().
 		WithComments().
@@ -200,14 +206,12 @@ func (ds *ThreadDatasource) FindByTitle(params ThreadDatasourceFindByTitleParams
 		return nil, err
 	}
 
-	var modelThreads []*model.Thread
-	for _, entThread := range threads {
-		modelThreads = append(modelThreads, &model.Thread{
-			EntThread: entThread,
-		})
+	var threads []*model.Thread
+	for _, entThread_i := range entThreadList {
+		threads = append(threads, model.NewThread(model.NewThreadParams{EntThread: entThread_i}))
 	}
 
-	return modelThreads, nil
+	return threads, nil
 }
 
 type ThreadDatasourceFindByIDParams struct {
@@ -217,7 +221,7 @@ type ThreadDatasourceFindByIDParams struct {
 	Limit, Offset int
 }
 
-func (ds *ThreadDatasource) FindById(params ThreadDatasourceFindByIDParams) (*model.Thread, int, error) {
+func (ds *ThreadDatasource) FindById(params ThreadDatasourceFindByIDParams) (*model.Thread, error) {
 	orderFunc := ent.Desc
 	if params.SortOrder == "asc" {
 		orderFunc = ent.Asc
@@ -241,22 +245,12 @@ func (ds *ThreadDatasource) FindById(params ThreadDatasourceFindByIDParams) (*mo
 		}).
 		Only(params.Ctx)
 	if err != nil {
-		return nil, 0, err
+		return nil, err
 	}
 
-	commentCount, err := ds.client.ThreadComment.Query().
-		Where(threadcomment.ThreadID(params.ThreadID)).
-		Count(params.Ctx)
+	thread := model.NewThread(model.NewThreadParams{EntThread: entThread})
 
-	if err != nil {
-		return nil, 0, err
-	}
-
-	modelThread := &model.Thread{
-		EntThread: entThread,
-	}
-
-	return modelThread, commentCount, nil
+	return thread, nil
 }
 
 type ThreadDatasourceCreateTxParams struct {
@@ -267,7 +261,7 @@ type ThreadDatasourceCreateTxParams struct {
 }
 
 func (ds *ThreadDatasource) CreateTx(params ThreadDatasourceCreateTxParams) (*model.Thread, error) {
-	threadBuilder := params.Tx.Thread.Create().
+	q := params.Tx.Thread.Create().
 		SetTitle(params.Thread.EntThread.Title).
 		SetUserID(params.Thread.EntThread.UserID).
 		SetBoardID(params.Thread.EntThread.BoardID).
@@ -276,16 +270,18 @@ func (ds *ThreadDatasource) CreateTx(params ThreadDatasourceCreateTxParams) (*mo
 		AddTagIDs(params.TagIDs...)
 
 	if params.Thread.EntThread.Description != nil {
-		threadBuilder.SetDescription(*params.Thread.EntThread.Description)
+		q.SetDescription(*params.Thread.EntThread.Description)
 	}
 	if params.Thread.EntThread.ThumbnailURL != nil {
-		threadBuilder.SetThumbnailURL(*params.Thread.EntThread.ThumbnailURL)
+		q.SetThumbnailURL(*params.Thread.EntThread.ThumbnailURL)
 	}
 
-	savedThread, err := threadBuilder.Save(params.Ctx)
+	entThread, err := q.Save(params.Ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	return &model.Thread{EntThread: savedThread}, nil
+	thread := model.NewThread(model.NewThreadParams{EntThread: entThread})
+
+	return thread, nil
 }

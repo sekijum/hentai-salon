@@ -18,6 +18,6 @@ type ThreadCommentAttachmentRequest struct {
 
 type ThreadCommentCreateRequest struct {
 	Content     string                           `json:"content" binding:"required"`
-	GuestName   *string                          `json:"guestName" binding:"omitempty"`
+	GuestName   string                           `json:"guestName" binding:"omitempty"`
 	Attachments []ThreadCommentAttachmentRequest `json:"attachments" binding:"omitempty,dive"`
 }

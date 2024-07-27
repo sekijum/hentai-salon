@@ -46,7 +46,7 @@ func (ctrl *UserAdminController) Update(ctx *gin.Context) {
 
 	userID, err := strconv.Atoi(ctx.Param("userId"))
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 

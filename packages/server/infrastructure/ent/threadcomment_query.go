@@ -13,7 +13,6 @@ import (
 	"server/infrastructure/ent/threadcommentattachment"
 	"server/infrastructure/ent/user"
 	"server/infrastructure/ent/usercommentlike"
-	"server/infrastructure/ent/usercommentsubscription"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -23,19 +22,17 @@ import (
 // ThreadCommentQuery is the builder for querying ThreadComment entities.
 type ThreadCommentQuery struct {
 	config
-	ctx                         *QueryContext
-	order                       []threadcomment.OrderOption
-	inters                      []Interceptor
-	predicates                  []predicate.ThreadComment
-	withThread                  *ThreadQuery
-	withAuthor                  *UserQuery
-	withParentComment           *ThreadCommentQuery
-	withReplies                 *ThreadCommentQuery
-	withAttachments             *ThreadCommentAttachmentQuery
-	withLikedUsers              *UserQuery
-	withSubscribedUsers         *UserQuery
-	withUserCommentLike         *UserCommentLikeQuery
-	withUserCommentSubscription *UserCommentSubscriptionQuery
+	ctx                 *QueryContext
+	order               []threadcomment.OrderOption
+	inters              []Interceptor
+	predicates          []predicate.ThreadComment
+	withThread          *ThreadQuery
+	withAuthor          *UserQuery
+	withParentComment   *ThreadCommentQuery
+	withReplies         *ThreadCommentQuery
+	withAttachments     *ThreadCommentAttachmentQuery
+	withLikedUsers      *UserQuery
+	withUserCommentLike *UserCommentLikeQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -204,28 +201,6 @@ func (tcq *ThreadCommentQuery) QueryLikedUsers() *UserQuery {
 	return query
 }
 
-// QuerySubscribedUsers chains the current query on the "subscribed_users" edge.
-func (tcq *ThreadCommentQuery) QuerySubscribedUsers() *UserQuery {
-	query := (&UserClient{config: tcq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := tcq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := tcq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(threadcomment.Table, threadcomment.FieldID, selector),
-			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, threadcomment.SubscribedUsersTable, threadcomment.SubscribedUsersPrimaryKey...),
-		)
-		fromU = sqlgraph.SetNeighbors(tcq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
 // QueryUserCommentLike chains the current query on the "user_comment_like" edge.
 func (tcq *ThreadCommentQuery) QueryUserCommentLike() *UserCommentLikeQuery {
 	query := (&UserCommentLikeClient{config: tcq.config}).Query()
@@ -241,28 +216,6 @@ func (tcq *ThreadCommentQuery) QueryUserCommentLike() *UserCommentLikeQuery {
 			sqlgraph.From(threadcomment.Table, threadcomment.FieldID, selector),
 			sqlgraph.To(usercommentlike.Table, usercommentlike.CommentColumn),
 			sqlgraph.Edge(sqlgraph.O2M, true, threadcomment.UserCommentLikeTable, threadcomment.UserCommentLikeColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(tcq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryUserCommentSubscription chains the current query on the "user_comment_subscription" edge.
-func (tcq *ThreadCommentQuery) QueryUserCommentSubscription() *UserCommentSubscriptionQuery {
-	query := (&UserCommentSubscriptionClient{config: tcq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := tcq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := tcq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(threadcomment.Table, threadcomment.FieldID, selector),
-			sqlgraph.To(usercommentsubscription.Table, usercommentsubscription.CommentColumn),
-			sqlgraph.Edge(sqlgraph.O2M, true, threadcomment.UserCommentSubscriptionTable, threadcomment.UserCommentSubscriptionColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(tcq.driver.Dialect(), step)
 		return fromU, nil
@@ -457,20 +410,18 @@ func (tcq *ThreadCommentQuery) Clone() *ThreadCommentQuery {
 		return nil
 	}
 	return &ThreadCommentQuery{
-		config:                      tcq.config,
-		ctx:                         tcq.ctx.Clone(),
-		order:                       append([]threadcomment.OrderOption{}, tcq.order...),
-		inters:                      append([]Interceptor{}, tcq.inters...),
-		predicates:                  append([]predicate.ThreadComment{}, tcq.predicates...),
-		withThread:                  tcq.withThread.Clone(),
-		withAuthor:                  tcq.withAuthor.Clone(),
-		withParentComment:           tcq.withParentComment.Clone(),
-		withReplies:                 tcq.withReplies.Clone(),
-		withAttachments:             tcq.withAttachments.Clone(),
-		withLikedUsers:              tcq.withLikedUsers.Clone(),
-		withSubscribedUsers:         tcq.withSubscribedUsers.Clone(),
-		withUserCommentLike:         tcq.withUserCommentLike.Clone(),
-		withUserCommentSubscription: tcq.withUserCommentSubscription.Clone(),
+		config:              tcq.config,
+		ctx:                 tcq.ctx.Clone(),
+		order:               append([]threadcomment.OrderOption{}, tcq.order...),
+		inters:              append([]Interceptor{}, tcq.inters...),
+		predicates:          append([]predicate.ThreadComment{}, tcq.predicates...),
+		withThread:          tcq.withThread.Clone(),
+		withAuthor:          tcq.withAuthor.Clone(),
+		withParentComment:   tcq.withParentComment.Clone(),
+		withReplies:         tcq.withReplies.Clone(),
+		withAttachments:     tcq.withAttachments.Clone(),
+		withLikedUsers:      tcq.withLikedUsers.Clone(),
+		withUserCommentLike: tcq.withUserCommentLike.Clone(),
 		// clone intermediate query.
 		sql:  tcq.sql.Clone(),
 		path: tcq.path,
@@ -543,17 +494,6 @@ func (tcq *ThreadCommentQuery) WithLikedUsers(opts ...func(*UserQuery)) *ThreadC
 	return tcq
 }
 
-// WithSubscribedUsers tells the query-builder to eager-load the nodes that are connected to
-// the "subscribed_users" edge. The optional arguments are used to configure the query builder of the edge.
-func (tcq *ThreadCommentQuery) WithSubscribedUsers(opts ...func(*UserQuery)) *ThreadCommentQuery {
-	query := (&UserClient{config: tcq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	tcq.withSubscribedUsers = query
-	return tcq
-}
-
 // WithUserCommentLike tells the query-builder to eager-load the nodes that are connected to
 // the "user_comment_like" edge. The optional arguments are used to configure the query builder of the edge.
 func (tcq *ThreadCommentQuery) WithUserCommentLike(opts ...func(*UserCommentLikeQuery)) *ThreadCommentQuery {
@@ -562,17 +502,6 @@ func (tcq *ThreadCommentQuery) WithUserCommentLike(opts ...func(*UserCommentLike
 		opt(query)
 	}
 	tcq.withUserCommentLike = query
-	return tcq
-}
-
-// WithUserCommentSubscription tells the query-builder to eager-load the nodes that are connected to
-// the "user_comment_subscription" edge. The optional arguments are used to configure the query builder of the edge.
-func (tcq *ThreadCommentQuery) WithUserCommentSubscription(opts ...func(*UserCommentSubscriptionQuery)) *ThreadCommentQuery {
-	query := (&UserCommentSubscriptionClient{config: tcq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	tcq.withUserCommentSubscription = query
 	return tcq
 }
 
@@ -654,16 +583,14 @@ func (tcq *ThreadCommentQuery) sqlAll(ctx context.Context, hooks ...queryHook) (
 	var (
 		nodes       = []*ThreadComment{}
 		_spec       = tcq.querySpec()
-		loadedTypes = [9]bool{
+		loadedTypes = [7]bool{
 			tcq.withThread != nil,
 			tcq.withAuthor != nil,
 			tcq.withParentComment != nil,
 			tcq.withReplies != nil,
 			tcq.withAttachments != nil,
 			tcq.withLikedUsers != nil,
-			tcq.withSubscribedUsers != nil,
 			tcq.withUserCommentLike != nil,
-			tcq.withUserCommentSubscription != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -725,27 +652,11 @@ func (tcq *ThreadCommentQuery) sqlAll(ctx context.Context, hooks ...queryHook) (
 			return nil, err
 		}
 	}
-	if query := tcq.withSubscribedUsers; query != nil {
-		if err := tcq.loadSubscribedUsers(ctx, query, nodes,
-			func(n *ThreadComment) { n.Edges.SubscribedUsers = []*User{} },
-			func(n *ThreadComment, e *User) { n.Edges.SubscribedUsers = append(n.Edges.SubscribedUsers, e) }); err != nil {
-			return nil, err
-		}
-	}
 	if query := tcq.withUserCommentLike; query != nil {
 		if err := tcq.loadUserCommentLike(ctx, query, nodes,
 			func(n *ThreadComment) { n.Edges.UserCommentLike = []*UserCommentLike{} },
 			func(n *ThreadComment, e *UserCommentLike) {
 				n.Edges.UserCommentLike = append(n.Edges.UserCommentLike, e)
-			}); err != nil {
-			return nil, err
-		}
-	}
-	if query := tcq.withUserCommentSubscription; query != nil {
-		if err := tcq.loadUserCommentSubscription(ctx, query, nodes,
-			func(n *ThreadComment) { n.Edges.UserCommentSubscription = []*UserCommentSubscription{} },
-			func(n *ThreadComment, e *UserCommentSubscription) {
-				n.Edges.UserCommentSubscription = append(n.Edges.UserCommentSubscription, e)
 			}); err != nil {
 			return nil, err
 		}
@@ -970,67 +881,6 @@ func (tcq *ThreadCommentQuery) loadLikedUsers(ctx context.Context, query *UserQu
 	}
 	return nil
 }
-func (tcq *ThreadCommentQuery) loadSubscribedUsers(ctx context.Context, query *UserQuery, nodes []*ThreadComment, init func(*ThreadComment), assign func(*ThreadComment, *User)) error {
-	edgeIDs := make([]driver.Value, len(nodes))
-	byID := make(map[int]*ThreadComment)
-	nids := make(map[int]map[*ThreadComment]struct{})
-	for i, node := range nodes {
-		edgeIDs[i] = node.ID
-		byID[node.ID] = node
-		if init != nil {
-			init(node)
-		}
-	}
-	query.Where(func(s *sql.Selector) {
-		joinT := sql.Table(threadcomment.SubscribedUsersTable)
-		s.Join(joinT).On(s.C(user.FieldID), joinT.C(threadcomment.SubscribedUsersPrimaryKey[0]))
-		s.Where(sql.InValues(joinT.C(threadcomment.SubscribedUsersPrimaryKey[1]), edgeIDs...))
-		columns := s.SelectedColumns()
-		s.Select(joinT.C(threadcomment.SubscribedUsersPrimaryKey[1]))
-		s.AppendSelect(columns...)
-		s.SetDistinct(false)
-	})
-	if err := query.prepareQuery(ctx); err != nil {
-		return err
-	}
-	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
-		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
-			assign := spec.Assign
-			values := spec.ScanValues
-			spec.ScanValues = func(columns []string) ([]any, error) {
-				values, err := values(columns[1:])
-				if err != nil {
-					return nil, err
-				}
-				return append([]any{new(sql.NullInt64)}, values...), nil
-			}
-			spec.Assign = func(columns []string, values []any) error {
-				outValue := int(values[0].(*sql.NullInt64).Int64)
-				inValue := int(values[1].(*sql.NullInt64).Int64)
-				if nids[inValue] == nil {
-					nids[inValue] = map[*ThreadComment]struct{}{byID[outValue]: {}}
-					return assign(columns[1:], values[1:])
-				}
-				nids[inValue][byID[outValue]] = struct{}{}
-				return nil
-			}
-		})
-	})
-	neighbors, err := withInterceptors[[]*User](ctx, query, qr, query.inters)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected "subscribed_users" node returned %v`, n.ID)
-		}
-		for kn := range nodes {
-			assign(kn, n)
-		}
-	}
-	return nil
-}
 func (tcq *ThreadCommentQuery) loadUserCommentLike(ctx context.Context, query *UserCommentLikeQuery, nodes []*ThreadComment, init func(*ThreadComment), assign func(*ThreadComment, *UserCommentLike)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*ThreadComment)
@@ -1046,36 +896,6 @@ func (tcq *ThreadCommentQuery) loadUserCommentLike(ctx context.Context, query *U
 	}
 	query.Where(predicate.UserCommentLike(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(threadcomment.UserCommentLikeColumn), fks...))
-	}))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		fk := n.CommentID
-		node, ok := nodeids[fk]
-		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "comment_id" returned %v for node %v`, fk, n)
-		}
-		assign(node, n)
-	}
-	return nil
-}
-func (tcq *ThreadCommentQuery) loadUserCommentSubscription(ctx context.Context, query *UserCommentSubscriptionQuery, nodes []*ThreadComment, init func(*ThreadComment), assign func(*ThreadComment, *UserCommentSubscription)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*ThreadComment)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
-		}
-	}
-	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(usercommentsubscription.FieldCommentID)
-	}
-	query.Where(predicate.UserCommentSubscription(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(threadcomment.UserCommentSubscriptionColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {

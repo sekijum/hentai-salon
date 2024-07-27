@@ -2,10 +2,11 @@ package service
 
 import (
 	"context"
+	"server/domain/model"
 	"server/infrastructure/datasource"
+	"server/infrastructure/ent"
 	"server/presentation/request"
 	"server/presentation/resource"
-	"time"
 )
 
 type UserAdminApplicationService struct {
@@ -21,8 +22,8 @@ type UserAdminApplicationServiceFindAllParams struct {
 	Qs  request.UserAdminFindAllRequest
 }
 
-func (svc *UserAdminApplicationService) FindAll(params UserAdminApplicationServiceFindAllParams) (*resource.ListResource[*resource.UserAdminResource], error) {
-	users, err := svc.userAdminDatasource.FindAll(datasource.UserAdminDatasourceFindAllParams{
+func (svc *UserAdminApplicationService) FindAll(params UserAdminApplicationServiceFindAllParams) (*resource.Collection[*resource.UserAdminResource], error) {
+	userList, err := svc.userAdminDatasource.FindAll(datasource.UserAdminDatasourceFindAllParams{
 		Ctx:       params.Ctx,
 		Limit:     params.Qs.Limit,
 		Offset:    params.Qs.Offset,
@@ -44,19 +45,19 @@ func (svc *UserAdminApplicationService) FindAll(params UserAdminApplicationServi
 		return nil, err
 	}
 
-	var userAdminResourceList []*resource.UserAdminResource
-	for _, user := range users {
-		userAdminResourceList = append(userAdminResourceList, resource.NewUserAdminResource(resource.NewUserAdminResourceParams{
-			User: user,
+	var userResourceList []*resource.UserAdminResource
+	for _, user_i := range userList {
+		userResourceList = append(userResourceList, resource.NewUserAdminResource(resource.NewUserAdminResourceParams{
+			User: user_i,
 		}))
 	}
 
-	dto := &resource.ListResource[*resource.UserAdminResource]{
+	dto := resource.NewCollection(resource.NewCollectionParams[*resource.UserAdminResource]{
+		Data:       userResourceList,
 		TotalCount: userCount,
 		Limit:      params.Qs.Limit,
 		Offset:     params.Qs.Offset,
-		Data:       userAdminResourceList,
-	}
+	})
 
 	return dto, nil
 }
@@ -68,29 +69,19 @@ type UserAdminApplicationServiceUpdateParams struct {
 }
 
 func (svc *UserAdminApplicationService) Update(params UserAdminApplicationServiceUpdateParams) (*resource.UserAdminResource, error) {
-	user, err := svc.userAdminDatasource.FindByID(datasource.UserAdminDatasourceFindByIDParams{
-		Ctx:    params.Ctx,
-		UserID: params.UserID,
+	user := model.NewUser(model.NewUserParams{
+		EntUser: &ent.User{
+			ID:    params.UserID,
+			Name:  params.Body.Name,
+			Email: params.Body.Email,
+		},
+		OptionList: []func(*model.User){
+			model.WithUserStatus(model.UserStatus(params.Body.Status)),
+			model.WithUserRole(model.UserRole(params.Body.Role)),
+		},
 	})
-	if err != nil {
-		return nil, err
-	}
 
-	if params.Body.Name != nil {
-		user.EntUser.Name = *params.Body.Name
-	}
-	if params.Body.Email != nil {
-		user.EntUser.Email = *params.Body.Email
-	}
-	if params.Body.Role != nil {
-		user.EntUser.Role = *params.Body.Role
-	}
-	if params.Body.Status != nil {
-		user.EntUser.Status = *params.Body.Status
-	}
-	user.EntUser.UpdatedAt = time.Now()
-
-	updatedUser, err := svc.userAdminDatasource.Update(datasource.UserAdminDatasourceUpdateParams{
+	user, err := svc.userAdminDatasource.Update(datasource.UserAdminDatasourceUpdateParams{
 		Ctx:  params.Ctx,
 		User: *user,
 	})
@@ -98,7 +89,7 @@ func (svc *UserAdminApplicationService) Update(params UserAdminApplicationServic
 		return nil, err
 	}
 
-	dto := resource.NewUserAdminResource(resource.NewUserAdminResourceParams{User: updatedUser})
+	dto := resource.NewUserAdminResource(resource.NewUserAdminResourceParams{User: user})
 
 	return dto, nil
 }

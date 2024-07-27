@@ -7,7 +7,6 @@ import (
 	"server/infrastructure/ent"
 	"server/presentation/request"
 	"server/presentation/resource"
-	"time"
 )
 
 type ThreadCommentApplicationService struct {
@@ -24,8 +23,8 @@ type ThreadCommentApplicationServiceFindByUserIDParams struct {
 	Qs     request.ThreadCommentFindAllByUserIDRequest
 }
 
-func (svc *ThreadCommentApplicationService) FindAllByUserID(params ThreadCommentApplicationServiceFindByUserIDParams) (*resource.ListResource[*resource.ThreadCommentResource], error) {
-	comments, commentCount, err := svc.threadCommentDatasource.FindAllByUserID(datasource.ThreadCommentDatasourceFindAllByUserIDParams{
+func (svc *ThreadCommentApplicationService) FindAllByUserID(params ThreadCommentApplicationServiceFindByUserIDParams) (*resource.Collection[*resource.ThreadCommentResource], error) {
+	commentList, err := svc.threadCommentDatasource.FindAllByUserID(datasource.ThreadCommentDatasourceFindAllByUserIDParams{
 		Ctx:    params.Ctx,
 		UserID: params.UserID,
 		Limit:  params.Qs.Limit,
@@ -35,20 +34,28 @@ func (svc *ThreadCommentApplicationService) FindAllByUserID(params ThreadComment
 		return nil, err
 	}
 
+	commentCount, err := svc.threadCommentDatasource.GetCommentCount(datasource.ThreadDatasourceGetCommentCountParams{
+		Ctx:    params.Ctx,
+		UserID: &params.UserID,
+	})
+	if err != nil {
+		return nil, err
+	}
+
 	var threadCommentResourceList []*resource.ThreadCommentResource
-	for _, comment := range comments {
+	for _, comment_i := range commentList {
 		threadCommentResourceList = append(threadCommentResourceList, resource.NewThreadCommentResource(resource.NewThreadCommentResourceParams{
-			ThreadComment: comment,
-			ReplyCount:    len(comment.EntThreadComment.Edges.Replies),
+			ThreadComment: comment_i,
+			ReplyCount:    len(comment_i.EntThreadComment.Edges.Replies),
 		}))
 	}
 
-	dto := &resource.ListResource[*resource.ThreadCommentResource]{
+	dto := resource.NewCollection(resource.NewCollectionParams[*resource.ThreadCommentResource]{
+		Data:       threadCommentResourceList,
 		TotalCount: commentCount,
 		Limit:      params.Qs.Limit,
 		Offset:     params.Qs.Offset,
-		Data:       threadCommentResourceList,
-	}
+	})
 
 	return dto, nil
 }
@@ -82,52 +89,46 @@ func (svc *ThreadCommentApplicationService) FindByID(params ThreadCommentApplica
 
 type ThreadCommentApplicationServiceCreateParams struct {
 	Ctx             context.Context
-	UserID          int
-	ClientIP        string
+	UserID          *int
 	ThreadID        int
+	ClientIP        string
 	ParentCommentID *int
 	Body            request.ThreadCommentCreateRequest
 }
 
 func (svc *ThreadCommentApplicationService) Create(params ThreadCommentApplicationServiceCreateParams) (*resource.ThreadCommentResource, error) {
 
-	comment := &model.ThreadComment{
+	comment := model.NewThreadComment(model.NewThreadCommentParams{
 		EntThreadComment: &ent.ThreadComment{
-			ThreadID:  params.ThreadID,
-			Content:   params.Body.Content,
-			IPAddress: params.ClientIP,
-			Status:    int(model.ThreadCommentStatusVisible),
-			CreatedAt: time.Now(),
-			UpdatedAt: time.Now(),
+			ThreadID:        params.ThreadID,
+			Content:         params.Body.Content,
+			IPAddress:       params.ClientIP,
+			GuestName:       &params.Body.GuestName,
+			UserID:          params.UserID,
+			ParentCommentID: params.ParentCommentID,
 		},
-	}
+		OptionList: []func(*model.ThreadComment){
+			model.WithThreadCommentStatus(model.ThreadCommentStatusVisible),
+		},
+	})
 
-	if params.Body.GuestName != nil {
-		comment.EntThreadComment.GuestName = params.Body.GuestName
-	}
-
-	if params.UserID != 0 {
-		comment.EntThreadComment.UserID = &params.UserID
+	if params.UserID != nil {
 		comment.EntThreadComment.GuestName = nil
 	}
 
-	if params.ParentCommentID != nil {
-		comment.EntThreadComment.ParentCommentID = params.ParentCommentID
-	}
-
-	attachments := make([]*ent.ThreadCommentAttachment, len(params.Body.Attachments))
-	for i, a := range params.Body.Attachments {
-		attachmentType, err := model.AttachmentTypeFromString(a.Type)
-		if err != nil {
-			return nil, err
-		}
-
-		attachments[i] = &ent.ThreadCommentAttachment{
-			URL:          a.URL,
-			DisplayOrder: a.DisplayOrder,
-			Type:         int(attachmentType),
-			CreatedAt:    time.Now(),
-		}
+	var attachments []*ent.ThreadCommentAttachment
+	for _, attachment_i := range params.Body.Attachments {
+		attachment := model.NewThreadCommentAttachment(model.NewThreadCommentAttachmentParams{
+			EntAttachment: &ent.ThreadCommentAttachment{
+				URL:          attachment_i.URL,
+				DisplayOrder: attachment_i.DisplayOrder,
+			},
+			OptionList: []func(*model.ThreadCommentAttachment){
+				model.WithAttachmentTypeFromString(attachment_i.Type),
+			},
+		},
+		)
+		attachments = append(attachments, attachment.EntAttachment)
 	}
 
 	comment.EntThreadComment.Edges.Attachments = attachments

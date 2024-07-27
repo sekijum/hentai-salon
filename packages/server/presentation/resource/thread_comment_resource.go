@@ -2,29 +2,23 @@ package resource
 
 import (
 	"server/domain/model"
+	"server/infrastructure/ent"
 	"time"
 )
 
-type ThreadCommentAttachmentResource struct {
-	Url          string `json:"url"`
-	DisplayOrder int    `json:"displayOrder"`
-	Type         string `json:"type"`
-	CommentID    int    `json:"commentId"`
-}
-
 type ThreadCommentResource struct {
-	ID              int                                  `json:"id"`
-	User            *UserResource                        `json:"user,omitempty"`
-	GuestName       *string                              `json:"guestName,omitempty"`
-	Content         string                               `json:"content"`
-	ParentCommentID *int                                 `json:"parentCommentId"`
-	CreatedAt       string                               `json:"createdAt"`
-	UpdatedAt       string                               `json:"updatedAt"`
-	Thread          *ThreadResource                      `json:"thread,omitempty"`
-	ParentComment   *ThreadCommentResource               `json:"parentComment"`
-	Attachments     []*ThreadCommentAttachmentResource   `json:"attachments"`
-	ReplyCount      int                                  `json:"replyCount"`
-	Replies         ListResource[*ThreadCommentResource] `json:"replies"`
+	ID              int                                 `json:"id"`
+	User            *UserResource                       `json:"user,omitempty"`
+	GuestName       *string                             `json:"guestName,omitempty"`
+	Content         string                              `json:"content"`
+	ParentCommentID *int                                `json:"parentCommentId"`
+	CreatedAt       string                              `json:"createdAt"`
+	UpdatedAt       string                              `json:"updatedAt"`
+	Thread          *ThreadResource                     `json:"thread,omitempty"`
+	ParentComment   *ThreadCommentResource              `json:"parentComment"`
+	Attachments     []*ThreadCommentAttachmentResource  `json:"attachments"`
+	ReplyCount      int                                 `json:"replyCount"`
+	Replies         *Collection[*ThreadCommentResource] `json:"replies"`
 }
 
 type NewThreadCommentResourceParams struct {
@@ -35,79 +29,78 @@ type NewThreadCommentResourceParams struct {
 
 func NewThreadCommentResource(params NewThreadCommentResourceParams) *ThreadCommentResource {
 
-	var user *UserResource
+	var userResource *UserResource
 	if params.ThreadComment.EntThreadComment.Edges.Author != nil {
-		user = &UserResource{
-			ID:          params.ThreadComment.EntThreadComment.Edges.Author.ID,
-			Name:        params.ThreadComment.EntThreadComment.Edges.Author.Name,
-			ProfileLink: params.ThreadComment.EntThreadComment.Edges.Author.ProfileLink,
-		}
+		userResource = NewUserResource(NewUserResourceParams{
+			User: model.NewUser(model.NewUserParams{
+				EntUser: &ent.User{
+					ID:          params.ThreadComment.EntThreadComment.Edges.Author.ID,
+					Name:        params.ThreadComment.EntThreadComment.Edges.Author.Name,
+					ProfileLink: params.ThreadComment.EntThreadComment.Edges.Author.ProfileLink,
+				},
+			}),
+		})
 	}
 
 	var parentComment *ThreadCommentResource
 	if params.ThreadComment.EntThreadComment.Edges.ParentComment != nil {
 		parentComment = NewThreadCommentResource(NewThreadCommentResourceParams{
-			ThreadComment: &model.ThreadComment{EntThreadComment: params.ThreadComment.EntThreadComment.Edges.ParentComment},
+			ThreadComment: model.NewThreadComment(model.NewThreadCommentParams{
+				EntThreadComment: params.ThreadComment.EntThreadComment.Edges.ParentComment,
+			}),
 		})
 	}
 
-	var attachments []*ThreadCommentAttachmentResource
-	for _, attachment := range params.ThreadComment.EntThreadComment.Edges.Attachments {
-		threadCommentAttachment := &model.ThreadCommentAttachment{EntAttachment: attachment}
-		attachments = append(attachments, &ThreadCommentAttachmentResource{
-			Url:          threadCommentAttachment.EntAttachment.URL,
-			DisplayOrder: threadCommentAttachment.EntAttachment.DisplayOrder,
-			Type:         threadCommentAttachment.TypeToString(),
-		})
+	var attachmentResourceList []*ThreadCommentAttachmentResource
+	for _, attachment_i := range params.ThreadComment.EntThreadComment.Edges.Attachments {
+		attachmentResourceList = append(attachmentResourceList, NewThreadCommentAttachmentResource(NewThreadCommentAttachmentResourceParams{
+			ThreadCommentAttachment: model.NewThreadCommentAttachment(model.NewThreadCommentAttachmentParams{
+				EntAttachment: attachment_i,
+			}),
+		}))
 	}
 
-	var replies []*ThreadCommentResource
-	for _, reply := range params.ThreadComment.EntThreadComment.Edges.Replies {
-		commentResource := NewThreadCommentResource(NewThreadCommentResourceParams{
-			ThreadComment: &model.ThreadComment{EntThreadComment: reply},
+	var replyResourceList []*ThreadCommentResource
+	for _, reply_i := range params.ThreadComment.EntThreadComment.Edges.Replies {
+		replyResourceList = append(replyResourceList, NewThreadCommentResource(NewThreadCommentResourceParams{
+			ThreadComment: model.NewThreadComment(model.NewThreadCommentParams{EntThreadComment: reply_i}),
 			Offset:        params.Offset,
-			ReplyCount:    len(reply.Edges.Replies),
-		})
-		replies = append(replies, commentResource)
+			ReplyCount:    len(reply_i.Edges.Replies),
+		}))
 	}
 
-	replyList := ListResource[*ThreadCommentResource]{
+	replyCollection := NewCollection(NewCollectionParams[*ThreadCommentResource]{
+		Data:       replyResourceList,
 		TotalCount: params.ReplyCount,
 		Limit:      params.Limit,
 		Offset:     params.Offset,
-		Data:       replies,
-	}
+	})
 
-	var thread *ThreadResource
+	var threadResource *ThreadResource
 	if params.ThreadComment.EntThreadComment.Edges.Thread != nil {
 		var description *string
 		if params.ThreadComment.EntThreadComment.Edges.Thread.Description != nil {
 			description = params.ThreadComment.EntThreadComment.Edges.Thread.Description
 		}
-		thread = &ThreadResource{
+		threadResource = &ThreadResource{
 			ID:          params.ThreadComment.EntThreadComment.Edges.Thread.ID,
 			Title:       params.ThreadComment.EntThreadComment.Edges.Thread.Title,
 			Description: description,
 		}
 	}
 
-	var guestName *string
-	if params.ThreadComment.EntThreadComment.GuestName != nil {
-		guestName = params.ThreadComment.EntThreadComment.GuestName
-	}
-
 	return &ThreadCommentResource{
 		ID:              params.ThreadComment.EntThreadComment.ID,
-		User:            user,
-		GuestName:       guestName,
+		User:            userResource,
+		GuestName:       params.ThreadComment.EntThreadComment.GuestName,
 		Content:         params.ThreadComment.EntThreadComment.Content,
 		ParentCommentID: params.ThreadComment.EntThreadComment.ParentCommentID,
 		ParentComment:   parentComment,
 		CreatedAt:       params.ThreadComment.EntThreadComment.CreatedAt.Format(time.RFC3339),
 		UpdatedAt:       params.ThreadComment.EntThreadComment.UpdatedAt.Format(time.RFC3339),
-		Thread:          thread,
-		Attachments:     attachments,
+		Thread:          threadResource,
+		Attachments:     attachmentResourceList,
 		ReplyCount:      params.ReplyCount,
-		Replies:         replyList,
+		Replies:         replyCollection,
 	}
 }

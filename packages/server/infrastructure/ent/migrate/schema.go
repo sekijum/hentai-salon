@@ -40,6 +40,23 @@ var (
 			},
 		},
 	}
+	// ContactsColumns holds the columns for the "contacts" table.
+	ContactsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "email", Type: field.TypeString, Size: 254},
+		{Name: "subject", Type: field.TypeString, Size: 255},
+		{Name: "message", Type: field.TypeString, Size: 2147483647},
+		{Name: "ip_address", Type: field.TypeString, Size: 64},
+		{Name: "status", Type: field.TypeInt, Default: 0},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// ContactsTable holds the schema information for the "contacts" table.
+	ContactsTable = &schema.Table{
+		Name:       "contacts",
+		Columns:    ContactsColumns,
+		PrimaryKey: []*schema.Column{ContactsColumns[0]},
+	}
 	// TagsColumns holds the columns for the "tags" table.
 	TagsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -230,34 +247,6 @@ var (
 			},
 		},
 	}
-	// UserCommentSubscriptionsColumns holds the columns for the "user_comment_subscriptions" table.
-	UserCommentSubscriptionsColumns = []*schema.Column{
-		{Name: "is_notified", Type: field.TypeBool, Default: true},
-		{Name: "is_checked", Type: field.TypeBool, Default: false},
-		{Name: "subscribed_at", Type: field.TypeTime},
-		{Name: "user_id", Type: field.TypeInt},
-		{Name: "comment_id", Type: field.TypeInt},
-	}
-	// UserCommentSubscriptionsTable holds the schema information for the "user_comment_subscriptions" table.
-	UserCommentSubscriptionsTable = &schema.Table{
-		Name:       "user_comment_subscriptions",
-		Columns:    UserCommentSubscriptionsColumns,
-		PrimaryKey: []*schema.Column{UserCommentSubscriptionsColumns[3], UserCommentSubscriptionsColumns[4]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "user_comment_subscriptions_users_user",
-				Columns:    []*schema.Column{UserCommentSubscriptionsColumns[3]},
-				RefColumns: []*schema.Column{UsersColumns[0]},
-				OnDelete:   schema.NoAction,
-			},
-			{
-				Symbol:     "user_comment_subscriptions_thread_comments_comment",
-				Columns:    []*schema.Column{UserCommentSubscriptionsColumns[4]},
-				RefColumns: []*schema.Column{ThreadCommentsColumns[0]},
-				OnDelete:   schema.NoAction,
-			},
-		},
-	}
 	// UserThreadLikesColumns holds the columns for the "user_thread_likes" table.
 	UserThreadLikesColumns = []*schema.Column{
 		{Name: "liked_at", Type: field.TypeTime},
@@ -284,37 +273,10 @@ var (
 			},
 		},
 	}
-	// UserThreadSubscriptionsColumns holds the columns for the "user_thread_subscriptions" table.
-	UserThreadSubscriptionsColumns = []*schema.Column{
-		{Name: "is_notified", Type: field.TypeBool, Default: true},
-		{Name: "is_checked", Type: field.TypeBool, Default: false},
-		{Name: "subscribed_at", Type: field.TypeTime},
-		{Name: "user_id", Type: field.TypeInt},
-		{Name: "thread_id", Type: field.TypeInt},
-	}
-	// UserThreadSubscriptionsTable holds the schema information for the "user_thread_subscriptions" table.
-	UserThreadSubscriptionsTable = &schema.Table{
-		Name:       "user_thread_subscriptions",
-		Columns:    UserThreadSubscriptionsColumns,
-		PrimaryKey: []*schema.Column{UserThreadSubscriptionsColumns[3], UserThreadSubscriptionsColumns[4]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "user_thread_subscriptions_users_user",
-				Columns:    []*schema.Column{UserThreadSubscriptionsColumns[3]},
-				RefColumns: []*schema.Column{UsersColumns[0]},
-				OnDelete:   schema.NoAction,
-			},
-			{
-				Symbol:     "user_thread_subscriptions_threads_thread",
-				Columns:    []*schema.Column{UserThreadSubscriptionsColumns[4]},
-				RefColumns: []*schema.Column{ThreadsColumns[0]},
-				OnDelete:   schema.NoAction,
-			},
-		},
-	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		BoardsTable,
+		ContactsTable,
 		TagsTable,
 		ThreadsTable,
 		ThreadCommentsTable,
@@ -322,9 +284,7 @@ var (
 		ThreadTagsTable,
 		UsersTable,
 		UserCommentLikesTable,
-		UserCommentSubscriptionsTable,
 		UserThreadLikesTable,
-		UserThreadSubscriptionsTable,
 	}
 )
 
@@ -340,10 +300,6 @@ func init() {
 	ThreadTagsTable.ForeignKeys[1].RefTable = TagsTable
 	UserCommentLikesTable.ForeignKeys[0].RefTable = UsersTable
 	UserCommentLikesTable.ForeignKeys[1].RefTable = ThreadCommentsTable
-	UserCommentSubscriptionsTable.ForeignKeys[0].RefTable = UsersTable
-	UserCommentSubscriptionsTable.ForeignKeys[1].RefTable = ThreadCommentsTable
 	UserThreadLikesTable.ForeignKeys[0].RefTable = UsersTable
 	UserThreadLikesTable.ForeignKeys[1].RefTable = ThreadsTable
-	UserThreadSubscriptionsTable.ForeignKeys[0].RefTable = UsersTable
-	UserThreadSubscriptionsTable.ForeignKeys[1].RefTable = ThreadsTable
 }

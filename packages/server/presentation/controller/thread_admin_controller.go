@@ -29,7 +29,7 @@ func (ctrl *ThreadAdminController) FindAll(ctx *gin.Context) {
 	qs.Limit = ctx.GetInt("limit")
 	qs.Offset = ctx.GetInt("offset")
 
-	listResource, err := ctrl.threadApplicationService.FindAll(service.ThreadAdminApplicationServiceFindAllParams{
+	dto, err := ctrl.threadApplicationService.FindAll(service.ThreadAdminApplicationServiceFindAllParams{
 		Ctx: context.Background(),
 		Qs:  qs,
 	})
@@ -38,13 +38,13 @@ func (ctrl *ThreadAdminController) FindAll(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, listResource)
+	ctx.JSON(http.StatusOK, dto)
 }
 
 func (ctrl *ThreadAdminController) FindByID(ctx *gin.Context) {
 	threadID, err := strconv.Atoi(ctx.Param("threadId"))
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid thread ID"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -76,7 +76,7 @@ func (ctrl *ThreadAdminController) Update(ctx *gin.Context) {
 
 	threadID, err := strconv.Atoi(ctx.Param("threadId"))
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid thread ID"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 

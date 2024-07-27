@@ -72,18 +72,18 @@ func (svc *UserApplicationService) Signup(params UserApplicationServiceSignupPar
 		return "", err
 	}
 
-	user := &model.User{
+	user := model.NewUser(model.NewUserParams{
 		EntUser: &ent.User{
 			Name:        params.Body.Name,
 			Email:       params.Body.Email,
 			Password:    hashedPassword,
 			ProfileLink: params.Body.ProfileLink,
-			Status:      int(model.UserStatusActive),
-			Role:        int(model.UserRoleMember),
-			CreatedAt:   time.Now(),
-			UpdatedAt:   time.Now(),
 		},
-	}
+		OptionList: []func(*model.User){
+			model.WithUserStatus(model.UserStatusActive),
+			model.WithUserRole(model.UserRoleMember),
+		},
+	})
 
 	user, err = svc.userDatasource.Create(datasource.UserDatasourceCreateParams{
 		Ctx:  params.Ctx,
@@ -215,14 +215,14 @@ func (svc *UserApplicationService) Update(params UserApplicationServiceUpdatePar
 		return errors.New("このメールアドレスは既に使用されています。")
 	}
 
-	user := model.User{
+	user := model.NewUser(model.NewUserParams{
 		EntUser: &ent.User{
 			ID:          params.UserID,
 			Name:        params.Body.Name,
 			Email:       params.Body.Email,
 			ProfileLink: params.Body.ProfileLink,
 		},
-	}
+	})
 
 	_, err = svc.userDatasource.Update(datasource.UserDatasourceUpdateParams{
 		Ctx:  params.Ctx,

@@ -24,16 +24,6 @@ type UserDatasourceFindByIDParams struct {
 	UserID, Limit, Offset int
 }
 
-type ThreadCommentCount struct {
-	ThreadID int `json:"thread_id"`
-	Count    int `json:"count"`
-}
-
-type ThreadCommentReplyCount struct {
-	ParentCommentID int `json:"parent_comment_id"`
-	Count           int `json:"count"`
-}
-
 func (ds *UserDatasource) FindByID(params UserDatasourceFindByIDParams) (*model.User, error) {
 	entUser, err := ds.client.User.Query().
 		Where(user.ID(params.UserID)).
@@ -54,11 +44,9 @@ func (ds *UserDatasource) FindByID(params UserDatasourceFindByIDParams) (*model.
 		return nil, err
 	}
 
-	modelUser := &model.User{
-		EntUser: entUser,
-	}
+	user := model.NewUser(model.NewUserParams{EntUser: entUser})
 
-	return modelUser, nil
+	return user, nil
 }
 
 type UserDatasourceIsEmailDuplicatedParams struct {
@@ -68,17 +56,19 @@ type UserDatasourceIsEmailDuplicatedParams struct {
 }
 
 func (ds *UserDatasource) IsEmailDuplicated(params UserDatasourceIsEmailDuplicatedParams) (bool, error) {
-	query := ds.client.User.Query().Where(user.EmailEQ(params.Email))
+	q := ds.client.User.Query().Where(user.EmailEQ(params.Email))
 	if params.ExcludeID != nil {
-		query = query.Where(user.IDNEQ(*params.ExcludeID))
+		q = q.Where(user.IDNEQ(*params.ExcludeID))
 	}
-	_, err := query.First(params.Ctx)
+
+	_, err := q.First(params.Ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return false, nil
 		}
 		return false, err
 	}
+
 	return true, nil
 }
 
@@ -96,9 +86,9 @@ func (ds *UserDatasource) FindByEmail(params UserDatasourceFindByEmailParams) (*
 		return nil, err
 	}
 
-	modelUser := &model.User{EntUser: entUser}
+	user := model.NewUser(model.NewUserParams{EntUser: entUser})
 
-	return modelUser, nil
+	return user, nil
 }
 
 type UserDatasourceCreateParams struct {
@@ -107,7 +97,7 @@ type UserDatasourceCreateParams struct {
 }
 
 func (ds *UserDatasource) Create(params UserDatasourceCreateParams) (*model.User, error) {
-	userBuilder := ds.client.User.Create().
+	q := ds.client.User.Create().
 		SetName(params.User.EntUser.Name).
 		SetEmail(params.User.EntUser.Email).
 		SetPassword(params.User.EntUser.Password).
@@ -115,10 +105,10 @@ func (ds *UserDatasource) Create(params UserDatasourceCreateParams) (*model.User
 		SetRole(params.User.EntUser.Role)
 
 	if params.User.EntUser.ProfileLink != nil {
-		userBuilder.SetProfileLink(*params.User.EntUser.ProfileLink)
+		q.SetProfileLink(*params.User.EntUser.ProfileLink)
 	}
 
-	savedUser, err := userBuilder.Save(params.Ctx)
+	entUser, err := q.Save(params.Ctx)
 	if err != nil {
 		if ent.IsConstraintError(err) {
 			if strings.Contains(err.Error(), "Duplicate entry") && strings.Contains(err.Error(), "for key 'users.email'") {
@@ -128,14 +118,14 @@ func (ds *UserDatasource) Create(params UserDatasourceCreateParams) (*model.User
 		return nil, errors.New("データの制約に違反しています。")
 	}
 
-	modelUser := &model.User{EntUser: savedUser}
+	user := model.NewUser(model.NewUserParams{EntUser: entUser})
 
-	return modelUser, nil
+	return user, nil
 }
 
 type UserDatasourceUpdateParams struct {
 	Ctx  context.Context
-	User model.User
+	User *model.User
 }
 
 func (ds *UserDatasource) Update(params UserDatasourceUpdateParams) (*model.User, error) {
@@ -168,7 +158,9 @@ func (ds *UserDatasource) Update(params UserDatasourceUpdateParams) (*model.User
 		return nil, err
 	}
 
-	return &model.User{EntUser: entUser}, nil
+	user := model.NewUser(model.NewUserParams{EntUser: entUser})
+
+	return user, nil
 }
 
 type UserDatasourceUpdatePasswordParams struct {
@@ -188,5 +180,7 @@ func (ds *UserDatasource) UpdatePassword(params UserDatasourceUpdatePasswordPara
 		return nil, err
 	}
 
-	return &model.User{EntUser: entUser}, nil
+	user := model.NewUser(model.NewUserParams{EntUser: entUser})
+
+	return user, nil
 }

@@ -89,6 +89,7 @@ import * as yup from 'yup';
 import { Form, Field } from 'vee-validate';
 import PageTitle from '~/components/PageTitle.vue';
 import type { IBoard } from '~/types/board';
+import type { IThread } from '~/types/thread';
 
 definePageMeta({ middleware: ['logged-in-access-only'] });
 
@@ -151,8 +152,9 @@ async function submit() {
         const thumbnailUrl = await uploadFilesToS3(presignedUrls[0], thumbnailFile.value);
         form.value.thumbnailUrl = thumbnailUrl;
       }
-      await $api.post('/threads', form.value);
-      router.push('/');
+      const response = await $api.post<IThread>('/threads', form.value);
+      alert('スレッドを作成しました。');
+      router.push(`/threads/${response.data.id}`);
     }
   } catch (error) {
     alert('通信中にエラーが発生しました');

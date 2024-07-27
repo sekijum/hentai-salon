@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"reflect"
 	"server/infrastructure/ent/board"
+	"server/infrastructure/ent/contact"
 	"server/infrastructure/ent/tag"
 	"server/infrastructure/ent/thread"
 	"server/infrastructure/ent/threadcomment"
@@ -15,9 +16,7 @@ import (
 	"server/infrastructure/ent/threadtag"
 	"server/infrastructure/ent/user"
 	"server/infrastructure/ent/usercommentlike"
-	"server/infrastructure/ent/usercommentsubscription"
 	"server/infrastructure/ent/userthreadlike"
-	"server/infrastructure/ent/userthreadsubscription"
 	"sync"
 
 	"entgo.io/ent"
@@ -84,6 +83,7 @@ func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
 			board.Table:                   board.ValidColumn,
+			contact.Table:                 contact.ValidColumn,
 			tag.Table:                     tag.ValidColumn,
 			thread.Table:                  thread.ValidColumn,
 			threadcomment.Table:           threadcomment.ValidColumn,
@@ -91,9 +91,7 @@ func checkColumn(table, column string) error {
 			threadtag.Table:               threadtag.ValidColumn,
 			user.Table:                    user.ValidColumn,
 			usercommentlike.Table:         usercommentlike.ValidColumn,
-			usercommentsubscription.Table: usercommentsubscription.ValidColumn,
 			userthreadlike.Table:          userthreadlike.ValidColumn,
-			userthreadsubscription.Table:  userthreadsubscription.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

@@ -51,21 +51,13 @@ type UserEdges struct {
 	LikedThreads []*Thread `json:"liked_threads,omitempty"`
 	// LikedComments holds the value of the liked_comments edge.
 	LikedComments []*ThreadComment `json:"liked_comments,omitempty"`
-	// SubscribedThreads holds the value of the subscribed_threads edge.
-	SubscribedThreads []*Thread `json:"subscribed_threads,omitempty"`
-	// SubscribedComments holds the value of the subscribed_comments edge.
-	SubscribedComments []*ThreadComment `json:"subscribed_comments,omitempty"`
 	// UserThreadLike holds the value of the user_thread_like edge.
 	UserThreadLike []*UserThreadLike `json:"user_thread_like,omitempty"`
 	// UserCommentLike holds the value of the user_comment_like edge.
 	UserCommentLike []*UserCommentLike `json:"user_comment_like,omitempty"`
-	// UserThreadSubscription holds the value of the user_thread_subscription edge.
-	UserThreadSubscription []*UserThreadSubscription `json:"user_thread_subscription,omitempty"`
-	// UserCommentSubscription holds the value of the user_comment_subscription edge.
-	UserCommentSubscription []*UserCommentSubscription `json:"user_comment_subscription,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [11]bool
+	loadedTypes [7]bool
 }
 
 // BoardsOrErr returns the Boards value or an error if the edge
@@ -113,28 +105,10 @@ func (e UserEdges) LikedCommentsOrErr() ([]*ThreadComment, error) {
 	return nil, &NotLoadedError{edge: "liked_comments"}
 }
 
-// SubscribedThreadsOrErr returns the SubscribedThreads value or an error if the edge
-// was not loaded in eager-loading.
-func (e UserEdges) SubscribedThreadsOrErr() ([]*Thread, error) {
-	if e.loadedTypes[5] {
-		return e.SubscribedThreads, nil
-	}
-	return nil, &NotLoadedError{edge: "subscribed_threads"}
-}
-
-// SubscribedCommentsOrErr returns the SubscribedComments value or an error if the edge
-// was not loaded in eager-loading.
-func (e UserEdges) SubscribedCommentsOrErr() ([]*ThreadComment, error) {
-	if e.loadedTypes[6] {
-		return e.SubscribedComments, nil
-	}
-	return nil, &NotLoadedError{edge: "subscribed_comments"}
-}
-
 // UserThreadLikeOrErr returns the UserThreadLike value or an error if the edge
 // was not loaded in eager-loading.
 func (e UserEdges) UserThreadLikeOrErr() ([]*UserThreadLike, error) {
-	if e.loadedTypes[7] {
+	if e.loadedTypes[5] {
 		return e.UserThreadLike, nil
 	}
 	return nil, &NotLoadedError{edge: "user_thread_like"}
@@ -143,28 +117,10 @@ func (e UserEdges) UserThreadLikeOrErr() ([]*UserThreadLike, error) {
 // UserCommentLikeOrErr returns the UserCommentLike value or an error if the edge
 // was not loaded in eager-loading.
 func (e UserEdges) UserCommentLikeOrErr() ([]*UserCommentLike, error) {
-	if e.loadedTypes[8] {
+	if e.loadedTypes[6] {
 		return e.UserCommentLike, nil
 	}
 	return nil, &NotLoadedError{edge: "user_comment_like"}
-}
-
-// UserThreadSubscriptionOrErr returns the UserThreadSubscription value or an error if the edge
-// was not loaded in eager-loading.
-func (e UserEdges) UserThreadSubscriptionOrErr() ([]*UserThreadSubscription, error) {
-	if e.loadedTypes[9] {
-		return e.UserThreadSubscription, nil
-	}
-	return nil, &NotLoadedError{edge: "user_thread_subscription"}
-}
-
-// UserCommentSubscriptionOrErr returns the UserCommentSubscription value or an error if the edge
-// was not loaded in eager-loading.
-func (e UserEdges) UserCommentSubscriptionOrErr() ([]*UserCommentSubscription, error) {
-	if e.loadedTypes[10] {
-		return e.UserCommentSubscription, nil
-	}
-	return nil, &NotLoadedError{edge: "user_comment_subscription"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -286,16 +242,6 @@ func (u *User) QueryLikedComments() *ThreadCommentQuery {
 	return NewUserClient(u.config).QueryLikedComments(u)
 }
 
-// QuerySubscribedThreads queries the "subscribed_threads" edge of the User entity.
-func (u *User) QuerySubscribedThreads() *ThreadQuery {
-	return NewUserClient(u.config).QuerySubscribedThreads(u)
-}
-
-// QuerySubscribedComments queries the "subscribed_comments" edge of the User entity.
-func (u *User) QuerySubscribedComments() *ThreadCommentQuery {
-	return NewUserClient(u.config).QuerySubscribedComments(u)
-}
-
 // QueryUserThreadLike queries the "user_thread_like" edge of the User entity.
 func (u *User) QueryUserThreadLike() *UserThreadLikeQuery {
 	return NewUserClient(u.config).QueryUserThreadLike(u)
@@ -304,16 +250,6 @@ func (u *User) QueryUserThreadLike() *UserThreadLikeQuery {
 // QueryUserCommentLike queries the "user_comment_like" edge of the User entity.
 func (u *User) QueryUserCommentLike() *UserCommentLikeQuery {
 	return NewUserClient(u.config).QueryUserCommentLike(u)
-}
-
-// QueryUserThreadSubscription queries the "user_thread_subscription" edge of the User entity.
-func (u *User) QueryUserThreadSubscription() *UserThreadSubscriptionQuery {
-	return NewUserClient(u.config).QueryUserThreadSubscription(u)
-}
-
-// QueryUserCommentSubscription queries the "user_comment_subscription" edge of the User entity.
-func (u *User) QueryUserCommentSubscription() *UserCommentSubscriptionQuery {
-	return NewUserClient(u.config).QueryUserCommentSubscription(u)
 }
 
 // Update returns a builder for updating this User.

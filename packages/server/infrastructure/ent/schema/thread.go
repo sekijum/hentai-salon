@@ -35,7 +35,6 @@ func (Thread) Edges() []ent.Edge {
 		edge.To("comments", ThreadComment.Type),
 		edge.To("tags", Tag.Type).Through("thread_tags", ThreadTag.Type),
 		edge.From("liked_users", User.Type).Ref("liked_threads").Through("user_thread_like", UserThreadLike.Type),
-		edge.From("subscribed_users", User.Type).Ref("subscribed_threads").Through("user_thread_subscription", UserThreadSubscription.Type),
 	}
 }
 

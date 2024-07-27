@@ -54,19 +54,17 @@ func (ds *ThreadAdminDatasource) FindAll(params ThreadAdminDatasourceFindAllPara
 	query = query.Limit(params.Limit)
 	query = query.Offset(params.Offset)
 
-	entThreads, err := query.All(params.Ctx)
+	entThreadList, err := query.All(params.Ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	var modelThreads []*model.Thread
-	for _, entThread := range entThreads {
-		modelThreads = append(modelThreads, &model.Thread{
-			EntThread: entThread,
-		})
+	var threadList []*model.Thread
+	for _, entThread_i := range entThreadList {
+		threadList = append(threadList, model.NewThread(model.NewThreadParams{EntThread: entThread_i}))
 	}
 
-	return modelThreads, nil
+	return threadList, nil
 }
 
 type ThreadAdminDatasourceGetThreadCountParams struct {
@@ -115,7 +113,10 @@ func (ds *ThreadAdminDatasource) FindByID(params ThreadAdminDatasourceFindByIDPa
 	if err != nil {
 		return nil, err
 	}
-	return &model.Thread{EntThread: entThread}, nil
+
+	thread := model.NewThread(model.NewThreadParams{EntThread: entThread})
+
+	return thread, nil
 }
 
 type ThreadAdminDatasourceUpdateParams struct {
@@ -124,12 +125,7 @@ type ThreadAdminDatasourceUpdateParams struct {
 }
 
 func (ds *ThreadAdminDatasource) Update(params ThreadAdminDatasourceUpdateParams) (*model.Thread, error) {
-	t, err := ds.client.Thread.Get(params.Ctx, params.Thread.EntThread.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	update := t.Update()
+	update := ds.client.Thread.UpdateOneID(params.Thread.EntThread.ID)
 
 	if params.Thread.EntThread.Title != "" {
 		update = update.SetTitle(params.Thread.EntThread.Title)
@@ -144,12 +140,16 @@ func (ds *ThreadAdminDatasource) Update(params ThreadAdminDatasourceUpdateParams
 		update = update.SetThumbnailURL(*params.Thread.EntThread.ThumbnailURL)
 	}
 
-	update.SetUpdatedAt(time.Now())
+	update = update.SetUpdatedAt(time.Now())
 
-	t, err = update.Save(params.Ctx)
+	entThread, err := update.Save(params.Ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	return &model.Thread{EntThread: t}, nil
+	thread := model.NewThread(model.NewThreadParams{
+		EntThread: entThread,
+	})
+
+	return thread, nil
 }

@@ -9,6 +9,7 @@ import (
 
 	aws "server/infrastructure/aws"
 	minio "server/infrastructure/minio"
+	"server/presentation/request"
 )
 
 type StorageApplicationService struct {
@@ -24,25 +25,25 @@ func NewStorageApplicationService(minioClient *minio.MinioClient, s3Client *aws.
 }
 
 type StorageApplicationServiceGeneratePresignedURLs struct {
-	Ctx         context.Context
-	ObjectNames []string
+	Ctx  context.Context
+	Body request.GeneratePresignedURLsRequest
 }
 
 func (s *StorageApplicationService) GeneratePresignedURLs(params StorageApplicationServiceGeneratePresignedURLs) ([]string, error) {
 	env := os.Getenv("APP_ENV")
 	bucketName := os.Getenv("AWS_BUCKET_NAME")
-	urls := make([]string, len(params.ObjectNames))
+	urls := make([]string, len(params.Body.ObjectNameList))
 
-	for i, objectName := range params.ObjectNames {
+	for i, objectName_i := range params.Body.ObjectNameList {
 		now := time.Now()
-		objectKey := fmt.Sprintf("%d/%02d/%02d/%s", now.Year(), now.Month(), now.Day(), objectName)
+		objectKey := fmt.Sprintf("%d/%02d/%02d/%s", now.Year(), now.Month(), now.Day(), objectName_i)
 
 		var url string
 		var err error
 
 		if env == "development" {
 			if s.minioClient == nil {
-				return nil, errors.New("Minio クライアントが初期化されていません")
+				return nil, errors.New("minio クライアントが初期化されていません")
 			}
 			url, err = s.minioClient.GeneratePresignedURL(minio.MinioClientGeneratePresignedURL{
 				Ctx:        params.Ctx,

@@ -35,6 +35,5 @@ func (ThreadComment) Edges() []ent.Edge {
 		edge.To("replies", ThreadComment.Type),
 		edge.To("attachments", ThreadCommentAttachment.Type),
 		edge.From("liked_users", User.Type).Ref("liked_comments").Through("user_comment_like", UserCommentLike.Type),
-		edge.From("subscribed_users", User.Type).Ref("subscribed_comments").Through("user_comment_subscription", UserCommentSubscription.Type),
 	}
 }

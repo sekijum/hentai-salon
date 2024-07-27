@@ -16,13 +16,37 @@ func NewThreadCommentDatasource(client *ent.Client) *ThreadCommentDatasource {
 	return &ThreadCommentDatasource{client: client}
 }
 
+type ThreadDatasourceGetCommentCountParams struct {
+	Ctx      context.Context
+	UserID   *int
+	ThreadID *int
+}
+
+func (ds *ThreadCommentDatasource) GetCommentCount(params ThreadDatasourceGetCommentCountParams) (int, error) {
+	q := ds.client.ThreadComment.Query()
+
+	if params.ThreadID != nil {
+		q = q.Where(threadcomment.ThreadID(*params.ThreadID))
+	}
+
+	if params.UserID != nil {
+		q = q.Where(threadcomment.UserID(*params.UserID))
+	}
+
+	count, err := q.Count(params.Ctx)
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
 type ThreadCommentDatasourceFindAllByUserIDParams struct {
 	Ctx                   context.Context
 	UserID, Limit, Offset int
 }
 
-func (ds *ThreadCommentDatasource) FindAllByUserID(params ThreadCommentDatasourceFindAllByUserIDParams) ([]*model.ThreadComment, int, error) {
-	comments, err := ds.client.ThreadComment.
+func (ds *ThreadCommentDatasource) FindAllByUserID(params ThreadCommentDatasourceFindAllByUserIDParams) ([]*model.ThreadComment, error) {
+	entCommentList, err := ds.client.ThreadComment.
 		Query().
 		Where(threadcomment.UserID(params.UserID)).
 		WithReplies().
@@ -34,25 +58,15 @@ func (ds *ThreadCommentDatasource) FindAllByUserID(params ThreadCommentDatasourc
 		All(params.Ctx)
 
 	if err != nil {
-		return nil, 0, err
+		return nil, err
 	}
 
-	commentCount, err := ds.client.ThreadComment.Query().
-		Where(threadcomment.UserID(params.UserID)).
-		Count(params.Ctx)
-
-	if err != nil {
-		return nil, 0, err
+	var threadCommentList []*model.ThreadComment
+	for _, comment_i := range entCommentList {
+		threadCommentList = append(threadCommentList, model.NewThreadComment(model.NewThreadCommentParams{EntThreadComment: comment_i}))
 	}
 
-	var modelThreadCommentList []*model.ThreadComment
-	for _, comment := range comments {
-		modelThreadCommentList = append(modelThreadCommentList, &model.ThreadComment{
-			EntThreadComment: comment,
-		})
-	}
-
-	return modelThreadCommentList, commentCount, nil
+	return threadCommentList, nil
 }
 
 type ThreadCommentDatasourceFindByIDParams struct {
@@ -61,7 +75,7 @@ type ThreadCommentDatasourceFindByIDParams struct {
 }
 
 func (ds *ThreadCommentDatasource) FindByID(params ThreadCommentDatasourceFindByIDParams) (*model.ThreadComment, error) {
-	comment, err := ds.client.ThreadComment.Query().
+	entComment, err := ds.client.ThreadComment.Query().
 		Where(threadcomment.IDEQ(params.CommentID)).
 		WithAttachments().
 		WithThread().
@@ -87,7 +101,9 @@ func (ds *ThreadCommentDatasource) FindByID(params ThreadCommentDatasourceFindBy
 		return nil, err
 	}
 
-	return &model.ThreadComment{EntThreadComment: comment}, nil
+	comment := model.NewThreadComment(model.NewThreadCommentParams{EntThreadComment: entComment})
+
+	return comment, nil
 }
 
 type ThreadCommentDatasourceCreateParams struct {
@@ -101,34 +117,34 @@ func (ds *ThreadCommentDatasource) Create(params ThreadCommentDatasourceCreatePa
 		return nil, err
 	}
 
-	commentBuilder := tx.ThreadComment.Create().
+	q := tx.ThreadComment.Create().
 		SetThreadID(params.ThreadComment.EntThreadComment.ThreadID).
 		SetContent(params.ThreadComment.EntThreadComment.Content).
 		SetIPAddress(params.ThreadComment.EntThreadComment.IPAddress).
 		SetStatus(params.ThreadComment.EntThreadComment.Status)
 
 	if params.ThreadComment.EntThreadComment.UserID != nil {
-		commentBuilder.SetUserID(*params.ThreadComment.EntThreadComment.UserID)
+		q.SetUserID(*params.ThreadComment.EntThreadComment.UserID)
 	}
 	if params.ThreadComment.EntThreadComment.ParentCommentID != nil {
-		commentBuilder.SetParentCommentID(*params.ThreadComment.EntThreadComment.ParentCommentID)
+		q.SetParentCommentID(*params.ThreadComment.EntThreadComment.ParentCommentID)
 	}
 	if params.ThreadComment.EntThreadComment.GuestName != nil {
-		commentBuilder.SetGuestName(*params.ThreadComment.EntThreadComment.GuestName)
+		q.SetGuestName(*params.ThreadComment.EntThreadComment.GuestName)
 	}
 
-	savedComment, err := commentBuilder.Save(params.Ctx)
+	entComment, err := q.Save(params.Ctx)
 	if err != nil {
 		tx.Rollback()
 		return nil, err
 	}
 
-	for _, attachment := range params.ThreadComment.EntThreadComment.Edges.Attachments {
+	for _, attachment_i := range params.ThreadComment.EntThreadComment.Edges.Attachments {
 		_, err := tx.ThreadCommentAttachment.Create().
-			SetCommentID(savedComment.ID).
-			SetURL(attachment.URL).
-			SetDisplayOrder(attachment.DisplayOrder).
-			SetType(attachment.Type).
+			SetCommentID(entComment.ID).
+			SetURL(attachment_i.URL).
+			SetDisplayOrder(attachment_i.DisplayOrder).
+			SetType(attachment_i.Type).
 			Save(params.Ctx)
 		if err != nil {
 			tx.Rollback()
@@ -140,5 +156,7 @@ func (ds *ThreadCommentDatasource) Create(params ThreadCommentDatasourceCreatePa
 		return nil, err
 	}
 
-	return &model.ThreadComment{EntThreadComment: savedComment}, nil
+	comment := model.NewThreadComment(model.NewThreadCommentParams{EntThreadComment: entComment})
+
+	return comment, nil
 }

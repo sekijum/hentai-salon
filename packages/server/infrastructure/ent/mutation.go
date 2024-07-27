@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"server/infrastructure/ent/board"
+	"server/infrastructure/ent/contact"
 	"server/infrastructure/ent/predicate"
 	"server/infrastructure/ent/tag"
 	"server/infrastructure/ent/thread"
@@ -15,9 +16,7 @@ import (
 	"server/infrastructure/ent/threadtag"
 	"server/infrastructure/ent/user"
 	"server/infrastructure/ent/usercommentlike"
-	"server/infrastructure/ent/usercommentsubscription"
 	"server/infrastructure/ent/userthreadlike"
-	"server/infrastructure/ent/userthreadsubscription"
 	"sync"
 	"time"
 
@@ -35,6 +34,7 @@ const (
 
 	// Node types.
 	TypeBoard                   = "Board"
+	TypeContact                 = "Contact"
 	TypeTag                     = "Tag"
 	TypeThread                  = "Thread"
 	TypeThreadComment           = "ThreadComment"
@@ -42,9 +42,7 @@ const (
 	TypeThreadTag               = "ThreadTag"
 	TypeUser                    = "User"
 	TypeUserCommentLike         = "UserCommentLike"
-	TypeUserCommentSubscription = "UserCommentSubscription"
 	TypeUserThreadLike          = "UserThreadLike"
-	TypeUserThreadSubscription  = "UserThreadSubscription"
 )
 
 // BoardMutation represents an operation that mutates the Board nodes in the graph.
@@ -932,6 +930,698 @@ func (m *BoardMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown Board edge %s", name)
 }
 
+// ContactMutation represents an operation that mutates the Contact nodes in the graph.
+type ContactMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *int
+	email         *string
+	subject       *string
+	message       *string
+	ip_address    *string
+	status        *int
+	addstatus     *int
+	created_at    *time.Time
+	updated_at    *time.Time
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*Contact, error)
+	predicates    []predicate.Contact
+}
+
+var _ ent.Mutation = (*ContactMutation)(nil)
+
+// contactOption allows management of the mutation configuration using functional options.
+type contactOption func(*ContactMutation)
+
+// newContactMutation creates new mutation for the Contact entity.
+func newContactMutation(c config, op Op, opts ...contactOption) *ContactMutation {
+	m := &ContactMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeContact,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withContactID sets the ID field of the mutation.
+func withContactID(id int) contactOption {
+	return func(m *ContactMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Contact
+		)
+		m.oldValue = func(ctx context.Context) (*Contact, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Contact.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withContact sets the old Contact of the mutation.
+func withContact(node *Contact) contactOption {
+	return func(m *ContactMutation) {
+		m.oldValue = func(context.Context) (*Contact, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m ContactMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m ContactMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Contact entities.
+func (m *ContactMutation) SetID(id int) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *ContactMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *ContactMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Contact.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetEmail sets the "email" field.
+func (m *ContactMutation) SetEmail(s string) {
+	m.email = &s
+}
+
+// Email returns the value of the "email" field in the mutation.
+func (m *ContactMutation) Email() (r string, exists bool) {
+	v := m.email
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEmail returns the old "email" field's value of the Contact entity.
+// If the Contact object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ContactMutation) OldEmail(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEmail is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEmail requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEmail: %w", err)
+	}
+	return oldValue.Email, nil
+}
+
+// ResetEmail resets all changes to the "email" field.
+func (m *ContactMutation) ResetEmail() {
+	m.email = nil
+}
+
+// SetSubject sets the "subject" field.
+func (m *ContactMutation) SetSubject(s string) {
+	m.subject = &s
+}
+
+// Subject returns the value of the "subject" field in the mutation.
+func (m *ContactMutation) Subject() (r string, exists bool) {
+	v := m.subject
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSubject returns the old "subject" field's value of the Contact entity.
+// If the Contact object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ContactMutation) OldSubject(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSubject is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSubject requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSubject: %w", err)
+	}
+	return oldValue.Subject, nil
+}
+
+// ResetSubject resets all changes to the "subject" field.
+func (m *ContactMutation) ResetSubject() {
+	m.subject = nil
+}
+
+// SetMessage sets the "message" field.
+func (m *ContactMutation) SetMessage(s string) {
+	m.message = &s
+}
+
+// Message returns the value of the "message" field in the mutation.
+func (m *ContactMutation) Message() (r string, exists bool) {
+	v := m.message
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMessage returns the old "message" field's value of the Contact entity.
+// If the Contact object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ContactMutation) OldMessage(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMessage is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMessage requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMessage: %w", err)
+	}
+	return oldValue.Message, nil
+}
+
+// ResetMessage resets all changes to the "message" field.
+func (m *ContactMutation) ResetMessage() {
+	m.message = nil
+}
+
+// SetIPAddress sets the "ip_address" field.
+func (m *ContactMutation) SetIPAddress(s string) {
+	m.ip_address = &s
+}
+
+// IPAddress returns the value of the "ip_address" field in the mutation.
+func (m *ContactMutation) IPAddress() (r string, exists bool) {
+	v := m.ip_address
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIPAddress returns the old "ip_address" field's value of the Contact entity.
+// If the Contact object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ContactMutation) OldIPAddress(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIPAddress is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIPAddress requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIPAddress: %w", err)
+	}
+	return oldValue.IPAddress, nil
+}
+
+// ResetIPAddress resets all changes to the "ip_address" field.
+func (m *ContactMutation) ResetIPAddress() {
+	m.ip_address = nil
+}
+
+// SetStatus sets the "status" field.
+func (m *ContactMutation) SetStatus(i int) {
+	m.status = &i
+	m.addstatus = nil
+}
+
+// Status returns the value of the "status" field in the mutation.
+func (m *ContactMutation) Status() (r int, exists bool) {
+	v := m.status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStatus returns the old "status" field's value of the Contact entity.
+// If the Contact object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ContactMutation) OldStatus(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+	}
+	return oldValue.Status, nil
+}
+
+// AddStatus adds i to the "status" field.
+func (m *ContactMutation) AddStatus(i int) {
+	if m.addstatus != nil {
+		*m.addstatus += i
+	} else {
+		m.addstatus = &i
+	}
+}
+
+// AddedStatus returns the value that was added to the "status" field in this mutation.
+func (m *ContactMutation) AddedStatus() (r int, exists bool) {
+	v := m.addstatus
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetStatus resets all changes to the "status" field.
+func (m *ContactMutation) ResetStatus() {
+	m.status = nil
+	m.addstatus = nil
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *ContactMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *ContactMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the Contact entity.
+// If the Contact object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ContactMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *ContactMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *ContactMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *ContactMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the Contact entity.
+// If the Contact object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ContactMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *ContactMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// Where appends a list predicates to the ContactMutation builder.
+func (m *ContactMutation) Where(ps ...predicate.Contact) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the ContactMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *ContactMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Contact, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *ContactMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *ContactMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Contact).
+func (m *ContactMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *ContactMutation) Fields() []string {
+	fields := make([]string, 0, 7)
+	if m.email != nil {
+		fields = append(fields, contact.FieldEmail)
+	}
+	if m.subject != nil {
+		fields = append(fields, contact.FieldSubject)
+	}
+	if m.message != nil {
+		fields = append(fields, contact.FieldMessage)
+	}
+	if m.ip_address != nil {
+		fields = append(fields, contact.FieldIPAddress)
+	}
+	if m.status != nil {
+		fields = append(fields, contact.FieldStatus)
+	}
+	if m.created_at != nil {
+		fields = append(fields, contact.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, contact.FieldUpdatedAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *ContactMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case contact.FieldEmail:
+		return m.Email()
+	case contact.FieldSubject:
+		return m.Subject()
+	case contact.FieldMessage:
+		return m.Message()
+	case contact.FieldIPAddress:
+		return m.IPAddress()
+	case contact.FieldStatus:
+		return m.Status()
+	case contact.FieldCreatedAt:
+		return m.CreatedAt()
+	case contact.FieldUpdatedAt:
+		return m.UpdatedAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *ContactMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case contact.FieldEmail:
+		return m.OldEmail(ctx)
+	case contact.FieldSubject:
+		return m.OldSubject(ctx)
+	case contact.FieldMessage:
+		return m.OldMessage(ctx)
+	case contact.FieldIPAddress:
+		return m.OldIPAddress(ctx)
+	case contact.FieldStatus:
+		return m.OldStatus(ctx)
+	case contact.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case contact.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown Contact field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ContactMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case contact.FieldEmail:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEmail(v)
+		return nil
+	case contact.FieldSubject:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSubject(v)
+		return nil
+	case contact.FieldMessage:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMessage(v)
+		return nil
+	case contact.FieldIPAddress:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIPAddress(v)
+		return nil
+	case contact.FieldStatus:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStatus(v)
+		return nil
+	case contact.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case contact.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Contact field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *ContactMutation) AddedFields() []string {
+	var fields []string
+	if m.addstatus != nil {
+		fields = append(fields, contact.FieldStatus)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *ContactMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case contact.FieldStatus:
+		return m.AddedStatus()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ContactMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case contact.FieldStatus:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddStatus(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Contact numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *ContactMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *ContactMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *ContactMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown Contact nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *ContactMutation) ResetField(name string) error {
+	switch name {
+	case contact.FieldEmail:
+		m.ResetEmail()
+		return nil
+	case contact.FieldSubject:
+		m.ResetSubject()
+		return nil
+	case contact.FieldMessage:
+		m.ResetMessage()
+		return nil
+	case contact.FieldIPAddress:
+		m.ResetIPAddress()
+		return nil
+	case contact.FieldStatus:
+		m.ResetStatus()
+		return nil
+	case contact.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case contact.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown Contact field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *ContactMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *ContactMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *ContactMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *ContactMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *ContactMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *ContactMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *ContactMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown Contact unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *ContactMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown Contact edge %s", name)
+}
+
 // TagMutation represents an operation that mutates the Tag nodes in the graph.
 type TagMutation struct {
 	config
@@ -1414,37 +2104,34 @@ func (m *TagMutation) ResetEdge(name string) error {
 // ThreadMutation represents an operation that mutates the Thread nodes in the graph.
 type ThreadMutation struct {
 	config
-	op                      Op
-	typ                     string
-	id                      *int
-	title                   *string
-	description             *string
-	thumbnail_url           *string
-	ip_address              *string
-	status                  *int
-	addstatus               *int
-	created_at              *time.Time
-	updated_at              *time.Time
-	clearedFields           map[string]struct{}
-	board                   *int
-	clearedboard            bool
-	owner                   *int
-	clearedowner            bool
-	comments                map[int]struct{}
-	removedcomments         map[int]struct{}
-	clearedcomments         bool
-	tags                    map[int]struct{}
-	removedtags             map[int]struct{}
-	clearedtags             bool
-	liked_users             map[int]struct{}
-	removedliked_users      map[int]struct{}
-	clearedliked_users      bool
-	subscribed_users        map[int]struct{}
-	removedsubscribed_users map[int]struct{}
-	clearedsubscribed_users bool
-	done                    bool
-	oldValue                func(context.Context) (*Thread, error)
-	predicates              []predicate.Thread
+	op                 Op
+	typ                string
+	id                 *int
+	title              *string
+	description        *string
+	thumbnail_url      *string
+	ip_address         *string
+	status             *int
+	addstatus          *int
+	created_at         *time.Time
+	updated_at         *time.Time
+	clearedFields      map[string]struct{}
+	board              *int
+	clearedboard       bool
+	owner              *int
+	clearedowner       bool
+	comments           map[int]struct{}
+	removedcomments    map[int]struct{}
+	clearedcomments    bool
+	tags               map[int]struct{}
+	removedtags        map[int]struct{}
+	clearedtags        bool
+	liked_users        map[int]struct{}
+	removedliked_users map[int]struct{}
+	clearedliked_users bool
+	done               bool
+	oldValue           func(context.Context) (*Thread, error)
+	predicates         []predicate.Thread
 }
 
 var _ ent.Mutation = (*ThreadMutation)(nil)
@@ -2150,60 +2837,6 @@ func (m *ThreadMutation) ResetLikedUsers() {
 	m.removedliked_users = nil
 }
 
-// AddSubscribedUserIDs adds the "subscribed_users" edge to the User entity by ids.
-func (m *ThreadMutation) AddSubscribedUserIDs(ids ...int) {
-	if m.subscribed_users == nil {
-		m.subscribed_users = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.subscribed_users[ids[i]] = struct{}{}
-	}
-}
-
-// ClearSubscribedUsers clears the "subscribed_users" edge to the User entity.
-func (m *ThreadMutation) ClearSubscribedUsers() {
-	m.clearedsubscribed_users = true
-}
-
-// SubscribedUsersCleared reports if the "subscribed_users" edge to the User entity was cleared.
-func (m *ThreadMutation) SubscribedUsersCleared() bool {
-	return m.clearedsubscribed_users
-}
-
-// RemoveSubscribedUserIDs removes the "subscribed_users" edge to the User entity by IDs.
-func (m *ThreadMutation) RemoveSubscribedUserIDs(ids ...int) {
-	if m.removedsubscribed_users == nil {
-		m.removedsubscribed_users = make(map[int]struct{})
-	}
-	for i := range ids {
-		delete(m.subscribed_users, ids[i])
-		m.removedsubscribed_users[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedSubscribedUsers returns the removed IDs of the "subscribed_users" edge to the User entity.
-func (m *ThreadMutation) RemovedSubscribedUsersIDs() (ids []int) {
-	for id := range m.removedsubscribed_users {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// SubscribedUsersIDs returns the "subscribed_users" edge IDs in the mutation.
-func (m *ThreadMutation) SubscribedUsersIDs() (ids []int) {
-	for id := range m.subscribed_users {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetSubscribedUsers resets all changes to the "subscribed_users" edge.
-func (m *ThreadMutation) ResetSubscribedUsers() {
-	m.subscribed_users = nil
-	m.clearedsubscribed_users = false
-	m.removedsubscribed_users = nil
-}
-
 // Where appends a list predicates to the ThreadMutation builder.
 func (m *ThreadMutation) Where(ps ...predicate.Thread) {
 	m.predicates = append(m.predicates, ps...)
@@ -2503,7 +3136,7 @@ func (m *ThreadMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *ThreadMutation) AddedEdges() []string {
-	edges := make([]string, 0, 6)
+	edges := make([]string, 0, 5)
 	if m.board != nil {
 		edges = append(edges, thread.EdgeBoard)
 	}
@@ -2518,9 +3151,6 @@ func (m *ThreadMutation) AddedEdges() []string {
 	}
 	if m.liked_users != nil {
 		edges = append(edges, thread.EdgeLikedUsers)
-	}
-	if m.subscribed_users != nil {
-		edges = append(edges, thread.EdgeSubscribedUsers)
 	}
 	return edges
 }
@@ -2555,19 +3185,13 @@ func (m *ThreadMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case thread.EdgeSubscribedUsers:
-		ids := make([]ent.Value, 0, len(m.subscribed_users))
-		for id := range m.subscribed_users {
-			ids = append(ids, id)
-		}
-		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ThreadMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 6)
+	edges := make([]string, 0, 5)
 	if m.removedcomments != nil {
 		edges = append(edges, thread.EdgeComments)
 	}
@@ -2576,9 +3200,6 @@ func (m *ThreadMutation) RemovedEdges() []string {
 	}
 	if m.removedliked_users != nil {
 		edges = append(edges, thread.EdgeLikedUsers)
-	}
-	if m.removedsubscribed_users != nil {
-		edges = append(edges, thread.EdgeSubscribedUsers)
 	}
 	return edges
 }
@@ -2605,19 +3226,13 @@ func (m *ThreadMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case thread.EdgeSubscribedUsers:
-		ids := make([]ent.Value, 0, len(m.removedsubscribed_users))
-		for id := range m.removedsubscribed_users {
-			ids = append(ids, id)
-		}
-		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *ThreadMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 6)
+	edges := make([]string, 0, 5)
 	if m.clearedboard {
 		edges = append(edges, thread.EdgeBoard)
 	}
@@ -2632,9 +3247,6 @@ func (m *ThreadMutation) ClearedEdges() []string {
 	}
 	if m.clearedliked_users {
 		edges = append(edges, thread.EdgeLikedUsers)
-	}
-	if m.clearedsubscribed_users {
-		edges = append(edges, thread.EdgeSubscribedUsers)
 	}
 	return edges
 }
@@ -2653,8 +3265,6 @@ func (m *ThreadMutation) EdgeCleared(name string) bool {
 		return m.clearedtags
 	case thread.EdgeLikedUsers:
 		return m.clearedliked_users
-	case thread.EdgeSubscribedUsers:
-		return m.clearedsubscribed_users
 	}
 	return false
 }
@@ -2692,9 +3302,6 @@ func (m *ThreadMutation) ResetEdge(name string) error {
 	case thread.EdgeLikedUsers:
 		m.ResetLikedUsers()
 		return nil
-	case thread.EdgeSubscribedUsers:
-		m.ResetSubscribedUsers()
-		return nil
 	}
 	return fmt.Errorf("unknown Thread edge %s", name)
 }
@@ -2702,38 +3309,35 @@ func (m *ThreadMutation) ResetEdge(name string) error {
 // ThreadCommentMutation represents an operation that mutates the ThreadComment nodes in the graph.
 type ThreadCommentMutation struct {
 	config
-	op                      Op
-	typ                     string
-	id                      *int
-	guest_name              *string
-	content                 *string
-	ip_address              *string
-	status                  *int
-	addstatus               *int
-	created_at              *time.Time
-	updated_at              *time.Time
-	clearedFields           map[string]struct{}
-	thread                  *int
-	clearedthread           bool
-	author                  *int
-	clearedauthor           bool
-	parent_comment          *int
-	clearedparent_comment   bool
-	replies                 map[int]struct{}
-	removedreplies          map[int]struct{}
-	clearedreplies          bool
-	attachments             map[int]struct{}
-	removedattachments      map[int]struct{}
-	clearedattachments      bool
-	liked_users             map[int]struct{}
-	removedliked_users      map[int]struct{}
-	clearedliked_users      bool
-	subscribed_users        map[int]struct{}
-	removedsubscribed_users map[int]struct{}
-	clearedsubscribed_users bool
-	done                    bool
-	oldValue                func(context.Context) (*ThreadComment, error)
-	predicates              []predicate.ThreadComment
+	op                    Op
+	typ                   string
+	id                    *int
+	guest_name            *string
+	content               *string
+	ip_address            *string
+	status                *int
+	addstatus             *int
+	created_at            *time.Time
+	updated_at            *time.Time
+	clearedFields         map[string]struct{}
+	thread                *int
+	clearedthread         bool
+	author                *int
+	clearedauthor         bool
+	parent_comment        *int
+	clearedparent_comment bool
+	replies               map[int]struct{}
+	removedreplies        map[int]struct{}
+	clearedreplies        bool
+	attachments           map[int]struct{}
+	removedattachments    map[int]struct{}
+	clearedattachments    bool
+	liked_users           map[int]struct{}
+	removedliked_users    map[int]struct{}
+	clearedliked_users    bool
+	done                  bool
+	oldValue              func(context.Context) (*ThreadComment, error)
+	predicates            []predicate.ThreadComment
 }
 
 var _ ent.Mutation = (*ThreadCommentMutation)(nil)
@@ -3479,60 +4083,6 @@ func (m *ThreadCommentMutation) ResetLikedUsers() {
 	m.removedliked_users = nil
 }
 
-// AddSubscribedUserIDs adds the "subscribed_users" edge to the User entity by ids.
-func (m *ThreadCommentMutation) AddSubscribedUserIDs(ids ...int) {
-	if m.subscribed_users == nil {
-		m.subscribed_users = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.subscribed_users[ids[i]] = struct{}{}
-	}
-}
-
-// ClearSubscribedUsers clears the "subscribed_users" edge to the User entity.
-func (m *ThreadCommentMutation) ClearSubscribedUsers() {
-	m.clearedsubscribed_users = true
-}
-
-// SubscribedUsersCleared reports if the "subscribed_users" edge to the User entity was cleared.
-func (m *ThreadCommentMutation) SubscribedUsersCleared() bool {
-	return m.clearedsubscribed_users
-}
-
-// RemoveSubscribedUserIDs removes the "subscribed_users" edge to the User entity by IDs.
-func (m *ThreadCommentMutation) RemoveSubscribedUserIDs(ids ...int) {
-	if m.removedsubscribed_users == nil {
-		m.removedsubscribed_users = make(map[int]struct{})
-	}
-	for i := range ids {
-		delete(m.subscribed_users, ids[i])
-		m.removedsubscribed_users[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedSubscribedUsers returns the removed IDs of the "subscribed_users" edge to the User entity.
-func (m *ThreadCommentMutation) RemovedSubscribedUsersIDs() (ids []int) {
-	for id := range m.removedsubscribed_users {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// SubscribedUsersIDs returns the "subscribed_users" edge IDs in the mutation.
-func (m *ThreadCommentMutation) SubscribedUsersIDs() (ids []int) {
-	for id := range m.subscribed_users {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetSubscribedUsers resets all changes to the "subscribed_users" edge.
-func (m *ThreadCommentMutation) ResetSubscribedUsers() {
-	m.subscribed_users = nil
-	m.clearedsubscribed_users = false
-	m.removedsubscribed_users = nil
-}
-
 // Where appends a list predicates to the ThreadCommentMutation builder.
 func (m *ThreadCommentMutation) Where(ps ...predicate.ThreadComment) {
 	m.predicates = append(m.predicates, ps...)
@@ -3838,7 +4388,7 @@ func (m *ThreadCommentMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *ThreadCommentMutation) AddedEdges() []string {
-	edges := make([]string, 0, 7)
+	edges := make([]string, 0, 6)
 	if m.thread != nil {
 		edges = append(edges, threadcomment.EdgeThread)
 	}
@@ -3856,9 +4406,6 @@ func (m *ThreadCommentMutation) AddedEdges() []string {
 	}
 	if m.liked_users != nil {
 		edges = append(edges, threadcomment.EdgeLikedUsers)
-	}
-	if m.subscribed_users != nil {
-		edges = append(edges, threadcomment.EdgeSubscribedUsers)
 	}
 	return edges
 }
@@ -3897,19 +4444,13 @@ func (m *ThreadCommentMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case threadcomment.EdgeSubscribedUsers:
-		ids := make([]ent.Value, 0, len(m.subscribed_users))
-		for id := range m.subscribed_users {
-			ids = append(ids, id)
-		}
-		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ThreadCommentMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 7)
+	edges := make([]string, 0, 6)
 	if m.removedreplies != nil {
 		edges = append(edges, threadcomment.EdgeReplies)
 	}
@@ -3918,9 +4459,6 @@ func (m *ThreadCommentMutation) RemovedEdges() []string {
 	}
 	if m.removedliked_users != nil {
 		edges = append(edges, threadcomment.EdgeLikedUsers)
-	}
-	if m.removedsubscribed_users != nil {
-		edges = append(edges, threadcomment.EdgeSubscribedUsers)
 	}
 	return edges
 }
@@ -3947,19 +4485,13 @@ func (m *ThreadCommentMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case threadcomment.EdgeSubscribedUsers:
-		ids := make([]ent.Value, 0, len(m.removedsubscribed_users))
-		for id := range m.removedsubscribed_users {
-			ids = append(ids, id)
-		}
-		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *ThreadCommentMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 7)
+	edges := make([]string, 0, 6)
 	if m.clearedthread {
 		edges = append(edges, threadcomment.EdgeThread)
 	}
@@ -3977,9 +4509,6 @@ func (m *ThreadCommentMutation) ClearedEdges() []string {
 	}
 	if m.clearedliked_users {
 		edges = append(edges, threadcomment.EdgeLikedUsers)
-	}
-	if m.clearedsubscribed_users {
-		edges = append(edges, threadcomment.EdgeSubscribedUsers)
 	}
 	return edges
 }
@@ -4000,8 +4529,6 @@ func (m *ThreadCommentMutation) EdgeCleared(name string) bool {
 		return m.clearedattachments
 	case threadcomment.EdgeLikedUsers:
 		return m.clearedliked_users
-	case threadcomment.EdgeSubscribedUsers:
-		return m.clearedsubscribed_users
 	}
 	return false
 }
@@ -4044,9 +4571,6 @@ func (m *ThreadCommentMutation) ResetEdge(name string) error {
 		return nil
 	case threadcomment.EdgeLikedUsers:
 		m.ResetLikedUsers()
-		return nil
-	case threadcomment.EdgeSubscribedUsers:
-		m.ResetSubscribedUsers()
 		return nil
 	}
 	return fmt.Errorf("unknown ThreadComment edge %s", name)
@@ -5108,44 +5632,38 @@ func (m *ThreadTagMutation) ResetEdge(name string) error {
 // UserMutation represents an operation that mutates the User nodes in the graph.
 type UserMutation struct {
 	config
-	op                         Op
-	typ                        string
-	id                         *int
-	name                       *string
-	email                      *string
-	password                   *string
-	profile_link               *string
-	status                     *int
-	addstatus                  *int
-	role                       *int
-	addrole                    *int
-	created_at                 *time.Time
-	updated_at                 *time.Time
-	clearedFields              map[string]struct{}
-	boards                     map[int]struct{}
-	removedboards              map[int]struct{}
-	clearedboards              bool
-	threads                    map[int]struct{}
-	removedthreads             map[int]struct{}
-	clearedthreads             bool
-	comments                   map[int]struct{}
-	removedcomments            map[int]struct{}
-	clearedcomments            bool
-	liked_threads              map[int]struct{}
-	removedliked_threads       map[int]struct{}
-	clearedliked_threads       bool
-	liked_comments             map[int]struct{}
-	removedliked_comments      map[int]struct{}
-	clearedliked_comments      bool
-	subscribed_threads         map[int]struct{}
-	removedsubscribed_threads  map[int]struct{}
-	clearedsubscribed_threads  bool
-	subscribed_comments        map[int]struct{}
-	removedsubscribed_comments map[int]struct{}
-	clearedsubscribed_comments bool
-	done                       bool
-	oldValue                   func(context.Context) (*User, error)
-	predicates                 []predicate.User
+	op                    Op
+	typ                   string
+	id                    *int
+	name                  *string
+	email                 *string
+	password              *string
+	profile_link          *string
+	status                *int
+	addstatus             *int
+	role                  *int
+	addrole               *int
+	created_at            *time.Time
+	updated_at            *time.Time
+	clearedFields         map[string]struct{}
+	boards                map[int]struct{}
+	removedboards         map[int]struct{}
+	clearedboards         bool
+	threads               map[int]struct{}
+	removedthreads        map[int]struct{}
+	clearedthreads        bool
+	comments              map[int]struct{}
+	removedcomments       map[int]struct{}
+	clearedcomments       bool
+	liked_threads         map[int]struct{}
+	removedliked_threads  map[int]struct{}
+	clearedliked_threads  bool
+	liked_comments        map[int]struct{}
+	removedliked_comments map[int]struct{}
+	clearedliked_comments bool
+	done                  bool
+	oldValue              func(context.Context) (*User, error)
+	predicates            []predicate.User
 }
 
 var _ ent.Mutation = (*UserMutation)(nil)
@@ -5863,114 +6381,6 @@ func (m *UserMutation) ResetLikedComments() {
 	m.removedliked_comments = nil
 }
 
-// AddSubscribedThreadIDs adds the "subscribed_threads" edge to the Thread entity by ids.
-func (m *UserMutation) AddSubscribedThreadIDs(ids ...int) {
-	if m.subscribed_threads == nil {
-		m.subscribed_threads = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.subscribed_threads[ids[i]] = struct{}{}
-	}
-}
-
-// ClearSubscribedThreads clears the "subscribed_threads" edge to the Thread entity.
-func (m *UserMutation) ClearSubscribedThreads() {
-	m.clearedsubscribed_threads = true
-}
-
-// SubscribedThreadsCleared reports if the "subscribed_threads" edge to the Thread entity was cleared.
-func (m *UserMutation) SubscribedThreadsCleared() bool {
-	return m.clearedsubscribed_threads
-}
-
-// RemoveSubscribedThreadIDs removes the "subscribed_threads" edge to the Thread entity by IDs.
-func (m *UserMutation) RemoveSubscribedThreadIDs(ids ...int) {
-	if m.removedsubscribed_threads == nil {
-		m.removedsubscribed_threads = make(map[int]struct{})
-	}
-	for i := range ids {
-		delete(m.subscribed_threads, ids[i])
-		m.removedsubscribed_threads[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedSubscribedThreads returns the removed IDs of the "subscribed_threads" edge to the Thread entity.
-func (m *UserMutation) RemovedSubscribedThreadsIDs() (ids []int) {
-	for id := range m.removedsubscribed_threads {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// SubscribedThreadsIDs returns the "subscribed_threads" edge IDs in the mutation.
-func (m *UserMutation) SubscribedThreadsIDs() (ids []int) {
-	for id := range m.subscribed_threads {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetSubscribedThreads resets all changes to the "subscribed_threads" edge.
-func (m *UserMutation) ResetSubscribedThreads() {
-	m.subscribed_threads = nil
-	m.clearedsubscribed_threads = false
-	m.removedsubscribed_threads = nil
-}
-
-// AddSubscribedCommentIDs adds the "subscribed_comments" edge to the ThreadComment entity by ids.
-func (m *UserMutation) AddSubscribedCommentIDs(ids ...int) {
-	if m.subscribed_comments == nil {
-		m.subscribed_comments = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.subscribed_comments[ids[i]] = struct{}{}
-	}
-}
-
-// ClearSubscribedComments clears the "subscribed_comments" edge to the ThreadComment entity.
-func (m *UserMutation) ClearSubscribedComments() {
-	m.clearedsubscribed_comments = true
-}
-
-// SubscribedCommentsCleared reports if the "subscribed_comments" edge to the ThreadComment entity was cleared.
-func (m *UserMutation) SubscribedCommentsCleared() bool {
-	return m.clearedsubscribed_comments
-}
-
-// RemoveSubscribedCommentIDs removes the "subscribed_comments" edge to the ThreadComment entity by IDs.
-func (m *UserMutation) RemoveSubscribedCommentIDs(ids ...int) {
-	if m.removedsubscribed_comments == nil {
-		m.removedsubscribed_comments = make(map[int]struct{})
-	}
-	for i := range ids {
-		delete(m.subscribed_comments, ids[i])
-		m.removedsubscribed_comments[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedSubscribedComments returns the removed IDs of the "subscribed_comments" edge to the ThreadComment entity.
-func (m *UserMutation) RemovedSubscribedCommentsIDs() (ids []int) {
-	for id := range m.removedsubscribed_comments {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// SubscribedCommentsIDs returns the "subscribed_comments" edge IDs in the mutation.
-func (m *UserMutation) SubscribedCommentsIDs() (ids []int) {
-	for id := range m.subscribed_comments {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetSubscribedComments resets all changes to the "subscribed_comments" edge.
-func (m *UserMutation) ResetSubscribedComments() {
-	m.subscribed_comments = nil
-	m.clearedsubscribed_comments = false
-	m.removedsubscribed_comments = nil
-}
-
 // Where appends a list predicates to the UserMutation builder.
 func (m *UserMutation) Where(ps ...predicate.User) {
 	m.predicates = append(m.predicates, ps...)
@@ -6259,7 +6669,7 @@ func (m *UserMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *UserMutation) AddedEdges() []string {
-	edges := make([]string, 0, 7)
+	edges := make([]string, 0, 5)
 	if m.boards != nil {
 		edges = append(edges, user.EdgeBoards)
 	}
@@ -6274,12 +6684,6 @@ func (m *UserMutation) AddedEdges() []string {
 	}
 	if m.liked_comments != nil {
 		edges = append(edges, user.EdgeLikedComments)
-	}
-	if m.subscribed_threads != nil {
-		edges = append(edges, user.EdgeSubscribedThreads)
-	}
-	if m.subscribed_comments != nil {
-		edges = append(edges, user.EdgeSubscribedComments)
 	}
 	return edges
 }
@@ -6318,25 +6722,13 @@ func (m *UserMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case user.EdgeSubscribedThreads:
-		ids := make([]ent.Value, 0, len(m.subscribed_threads))
-		for id := range m.subscribed_threads {
-			ids = append(ids, id)
-		}
-		return ids
-	case user.EdgeSubscribedComments:
-		ids := make([]ent.Value, 0, len(m.subscribed_comments))
-		for id := range m.subscribed_comments {
-			ids = append(ids, id)
-		}
-		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *UserMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 7)
+	edges := make([]string, 0, 5)
 	if m.removedboards != nil {
 		edges = append(edges, user.EdgeBoards)
 	}
@@ -6351,12 +6743,6 @@ func (m *UserMutation) RemovedEdges() []string {
 	}
 	if m.removedliked_comments != nil {
 		edges = append(edges, user.EdgeLikedComments)
-	}
-	if m.removedsubscribed_threads != nil {
-		edges = append(edges, user.EdgeSubscribedThreads)
-	}
-	if m.removedsubscribed_comments != nil {
-		edges = append(edges, user.EdgeSubscribedComments)
 	}
 	return edges
 }
@@ -6395,25 +6781,13 @@ func (m *UserMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case user.EdgeSubscribedThreads:
-		ids := make([]ent.Value, 0, len(m.removedsubscribed_threads))
-		for id := range m.removedsubscribed_threads {
-			ids = append(ids, id)
-		}
-		return ids
-	case user.EdgeSubscribedComments:
-		ids := make([]ent.Value, 0, len(m.removedsubscribed_comments))
-		for id := range m.removedsubscribed_comments {
-			ids = append(ids, id)
-		}
-		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *UserMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 7)
+	edges := make([]string, 0, 5)
 	if m.clearedboards {
 		edges = append(edges, user.EdgeBoards)
 	}
@@ -6428,12 +6802,6 @@ func (m *UserMutation) ClearedEdges() []string {
 	}
 	if m.clearedliked_comments {
 		edges = append(edges, user.EdgeLikedComments)
-	}
-	if m.clearedsubscribed_threads {
-		edges = append(edges, user.EdgeSubscribedThreads)
-	}
-	if m.clearedsubscribed_comments {
-		edges = append(edges, user.EdgeSubscribedComments)
 	}
 	return edges
 }
@@ -6452,10 +6820,6 @@ func (m *UserMutation) EdgeCleared(name string) bool {
 		return m.clearedliked_threads
 	case user.EdgeLikedComments:
 		return m.clearedliked_comments
-	case user.EdgeSubscribedThreads:
-		return m.clearedsubscribed_threads
-	case user.EdgeSubscribedComments:
-		return m.clearedsubscribed_comments
 	}
 	return false
 }
@@ -6486,12 +6850,6 @@ func (m *UserMutation) ResetEdge(name string) error {
 		return nil
 	case user.EdgeLikedComments:
 		m.ResetLikedComments()
-		return nil
-	case user.EdgeSubscribedThreads:
-		m.ResetSubscribedThreads()
-		return nil
-	case user.EdgeSubscribedComments:
-		m.ResetSubscribedComments()
 		return nil
 	}
 	return fmt.Errorf("unknown User edge %s", name)
@@ -6914,493 +7272,6 @@ func (m *UserCommentLikeMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown UserCommentLike edge %s", name)
 }
 
-// UserCommentSubscriptionMutation represents an operation that mutates the UserCommentSubscription nodes in the graph.
-type UserCommentSubscriptionMutation struct {
-	config
-	op             Op
-	typ            string
-	is_notified    *bool
-	is_checked     *bool
-	subscribed_at  *time.Time
-	clearedFields  map[string]struct{}
-	user           *int
-	cleareduser    bool
-	comment        *int
-	clearedcomment bool
-	done           bool
-	oldValue       func(context.Context) (*UserCommentSubscription, error)
-	predicates     []predicate.UserCommentSubscription
-}
-
-var _ ent.Mutation = (*UserCommentSubscriptionMutation)(nil)
-
-// usercommentsubscriptionOption allows management of the mutation configuration using functional options.
-type usercommentsubscriptionOption func(*UserCommentSubscriptionMutation)
-
-// newUserCommentSubscriptionMutation creates new mutation for the UserCommentSubscription entity.
-func newUserCommentSubscriptionMutation(c config, op Op, opts ...usercommentsubscriptionOption) *UserCommentSubscriptionMutation {
-	m := &UserCommentSubscriptionMutation{
-		config:        c,
-		op:            op,
-		typ:           TypeUserCommentSubscription,
-		clearedFields: make(map[string]struct{}),
-	}
-	for _, opt := range opts {
-		opt(m)
-	}
-	return m
-}
-
-// Client returns a new `ent.Client` from the mutation. If the mutation was
-// executed in a transaction (ent.Tx), a transactional client is returned.
-func (m UserCommentSubscriptionMutation) Client() *Client {
-	client := &Client{config: m.config}
-	client.init()
-	return client
-}
-
-// Tx returns an `ent.Tx` for mutations that were executed in transactions;
-// it returns an error otherwise.
-func (m UserCommentSubscriptionMutation) Tx() (*Tx, error) {
-	if _, ok := m.driver.(*txDriver); !ok {
-		return nil, errors.New("ent: mutation is not running in a transaction")
-	}
-	tx := &Tx{config: m.config}
-	tx.init()
-	return tx, nil
-}
-
-// SetUserID sets the "user_id" field.
-func (m *UserCommentSubscriptionMutation) SetUserID(i int) {
-	m.user = &i
-}
-
-// UserID returns the value of the "user_id" field in the mutation.
-func (m *UserCommentSubscriptionMutation) UserID() (r int, exists bool) {
-	v := m.user
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetUserID resets all changes to the "user_id" field.
-func (m *UserCommentSubscriptionMutation) ResetUserID() {
-	m.user = nil
-}
-
-// SetCommentID sets the "comment_id" field.
-func (m *UserCommentSubscriptionMutation) SetCommentID(i int) {
-	m.comment = &i
-}
-
-// CommentID returns the value of the "comment_id" field in the mutation.
-func (m *UserCommentSubscriptionMutation) CommentID() (r int, exists bool) {
-	v := m.comment
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetCommentID resets all changes to the "comment_id" field.
-func (m *UserCommentSubscriptionMutation) ResetCommentID() {
-	m.comment = nil
-}
-
-// SetIsNotified sets the "is_notified" field.
-func (m *UserCommentSubscriptionMutation) SetIsNotified(b bool) {
-	m.is_notified = &b
-}
-
-// IsNotified returns the value of the "is_notified" field in the mutation.
-func (m *UserCommentSubscriptionMutation) IsNotified() (r bool, exists bool) {
-	v := m.is_notified
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetIsNotified resets all changes to the "is_notified" field.
-func (m *UserCommentSubscriptionMutation) ResetIsNotified() {
-	m.is_notified = nil
-}
-
-// SetIsChecked sets the "is_checked" field.
-func (m *UserCommentSubscriptionMutation) SetIsChecked(b bool) {
-	m.is_checked = &b
-}
-
-// IsChecked returns the value of the "is_checked" field in the mutation.
-func (m *UserCommentSubscriptionMutation) IsChecked() (r bool, exists bool) {
-	v := m.is_checked
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetIsChecked resets all changes to the "is_checked" field.
-func (m *UserCommentSubscriptionMutation) ResetIsChecked() {
-	m.is_checked = nil
-}
-
-// SetSubscribedAt sets the "subscribed_at" field.
-func (m *UserCommentSubscriptionMutation) SetSubscribedAt(t time.Time) {
-	m.subscribed_at = &t
-}
-
-// SubscribedAt returns the value of the "subscribed_at" field in the mutation.
-func (m *UserCommentSubscriptionMutation) SubscribedAt() (r time.Time, exists bool) {
-	v := m.subscribed_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetSubscribedAt resets all changes to the "subscribed_at" field.
-func (m *UserCommentSubscriptionMutation) ResetSubscribedAt() {
-	m.subscribed_at = nil
-}
-
-// ClearUser clears the "user" edge to the User entity.
-func (m *UserCommentSubscriptionMutation) ClearUser() {
-	m.cleareduser = true
-	m.clearedFields[usercommentsubscription.FieldUserID] = struct{}{}
-}
-
-// UserCleared reports if the "user" edge to the User entity was cleared.
-func (m *UserCommentSubscriptionMutation) UserCleared() bool {
-	return m.cleareduser
-}
-
-// UserIDs returns the "user" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// UserID instead. It exists only for internal usage by the builders.
-func (m *UserCommentSubscriptionMutation) UserIDs() (ids []int) {
-	if id := m.user; id != nil {
-		ids = append(ids, *id)
-	}
-	return
-}
-
-// ResetUser resets all changes to the "user" edge.
-func (m *UserCommentSubscriptionMutation) ResetUser() {
-	m.user = nil
-	m.cleareduser = false
-}
-
-// ClearComment clears the "comment" edge to the ThreadComment entity.
-func (m *UserCommentSubscriptionMutation) ClearComment() {
-	m.clearedcomment = true
-	m.clearedFields[usercommentsubscription.FieldCommentID] = struct{}{}
-}
-
-// CommentCleared reports if the "comment" edge to the ThreadComment entity was cleared.
-func (m *UserCommentSubscriptionMutation) CommentCleared() bool {
-	return m.clearedcomment
-}
-
-// CommentIDs returns the "comment" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// CommentID instead. It exists only for internal usage by the builders.
-func (m *UserCommentSubscriptionMutation) CommentIDs() (ids []int) {
-	if id := m.comment; id != nil {
-		ids = append(ids, *id)
-	}
-	return
-}
-
-// ResetComment resets all changes to the "comment" edge.
-func (m *UserCommentSubscriptionMutation) ResetComment() {
-	m.comment = nil
-	m.clearedcomment = false
-}
-
-// Where appends a list predicates to the UserCommentSubscriptionMutation builder.
-func (m *UserCommentSubscriptionMutation) Where(ps ...predicate.UserCommentSubscription) {
-	m.predicates = append(m.predicates, ps...)
-}
-
-// WhereP appends storage-level predicates to the UserCommentSubscriptionMutation builder. Using this method,
-// users can use type-assertion to append predicates that do not depend on any generated package.
-func (m *UserCommentSubscriptionMutation) WhereP(ps ...func(*sql.Selector)) {
-	p := make([]predicate.UserCommentSubscription, len(ps))
-	for i := range ps {
-		p[i] = ps[i]
-	}
-	m.Where(p...)
-}
-
-// Op returns the operation name.
-func (m *UserCommentSubscriptionMutation) Op() Op {
-	return m.op
-}
-
-// SetOp allows setting the mutation operation.
-func (m *UserCommentSubscriptionMutation) SetOp(op Op) {
-	m.op = op
-}
-
-// Type returns the node type of this mutation (UserCommentSubscription).
-func (m *UserCommentSubscriptionMutation) Type() string {
-	return m.typ
-}
-
-// Fields returns all fields that were changed during this mutation. Note that in
-// order to get all numeric fields that were incremented/decremented, call
-// AddedFields().
-func (m *UserCommentSubscriptionMutation) Fields() []string {
-	fields := make([]string, 0, 5)
-	if m.user != nil {
-		fields = append(fields, usercommentsubscription.FieldUserID)
-	}
-	if m.comment != nil {
-		fields = append(fields, usercommentsubscription.FieldCommentID)
-	}
-	if m.is_notified != nil {
-		fields = append(fields, usercommentsubscription.FieldIsNotified)
-	}
-	if m.is_checked != nil {
-		fields = append(fields, usercommentsubscription.FieldIsChecked)
-	}
-	if m.subscribed_at != nil {
-		fields = append(fields, usercommentsubscription.FieldSubscribedAt)
-	}
-	return fields
-}
-
-// Field returns the value of a field with the given name. The second boolean
-// return value indicates that this field was not set, or was not defined in the
-// schema.
-func (m *UserCommentSubscriptionMutation) Field(name string) (ent.Value, bool) {
-	switch name {
-	case usercommentsubscription.FieldUserID:
-		return m.UserID()
-	case usercommentsubscription.FieldCommentID:
-		return m.CommentID()
-	case usercommentsubscription.FieldIsNotified:
-		return m.IsNotified()
-	case usercommentsubscription.FieldIsChecked:
-		return m.IsChecked()
-	case usercommentsubscription.FieldSubscribedAt:
-		return m.SubscribedAt()
-	}
-	return nil, false
-}
-
-// OldField returns the old value of the field from the database. An error is
-// returned if the mutation operation is not UpdateOne, or the query to the
-// database failed.
-func (m *UserCommentSubscriptionMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
-	return nil, errors.New("edge schema UserCommentSubscription does not support getting old values")
-}
-
-// SetField sets the value of a field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *UserCommentSubscriptionMutation) SetField(name string, value ent.Value) error {
-	switch name {
-	case usercommentsubscription.FieldUserID:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUserID(v)
-		return nil
-	case usercommentsubscription.FieldCommentID:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetCommentID(v)
-		return nil
-	case usercommentsubscription.FieldIsNotified:
-		v, ok := value.(bool)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetIsNotified(v)
-		return nil
-	case usercommentsubscription.FieldIsChecked:
-		v, ok := value.(bool)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetIsChecked(v)
-		return nil
-	case usercommentsubscription.FieldSubscribedAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetSubscribedAt(v)
-		return nil
-	}
-	return fmt.Errorf("unknown UserCommentSubscription field %s", name)
-}
-
-// AddedFields returns all numeric fields that were incremented/decremented during
-// this mutation.
-func (m *UserCommentSubscriptionMutation) AddedFields() []string {
-	var fields []string
-	return fields
-}
-
-// AddedField returns the numeric value that was incremented/decremented on a field
-// with the given name. The second boolean return value indicates that this field
-// was not set, or was not defined in the schema.
-func (m *UserCommentSubscriptionMutation) AddedField(name string) (ent.Value, bool) {
-	switch name {
-	}
-	return nil, false
-}
-
-// AddField adds the value to the field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *UserCommentSubscriptionMutation) AddField(name string, value ent.Value) error {
-	switch name {
-	}
-	return fmt.Errorf("unknown UserCommentSubscription numeric field %s", name)
-}
-
-// ClearedFields returns all nullable fields that were cleared during this
-// mutation.
-func (m *UserCommentSubscriptionMutation) ClearedFields() []string {
-	return nil
-}
-
-// FieldCleared returns a boolean indicating if a field with the given name was
-// cleared in this mutation.
-func (m *UserCommentSubscriptionMutation) FieldCleared(name string) bool {
-	_, ok := m.clearedFields[name]
-	return ok
-}
-
-// ClearField clears the value of the field with the given name. It returns an
-// error if the field is not defined in the schema.
-func (m *UserCommentSubscriptionMutation) ClearField(name string) error {
-	return fmt.Errorf("unknown UserCommentSubscription nullable field %s", name)
-}
-
-// ResetField resets all changes in the mutation for the field with the given name.
-// It returns an error if the field is not defined in the schema.
-func (m *UserCommentSubscriptionMutation) ResetField(name string) error {
-	switch name {
-	case usercommentsubscription.FieldUserID:
-		m.ResetUserID()
-		return nil
-	case usercommentsubscription.FieldCommentID:
-		m.ResetCommentID()
-		return nil
-	case usercommentsubscription.FieldIsNotified:
-		m.ResetIsNotified()
-		return nil
-	case usercommentsubscription.FieldIsChecked:
-		m.ResetIsChecked()
-		return nil
-	case usercommentsubscription.FieldSubscribedAt:
-		m.ResetSubscribedAt()
-		return nil
-	}
-	return fmt.Errorf("unknown UserCommentSubscription field %s", name)
-}
-
-// AddedEdges returns all edge names that were set/added in this mutation.
-func (m *UserCommentSubscriptionMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
-	if m.user != nil {
-		edges = append(edges, usercommentsubscription.EdgeUser)
-	}
-	if m.comment != nil {
-		edges = append(edges, usercommentsubscription.EdgeComment)
-	}
-	return edges
-}
-
-// AddedIDs returns all IDs (to other nodes) that were added for the given edge
-// name in this mutation.
-func (m *UserCommentSubscriptionMutation) AddedIDs(name string) []ent.Value {
-	switch name {
-	case usercommentsubscription.EdgeUser:
-		if id := m.user; id != nil {
-			return []ent.Value{*id}
-		}
-	case usercommentsubscription.EdgeComment:
-		if id := m.comment; id != nil {
-			return []ent.Value{*id}
-		}
-	}
-	return nil
-}
-
-// RemovedEdges returns all edge names that were removed in this mutation.
-func (m *UserCommentSubscriptionMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
-	return edges
-}
-
-// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
-// the given name in this mutation.
-func (m *UserCommentSubscriptionMutation) RemovedIDs(name string) []ent.Value {
-	return nil
-}
-
-// ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *UserCommentSubscriptionMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
-	if m.cleareduser {
-		edges = append(edges, usercommentsubscription.EdgeUser)
-	}
-	if m.clearedcomment {
-		edges = append(edges, usercommentsubscription.EdgeComment)
-	}
-	return edges
-}
-
-// EdgeCleared returns a boolean which indicates if the edge with the given name
-// was cleared in this mutation.
-func (m *UserCommentSubscriptionMutation) EdgeCleared(name string) bool {
-	switch name {
-	case usercommentsubscription.EdgeUser:
-		return m.cleareduser
-	case usercommentsubscription.EdgeComment:
-		return m.clearedcomment
-	}
-	return false
-}
-
-// ClearEdge clears the value of the edge with the given name. It returns an error
-// if that edge is not defined in the schema.
-func (m *UserCommentSubscriptionMutation) ClearEdge(name string) error {
-	switch name {
-	case usercommentsubscription.EdgeUser:
-		m.ClearUser()
-		return nil
-	case usercommentsubscription.EdgeComment:
-		m.ClearComment()
-		return nil
-	}
-	return fmt.Errorf("unknown UserCommentSubscription unique edge %s", name)
-}
-
-// ResetEdge resets all changes to the edge with the given name in this mutation.
-// It returns an error if the edge is not defined in the schema.
-func (m *UserCommentSubscriptionMutation) ResetEdge(name string) error {
-	switch name {
-	case usercommentsubscription.EdgeUser:
-		m.ResetUser()
-		return nil
-	case usercommentsubscription.EdgeComment:
-		m.ResetComment()
-		return nil
-	}
-	return fmt.Errorf("unknown UserCommentSubscription edge %s", name)
-}
-
 // UserThreadLikeMutation represents an operation that mutates the UserThreadLike nodes in the graph.
 type UserThreadLikeMutation struct {
 	config
@@ -7816,491 +7687,4 @@ func (m *UserThreadLikeMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown UserThreadLike edge %s", name)
-}
-
-// UserThreadSubscriptionMutation represents an operation that mutates the UserThreadSubscription nodes in the graph.
-type UserThreadSubscriptionMutation struct {
-	config
-	op            Op
-	typ           string
-	is_notified   *bool
-	is_checked    *bool
-	subscribed_at *time.Time
-	clearedFields map[string]struct{}
-	user          *int
-	cleareduser   bool
-	thread        *int
-	clearedthread bool
-	done          bool
-	oldValue      func(context.Context) (*UserThreadSubscription, error)
-	predicates    []predicate.UserThreadSubscription
-}
-
-var _ ent.Mutation = (*UserThreadSubscriptionMutation)(nil)
-
-// userthreadsubscriptionOption allows management of the mutation configuration using functional options.
-type userthreadsubscriptionOption func(*UserThreadSubscriptionMutation)
-
-// newUserThreadSubscriptionMutation creates new mutation for the UserThreadSubscription entity.
-func newUserThreadSubscriptionMutation(c config, op Op, opts ...userthreadsubscriptionOption) *UserThreadSubscriptionMutation {
-	m := &UserThreadSubscriptionMutation{
-		config:        c,
-		op:            op,
-		typ:           TypeUserThreadSubscription,
-		clearedFields: make(map[string]struct{}),
-	}
-	for _, opt := range opts {
-		opt(m)
-	}
-	return m
-}
-
-// Client returns a new `ent.Client` from the mutation. If the mutation was
-// executed in a transaction (ent.Tx), a transactional client is returned.
-func (m UserThreadSubscriptionMutation) Client() *Client {
-	client := &Client{config: m.config}
-	client.init()
-	return client
-}
-
-// Tx returns an `ent.Tx` for mutations that were executed in transactions;
-// it returns an error otherwise.
-func (m UserThreadSubscriptionMutation) Tx() (*Tx, error) {
-	if _, ok := m.driver.(*txDriver); !ok {
-		return nil, errors.New("ent: mutation is not running in a transaction")
-	}
-	tx := &Tx{config: m.config}
-	tx.init()
-	return tx, nil
-}
-
-// SetUserID sets the "user_id" field.
-func (m *UserThreadSubscriptionMutation) SetUserID(i int) {
-	m.user = &i
-}
-
-// UserID returns the value of the "user_id" field in the mutation.
-func (m *UserThreadSubscriptionMutation) UserID() (r int, exists bool) {
-	v := m.user
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetUserID resets all changes to the "user_id" field.
-func (m *UserThreadSubscriptionMutation) ResetUserID() {
-	m.user = nil
-}
-
-// SetThreadID sets the "thread_id" field.
-func (m *UserThreadSubscriptionMutation) SetThreadID(i int) {
-	m.thread = &i
-}
-
-// ThreadID returns the value of the "thread_id" field in the mutation.
-func (m *UserThreadSubscriptionMutation) ThreadID() (r int, exists bool) {
-	v := m.thread
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetThreadID resets all changes to the "thread_id" field.
-func (m *UserThreadSubscriptionMutation) ResetThreadID() {
-	m.thread = nil
-}
-
-// SetIsNotified sets the "is_notified" field.
-func (m *UserThreadSubscriptionMutation) SetIsNotified(b bool) {
-	m.is_notified = &b
-}
-
-// IsNotified returns the value of the "is_notified" field in the mutation.
-func (m *UserThreadSubscriptionMutation) IsNotified() (r bool, exists bool) {
-	v := m.is_notified
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetIsNotified resets all changes to the "is_notified" field.
-func (m *UserThreadSubscriptionMutation) ResetIsNotified() {
-	m.is_notified = nil
-}
-
-// SetIsChecked sets the "is_checked" field.
-func (m *UserThreadSubscriptionMutation) SetIsChecked(b bool) {
-	m.is_checked = &b
-}
-
-// IsChecked returns the value of the "is_checked" field in the mutation.
-func (m *UserThreadSubscriptionMutation) IsChecked() (r bool, exists bool) {
-	v := m.is_checked
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetIsChecked resets all changes to the "is_checked" field.
-func (m *UserThreadSubscriptionMutation) ResetIsChecked() {
-	m.is_checked = nil
-}
-
-// SetSubscribedAt sets the "subscribed_at" field.
-func (m *UserThreadSubscriptionMutation) SetSubscribedAt(t time.Time) {
-	m.subscribed_at = &t
-}
-
-// SubscribedAt returns the value of the "subscribed_at" field in the mutation.
-func (m *UserThreadSubscriptionMutation) SubscribedAt() (r time.Time, exists bool) {
-	v := m.subscribed_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetSubscribedAt resets all changes to the "subscribed_at" field.
-func (m *UserThreadSubscriptionMutation) ResetSubscribedAt() {
-	m.subscribed_at = nil
-}
-
-// ClearUser clears the "user" edge to the User entity.
-func (m *UserThreadSubscriptionMutation) ClearUser() {
-	m.cleareduser = true
-	m.clearedFields[userthreadsubscription.FieldUserID] = struct{}{}
-}
-
-// UserCleared reports if the "user" edge to the User entity was cleared.
-func (m *UserThreadSubscriptionMutation) UserCleared() bool {
-	return m.cleareduser
-}
-
-// UserIDs returns the "user" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// UserID instead. It exists only for internal usage by the builders.
-func (m *UserThreadSubscriptionMutation) UserIDs() (ids []int) {
-	if id := m.user; id != nil {
-		ids = append(ids, *id)
-	}
-	return
-}
-
-// ResetUser resets all changes to the "user" edge.
-func (m *UserThreadSubscriptionMutation) ResetUser() {
-	m.user = nil
-	m.cleareduser = false
-}
-
-// ClearThread clears the "thread" edge to the Thread entity.
-func (m *UserThreadSubscriptionMutation) ClearThread() {
-	m.clearedthread = true
-	m.clearedFields[userthreadsubscription.FieldThreadID] = struct{}{}
-}
-
-// ThreadCleared reports if the "thread" edge to the Thread entity was cleared.
-func (m *UserThreadSubscriptionMutation) ThreadCleared() bool {
-	return m.clearedthread
-}
-
-// ThreadIDs returns the "thread" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// ThreadID instead. It exists only for internal usage by the builders.
-func (m *UserThreadSubscriptionMutation) ThreadIDs() (ids []int) {
-	if id := m.thread; id != nil {
-		ids = append(ids, *id)
-	}
-	return
-}
-
-// ResetThread resets all changes to the "thread" edge.
-func (m *UserThreadSubscriptionMutation) ResetThread() {
-	m.thread = nil
-	m.clearedthread = false
-}
-
-// Where appends a list predicates to the UserThreadSubscriptionMutation builder.
-func (m *UserThreadSubscriptionMutation) Where(ps ...predicate.UserThreadSubscription) {
-	m.predicates = append(m.predicates, ps...)
-}
-
-// WhereP appends storage-level predicates to the UserThreadSubscriptionMutation builder. Using this method,
-// users can use type-assertion to append predicates that do not depend on any generated package.
-func (m *UserThreadSubscriptionMutation) WhereP(ps ...func(*sql.Selector)) {
-	p := make([]predicate.UserThreadSubscription, len(ps))
-	for i := range ps {
-		p[i] = ps[i]
-	}
-	m.Where(p...)
-}
-
-// Op returns the operation name.
-func (m *UserThreadSubscriptionMutation) Op() Op {
-	return m.op
-}
-
-// SetOp allows setting the mutation operation.
-func (m *UserThreadSubscriptionMutation) SetOp(op Op) {
-	m.op = op
-}
-
-// Type returns the node type of this mutation (UserThreadSubscription).
-func (m *UserThreadSubscriptionMutation) Type() string {
-	return m.typ
-}
-
-// Fields returns all fields that were changed during this mutation. Note that in
-// order to get all numeric fields that were incremented/decremented, call
-// AddedFields().
-func (m *UserThreadSubscriptionMutation) Fields() []string {
-	fields := make([]string, 0, 5)
-	if m.user != nil {
-		fields = append(fields, userthreadsubscription.FieldUserID)
-	}
-	if m.thread != nil {
-		fields = append(fields, userthreadsubscription.FieldThreadID)
-	}
-	if m.is_notified != nil {
-		fields = append(fields, userthreadsubscription.FieldIsNotified)
-	}
-	if m.is_checked != nil {
-		fields = append(fields, userthreadsubscription.FieldIsChecked)
-	}
-	if m.subscribed_at != nil {
-		fields = append(fields, userthreadsubscription.FieldSubscribedAt)
-	}
-	return fields
-}
-
-// Field returns the value of a field with the given name. The second boolean
-// return value indicates that this field was not set, or was not defined in the
-// schema.
-func (m *UserThreadSubscriptionMutation) Field(name string) (ent.Value, bool) {
-	switch name {
-	case userthreadsubscription.FieldUserID:
-		return m.UserID()
-	case userthreadsubscription.FieldThreadID:
-		return m.ThreadID()
-	case userthreadsubscription.FieldIsNotified:
-		return m.IsNotified()
-	case userthreadsubscription.FieldIsChecked:
-		return m.IsChecked()
-	case userthreadsubscription.FieldSubscribedAt:
-		return m.SubscribedAt()
-	}
-	return nil, false
-}
-
-// OldField returns the old value of the field from the database. An error is
-// returned if the mutation operation is not UpdateOne, or the query to the
-// database failed.
-func (m *UserThreadSubscriptionMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
-	return nil, errors.New("edge schema UserThreadSubscription does not support getting old values")
-}
-
-// SetField sets the value of a field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *UserThreadSubscriptionMutation) SetField(name string, value ent.Value) error {
-	switch name {
-	case userthreadsubscription.FieldUserID:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUserID(v)
-		return nil
-	case userthreadsubscription.FieldThreadID:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetThreadID(v)
-		return nil
-	case userthreadsubscription.FieldIsNotified:
-		v, ok := value.(bool)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetIsNotified(v)
-		return nil
-	case userthreadsubscription.FieldIsChecked:
-		v, ok := value.(bool)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetIsChecked(v)
-		return nil
-	case userthreadsubscription.FieldSubscribedAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetSubscribedAt(v)
-		return nil
-	}
-	return fmt.Errorf("unknown UserThreadSubscription field %s", name)
-}
-
-// AddedFields returns all numeric fields that were incremented/decremented during
-// this mutation.
-func (m *UserThreadSubscriptionMutation) AddedFields() []string {
-	var fields []string
-	return fields
-}
-
-// AddedField returns the numeric value that was incremented/decremented on a field
-// with the given name. The second boolean return value indicates that this field
-// was not set, or was not defined in the schema.
-func (m *UserThreadSubscriptionMutation) AddedField(name string) (ent.Value, bool) {
-	switch name {
-	}
-	return nil, false
-}
-
-// AddField adds the value to the field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *UserThreadSubscriptionMutation) AddField(name string, value ent.Value) error {
-	switch name {
-	}
-	return fmt.Errorf("unknown UserThreadSubscription numeric field %s", name)
-}
-
-// ClearedFields returns all nullable fields that were cleared during this
-// mutation.
-func (m *UserThreadSubscriptionMutation) ClearedFields() []string {
-	return nil
-}
-
-// FieldCleared returns a boolean indicating if a field with the given name was
-// cleared in this mutation.
-func (m *UserThreadSubscriptionMutation) FieldCleared(name string) bool {
-	_, ok := m.clearedFields[name]
-	return ok
-}
-
-// ClearField clears the value of the field with the given name. It returns an
-// error if the field is not defined in the schema.
-func (m *UserThreadSubscriptionMutation) ClearField(name string) error {
-	return fmt.Errorf("unknown UserThreadSubscription nullable field %s", name)
-}
-
-// ResetField resets all changes in the mutation for the field with the given name.
-// It returns an error if the field is not defined in the schema.
-func (m *UserThreadSubscriptionMutation) ResetField(name string) error {
-	switch name {
-	case userthreadsubscription.FieldUserID:
-		m.ResetUserID()
-		return nil
-	case userthreadsubscription.FieldThreadID:
-		m.ResetThreadID()
-		return nil
-	case userthreadsubscription.FieldIsNotified:
-		m.ResetIsNotified()
-		return nil
-	case userthreadsubscription.FieldIsChecked:
-		m.ResetIsChecked()
-		return nil
-	case userthreadsubscription.FieldSubscribedAt:
-		m.ResetSubscribedAt()
-		return nil
-	}
-	return fmt.Errorf("unknown UserThreadSubscription field %s", name)
-}
-
-// AddedEdges returns all edge names that were set/added in this mutation.
-func (m *UserThreadSubscriptionMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
-	if m.user != nil {
-		edges = append(edges, userthreadsubscription.EdgeUser)
-	}
-	if m.thread != nil {
-		edges = append(edges, userthreadsubscription.EdgeThread)
-	}
-	return edges
-}
-
-// AddedIDs returns all IDs (to other nodes) that were added for the given edge
-// name in this mutation.
-func (m *UserThreadSubscriptionMutation) AddedIDs(name string) []ent.Value {
-	switch name {
-	case userthreadsubscription.EdgeUser:
-		if id := m.user; id != nil {
-			return []ent.Value{*id}
-		}
-	case userthreadsubscription.EdgeThread:
-		if id := m.thread; id != nil {
-			return []ent.Value{*id}
-		}
-	}
-	return nil
-}
-
-// RemovedEdges returns all edge names that were removed in this mutation.
-func (m *UserThreadSubscriptionMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
-	return edges
-}
-
-// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
-// the given name in this mutation.
-func (m *UserThreadSubscriptionMutation) RemovedIDs(name string) []ent.Value {
-	return nil
-}
-
-// ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *UserThreadSubscriptionMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
-	if m.cleareduser {
-		edges = append(edges, userthreadsubscription.EdgeUser)
-	}
-	if m.clearedthread {
-		edges = append(edges, userthreadsubscription.EdgeThread)
-	}
-	return edges
-}
-
-// EdgeCleared returns a boolean which indicates if the edge with the given name
-// was cleared in this mutation.
-func (m *UserThreadSubscriptionMutation) EdgeCleared(name string) bool {
-	switch name {
-	case userthreadsubscription.EdgeUser:
-		return m.cleareduser
-	case userthreadsubscription.EdgeThread:
-		return m.clearedthread
-	}
-	return false
-}
-
-// ClearEdge clears the value of the edge with the given name. It returns an error
-// if that edge is not defined in the schema.
-func (m *UserThreadSubscriptionMutation) ClearEdge(name string) error {
-	switch name {
-	case userthreadsubscription.EdgeUser:
-		m.ClearUser()
-		return nil
-	case userthreadsubscription.EdgeThread:
-		m.ClearThread()
-		return nil
-	}
-	return fmt.Errorf("unknown UserThreadSubscription unique edge %s", name)
-}
-
-// ResetEdge resets all changes to the edge with the given name in this mutation.
-// It returns an error if the edge is not defined in the schema.
-func (m *UserThreadSubscriptionMutation) ResetEdge(name string) error {
-	switch name {
-	case userthreadsubscription.EdgeUser:
-		m.ResetUser()
-		return nil
-	case userthreadsubscription.EdgeThread:
-		m.ResetThread()
-		return nil
-	}
-	return fmt.Errorf("unknown UserThreadSubscription edge %s", name)
 }

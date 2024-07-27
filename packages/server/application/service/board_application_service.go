@@ -8,7 +8,6 @@ import (
 	"server/infrastructure/ent"
 	request "server/presentation/request"
 	resource "server/presentation/resource"
-	"time"
 )
 
 type BoardApplicationService struct {
@@ -24,7 +23,7 @@ type BoardApplicationServiceFindAllParams struct {
 }
 
 func (svc *BoardApplicationService) FindAll(params BoardApplicationServiceFindAllParams) ([]*resource.BoardResource, error) {
-	boards, err := svc.boardDatasource.FindAll(datasource.BoardDatasourceFindAllParams{
+	boardList, err := svc.boardDatasource.FindAll(datasource.BoardDatasourceFindAllParams{
 		Ctx: params.Ctx,
 	})
 	if err != nil {
@@ -32,9 +31,9 @@ func (svc *BoardApplicationService) FindAll(params BoardApplicationServiceFindAl
 	}
 
 	var dto []*resource.BoardResource
-	for _, board := range boards {
+	for _, board_i := range boardList {
 		dto = append(dto, resource.NewBoardResource(resource.NewBoardResourceParams{
-			Board: board,
+			Board: board_i,
 		}))
 	}
 
@@ -48,34 +47,28 @@ type BoardApplicationServiceCreateParams struct {
 }
 
 func (svc *BoardApplicationService) Create(params BoardApplicationServiceCreateParams) (*resource.BoardResource, error) {
-
-	boards, err := svc.boardDatasource.FindByTitle(datasource.BoardDatasourceFindByTitleParams{
+	boardList, err := svc.boardDatasource.FindByTitle(datasource.BoardDatasourceFindByTitleParams{
 		Ctx:   params.Ctx,
 		Title: params.Body.Title,
 	})
 	if err != nil {
 		return nil, err
 	}
-	if len(boards) > 0 {
+	if len(boardList) > 0 {
 		return nil, errors.New("板タイトルが重複しています")
 	}
 
-	board := &model.Board{
+	board := model.NewBoard(model.NewBoardParams{
 		EntBoard: &ent.Board{
-			Title:     params.Body.Title,
-			UserID:    params.UserID,
-			Status:    int(model.BoardStatusPublic),
-			CreatedAt: time.Now(),
-			UpdatedAt: time.Now(),
+			Title:        params.Body.Title,
+			UserID:       params.UserID,
+			Description:  params.Body.Description,
+			ThumbnailURL: params.Body.ThumbnailURL,
 		},
-	}
-
-	if params.Body.Description != nil {
-		board.EntBoard.Description = params.Body.Description
-	}
-	if params.Body.ThumbnailURL != nil {
-		board.EntBoard.ThumbnailURL = params.Body.ThumbnailURL
-	}
+		OptionList: []func(*model.Board){
+			model.WithBoardStatus(model.BoardStatusPublic),
+		},
+	})
 
 	board, err = svc.boardDatasource.Create(datasource.BoardDatasourceCreateParams{
 		Ctx:   params.Ctx,

@@ -40,18 +40,10 @@ const (
 	EdgeLikedThreads = "liked_threads"
 	// EdgeLikedComments holds the string denoting the liked_comments edge name in mutations.
 	EdgeLikedComments = "liked_comments"
-	// EdgeSubscribedThreads holds the string denoting the subscribed_threads edge name in mutations.
-	EdgeSubscribedThreads = "subscribed_threads"
-	// EdgeSubscribedComments holds the string denoting the subscribed_comments edge name in mutations.
-	EdgeSubscribedComments = "subscribed_comments"
 	// EdgeUserThreadLike holds the string denoting the user_thread_like edge name in mutations.
 	EdgeUserThreadLike = "user_thread_like"
 	// EdgeUserCommentLike holds the string denoting the user_comment_like edge name in mutations.
 	EdgeUserCommentLike = "user_comment_like"
-	// EdgeUserThreadSubscription holds the string denoting the user_thread_subscription edge name in mutations.
-	EdgeUserThreadSubscription = "user_thread_subscription"
-	// EdgeUserCommentSubscription holds the string denoting the user_comment_subscription edge name in mutations.
-	EdgeUserCommentSubscription = "user_comment_subscription"
 	// Table holds the table name of the user in the database.
 	Table = "users"
 	// BoardsTable is the table that holds the boards relation/edge.
@@ -85,16 +77,6 @@ const (
 	// LikedCommentsInverseTable is the table name for the ThreadComment entity.
 	// It exists in this package in order to avoid circular dependency with the "threadcomment" package.
 	LikedCommentsInverseTable = "thread_comments"
-	// SubscribedThreadsTable is the table that holds the subscribed_threads relation/edge. The primary key declared below.
-	SubscribedThreadsTable = "user_thread_subscriptions"
-	// SubscribedThreadsInverseTable is the table name for the Thread entity.
-	// It exists in this package in order to avoid circular dependency with the "thread" package.
-	SubscribedThreadsInverseTable = "threads"
-	// SubscribedCommentsTable is the table that holds the subscribed_comments relation/edge. The primary key declared below.
-	SubscribedCommentsTable = "user_comment_subscriptions"
-	// SubscribedCommentsInverseTable is the table name for the ThreadComment entity.
-	// It exists in this package in order to avoid circular dependency with the "threadcomment" package.
-	SubscribedCommentsInverseTable = "thread_comments"
 	// UserThreadLikeTable is the table that holds the user_thread_like relation/edge.
 	UserThreadLikeTable = "user_thread_likes"
 	// UserThreadLikeInverseTable is the table name for the UserThreadLike entity.
@@ -109,20 +91,6 @@ const (
 	UserCommentLikeInverseTable = "user_comment_likes"
 	// UserCommentLikeColumn is the table column denoting the user_comment_like relation/edge.
 	UserCommentLikeColumn = "user_id"
-	// UserThreadSubscriptionTable is the table that holds the user_thread_subscription relation/edge.
-	UserThreadSubscriptionTable = "user_thread_subscriptions"
-	// UserThreadSubscriptionInverseTable is the table name for the UserThreadSubscription entity.
-	// It exists in this package in order to avoid circular dependency with the "userthreadsubscription" package.
-	UserThreadSubscriptionInverseTable = "user_thread_subscriptions"
-	// UserThreadSubscriptionColumn is the table column denoting the user_thread_subscription relation/edge.
-	UserThreadSubscriptionColumn = "user_id"
-	// UserCommentSubscriptionTable is the table that holds the user_comment_subscription relation/edge.
-	UserCommentSubscriptionTable = "user_comment_subscriptions"
-	// UserCommentSubscriptionInverseTable is the table name for the UserCommentSubscription entity.
-	// It exists in this package in order to avoid circular dependency with the "usercommentsubscription" package.
-	UserCommentSubscriptionInverseTable = "user_comment_subscriptions"
-	// UserCommentSubscriptionColumn is the table column denoting the user_comment_subscription relation/edge.
-	UserCommentSubscriptionColumn = "user_id"
 )
 
 // Columns holds all SQL columns for user fields.
@@ -145,12 +113,6 @@ var (
 	// LikedCommentsPrimaryKey and LikedCommentsColumn2 are the table columns denoting the
 	// primary key for the liked_comments relation (M2M).
 	LikedCommentsPrimaryKey = []string{"user_id", "comment_id"}
-	// SubscribedThreadsPrimaryKey and SubscribedThreadsColumn2 are the table columns denoting the
-	// primary key for the subscribed_threads relation (M2M).
-	SubscribedThreadsPrimaryKey = []string{"user_id", "thread_id"}
-	// SubscribedCommentsPrimaryKey and SubscribedCommentsColumn2 are the table columns denoting the
-	// primary key for the subscribed_comments relation (M2M).
-	SubscribedCommentsPrimaryKey = []string{"user_id", "comment_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -298,34 +260,6 @@ func ByLikedComments(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
-// BySubscribedThreadsCount orders the results by subscribed_threads count.
-func BySubscribedThreadsCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newSubscribedThreadsStep(), opts...)
-	}
-}
-
-// BySubscribedThreads orders the results by subscribed_threads terms.
-func BySubscribedThreads(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newSubscribedThreadsStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
-// BySubscribedCommentsCount orders the results by subscribed_comments count.
-func BySubscribedCommentsCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newSubscribedCommentsStep(), opts...)
-	}
-}
-
-// BySubscribedComments orders the results by subscribed_comments terms.
-func BySubscribedComments(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newSubscribedCommentsStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
 // ByUserThreadLikeCount orders the results by user_thread_like count.
 func ByUserThreadLikeCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -351,34 +285,6 @@ func ByUserCommentLikeCount(opts ...sql.OrderTermOption) OrderOption {
 func ByUserCommentLike(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newUserCommentLikeStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
-// ByUserThreadSubscriptionCount orders the results by user_thread_subscription count.
-func ByUserThreadSubscriptionCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newUserThreadSubscriptionStep(), opts...)
-	}
-}
-
-// ByUserThreadSubscription orders the results by user_thread_subscription terms.
-func ByUserThreadSubscription(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newUserThreadSubscriptionStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
-// ByUserCommentSubscriptionCount orders the results by user_comment_subscription count.
-func ByUserCommentSubscriptionCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newUserCommentSubscriptionStep(), opts...)
-	}
-}
-
-// ByUserCommentSubscription orders the results by user_comment_subscription terms.
-func ByUserCommentSubscription(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newUserCommentSubscriptionStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 func newBoardsStep() *sqlgraph.Step {
@@ -416,20 +322,6 @@ func newLikedCommentsStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2M, false, LikedCommentsTable, LikedCommentsPrimaryKey...),
 	)
 }
-func newSubscribedThreadsStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(SubscribedThreadsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, SubscribedThreadsTable, SubscribedThreadsPrimaryKey...),
-	)
-}
-func newSubscribedCommentsStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(SubscribedCommentsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, SubscribedCommentsTable, SubscribedCommentsPrimaryKey...),
-	)
-}
 func newUserThreadLikeStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -442,19 +334,5 @@ func newUserCommentLikeStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(UserCommentLikeInverseTable, UserCommentLikeColumn),
 		sqlgraph.Edge(sqlgraph.O2M, true, UserCommentLikeTable, UserCommentLikeColumn),
-	)
-}
-func newUserThreadSubscriptionStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(UserThreadSubscriptionInverseTable, UserThreadSubscriptionColumn),
-		sqlgraph.Edge(sqlgraph.O2M, true, UserThreadSubscriptionTable, UserThreadSubscriptionColumn),
-	)
-}
-func newUserCommentSubscriptionStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(UserCommentSubscriptionInverseTable, UserCommentSubscriptionColumn),
-		sqlgraph.Edge(sqlgraph.O2M, true, UserCommentSubscriptionTable, UserCommentSubscriptionColumn),
 	)
 }

@@ -6,16 +6,16 @@ import (
 )
 
 type ThreadResource struct {
-	ID           int                                  `json:"id"`
-	Board        *BoardResource                       `json:"board"`
-	Title        string                               `json:"title"`
-	Description  *string                              `json:"description"`
-	ThumbnailURL *string                              `json:"thumbnailUrl"`
-	TagNameList  []string                             `json:"tagNameList"`
-	CreatedAt    string                               `json:"createdAt"`
-	CommentCount int                                  `json:"commentCount"`
-	Comments     ListResource[*ThreadCommentResource] `json:"comments"`
-	Attachments  []*ThreadCommentAttachmentResource   `json:"attachments"`
+	ID           int                                 `json:"id"`
+	Board        *BoardResource                      `json:"board"`
+	Title        string                              `json:"title"`
+	Description  *string                             `json:"description"`
+	ThumbnailURL *string                             `json:"thumbnailUrl"`
+	TagNameList  []string                            `json:"tagNameList"`
+	CreatedAt    string                              `json:"createdAt"`
+	CommentCount int                                 `json:"commentCount"`
+	Comments     *Collection[*ThreadCommentResource] `json:"comments"`
+	Attachments  []*ThreadCommentAttachmentResource  `json:"attachments"`
 }
 
 type NewThreadResourceParams struct {
@@ -25,8 +25,8 @@ type NewThreadResourceParams struct {
 
 func NewThreadResource(params NewThreadResourceParams) *ThreadResource {
 	var tagNameList []string
-	for _, tag := range params.Thread.EntThread.Edges.Tags {
-		tagNameList = append(tagNameList, tag.Name)
+	for _, tag_i := range params.Thread.EntThread.Edges.Tags {
+		tagNameList = append(tagNameList, tag_i.Name)
 	}
 
 	var boardResource *BoardResource
@@ -37,54 +37,42 @@ func NewThreadResource(params NewThreadResourceParams) *ThreadResource {
 		}
 	}
 
-	var comments []*ThreadCommentResource
+	var commentResourceList []*ThreadCommentResource
 	var attachments []*ThreadCommentAttachmentResource
-	for _, comment := range params.Thread.EntThread.Edges.Comments {
+	for _, comment_i := range params.Thread.EntThread.Edges.Comments {
+		commentResourceList = append(commentResourceList, NewThreadCommentResource(NewThreadCommentResourceParams{
+			ThreadComment: model.NewThreadComment(model.NewThreadCommentParams{
+				EntThreadComment: comment_i,
+			}),
+			ReplyCount: len(comment_i.Edges.Replies),
+		}))
 
-		commentResource := NewThreadCommentResource(NewThreadCommentResourceParams{
-			ThreadComment: &model.ThreadComment{EntThreadComment: comment},
-			Offset:        params.Offset,
-			ReplyCount:    len(comment.Edges.Replies),
-		})
-		comments = append(comments, commentResource)
-
-		for _, attachment := range comment.Edges.Attachments {
-			threadCommentAttachment := &model.ThreadCommentAttachment{EntAttachment: attachment}
-			attachments = append(attachments, &ThreadCommentAttachmentResource{
-				Url:          threadCommentAttachment.EntAttachment.URL,
-				DisplayOrder: threadCommentAttachment.EntAttachment.DisplayOrder,
-				Type:         threadCommentAttachment.TypeToString(),
-				CommentID:    comment.ID,
-			})
+		for _, attachment_i := range comment_i.Edges.Attachments {
+			attachments = append(attachments, NewThreadCommentAttachmentResource(NewThreadCommentAttachmentResourceParams{
+				ThreadCommentAttachment: model.NewThreadCommentAttachment(model.NewThreadCommentAttachmentParams{
+					EntAttachment: attachment_i,
+				}),
+			}))
 		}
 	}
 
-	commentsList := ListResource[*ThreadCommentResource]{
+	commentCollection := NewCollection(NewCollectionParams[*ThreadCommentResource]{
+		Data:       commentResourceList,
 		TotalCount: params.CommentCount,
 		Limit:      params.Limit,
 		Offset:     params.Offset,
-		Data:       comments,
-	}
-
-	var description *string
-	if params.Thread.EntThread.Description != nil {
-		description = params.Thread.EntThread.Description
-	}
-	var thumbnailURL *string
-	if params.Thread.EntThread.ThumbnailURL != nil {
-		thumbnailURL = params.Thread.EntThread.ThumbnailURL
-	}
+	})
 
 	return &ThreadResource{
 		ID:           params.Thread.EntThread.ID,
 		Board:        boardResource,
 		Title:        params.Thread.EntThread.Title,
-		Description:  description,
-		ThumbnailURL: thumbnailURL,
+		Description:  params.Thread.EntThread.Description,
+		ThumbnailURL: params.Thread.EntThread.ThumbnailURL,
 		TagNameList:  tagNameList,
 		CreatedAt:    params.Thread.EntThread.CreatedAt.Format(time.RFC3339),
 		CommentCount: params.CommentCount,
-		Comments:     commentsList,
+		Comments:     commentCollection,
 		Attachments:  attachments,
 	}
 }

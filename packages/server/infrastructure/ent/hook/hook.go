@@ -20,6 +20,18 @@ func (f BoardFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.BoardMutation", m)
 }
 
+// The ContactFunc type is an adapter to allow the use of ordinary
+// function as Contact mutator.
+type ContactFunc func(context.Context, *ent.ContactMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ContactFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ContactMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ContactMutation", m)
+}
+
 // The TagFunc type is an adapter to allow the use of ordinary
 // function as Tag mutator.
 type TagFunc func(context.Context, *ent.TagMutation) (ent.Value, error)
@@ -104,18 +116,6 @@ func (f UserCommentLikeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Va
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UserCommentLikeMutation", m)
 }
 
-// The UserCommentSubscriptionFunc type is an adapter to allow the use of ordinary
-// function as UserCommentSubscription mutator.
-type UserCommentSubscriptionFunc func(context.Context, *ent.UserCommentSubscriptionMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f UserCommentSubscriptionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.UserCommentSubscriptionMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UserCommentSubscriptionMutation", m)
-}
-
 // The UserThreadLikeFunc type is an adapter to allow the use of ordinary
 // function as UserThreadLike mutator.
 type UserThreadLikeFunc func(context.Context, *ent.UserThreadLikeMutation) (ent.Value, error)
@@ -126,18 +126,6 @@ func (f UserThreadLikeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Val
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UserThreadLikeMutation", m)
-}
-
-// The UserThreadSubscriptionFunc type is an adapter to allow the use of ordinary
-// function as UserThreadSubscription mutator.
-type UserThreadSubscriptionFunc func(context.Context, *ent.UserThreadSubscriptionMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f UserThreadSubscriptionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.UserThreadSubscriptionMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UserThreadSubscriptionMutation", m)
 }
 
 // Condition is a hook condition function.

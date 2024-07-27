@@ -34,6 +34,7 @@ const guestMenuItems = computed(() => {
     { title: 'スレ一覧', clicked: () => router.push('/threads'), icon: 'mdi-format-list-bulleted' },
     { title: '板一覧', clicked: () => router.push('/boards'), icon: 'mdi-view-list' },
     { title: '設定', clicked: () => router.push('/setting'), icon: 'mdi-cog' },
+    { title: '問い合わせ', clicked: () => router.push('/contact'), icon: 'mdi-email' },
   ];
 
   if (!payload.isLoggedIn) {

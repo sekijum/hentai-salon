@@ -32,5 +32,5 @@ type ThreadCreateRequest struct {
 	Title        string   `json:"title" binding:"required,max=255"`
 	Description  *string  `json:"description" binding:"omitempty"`
 	ThumbnailURL *string  `json:"thumbnailUrl" binding:"omitempty,max=255"`
-	TagNameList  []string `json:"tagNameList" binding:"omitempty,dive,max=20"`
+	TagNameList  []string `json:"tagNameList" binding:"omitempty,dive,max=50"`
 }

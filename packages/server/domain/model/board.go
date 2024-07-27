@@ -8,6 +8,21 @@ type Board struct {
 	EntBoard *ent.Board
 }
 
+type NewBoardParams struct {
+	EntBoard   *ent.Board
+	OptionList []func(*Board)
+}
+
+func NewBoard(params NewBoardParams) *Board {
+	board := &Board{EntBoard: params.EntBoard}
+
+	for _, option := range params.OptionList {
+		option(board)
+	}
+
+	return board
+}
+
 type BoardStatus int
 
 const (
@@ -16,6 +31,12 @@ const (
 	BoardStatusPending
 	BoardStatusArchived
 )
+
+func WithBoardStatus(status BoardStatus) func(*Board) {
+	return func(b *Board) {
+		b.EntBoard.Status = int(status)
+	}
+}
 
 func (m Board) StatusToString() string {
 	switch m.EntBoard.Status {

@@ -10,8 +10,8 @@ type UserAdminFindAllRequest struct {
 }
 
 type UserAdminUpdateRequest struct {
-	Name   *string `json:"name,omitempty"`
-	Email  *string `json:"email,omitempty"`
-	Role   *int    `json:"role,omitempty"`
-	Status *int    `json:"status,omitempty"`
+	Name   string `json:"name,omitempty"`
+	Email  string `json:"email,omitempty"`
+	Role   int    `json:"role,omitempty"`
+	Status int    `json:"status,omitempty"`
 }

@@ -222,29 +222,6 @@ func seed(ctx context.Context, client *ent.Client) error {
 			SaveX(ctx)
 	}
 
-	// Create User Comment Subscriptions
-	userCommentSubscriptions := make(map[string]struct{})
-	for i := 0; i < 100; i++ {
-		var userID, commentID int
-		var key string
-		for {
-			userID = users[rand.Intn(100)].ID
-			commentID = comments[rand.Intn(len(comments))].ID
-			key = fmt.Sprintf("%d-%d", userID, commentID)
-			if _, exists := userCommentSubscriptions[key]; !exists {
-				break
-			}
-		}
-		userCommentSubscriptions[key] = struct{}{}
-		tx.UserCommentSubscription.Create().
-			SetIsNotified(true).
-			SetIsChecked(false).
-			SetSubscribedAt(time.Now()).
-			SetUserID(userID).
-			SetCommentID(commentID).
-			SaveX(ctx)
-	}
-
 	// Create User Thread Likes
 	userThreadLikes := make(map[string]struct{})
 	for i := 0; i < 100; i++ {
@@ -266,27 +243,18 @@ func seed(ctx context.Context, client *ent.Client) error {
 			SaveX(ctx)
 	}
 
-	// Create User Thread Subscriptions
-	userThreadSubscriptions := make(map[string]struct{})
+	// Create Contacts
+	contacts := make([]*ent.Contact, 100)
 	for i := 0; i < 100; i++ {
-		var userID, threadID int
-		var key string
-		for {
-			userID = users[rand.Intn(100)].ID
-			threadID = threads[rand.Intn(100)].ID
-			key = fmt.Sprintf("%d-%d", userID, threadID)
-			if _, exists := userThreadSubscriptions[key]; !exists {
-				break
-			}
-		}
-		userThreadSubscriptions[key] = struct{}{}
-		tx.UserThreadSubscription.Create().
-			SetIsNotified(true).
-			SetIsChecked(false).
-			SetSubscribedAt(time.Now()).
-			SetUserID(userID).
-			SetThreadID(threadID).
-			SaveX(ctx)
+		createContact := tx.Contact.Create().
+			SetEmail(fmt.Sprintf("contact%d@example.com", i)).
+			SetSubject("お問い合わせ件名" + uuid.New().String()[:8]).
+			SetMessage("お問い合わせ内容" + uuid.New().String()[:8]).
+			SetIPAddress("127.0.0.1").
+			SetStatus(0). // Open
+			SetCreatedAt(time.Now()).
+			SetUpdatedAt(time.Now())
+		contacts[i] = createContact.SaveX(ctx)
 	}
 
 	return nil

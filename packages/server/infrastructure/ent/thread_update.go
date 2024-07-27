@@ -230,21 +230,6 @@ func (tu *ThreadUpdate) AddLikedUsers(u ...*User) *ThreadUpdate {
 	return tu.AddLikedUserIDs(ids...)
 }
 
-// AddSubscribedUserIDs adds the "subscribed_users" edge to the User entity by IDs.
-func (tu *ThreadUpdate) AddSubscribedUserIDs(ids ...int) *ThreadUpdate {
-	tu.mutation.AddSubscribedUserIDs(ids...)
-	return tu
-}
-
-// AddSubscribedUsers adds the "subscribed_users" edges to the User entity.
-func (tu *ThreadUpdate) AddSubscribedUsers(u ...*User) *ThreadUpdate {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
-	}
-	return tu.AddSubscribedUserIDs(ids...)
-}
-
 // Mutation returns the ThreadMutation object of the builder.
 func (tu *ThreadUpdate) Mutation() *ThreadMutation {
 	return tu.mutation
@@ -323,27 +308,6 @@ func (tu *ThreadUpdate) RemoveLikedUsers(u ...*User) *ThreadUpdate {
 		ids[i] = u[i].ID
 	}
 	return tu.RemoveLikedUserIDs(ids...)
-}
-
-// ClearSubscribedUsers clears all "subscribed_users" edges to the User entity.
-func (tu *ThreadUpdate) ClearSubscribedUsers() *ThreadUpdate {
-	tu.mutation.ClearSubscribedUsers()
-	return tu
-}
-
-// RemoveSubscribedUserIDs removes the "subscribed_users" edge to User entities by IDs.
-func (tu *ThreadUpdate) RemoveSubscribedUserIDs(ids ...int) *ThreadUpdate {
-	tu.mutation.RemoveSubscribedUserIDs(ids...)
-	return tu
-}
-
-// RemoveSubscribedUsers removes "subscribed_users" edges to User entities.
-func (tu *ThreadUpdate) RemoveSubscribedUsers(u ...*User) *ThreadUpdate {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
-	}
-	return tu.RemoveSubscribedUserIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -650,63 +614,6 @@ func (tu *ThreadUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if tu.mutation.SubscribedUsersCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   thread.SubscribedUsersTable,
-			Columns: thread.SubscribedUsersPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
-			},
-		}
-		createE := &UserThreadSubscriptionCreate{config: tu.config, mutation: newUserThreadSubscriptionMutation(tu.config, OpCreate)}
-		createE.defaults()
-		_, specE := createE.createSpec()
-		edge.Target.Fields = specE.Fields
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := tu.mutation.RemovedSubscribedUsersIDs(); len(nodes) > 0 && !tu.mutation.SubscribedUsersCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   thread.SubscribedUsersTable,
-			Columns: thread.SubscribedUsersPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		createE := &UserThreadSubscriptionCreate{config: tu.config, mutation: newUserThreadSubscriptionMutation(tu.config, OpCreate)}
-		createE.defaults()
-		_, specE := createE.createSpec()
-		edge.Target.Fields = specE.Fields
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := tu.mutation.SubscribedUsersIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   thread.SubscribedUsersTable,
-			Columns: thread.SubscribedUsersPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		createE := &UserThreadSubscriptionCreate{config: tu.config, mutation: newUserThreadSubscriptionMutation(tu.config, OpCreate)}
-		createE.defaults()
-		_, specE := createE.createSpec()
-		edge.Target.Fields = specE.Fields
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
 	if n, err = sqlgraph.UpdateNodes(ctx, tu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{thread.Label}
@@ -925,21 +832,6 @@ func (tuo *ThreadUpdateOne) AddLikedUsers(u ...*User) *ThreadUpdateOne {
 	return tuo.AddLikedUserIDs(ids...)
 }
 
-// AddSubscribedUserIDs adds the "subscribed_users" edge to the User entity by IDs.
-func (tuo *ThreadUpdateOne) AddSubscribedUserIDs(ids ...int) *ThreadUpdateOne {
-	tuo.mutation.AddSubscribedUserIDs(ids...)
-	return tuo
-}
-
-// AddSubscribedUsers adds the "subscribed_users" edges to the User entity.
-func (tuo *ThreadUpdateOne) AddSubscribedUsers(u ...*User) *ThreadUpdateOne {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
-	}
-	return tuo.AddSubscribedUserIDs(ids...)
-}
-
 // Mutation returns the ThreadMutation object of the builder.
 func (tuo *ThreadUpdateOne) Mutation() *ThreadMutation {
 	return tuo.mutation
@@ -1018,27 +910,6 @@ func (tuo *ThreadUpdateOne) RemoveLikedUsers(u ...*User) *ThreadUpdateOne {
 		ids[i] = u[i].ID
 	}
 	return tuo.RemoveLikedUserIDs(ids...)
-}
-
-// ClearSubscribedUsers clears all "subscribed_users" edges to the User entity.
-func (tuo *ThreadUpdateOne) ClearSubscribedUsers() *ThreadUpdateOne {
-	tuo.mutation.ClearSubscribedUsers()
-	return tuo
-}
-
-// RemoveSubscribedUserIDs removes the "subscribed_users" edge to User entities by IDs.
-func (tuo *ThreadUpdateOne) RemoveSubscribedUserIDs(ids ...int) *ThreadUpdateOne {
-	tuo.mutation.RemoveSubscribedUserIDs(ids...)
-	return tuo
-}
-
-// RemoveSubscribedUsers removes "subscribed_users" edges to User entities.
-func (tuo *ThreadUpdateOne) RemoveSubscribedUsers(u ...*User) *ThreadUpdateOne {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
-	}
-	return tuo.RemoveSubscribedUserIDs(ids...)
 }
 
 // Where appends a list predicates to the ThreadUpdate builder.
@@ -1370,63 +1241,6 @@ func (tuo *ThreadUpdateOne) sqlSave(ctx context.Context) (_node *Thread, err err
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		createE := &UserThreadLikeCreate{config: tuo.config, mutation: newUserThreadLikeMutation(tuo.config, OpCreate)}
-		createE.defaults()
-		_, specE := createE.createSpec()
-		edge.Target.Fields = specE.Fields
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if tuo.mutation.SubscribedUsersCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   thread.SubscribedUsersTable,
-			Columns: thread.SubscribedUsersPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
-			},
-		}
-		createE := &UserThreadSubscriptionCreate{config: tuo.config, mutation: newUserThreadSubscriptionMutation(tuo.config, OpCreate)}
-		createE.defaults()
-		_, specE := createE.createSpec()
-		edge.Target.Fields = specE.Fields
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := tuo.mutation.RemovedSubscribedUsersIDs(); len(nodes) > 0 && !tuo.mutation.SubscribedUsersCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   thread.SubscribedUsersTable,
-			Columns: thread.SubscribedUsersPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		createE := &UserThreadSubscriptionCreate{config: tuo.config, mutation: newUserThreadSubscriptionMutation(tuo.config, OpCreate)}
-		createE.defaults()
-		_, specE := createE.createSpec()
-		edge.Target.Fields = specE.Fields
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := tuo.mutation.SubscribedUsersIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   thread.SubscribedUsersTable,
-			Columns: thread.SubscribedUsersPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		createE := &UserThreadSubscriptionCreate{config: tuo.config, mutation: newUserThreadSubscriptionMutation(tuo.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields

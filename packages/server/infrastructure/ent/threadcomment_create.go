@@ -205,21 +205,6 @@ func (tcc *ThreadCommentCreate) AddLikedUsers(u ...*User) *ThreadCommentCreate {
 	return tcc.AddLikedUserIDs(ids...)
 }
 
-// AddSubscribedUserIDs adds the "subscribed_users" edge to the User entity by IDs.
-func (tcc *ThreadCommentCreate) AddSubscribedUserIDs(ids ...int) *ThreadCommentCreate {
-	tcc.mutation.AddSubscribedUserIDs(ids...)
-	return tcc
-}
-
-// AddSubscribedUsers adds the "subscribed_users" edges to the User entity.
-func (tcc *ThreadCommentCreate) AddSubscribedUsers(u ...*User) *ThreadCommentCreate {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
-	}
-	return tcc.AddSubscribedUserIDs(ids...)
-}
-
 // Mutation returns the ThreadCommentMutation object of the builder.
 func (tcc *ThreadCommentCreate) Mutation() *ThreadCommentMutation {
 	return tcc.mutation
@@ -456,26 +441,6 @@ func (tcc *ThreadCommentCreate) createSpec() (*ThreadComment, *sqlgraph.CreateSp
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		createE := &UserCommentLikeCreate{config: tcc.config, mutation: newUserCommentLikeMutation(tcc.config, OpCreate)}
-		createE.defaults()
-		_, specE := createE.createSpec()
-		edge.Target.Fields = specE.Fields
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := tcc.mutation.SubscribedUsersIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   threadcomment.SubscribedUsersTable,
-			Columns: threadcomment.SubscribedUsersPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		createE := &UserCommentSubscriptionCreate{config: tcc.config, mutation: newUserCommentSubscriptionMutation(tcc.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields

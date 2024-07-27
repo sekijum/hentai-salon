@@ -9,6 +9,9 @@ import (
 // Board is the predicate function for board builders.
 type Board func(*sql.Selector)
 
+// Contact is the predicate function for contact builders.
+type Contact func(*sql.Selector)
+
 // Tag is the predicate function for tag builders.
 type Tag func(*sql.Selector)
 
@@ -30,11 +33,5 @@ type User func(*sql.Selector)
 // UserCommentLike is the predicate function for usercommentlike builders.
 type UserCommentLike func(*sql.Selector)
 
-// UserCommentSubscription is the predicate function for usercommentsubscription builders.
-type UserCommentSubscription func(*sql.Selector)
-
 // UserThreadLike is the predicate function for userthreadlike builders.
 type UserThreadLike func(*sql.Selector)
-
-// UserThreadSubscription is the predicate function for userthreadsubscription builders.
-type UserThreadSubscription func(*sql.Selector)

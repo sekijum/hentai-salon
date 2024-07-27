@@ -50,7 +50,7 @@ func (ctrl *ThreadController) FindAllList(ctx *gin.Context) {
 func (ctrl *ThreadController) FindById(ctx *gin.Context) {
 	threadID, err := strconv.Atoi(ctx.Param("threadID"))
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "無効なIDです"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 

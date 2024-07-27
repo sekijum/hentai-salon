@@ -192,36 +192,6 @@ func (uc *UserCreate) AddLikedComments(t ...*ThreadComment) *UserCreate {
 	return uc.AddLikedCommentIDs(ids...)
 }
 
-// AddSubscribedThreadIDs adds the "subscribed_threads" edge to the Thread entity by IDs.
-func (uc *UserCreate) AddSubscribedThreadIDs(ids ...int) *UserCreate {
-	uc.mutation.AddSubscribedThreadIDs(ids...)
-	return uc
-}
-
-// AddSubscribedThreads adds the "subscribed_threads" edges to the Thread entity.
-func (uc *UserCreate) AddSubscribedThreads(t ...*Thread) *UserCreate {
-	ids := make([]int, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
-	}
-	return uc.AddSubscribedThreadIDs(ids...)
-}
-
-// AddSubscribedCommentIDs adds the "subscribed_comments" edge to the ThreadComment entity by IDs.
-func (uc *UserCreate) AddSubscribedCommentIDs(ids ...int) *UserCreate {
-	uc.mutation.AddSubscribedCommentIDs(ids...)
-	return uc
-}
-
-// AddSubscribedComments adds the "subscribed_comments" edges to the ThreadComment entity.
-func (uc *UserCreate) AddSubscribedComments(t ...*ThreadComment) *UserCreate {
-	ids := make([]int, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
-	}
-	return uc.AddSubscribedCommentIDs(ids...)
-}
-
 // Mutation returns the UserMutation object of the builder.
 func (uc *UserCreate) Mutation() *UserMutation {
 	return uc.mutation
@@ -455,46 +425,6 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		createE := &UserCommentLikeCreate{config: uc.config, mutation: newUserCommentLikeMutation(uc.config, OpCreate)}
-		createE.defaults()
-		_, specE := createE.createSpec()
-		edge.Target.Fields = specE.Fields
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := uc.mutation.SubscribedThreadsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   user.SubscribedThreadsTable,
-			Columns: user.SubscribedThreadsPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(thread.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		createE := &UserThreadSubscriptionCreate{config: uc.config, mutation: newUserThreadSubscriptionMutation(uc.config, OpCreate)}
-		createE.defaults()
-		_, specE := createE.createSpec()
-		edge.Target.Fields = specE.Fields
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := uc.mutation.SubscribedCommentsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   user.SubscribedCommentsTable,
-			Columns: user.SubscribedCommentsPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		createE := &UserCommentSubscriptionCreate{config: uc.config, mutation: newUserCommentSubscriptionMutation(uc.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields

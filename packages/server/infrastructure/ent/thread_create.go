@@ -185,21 +185,6 @@ func (tc *ThreadCreate) AddLikedUsers(u ...*User) *ThreadCreate {
 	return tc.AddLikedUserIDs(ids...)
 }
 
-// AddSubscribedUserIDs adds the "subscribed_users" edge to the User entity by IDs.
-func (tc *ThreadCreate) AddSubscribedUserIDs(ids ...int) *ThreadCreate {
-	tc.mutation.AddSubscribedUserIDs(ids...)
-	return tc
-}
-
-// AddSubscribedUsers adds the "subscribed_users" edges to the User entity.
-func (tc *ThreadCreate) AddSubscribedUsers(u ...*User) *ThreadCreate {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
-	}
-	return tc.AddSubscribedUserIDs(ids...)
-}
-
 // Mutation returns the ThreadMutation object of the builder.
 func (tc *ThreadCreate) Mutation() *ThreadMutation {
 	return tc.mutation
@@ -429,26 +414,6 @@ func (tc *ThreadCreate) createSpec() (*Thread, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		createE := &UserThreadLikeCreate{config: tc.config, mutation: newUserThreadLikeMutation(tc.config, OpCreate)}
-		createE.defaults()
-		_, specE := createE.createSpec()
-		edge.Target.Fields = specE.Fields
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := tc.mutation.SubscribedUsersIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   thread.SubscribedUsersTable,
-			Columns: thread.SubscribedUsersPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		createE := &UserThreadSubscriptionCreate{config: tc.config, mutation: newUserThreadSubscriptionMutation(tc.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields

@@ -655,29 +655,6 @@ func HasLikedUsersWith(preds ...predicate.User) predicate.Thread {
 	})
 }
 
-// HasSubscribedUsers applies the HasEdge predicate on the "subscribed_users" edge.
-func HasSubscribedUsers() predicate.Thread {
-	return predicate.Thread(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, SubscribedUsersTable, SubscribedUsersPrimaryKey...),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasSubscribedUsersWith applies the HasEdge predicate on the "subscribed_users" edge with a given conditions (other predicates).
-func HasSubscribedUsersWith(preds ...predicate.User) predicate.Thread {
-	return predicate.Thread(func(s *sql.Selector) {
-		step := newSubscribedUsersStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
 // HasThreadTags applies the HasEdge predicate on the "thread_tags" edge.
 func HasThreadTags() predicate.Thread {
 	return predicate.Thread(func(s *sql.Selector) {
@@ -716,29 +693,6 @@ func HasUserThreadLike() predicate.Thread {
 func HasUserThreadLikeWith(preds ...predicate.UserThreadLike) predicate.Thread {
 	return predicate.Thread(func(s *sql.Selector) {
 		step := newUserThreadLikeStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasUserThreadSubscription applies the HasEdge predicate on the "user_thread_subscription" edge.
-func HasUserThreadSubscription() predicate.Thread {
-	return predicate.Thread(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, UserThreadSubscriptionTable, UserThreadSubscriptionColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasUserThreadSubscriptionWith applies the HasEdge predicate on the "user_thread_subscription" edge with a given conditions (other predicates).
-func HasUserThreadSubscriptionWith(preds ...predicate.UserThreadSubscription) predicate.Thread {
-	return predicate.Thread(func(s *sql.Selector) {
-		step := newUserThreadSubscriptionStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

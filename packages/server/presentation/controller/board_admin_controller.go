@@ -46,7 +46,7 @@ func (ctrl *BoardAdminController) Update(ctx *gin.Context) {
 
 	boardId, err := strconv.Atoi(ctx.Param("boardId"))
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid board ID"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 

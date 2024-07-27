@@ -55,17 +55,13 @@ type ThreadEdges struct {
 	Tags []*Tag `json:"tags,omitempty"`
 	// LikedUsers holds the value of the liked_users edge.
 	LikedUsers []*User `json:"liked_users,omitempty"`
-	// SubscribedUsers holds the value of the subscribed_users edge.
-	SubscribedUsers []*User `json:"subscribed_users,omitempty"`
 	// ThreadTags holds the value of the thread_tags edge.
 	ThreadTags []*ThreadTag `json:"thread_tags,omitempty"`
 	// UserThreadLike holds the value of the user_thread_like edge.
 	UserThreadLike []*UserThreadLike `json:"user_thread_like,omitempty"`
-	// UserThreadSubscription holds the value of the user_thread_subscription edge.
-	UserThreadSubscription []*UserThreadSubscription `json:"user_thread_subscription,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [9]bool
+	loadedTypes [7]bool
 }
 
 // BoardOrErr returns the Board value or an error if the edge
@@ -117,19 +113,10 @@ func (e ThreadEdges) LikedUsersOrErr() ([]*User, error) {
 	return nil, &NotLoadedError{edge: "liked_users"}
 }
 
-// SubscribedUsersOrErr returns the SubscribedUsers value or an error if the edge
-// was not loaded in eager-loading.
-func (e ThreadEdges) SubscribedUsersOrErr() ([]*User, error) {
-	if e.loadedTypes[5] {
-		return e.SubscribedUsers, nil
-	}
-	return nil, &NotLoadedError{edge: "subscribed_users"}
-}
-
 // ThreadTagsOrErr returns the ThreadTags value or an error if the edge
 // was not loaded in eager-loading.
 func (e ThreadEdges) ThreadTagsOrErr() ([]*ThreadTag, error) {
-	if e.loadedTypes[6] {
+	if e.loadedTypes[5] {
 		return e.ThreadTags, nil
 	}
 	return nil, &NotLoadedError{edge: "thread_tags"}
@@ -138,19 +125,10 @@ func (e ThreadEdges) ThreadTagsOrErr() ([]*ThreadTag, error) {
 // UserThreadLikeOrErr returns the UserThreadLike value or an error if the edge
 // was not loaded in eager-loading.
 func (e ThreadEdges) UserThreadLikeOrErr() ([]*UserThreadLike, error) {
-	if e.loadedTypes[7] {
+	if e.loadedTypes[6] {
 		return e.UserThreadLike, nil
 	}
 	return nil, &NotLoadedError{edge: "user_thread_like"}
-}
-
-// UserThreadSubscriptionOrErr returns the UserThreadSubscription value or an error if the edge
-// was not loaded in eager-loading.
-func (e ThreadEdges) UserThreadSubscriptionOrErr() ([]*UserThreadSubscription, error) {
-	if e.loadedTypes[8] {
-		return e.UserThreadSubscription, nil
-	}
-	return nil, &NotLoadedError{edge: "user_thread_subscription"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -279,11 +257,6 @@ func (t *Thread) QueryLikedUsers() *UserQuery {
 	return NewThreadClient(t.config).QueryLikedUsers(t)
 }
 
-// QuerySubscribedUsers queries the "subscribed_users" edge of the Thread entity.
-func (t *Thread) QuerySubscribedUsers() *UserQuery {
-	return NewThreadClient(t.config).QuerySubscribedUsers(t)
-}
-
 // QueryThreadTags queries the "thread_tags" edge of the Thread entity.
 func (t *Thread) QueryThreadTags() *ThreadTagQuery {
 	return NewThreadClient(t.config).QueryThreadTags(t)
@@ -292,11 +265,6 @@ func (t *Thread) QueryThreadTags() *ThreadTagQuery {
 // QueryUserThreadLike queries the "user_thread_like" edge of the Thread entity.
 func (t *Thread) QueryUserThreadLike() *UserThreadLikeQuery {
 	return NewThreadClient(t.config).QueryUserThreadLike(t)
-}
-
-// QueryUserThreadSubscription queries the "user_thread_subscription" edge of the Thread entity.
-func (t *Thread) QueryUserThreadSubscription() *UserThreadSubscriptionQuery {
-	return NewThreadClient(t.config).QueryUserThreadSubscription(t)
 }
 
 // Update returns a builder for updating this Thread.

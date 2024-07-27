@@ -5,6 +5,25 @@ import (
 	"server/infrastructure/ent"
 )
 
+type ThreadCommentAttachment struct {
+	EntAttachment *ent.ThreadCommentAttachment
+}
+
+type NewThreadCommentAttachmentParams struct {
+	EntAttachment *ent.ThreadCommentAttachment
+	OptionList    []func(*ThreadCommentAttachment)
+}
+
+func NewThreadCommentAttachment(params NewThreadCommentAttachmentParams) *ThreadCommentAttachment {
+	attachment := &ThreadCommentAttachment{EntAttachment: params.EntAttachment}
+
+	for _, option_i := range params.OptionList {
+		option_i(attachment)
+	}
+
+	return attachment
+}
+
 type AttachmentType int
 
 const (
@@ -12,8 +31,15 @@ const (
 	AttachmentTypeVideo
 )
 
-type ThreadCommentAttachment struct {
-	EntAttachment *ent.ThreadCommentAttachment
+func WithAttachmentTypeFromString(s string) func(*ThreadCommentAttachment) {
+	return func(a *ThreadCommentAttachment) {
+		attachmentType, err := AttachmentTypeFromString(s)
+		if err != nil {
+			a.EntAttachment.Type = -1 // Invalid type
+		} else {
+			a.EntAttachment.Type = int(attachmentType)
+		}
+	}
 }
 
 func (m ThreadCommentAttachment) TypeToString() string {
@@ -25,10 +51,6 @@ func (m ThreadCommentAttachment) TypeToString() string {
 	default:
 		return "Unknown"
 	}
-}
-
-func (m ThreadCommentAttachment) TypeToInt() int {
-	return int(m.EntAttachment.Type)
 }
 
 func AttachmentTypeFromString(s string) (AttachmentType, error) {

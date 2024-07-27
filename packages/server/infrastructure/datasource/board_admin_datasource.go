@@ -53,7 +53,10 @@ func (ds *BoardAdminDatasource) FindByID(params BoardAdminFindByIDParams) (*mode
 	if err != nil {
 		return nil, err
 	}
-	return &model.Board{EntBoard: entBoard}, nil
+
+	board := model.NewBoard(model.NewBoardParams{EntBoard: entBoard})
+
+	return board, nil
 }
 
 type BoardAdminFindAllParams struct {
@@ -101,9 +104,7 @@ func (ds *BoardAdminDatasource) FindAll(params BoardAdminFindAllParams) ([]*mode
 
 	var modelBoards []*model.Board
 	for _, entBoard := range entBoards {
-		modelBoards = append(modelBoards, &model.Board{
-			EntBoard: entBoard,
-		})
+		modelBoards = append(modelBoards, model.NewBoard(model.NewBoardParams{EntBoard: entBoard}))
 	}
 
 	return modelBoards, nil
@@ -115,12 +116,7 @@ type BoardAdminUpdateParams struct {
 }
 
 func (ds *BoardAdminDatasource) Update(params BoardAdminUpdateParams) (*model.Board, error) {
-	board, err := ds.client.Board.Get(params.Ctx, params.Board.EntBoard.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	update := board.Update()
+	update := ds.client.Board.UpdateOneID(params.Board.EntBoard.ID)
 
 	if params.Board.EntBoard.Title != "" {
 		update = update.SetTitle(params.Board.EntBoard.Title)
@@ -134,12 +130,16 @@ func (ds *BoardAdminDatasource) Update(params BoardAdminUpdateParams) (*model.Bo
 	if params.Board.EntBoard.ThumbnailURL != nil {
 		update = update.SetThumbnailURL(*params.Board.EntBoard.ThumbnailURL)
 	}
-	update.SetUpdatedAt(time.Now())
+	update = update.SetUpdatedAt(time.Now())
 
-	board, err = update.Save(params.Ctx)
+	entBoard, err := update.Save(params.Ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	return &model.Board{EntBoard: board}, nil
+	board := model.NewBoard(model.NewBoardParams{
+		EntBoard: entBoard,
+	})
+
+	return board, nil
 }

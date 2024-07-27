@@ -5,11 +5,22 @@ import (
 )
 
 type User struct {
-	EntUser                    *ent.User
-	ThreadCommentCount         int         // コメント数
-	ThreadCount                int         // スレッド数
-	ThreadCommentCountMap      map[int]int // スレッド毎のコメント数
-	ThreadCommentReplyCountMap map[int]int // コメント毎のリプライ数
+	EntUser *ent.User
+}
+
+type NewUserParams struct {
+	EntUser    *ent.User
+	OptionList []func(*User)
+}
+
+func NewUser(params NewUserParams) *User {
+	user := &User{EntUser: params.EntUser}
+
+	for _, option_i := range params.OptionList {
+		option_i(user)
+	}
+
+	return user
 }
 
 type UserStatus int
@@ -20,6 +31,25 @@ const (
 	UserStatusSuspended
 	UserStatusInactive
 )
+
+type UserRole int
+
+const (
+	UserRoleMember UserRole = iota
+	UserRoleAdmin
+)
+
+func WithUserStatus(status UserStatus) func(*User) {
+	return func(u *User) {
+		u.EntUser.Status = int(status)
+	}
+}
+
+func WithUserRole(role UserRole) func(*User) {
+	return func(u *User) {
+		u.EntUser.Role = int(role)
+	}
+}
 
 func (m *User) StatusToString() string {
 	switch UserStatus(m.EntUser.Status) {
@@ -51,13 +81,6 @@ func (m *User) StatusToLabel() string {
 	}
 }
 
-type UserRole int
-
-const (
-	UserRoleMember UserRole = iota
-	UserRoleAdmin
-)
-
 func (m *User) RoleToString() string {
 	switch UserRole(m.EntUser.Role) {
 	case UserRoleMember:
@@ -78,12 +101,4 @@ func (m *User) RoleToLabel() string {
 	default:
 		return "不明なステータス"
 	}
-}
-
-func (m *User) IsAdmin() bool {
-	return UserRole(m.EntUser.Role) == UserRoleAdmin
-}
-
-func (m *User) IsMember() bool {
-	return UserRole(m.EntUser.Role) == UserRoleMember
 }

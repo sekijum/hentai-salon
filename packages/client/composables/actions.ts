@@ -4,8 +4,8 @@ import type { IThreadCommentAttachment } from '~/types/thread-comment-attachment
 export const useActions = () => {
   const { $api } = useNuxtApp();
 
-  async function fetchListPresignedUrl(objectNames: string[]): Promise<string[]> {
-    const response = await $api.post<{ urls: string[] }>('/files/urls-for-upload', { objectNames });
+  async function fetchListPresignedUrl(objectNameList: string[]): Promise<string[]> {
+    const response = await $api.post<{ urls: string[] }>('/files/urls-for-upload', { objectNameList });
     return response.data.urls;
   }
 

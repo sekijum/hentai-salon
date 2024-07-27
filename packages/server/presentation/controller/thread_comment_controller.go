@@ -50,7 +50,7 @@ func (ctrl *ThreadCommentController) FindAllByUserID(ctx *gin.Context) {
 func (ctrl *ThreadCommentController) FindById(ctx *gin.Context) {
 	commentID, err := strconv.Atoi(ctx.Param("commentID"))
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "無効なコメントID"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -80,7 +80,7 @@ func (ctrl *ThreadCommentController) FindById(ctx *gin.Context) {
 func (ctrl *ThreadCommentController) Create(ctx *gin.Context) {
 	threadID, err := strconv.Atoi(ctx.Param("threadID"))
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "無効なIDです"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -91,13 +91,15 @@ func (ctrl *ThreadCommentController) Create(ctx *gin.Context) {
 	}
 
 	userID, exists := ctx.Get("userID")
-	if !exists {
-		userID = 0
+	var userIDPtr *int
+	if exists {
+		id := userID.(int)
+		userIDPtr = &id
 	}
 
 	dto, err := ctrl.threadCommentApplicationService.Create(service.ThreadCommentApplicationServiceCreateParams{
 		Ctx:             ctx.Request.Context(),
-		UserID:          userID.(int),
+		UserID:          userIDPtr,
 		ClientIP:        ctx.ClientIP(),
 		ThreadID:        threadID,
 		ParentCommentID: nil,
@@ -114,13 +116,13 @@ func (ctrl *ThreadCommentController) Create(ctx *gin.Context) {
 func (ctrl *ThreadCommentController) Reply(ctx *gin.Context) {
 	threadID, err := strconv.Atoi(ctx.Param("threadID"))
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "無効なIDです"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	parentCommentID, err := strconv.Atoi(ctx.Param("commentID"))
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "無効なコメントIDです"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -131,14 +133,16 @@ func (ctrl *ThreadCommentController) Reply(ctx *gin.Context) {
 	}
 
 	userID, exists := ctx.Get("userID")
-	if !exists {
-		userID = 0
+	var userIDPtr *int
+	if exists {
+		id := userID.(int)
+		userIDPtr = &id
 	}
 
 	dto, err := ctrl.threadCommentApplicationService.Create(service.ThreadCommentApplicationServiceCreateParams{
 		Ctx:             ctx.Request.Context(),
 		ThreadID:        threadID,
-		UserID:          userID.(int),
+		UserID:          userIDPtr,
 		ClientIP:        ctx.ClientIP(),
 		ParentCommentID: &parentCommentID,
 		Body:            body,

@@ -14,6 +14,8 @@ type Tx struct {
 	config
 	// Board is the client for interacting with the Board builders.
 	Board *BoardClient
+	// Contact is the client for interacting with the Contact builders.
+	Contact *ContactClient
 	// Tag is the client for interacting with the Tag builders.
 	Tag *TagClient
 	// Thread is the client for interacting with the Thread builders.
@@ -28,12 +30,8 @@ type Tx struct {
 	User *UserClient
 	// UserCommentLike is the client for interacting with the UserCommentLike builders.
 	UserCommentLike *UserCommentLikeClient
-	// UserCommentSubscription is the client for interacting with the UserCommentSubscription builders.
-	UserCommentSubscription *UserCommentSubscriptionClient
 	// UserThreadLike is the client for interacting with the UserThreadLike builders.
 	UserThreadLike *UserThreadLikeClient
-	// UserThreadSubscription is the client for interacting with the UserThreadSubscription builders.
-	UserThreadSubscription *UserThreadSubscriptionClient
 
 	// lazily loaded.
 	client     *Client
@@ -166,6 +164,7 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.Board = NewBoardClient(tx.config)
+	tx.Contact = NewContactClient(tx.config)
 	tx.Tag = NewTagClient(tx.config)
 	tx.Thread = NewThreadClient(tx.config)
 	tx.ThreadComment = NewThreadCommentClient(tx.config)
@@ -173,9 +172,7 @@ func (tx *Tx) init() {
 	tx.ThreadTag = NewThreadTagClient(tx.config)
 	tx.User = NewUserClient(tx.config)
 	tx.UserCommentLike = NewUserCommentLikeClient(tx.config)
-	tx.UserCommentSubscription = NewUserCommentSubscriptionClient(tx.config)
 	tx.UserThreadLike = NewUserThreadLikeClient(tx.config)
-	tx.UserThreadSubscription = NewUserThreadSubscriptionClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

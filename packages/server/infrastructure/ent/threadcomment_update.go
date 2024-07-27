@@ -248,21 +248,6 @@ func (tcu *ThreadCommentUpdate) AddLikedUsers(u ...*User) *ThreadCommentUpdate {
 	return tcu.AddLikedUserIDs(ids...)
 }
 
-// AddSubscribedUserIDs adds the "subscribed_users" edge to the User entity by IDs.
-func (tcu *ThreadCommentUpdate) AddSubscribedUserIDs(ids ...int) *ThreadCommentUpdate {
-	tcu.mutation.AddSubscribedUserIDs(ids...)
-	return tcu
-}
-
-// AddSubscribedUsers adds the "subscribed_users" edges to the User entity.
-func (tcu *ThreadCommentUpdate) AddSubscribedUsers(u ...*User) *ThreadCommentUpdate {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
-	}
-	return tcu.AddSubscribedUserIDs(ids...)
-}
-
 // Mutation returns the ThreadCommentMutation object of the builder.
 func (tcu *ThreadCommentUpdate) Mutation() *ThreadCommentMutation {
 	return tcu.mutation
@@ -347,27 +332,6 @@ func (tcu *ThreadCommentUpdate) RemoveLikedUsers(u ...*User) *ThreadCommentUpdat
 		ids[i] = u[i].ID
 	}
 	return tcu.RemoveLikedUserIDs(ids...)
-}
-
-// ClearSubscribedUsers clears all "subscribed_users" edges to the User entity.
-func (tcu *ThreadCommentUpdate) ClearSubscribedUsers() *ThreadCommentUpdate {
-	tcu.mutation.ClearSubscribedUsers()
-	return tcu
-}
-
-// RemoveSubscribedUserIDs removes the "subscribed_users" edge to User entities by IDs.
-func (tcu *ThreadCommentUpdate) RemoveSubscribedUserIDs(ids ...int) *ThreadCommentUpdate {
-	tcu.mutation.RemoveSubscribedUserIDs(ids...)
-	return tcu
-}
-
-// RemoveSubscribedUsers removes "subscribed_users" edges to User entities.
-func (tcu *ThreadCommentUpdate) RemoveSubscribedUsers(u ...*User) *ThreadCommentUpdate {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
-	}
-	return tcu.RemoveSubscribedUserIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -694,63 +658,6 @@ func (tcu *ThreadCommentUpdate) sqlSave(ctx context.Context) (n int, err error) 
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if tcu.mutation.SubscribedUsersCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   threadcomment.SubscribedUsersTable,
-			Columns: threadcomment.SubscribedUsersPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
-			},
-		}
-		createE := &UserCommentSubscriptionCreate{config: tcu.config, mutation: newUserCommentSubscriptionMutation(tcu.config, OpCreate)}
-		createE.defaults()
-		_, specE := createE.createSpec()
-		edge.Target.Fields = specE.Fields
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := tcu.mutation.RemovedSubscribedUsersIDs(); len(nodes) > 0 && !tcu.mutation.SubscribedUsersCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   threadcomment.SubscribedUsersTable,
-			Columns: threadcomment.SubscribedUsersPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		createE := &UserCommentSubscriptionCreate{config: tcu.config, mutation: newUserCommentSubscriptionMutation(tcu.config, OpCreate)}
-		createE.defaults()
-		_, specE := createE.createSpec()
-		edge.Target.Fields = specE.Fields
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := tcu.mutation.SubscribedUsersIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   threadcomment.SubscribedUsersTable,
-			Columns: threadcomment.SubscribedUsersPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		createE := &UserCommentSubscriptionCreate{config: tcu.config, mutation: newUserCommentSubscriptionMutation(tcu.config, OpCreate)}
-		createE.defaults()
-		_, specE := createE.createSpec()
-		edge.Target.Fields = specE.Fields
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
 	if n, err = sqlgraph.UpdateNodes(ctx, tcu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{threadcomment.Label}
@@ -988,21 +895,6 @@ func (tcuo *ThreadCommentUpdateOne) AddLikedUsers(u ...*User) *ThreadCommentUpda
 	return tcuo.AddLikedUserIDs(ids...)
 }
 
-// AddSubscribedUserIDs adds the "subscribed_users" edge to the User entity by IDs.
-func (tcuo *ThreadCommentUpdateOne) AddSubscribedUserIDs(ids ...int) *ThreadCommentUpdateOne {
-	tcuo.mutation.AddSubscribedUserIDs(ids...)
-	return tcuo
-}
-
-// AddSubscribedUsers adds the "subscribed_users" edges to the User entity.
-func (tcuo *ThreadCommentUpdateOne) AddSubscribedUsers(u ...*User) *ThreadCommentUpdateOne {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
-	}
-	return tcuo.AddSubscribedUserIDs(ids...)
-}
-
 // Mutation returns the ThreadCommentMutation object of the builder.
 func (tcuo *ThreadCommentUpdateOne) Mutation() *ThreadCommentMutation {
 	return tcuo.mutation
@@ -1087,27 +979,6 @@ func (tcuo *ThreadCommentUpdateOne) RemoveLikedUsers(u ...*User) *ThreadCommentU
 		ids[i] = u[i].ID
 	}
 	return tcuo.RemoveLikedUserIDs(ids...)
-}
-
-// ClearSubscribedUsers clears all "subscribed_users" edges to the User entity.
-func (tcuo *ThreadCommentUpdateOne) ClearSubscribedUsers() *ThreadCommentUpdateOne {
-	tcuo.mutation.ClearSubscribedUsers()
-	return tcuo
-}
-
-// RemoveSubscribedUserIDs removes the "subscribed_users" edge to User entities by IDs.
-func (tcuo *ThreadCommentUpdateOne) RemoveSubscribedUserIDs(ids ...int) *ThreadCommentUpdateOne {
-	tcuo.mutation.RemoveSubscribedUserIDs(ids...)
-	return tcuo
-}
-
-// RemoveSubscribedUsers removes "subscribed_users" edges to User entities.
-func (tcuo *ThreadCommentUpdateOne) RemoveSubscribedUsers(u ...*User) *ThreadCommentUpdateOne {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
-	}
-	return tcuo.RemoveSubscribedUserIDs(ids...)
 }
 
 // Where appends a list predicates to the ThreadCommentUpdate builder.
@@ -1459,63 +1330,6 @@ func (tcuo *ThreadCommentUpdateOne) sqlSave(ctx context.Context) (_node *ThreadC
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		createE := &UserCommentLikeCreate{config: tcuo.config, mutation: newUserCommentLikeMutation(tcuo.config, OpCreate)}
-		createE.defaults()
-		_, specE := createE.createSpec()
-		edge.Target.Fields = specE.Fields
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if tcuo.mutation.SubscribedUsersCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   threadcomment.SubscribedUsersTable,
-			Columns: threadcomment.SubscribedUsersPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
-			},
-		}
-		createE := &UserCommentSubscriptionCreate{config: tcuo.config, mutation: newUserCommentSubscriptionMutation(tcuo.config, OpCreate)}
-		createE.defaults()
-		_, specE := createE.createSpec()
-		edge.Target.Fields = specE.Fields
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := tcuo.mutation.RemovedSubscribedUsersIDs(); len(nodes) > 0 && !tcuo.mutation.SubscribedUsersCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   threadcomment.SubscribedUsersTable,
-			Columns: threadcomment.SubscribedUsersPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		createE := &UserCommentSubscriptionCreate{config: tcuo.config, mutation: newUserCommentSubscriptionMutation(tcuo.config, OpCreate)}
-		createE.defaults()
-		_, specE := createE.createSpec()
-		edge.Target.Fields = specE.Fields
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := tcuo.mutation.SubscribedUsersIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   threadcomment.SubscribedUsersTable,
-			Columns: threadcomment.SubscribedUsersPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		createE := &UserCommentSubscriptionCreate{config: tcuo.config, mutation: newUserCommentSubscriptionMutation(tcuo.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields

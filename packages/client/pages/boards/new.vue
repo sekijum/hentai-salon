@@ -93,6 +93,7 @@ async function submit() {
         form.value.thumbnailUrl = thumbnailUrl;
       }
       await $api.post('/admin/boards', form.value);
+      alert('板を作成しました。');
       router.push('/');
     }
   } catch (error) {

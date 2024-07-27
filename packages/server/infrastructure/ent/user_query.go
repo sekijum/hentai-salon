@@ -13,9 +13,7 @@ import (
 	"server/infrastructure/ent/threadcomment"
 	"server/infrastructure/ent/user"
 	"server/infrastructure/ent/usercommentlike"
-	"server/infrastructure/ent/usercommentsubscription"
 	"server/infrastructure/ent/userthreadlike"
-	"server/infrastructure/ent/userthreadsubscription"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -25,21 +23,17 @@ import (
 // UserQuery is the builder for querying User entities.
 type UserQuery struct {
 	config
-	ctx                         *QueryContext
-	order                       []user.OrderOption
-	inters                      []Interceptor
-	predicates                  []predicate.User
-	withBoards                  *BoardQuery
-	withThreads                 *ThreadQuery
-	withComments                *ThreadCommentQuery
-	withLikedThreads            *ThreadQuery
-	withLikedComments           *ThreadCommentQuery
-	withSubscribedThreads       *ThreadQuery
-	withSubscribedComments      *ThreadCommentQuery
-	withUserThreadLike          *UserThreadLikeQuery
-	withUserCommentLike         *UserCommentLikeQuery
-	withUserThreadSubscription  *UserThreadSubscriptionQuery
-	withUserCommentSubscription *UserCommentSubscriptionQuery
+	ctx                 *QueryContext
+	order               []user.OrderOption
+	inters              []Interceptor
+	predicates          []predicate.User
+	withBoards          *BoardQuery
+	withThreads         *ThreadQuery
+	withComments        *ThreadCommentQuery
+	withLikedThreads    *ThreadQuery
+	withLikedComments   *ThreadCommentQuery
+	withUserThreadLike  *UserThreadLikeQuery
+	withUserCommentLike *UserCommentLikeQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -186,50 +180,6 @@ func (uq *UserQuery) QueryLikedComments() *ThreadCommentQuery {
 	return query
 }
 
-// QuerySubscribedThreads chains the current query on the "subscribed_threads" edge.
-func (uq *UserQuery) QuerySubscribedThreads() *ThreadQuery {
-	query := (&ThreadClient{config: uq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := uq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := uq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(user.Table, user.FieldID, selector),
-			sqlgraph.To(thread.Table, thread.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, user.SubscribedThreadsTable, user.SubscribedThreadsPrimaryKey...),
-		)
-		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QuerySubscribedComments chains the current query on the "subscribed_comments" edge.
-func (uq *UserQuery) QuerySubscribedComments() *ThreadCommentQuery {
-	query := (&ThreadCommentClient{config: uq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := uq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := uq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(user.Table, user.FieldID, selector),
-			sqlgraph.To(threadcomment.Table, threadcomment.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, user.SubscribedCommentsTable, user.SubscribedCommentsPrimaryKey...),
-		)
-		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
 // QueryUserThreadLike chains the current query on the "user_thread_like" edge.
 func (uq *UserQuery) QueryUserThreadLike() *UserThreadLikeQuery {
 	query := (&UserThreadLikeClient{config: uq.config}).Query()
@@ -267,50 +217,6 @@ func (uq *UserQuery) QueryUserCommentLike() *UserCommentLikeQuery {
 			sqlgraph.From(user.Table, user.FieldID, selector),
 			sqlgraph.To(usercommentlike.Table, usercommentlike.UserColumn),
 			sqlgraph.Edge(sqlgraph.O2M, true, user.UserCommentLikeTable, user.UserCommentLikeColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryUserThreadSubscription chains the current query on the "user_thread_subscription" edge.
-func (uq *UserQuery) QueryUserThreadSubscription() *UserThreadSubscriptionQuery {
-	query := (&UserThreadSubscriptionClient{config: uq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := uq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := uq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(user.Table, user.FieldID, selector),
-			sqlgraph.To(userthreadsubscription.Table, userthreadsubscription.UserColumn),
-			sqlgraph.Edge(sqlgraph.O2M, true, user.UserThreadSubscriptionTable, user.UserThreadSubscriptionColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryUserCommentSubscription chains the current query on the "user_comment_subscription" edge.
-func (uq *UserQuery) QueryUserCommentSubscription() *UserCommentSubscriptionQuery {
-	query := (&UserCommentSubscriptionClient{config: uq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := uq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := uq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(user.Table, user.FieldID, selector),
-			sqlgraph.To(usercommentsubscription.Table, usercommentsubscription.UserColumn),
-			sqlgraph.Edge(sqlgraph.O2M, true, user.UserCommentSubscriptionTable, user.UserCommentSubscriptionColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
 		return fromU, nil
@@ -505,22 +411,18 @@ func (uq *UserQuery) Clone() *UserQuery {
 		return nil
 	}
 	return &UserQuery{
-		config:                      uq.config,
-		ctx:                         uq.ctx.Clone(),
-		order:                       append([]user.OrderOption{}, uq.order...),
-		inters:                      append([]Interceptor{}, uq.inters...),
-		predicates:                  append([]predicate.User{}, uq.predicates...),
-		withBoards:                  uq.withBoards.Clone(),
-		withThreads:                 uq.withThreads.Clone(),
-		withComments:                uq.withComments.Clone(),
-		withLikedThreads:            uq.withLikedThreads.Clone(),
-		withLikedComments:           uq.withLikedComments.Clone(),
-		withSubscribedThreads:       uq.withSubscribedThreads.Clone(),
-		withSubscribedComments:      uq.withSubscribedComments.Clone(),
-		withUserThreadLike:          uq.withUserThreadLike.Clone(),
-		withUserCommentLike:         uq.withUserCommentLike.Clone(),
-		withUserThreadSubscription:  uq.withUserThreadSubscription.Clone(),
-		withUserCommentSubscription: uq.withUserCommentSubscription.Clone(),
+		config:              uq.config,
+		ctx:                 uq.ctx.Clone(),
+		order:               append([]user.OrderOption{}, uq.order...),
+		inters:              append([]Interceptor{}, uq.inters...),
+		predicates:          append([]predicate.User{}, uq.predicates...),
+		withBoards:          uq.withBoards.Clone(),
+		withThreads:         uq.withThreads.Clone(),
+		withComments:        uq.withComments.Clone(),
+		withLikedThreads:    uq.withLikedThreads.Clone(),
+		withLikedComments:   uq.withLikedComments.Clone(),
+		withUserThreadLike:  uq.withUserThreadLike.Clone(),
+		withUserCommentLike: uq.withUserCommentLike.Clone(),
 		// clone intermediate query.
 		sql:  uq.sql.Clone(),
 		path: uq.path,
@@ -582,28 +484,6 @@ func (uq *UserQuery) WithLikedComments(opts ...func(*ThreadCommentQuery)) *UserQ
 	return uq
 }
 
-// WithSubscribedThreads tells the query-builder to eager-load the nodes that are connected to
-// the "subscribed_threads" edge. The optional arguments are used to configure the query builder of the edge.
-func (uq *UserQuery) WithSubscribedThreads(opts ...func(*ThreadQuery)) *UserQuery {
-	query := (&ThreadClient{config: uq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	uq.withSubscribedThreads = query
-	return uq
-}
-
-// WithSubscribedComments tells the query-builder to eager-load the nodes that are connected to
-// the "subscribed_comments" edge. The optional arguments are used to configure the query builder of the edge.
-func (uq *UserQuery) WithSubscribedComments(opts ...func(*ThreadCommentQuery)) *UserQuery {
-	query := (&ThreadCommentClient{config: uq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	uq.withSubscribedComments = query
-	return uq
-}
-
 // WithUserThreadLike tells the query-builder to eager-load the nodes that are connected to
 // the "user_thread_like" edge. The optional arguments are used to configure the query builder of the edge.
 func (uq *UserQuery) WithUserThreadLike(opts ...func(*UserThreadLikeQuery)) *UserQuery {
@@ -623,28 +503,6 @@ func (uq *UserQuery) WithUserCommentLike(opts ...func(*UserCommentLikeQuery)) *U
 		opt(query)
 	}
 	uq.withUserCommentLike = query
-	return uq
-}
-
-// WithUserThreadSubscription tells the query-builder to eager-load the nodes that are connected to
-// the "user_thread_subscription" edge. The optional arguments are used to configure the query builder of the edge.
-func (uq *UserQuery) WithUserThreadSubscription(opts ...func(*UserThreadSubscriptionQuery)) *UserQuery {
-	query := (&UserThreadSubscriptionClient{config: uq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	uq.withUserThreadSubscription = query
-	return uq
-}
-
-// WithUserCommentSubscription tells the query-builder to eager-load the nodes that are connected to
-// the "user_comment_subscription" edge. The optional arguments are used to configure the query builder of the edge.
-func (uq *UserQuery) WithUserCommentSubscription(opts ...func(*UserCommentSubscriptionQuery)) *UserQuery {
-	query := (&UserCommentSubscriptionClient{config: uq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	uq.withUserCommentSubscription = query
 	return uq
 }
 
@@ -726,18 +584,14 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 	var (
 		nodes       = []*User{}
 		_spec       = uq.querySpec()
-		loadedTypes = [11]bool{
+		loadedTypes = [7]bool{
 			uq.withBoards != nil,
 			uq.withThreads != nil,
 			uq.withComments != nil,
 			uq.withLikedThreads != nil,
 			uq.withLikedComments != nil,
-			uq.withSubscribedThreads != nil,
-			uq.withSubscribedComments != nil,
 			uq.withUserThreadLike != nil,
 			uq.withUserCommentLike != nil,
-			uq.withUserThreadSubscription != nil,
-			uq.withUserCommentSubscription != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -793,20 +647,6 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 			return nil, err
 		}
 	}
-	if query := uq.withSubscribedThreads; query != nil {
-		if err := uq.loadSubscribedThreads(ctx, query, nodes,
-			func(n *User) { n.Edges.SubscribedThreads = []*Thread{} },
-			func(n *User, e *Thread) { n.Edges.SubscribedThreads = append(n.Edges.SubscribedThreads, e) }); err != nil {
-			return nil, err
-		}
-	}
-	if query := uq.withSubscribedComments; query != nil {
-		if err := uq.loadSubscribedComments(ctx, query, nodes,
-			func(n *User) { n.Edges.SubscribedComments = []*ThreadComment{} },
-			func(n *User, e *ThreadComment) { n.Edges.SubscribedComments = append(n.Edges.SubscribedComments, e) }); err != nil {
-			return nil, err
-		}
-	}
 	if query := uq.withUserThreadLike; query != nil {
 		if err := uq.loadUserThreadLike(ctx, query, nodes,
 			func(n *User) { n.Edges.UserThreadLike = []*UserThreadLike{} },
@@ -818,24 +658,6 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 		if err := uq.loadUserCommentLike(ctx, query, nodes,
 			func(n *User) { n.Edges.UserCommentLike = []*UserCommentLike{} },
 			func(n *User, e *UserCommentLike) { n.Edges.UserCommentLike = append(n.Edges.UserCommentLike, e) }); err != nil {
-			return nil, err
-		}
-	}
-	if query := uq.withUserThreadSubscription; query != nil {
-		if err := uq.loadUserThreadSubscription(ctx, query, nodes,
-			func(n *User) { n.Edges.UserThreadSubscription = []*UserThreadSubscription{} },
-			func(n *User, e *UserThreadSubscription) {
-				n.Edges.UserThreadSubscription = append(n.Edges.UserThreadSubscription, e)
-			}); err != nil {
-			return nil, err
-		}
-	}
-	if query := uq.withUserCommentSubscription; query != nil {
-		if err := uq.loadUserCommentSubscription(ctx, query, nodes,
-			func(n *User) { n.Edges.UserCommentSubscription = []*UserCommentSubscription{} },
-			func(n *User, e *UserCommentSubscription) {
-				n.Edges.UserCommentSubscription = append(n.Edges.UserCommentSubscription, e)
-			}); err != nil {
 			return nil, err
 		}
 	}
@@ -1057,128 +879,6 @@ func (uq *UserQuery) loadLikedComments(ctx context.Context, query *ThreadComment
 	}
 	return nil
 }
-func (uq *UserQuery) loadSubscribedThreads(ctx context.Context, query *ThreadQuery, nodes []*User, init func(*User), assign func(*User, *Thread)) error {
-	edgeIDs := make([]driver.Value, len(nodes))
-	byID := make(map[int]*User)
-	nids := make(map[int]map[*User]struct{})
-	for i, node := range nodes {
-		edgeIDs[i] = node.ID
-		byID[node.ID] = node
-		if init != nil {
-			init(node)
-		}
-	}
-	query.Where(func(s *sql.Selector) {
-		joinT := sql.Table(user.SubscribedThreadsTable)
-		s.Join(joinT).On(s.C(thread.FieldID), joinT.C(user.SubscribedThreadsPrimaryKey[1]))
-		s.Where(sql.InValues(joinT.C(user.SubscribedThreadsPrimaryKey[0]), edgeIDs...))
-		columns := s.SelectedColumns()
-		s.Select(joinT.C(user.SubscribedThreadsPrimaryKey[0]))
-		s.AppendSelect(columns...)
-		s.SetDistinct(false)
-	})
-	if err := query.prepareQuery(ctx); err != nil {
-		return err
-	}
-	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
-		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
-			assign := spec.Assign
-			values := spec.ScanValues
-			spec.ScanValues = func(columns []string) ([]any, error) {
-				values, err := values(columns[1:])
-				if err != nil {
-					return nil, err
-				}
-				return append([]any{new(sql.NullInt64)}, values...), nil
-			}
-			spec.Assign = func(columns []string, values []any) error {
-				outValue := int(values[0].(*sql.NullInt64).Int64)
-				inValue := int(values[1].(*sql.NullInt64).Int64)
-				if nids[inValue] == nil {
-					nids[inValue] = map[*User]struct{}{byID[outValue]: {}}
-					return assign(columns[1:], values[1:])
-				}
-				nids[inValue][byID[outValue]] = struct{}{}
-				return nil
-			}
-		})
-	})
-	neighbors, err := withInterceptors[[]*Thread](ctx, query, qr, query.inters)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected "subscribed_threads" node returned %v`, n.ID)
-		}
-		for kn := range nodes {
-			assign(kn, n)
-		}
-	}
-	return nil
-}
-func (uq *UserQuery) loadSubscribedComments(ctx context.Context, query *ThreadCommentQuery, nodes []*User, init func(*User), assign func(*User, *ThreadComment)) error {
-	edgeIDs := make([]driver.Value, len(nodes))
-	byID := make(map[int]*User)
-	nids := make(map[int]map[*User]struct{})
-	for i, node := range nodes {
-		edgeIDs[i] = node.ID
-		byID[node.ID] = node
-		if init != nil {
-			init(node)
-		}
-	}
-	query.Where(func(s *sql.Selector) {
-		joinT := sql.Table(user.SubscribedCommentsTable)
-		s.Join(joinT).On(s.C(threadcomment.FieldID), joinT.C(user.SubscribedCommentsPrimaryKey[1]))
-		s.Where(sql.InValues(joinT.C(user.SubscribedCommentsPrimaryKey[0]), edgeIDs...))
-		columns := s.SelectedColumns()
-		s.Select(joinT.C(user.SubscribedCommentsPrimaryKey[0]))
-		s.AppendSelect(columns...)
-		s.SetDistinct(false)
-	})
-	if err := query.prepareQuery(ctx); err != nil {
-		return err
-	}
-	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
-		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
-			assign := spec.Assign
-			values := spec.ScanValues
-			spec.ScanValues = func(columns []string) ([]any, error) {
-				values, err := values(columns[1:])
-				if err != nil {
-					return nil, err
-				}
-				return append([]any{new(sql.NullInt64)}, values...), nil
-			}
-			spec.Assign = func(columns []string, values []any) error {
-				outValue := int(values[0].(*sql.NullInt64).Int64)
-				inValue := int(values[1].(*sql.NullInt64).Int64)
-				if nids[inValue] == nil {
-					nids[inValue] = map[*User]struct{}{byID[outValue]: {}}
-					return assign(columns[1:], values[1:])
-				}
-				nids[inValue][byID[outValue]] = struct{}{}
-				return nil
-			}
-		})
-	})
-	neighbors, err := withInterceptors[[]*ThreadComment](ctx, query, qr, query.inters)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected "subscribed_comments" node returned %v`, n.ID)
-		}
-		for kn := range nodes {
-			assign(kn, n)
-		}
-	}
-	return nil
-}
 func (uq *UserQuery) loadUserThreadLike(ctx context.Context, query *UserThreadLikeQuery, nodes []*User, init func(*User), assign func(*User, *UserThreadLike)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*User)
@@ -1224,66 +924,6 @@ func (uq *UserQuery) loadUserCommentLike(ctx context.Context, query *UserComment
 	}
 	query.Where(predicate.UserCommentLike(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(user.UserCommentLikeColumn), fks...))
-	}))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		fk := n.UserID
-		node, ok := nodeids[fk]
-		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "user_id" returned %v for node %v`, fk, n)
-		}
-		assign(node, n)
-	}
-	return nil
-}
-func (uq *UserQuery) loadUserThreadSubscription(ctx context.Context, query *UserThreadSubscriptionQuery, nodes []*User, init func(*User), assign func(*User, *UserThreadSubscription)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*User)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
-		}
-	}
-	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(userthreadsubscription.FieldUserID)
-	}
-	query.Where(predicate.UserThreadSubscription(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(user.UserThreadSubscriptionColumn), fks...))
-	}))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		fk := n.UserID
-		node, ok := nodeids[fk]
-		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "user_id" returned %v for node %v`, fk, n)
-		}
-		assign(node, n)
-	}
-	return nil
-}
-func (uq *UserQuery) loadUserCommentSubscription(ctx context.Context, query *UserCommentSubscriptionQuery, nodes []*User, init func(*User), assign func(*User, *UserCommentSubscription)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*User)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
-		}
-	}
-	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(usercommentsubscription.FieldUserID)
-	}
-	query.Where(predicate.UserCommentSubscription(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(user.UserCommentSubscriptionColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {

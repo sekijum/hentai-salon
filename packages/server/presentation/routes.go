@@ -21,6 +21,8 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 		c.JSON(200, gin.H{"message": "ok"})
 	})
 
+	r.POST("/contact", controllers.ContactController.Create)
+
 	r.POST("/signup", controllers.UserController.Signup)
 	r.POST("/signin", controllers.UserController.Signin)
 
@@ -29,7 +31,9 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 	r.PATCH("/reset-password", controllers.UserController.ResetPassword)
 
 	r.GET("/tags/name", controllers.TagController.FindNameList)
+
 	r.GET("/boards", controllers.BoardController.FindAll)
+
 	r.POST("/files/urls-for-upload", controllers.StorageController.GeneratePresignedURLs)
 
 	threadGroup := r.Group("/threads")

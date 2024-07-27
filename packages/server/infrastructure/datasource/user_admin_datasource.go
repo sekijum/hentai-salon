@@ -55,7 +55,10 @@ func (ds *UserAdminDatasource) FindByID(params UserAdminDatasourceFindByIDParams
 			return nil, err
 		}
 	}
-	return &model.User{EntUser: entUser}, nil
+
+	user := model.NewUser(model.NewUserParams{EntUser: entUser})
+
+	return user, nil
 }
 
 type UserAdminDatasourceFindAllParams struct {
@@ -93,16 +96,14 @@ func (ds *UserAdminDatasource) FindAll(params UserAdminDatasourceFindAllParams) 
 	query = query.Limit(params.Limit)
 	query = query.Offset(params.Offset)
 
-	entUsers, err := query.All(params.Ctx)
+	entUserList, err := query.All(params.Ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	var modelUsers []*model.User
-	for _, entUser := range entUsers {
-		modelUsers = append(modelUsers, &model.User{
-			EntUser: entUser,
-		})
+	for _, entUser_i := range entUserList {
+		modelUsers = append(modelUsers, model.NewUser(model.NewUserParams{EntUser: entUser_i}))
 	}
 
 	return modelUsers, nil
@@ -114,12 +115,7 @@ type UserAdminDatasourceUpdateParams struct {
 }
 
 func (ds *UserAdminDatasource) Update(params UserAdminDatasourceUpdateParams) (*model.User, error) {
-	user, err := ds.client.User.Get(params.Ctx, params.User.EntUser.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	update := user.Update()
+	update := ds.client.User.UpdateOneID(params.User.EntUser.ID)
 
 	if params.User.EntUser.Role != 0 {
 		update = update.SetRole(params.User.EntUser.Role)
@@ -139,12 +135,16 @@ func (ds *UserAdminDatasource) Update(params UserAdminDatasourceUpdateParams) (*
 	if params.User.EntUser.Status != 0 {
 		update = update.SetStatus(params.User.EntUser.Status)
 	}
-	update.SetUpdatedAt(time.Now())
+	update = update.SetUpdatedAt(time.Now())
 
-	user, err = update.Save(params.Ctx)
+	entUser, err := update.Save(params.Ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	return &model.User{EntUser: user}, nil
+	user := model.NewUser(model.NewUserParams{
+		EntUser: entUser,
+	})
+
+	return user, nil
 }

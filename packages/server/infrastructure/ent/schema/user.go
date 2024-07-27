@@ -16,7 +16,7 @@ func (User) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("id").Unique().Immutable(),
 		field.String("name").MaxLen(20),
-		field.String("email").Unique().MaxLen(254),
+		field.String("email").Unique().MaxLen(255),
 		field.String("password"),
 		field.String("profile_link").Optional().Nillable(),
 		field.Int("status").Default(0).Comment("0: Active, 1: Withdrawn, 2: Suspended, 2: Inactive"),
@@ -33,7 +33,5 @@ func (User) Edges() []ent.Edge {
 		edge.To("comments", ThreadComment.Type),
 		edge.To("liked_threads", Thread.Type).Through("user_thread_like", UserThreadLike.Type),
 		edge.To("liked_comments", ThreadComment.Type).Through("user_comment_like", UserCommentLike.Type),
-		edge.To("subscribed_threads", Thread.Type).Through("user_thread_subscription", UserThreadSubscription.Type),
-		edge.To("subscribed_comments", ThreadComment.Type).Through("user_comment_subscription", UserCommentSubscription.Type),
 	}
 }

@@ -12,6 +12,7 @@ import (
 	"server/infrastructure/ent/migrate"
 
 	"server/infrastructure/ent/board"
+	"server/infrastructure/ent/contact"
 	"server/infrastructure/ent/tag"
 	"server/infrastructure/ent/thread"
 	"server/infrastructure/ent/threadcomment"
@@ -19,9 +20,7 @@ import (
 	"server/infrastructure/ent/threadtag"
 	"server/infrastructure/ent/user"
 	"server/infrastructure/ent/usercommentlike"
-	"server/infrastructure/ent/usercommentsubscription"
 	"server/infrastructure/ent/userthreadlike"
-	"server/infrastructure/ent/userthreadsubscription"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
@@ -36,6 +35,8 @@ type Client struct {
 	Schema *migrate.Schema
 	// Board is the client for interacting with the Board builders.
 	Board *BoardClient
+	// Contact is the client for interacting with the Contact builders.
+	Contact *ContactClient
 	// Tag is the client for interacting with the Tag builders.
 	Tag *TagClient
 	// Thread is the client for interacting with the Thread builders.
@@ -50,12 +51,8 @@ type Client struct {
 	User *UserClient
 	// UserCommentLike is the client for interacting with the UserCommentLike builders.
 	UserCommentLike *UserCommentLikeClient
-	// UserCommentSubscription is the client for interacting with the UserCommentSubscription builders.
-	UserCommentSubscription *UserCommentSubscriptionClient
 	// UserThreadLike is the client for interacting with the UserThreadLike builders.
 	UserThreadLike *UserThreadLikeClient
-	// UserThreadSubscription is the client for interacting with the UserThreadSubscription builders.
-	UserThreadSubscription *UserThreadSubscriptionClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -68,6 +65,7 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Board = NewBoardClient(c.config)
+	c.Contact = NewContactClient(c.config)
 	c.Tag = NewTagClient(c.config)
 	c.Thread = NewThreadClient(c.config)
 	c.ThreadComment = NewThreadCommentClient(c.config)
@@ -75,9 +73,7 @@ func (c *Client) init() {
 	c.ThreadTag = NewThreadTagClient(c.config)
 	c.User = NewUserClient(c.config)
 	c.UserCommentLike = NewUserCommentLikeClient(c.config)
-	c.UserCommentSubscription = NewUserCommentSubscriptionClient(c.config)
 	c.UserThreadLike = NewUserThreadLikeClient(c.config)
-	c.UserThreadSubscription = NewUserThreadSubscriptionClient(c.config)
 }
 
 type (
@@ -171,6 +167,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ctx:                     ctx,
 		config:                  cfg,
 		Board:                   NewBoardClient(cfg),
+		Contact:                 NewContactClient(cfg),
 		Tag:                     NewTagClient(cfg),
 		Thread:                  NewThreadClient(cfg),
 		ThreadComment:           NewThreadCommentClient(cfg),
@@ -178,9 +175,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ThreadTag:               NewThreadTagClient(cfg),
 		User:                    NewUserClient(cfg),
 		UserCommentLike:         NewUserCommentLikeClient(cfg),
-		UserCommentSubscription: NewUserCommentSubscriptionClient(cfg),
 		UserThreadLike:          NewUserThreadLikeClient(cfg),
-		UserThreadSubscription:  NewUserThreadSubscriptionClient(cfg),
 	}, nil
 }
 
@@ -201,6 +196,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ctx:                     ctx,
 		config:                  cfg,
 		Board:                   NewBoardClient(cfg),
+		Contact:                 NewContactClient(cfg),
 		Tag:                     NewTagClient(cfg),
 		Thread:                  NewThreadClient(cfg),
 		ThreadComment:           NewThreadCommentClient(cfg),
@@ -208,9 +204,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ThreadTag:               NewThreadTagClient(cfg),
 		User:                    NewUserClient(cfg),
 		UserCommentLike:         NewUserCommentLikeClient(cfg),
-		UserCommentSubscription: NewUserCommentSubscriptionClient(cfg),
 		UserThreadLike:          NewUserThreadLikeClient(cfg),
-		UserThreadSubscription:  NewUserThreadSubscriptionClient(cfg),
 	}, nil
 }
 
@@ -240,9 +234,8 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.Board, c.Tag, c.Thread, c.ThreadComment, c.ThreadCommentAttachment,
-		c.ThreadTag, c.User, c.UserCommentLike, c.UserCommentSubscription,
-		c.UserThreadLike, c.UserThreadSubscription,
+		c.Board, c.Contact, c.Tag, c.Thread, c.ThreadComment, c.ThreadCommentAttachment,
+		c.ThreadTag, c.User, c.UserCommentLike, c.UserThreadLike,
 	} {
 		n.Use(hooks...)
 	}
@@ -252,9 +245,8 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.Board, c.Tag, c.Thread, c.ThreadComment, c.ThreadCommentAttachment,
-		c.ThreadTag, c.User, c.UserCommentLike, c.UserCommentSubscription,
-		c.UserThreadLike, c.UserThreadSubscription,
+		c.Board, c.Contact, c.Tag, c.Thread, c.ThreadComment, c.ThreadCommentAttachment,
+		c.ThreadTag, c.User, c.UserCommentLike, c.UserThreadLike,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -265,6 +257,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
 	case *BoardMutation:
 		return c.Board.mutate(ctx, m)
+	case *ContactMutation:
+		return c.Contact.mutate(ctx, m)
 	case *TagMutation:
 		return c.Tag.mutate(ctx, m)
 	case *ThreadMutation:
@@ -279,12 +273,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.User.mutate(ctx, m)
 	case *UserCommentLikeMutation:
 		return c.UserCommentLike.mutate(ctx, m)
-	case *UserCommentSubscriptionMutation:
-		return c.UserCommentSubscription.mutate(ctx, m)
 	case *UserThreadLikeMutation:
 		return c.UserThreadLike.mutate(ctx, m)
-	case *UserThreadSubscriptionMutation:
-		return c.UserThreadSubscription.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
 	}
@@ -452,6 +442,139 @@ func (c *BoardClient) mutate(ctx context.Context, m *BoardMutation) (Value, erro
 		return (&BoardDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Board mutation op: %q", m.Op())
+	}
+}
+
+// ContactClient is a client for the Contact schema.
+type ContactClient struct {
+	config
+}
+
+// NewContactClient returns a client for the Contact from the given config.
+func NewContactClient(c config) *ContactClient {
+	return &ContactClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `contact.Hooks(f(g(h())))`.
+func (c *ContactClient) Use(hooks ...Hook) {
+	c.hooks.Contact = append(c.hooks.Contact, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `contact.Intercept(f(g(h())))`.
+func (c *ContactClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Contact = append(c.inters.Contact, interceptors...)
+}
+
+// Create returns a builder for creating a Contact entity.
+func (c *ContactClient) Create() *ContactCreate {
+	mutation := newContactMutation(c.config, OpCreate)
+	return &ContactCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Contact entities.
+func (c *ContactClient) CreateBulk(builders ...*ContactCreate) *ContactCreateBulk {
+	return &ContactCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ContactClient) MapCreateBulk(slice any, setFunc func(*ContactCreate, int)) *ContactCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ContactCreateBulk{err: fmt.Errorf("calling to ContactClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ContactCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ContactCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Contact.
+func (c *ContactClient) Update() *ContactUpdate {
+	mutation := newContactMutation(c.config, OpUpdate)
+	return &ContactUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ContactClient) UpdateOne(co *Contact) *ContactUpdateOne {
+	mutation := newContactMutation(c.config, OpUpdateOne, withContact(co))
+	return &ContactUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ContactClient) UpdateOneID(id int) *ContactUpdateOne {
+	mutation := newContactMutation(c.config, OpUpdateOne, withContactID(id))
+	return &ContactUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Contact.
+func (c *ContactClient) Delete() *ContactDelete {
+	mutation := newContactMutation(c.config, OpDelete)
+	return &ContactDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ContactClient) DeleteOne(co *Contact) *ContactDeleteOne {
+	return c.DeleteOneID(co.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ContactClient) DeleteOneID(id int) *ContactDeleteOne {
+	builder := c.Delete().Where(contact.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ContactDeleteOne{builder}
+}
+
+// Query returns a query builder for Contact.
+func (c *ContactClient) Query() *ContactQuery {
+	return &ContactQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeContact},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Contact entity by its id.
+func (c *ContactClient) Get(ctx context.Context, id int) (*Contact, error) {
+	return c.Query().Where(contact.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ContactClient) GetX(ctx context.Context, id int) *Contact {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ContactClient) Hooks() []Hook {
+	return c.hooks.Contact
+}
+
+// Interceptors returns the client interceptors.
+func (c *ContactClient) Interceptors() []Interceptor {
+	return c.inters.Contact
+}
+
+func (c *ContactClient) mutate(ctx context.Context, m *ContactMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ContactCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ContactUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ContactUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ContactDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Contact mutation op: %q", m.Op())
 	}
 }
 
@@ -808,22 +931,6 @@ func (c *ThreadClient) QueryLikedUsers(t *Thread) *UserQuery {
 	return query
 }
 
-// QuerySubscribedUsers queries the subscribed_users edge of a Thread.
-func (c *ThreadClient) QuerySubscribedUsers(t *Thread) *UserQuery {
-	query := (&UserClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := t.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(thread.Table, thread.FieldID, id),
-			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, thread.SubscribedUsersTable, thread.SubscribedUsersPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
 // QueryThreadTags queries the thread_tags edge of a Thread.
 func (c *ThreadClient) QueryThreadTags(t *Thread) *ThreadTagQuery {
 	query := (&ThreadTagClient{config: c.config}).Query()
@@ -849,22 +956,6 @@ func (c *ThreadClient) QueryUserThreadLike(t *Thread) *UserThreadLikeQuery {
 			sqlgraph.From(thread.Table, thread.FieldID, id),
 			sqlgraph.To(userthreadlike.Table, userthreadlike.ThreadColumn),
 			sqlgraph.Edge(sqlgraph.O2M, true, thread.UserThreadLikeTable, thread.UserThreadLikeColumn),
-		)
-		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryUserThreadSubscription queries the user_thread_subscription edge of a Thread.
-func (c *ThreadClient) QueryUserThreadSubscription(t *Thread) *UserThreadSubscriptionQuery {
-	query := (&UserThreadSubscriptionClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := t.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(thread.Table, thread.FieldID, id),
-			sqlgraph.To(userthreadsubscription.Table, userthreadsubscription.ThreadColumn),
-			sqlgraph.Edge(sqlgraph.O2M, true, thread.UserThreadSubscriptionTable, thread.UserThreadSubscriptionColumn),
 		)
 		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
 		return fromV, nil
@@ -1101,22 +1192,6 @@ func (c *ThreadCommentClient) QueryLikedUsers(tc *ThreadComment) *UserQuery {
 	return query
 }
 
-// QuerySubscribedUsers queries the subscribed_users edge of a ThreadComment.
-func (c *ThreadCommentClient) QuerySubscribedUsers(tc *ThreadComment) *UserQuery {
-	query := (&UserClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := tc.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(threadcomment.Table, threadcomment.FieldID, id),
-			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, threadcomment.SubscribedUsersTable, threadcomment.SubscribedUsersPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(tc.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
 // QueryUserCommentLike queries the user_comment_like edge of a ThreadComment.
 func (c *ThreadCommentClient) QueryUserCommentLike(tc *ThreadComment) *UserCommentLikeQuery {
 	query := (&UserCommentLikeClient{config: c.config}).Query()
@@ -1126,22 +1201,6 @@ func (c *ThreadCommentClient) QueryUserCommentLike(tc *ThreadComment) *UserComme
 			sqlgraph.From(threadcomment.Table, threadcomment.FieldID, id),
 			sqlgraph.To(usercommentlike.Table, usercommentlike.CommentColumn),
 			sqlgraph.Edge(sqlgraph.O2M, true, threadcomment.UserCommentLikeTable, threadcomment.UserCommentLikeColumn),
-		)
-		fromV = sqlgraph.Neighbors(tc.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryUserCommentSubscription queries the user_comment_subscription edge of a ThreadComment.
-func (c *ThreadCommentClient) QueryUserCommentSubscription(tc *ThreadComment) *UserCommentSubscriptionQuery {
-	query := (&UserCommentSubscriptionClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := tc.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(threadcomment.Table, threadcomment.FieldID, id),
-			sqlgraph.To(usercommentsubscription.Table, usercommentsubscription.CommentColumn),
-			sqlgraph.Edge(sqlgraph.O2M, true, threadcomment.UserCommentSubscriptionTable, threadcomment.UserCommentSubscriptionColumn),
 		)
 		fromV = sqlgraph.Neighbors(tc.driver.Dialect(), step)
 		return fromV, nil
@@ -1627,38 +1686,6 @@ func (c *UserClient) QueryLikedComments(u *User) *ThreadCommentQuery {
 	return query
 }
 
-// QuerySubscribedThreads queries the subscribed_threads edge of a User.
-func (c *UserClient) QuerySubscribedThreads(u *User) *ThreadQuery {
-	query := (&ThreadClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := u.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(user.Table, user.FieldID, id),
-			sqlgraph.To(thread.Table, thread.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, user.SubscribedThreadsTable, user.SubscribedThreadsPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QuerySubscribedComments queries the subscribed_comments edge of a User.
-func (c *UserClient) QuerySubscribedComments(u *User) *ThreadCommentQuery {
-	query := (&ThreadCommentClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := u.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(user.Table, user.FieldID, id),
-			sqlgraph.To(threadcomment.Table, threadcomment.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, user.SubscribedCommentsTable, user.SubscribedCommentsPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
 // QueryUserThreadLike queries the user_thread_like edge of a User.
 func (c *UserClient) QueryUserThreadLike(u *User) *UserThreadLikeQuery {
 	query := (&UserThreadLikeClient{config: c.config}).Query()
@@ -1684,38 +1711,6 @@ func (c *UserClient) QueryUserCommentLike(u *User) *UserCommentLikeQuery {
 			sqlgraph.From(user.Table, user.FieldID, id),
 			sqlgraph.To(usercommentlike.Table, usercommentlike.UserColumn),
 			sqlgraph.Edge(sqlgraph.O2M, true, user.UserCommentLikeTable, user.UserCommentLikeColumn),
-		)
-		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryUserThreadSubscription queries the user_thread_subscription edge of a User.
-func (c *UserClient) QueryUserThreadSubscription(u *User) *UserThreadSubscriptionQuery {
-	query := (&UserThreadSubscriptionClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := u.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(user.Table, user.FieldID, id),
-			sqlgraph.To(userthreadsubscription.Table, userthreadsubscription.UserColumn),
-			sqlgraph.Edge(sqlgraph.O2M, true, user.UserThreadSubscriptionTable, user.UserThreadSubscriptionColumn),
-		)
-		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryUserCommentSubscription queries the user_comment_subscription edge of a User.
-func (c *UserClient) QueryUserCommentSubscription(u *User) *UserCommentSubscriptionQuery {
-	query := (&UserCommentSubscriptionClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := u.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(user.Table, user.FieldID, id),
-			sqlgraph.To(usercommentsubscription.Table, usercommentsubscription.UserColumn),
-			sqlgraph.Edge(sqlgraph.O2M, true, user.UserCommentSubscriptionTable, user.UserCommentSubscriptionColumn),
 		)
 		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
 		return fromV, nil
@@ -1864,122 +1859,6 @@ func (c *UserCommentLikeClient) mutate(ctx context.Context, m *UserCommentLikeMu
 	}
 }
 
-// UserCommentSubscriptionClient is a client for the UserCommentSubscription schema.
-type UserCommentSubscriptionClient struct {
-	config
-}
-
-// NewUserCommentSubscriptionClient returns a client for the UserCommentSubscription from the given config.
-func NewUserCommentSubscriptionClient(c config) *UserCommentSubscriptionClient {
-	return &UserCommentSubscriptionClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `usercommentsubscription.Hooks(f(g(h())))`.
-func (c *UserCommentSubscriptionClient) Use(hooks ...Hook) {
-	c.hooks.UserCommentSubscription = append(c.hooks.UserCommentSubscription, hooks...)
-}
-
-// Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `usercommentsubscription.Intercept(f(g(h())))`.
-func (c *UserCommentSubscriptionClient) Intercept(interceptors ...Interceptor) {
-	c.inters.UserCommentSubscription = append(c.inters.UserCommentSubscription, interceptors...)
-}
-
-// Create returns a builder for creating a UserCommentSubscription entity.
-func (c *UserCommentSubscriptionClient) Create() *UserCommentSubscriptionCreate {
-	mutation := newUserCommentSubscriptionMutation(c.config, OpCreate)
-	return &UserCommentSubscriptionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of UserCommentSubscription entities.
-func (c *UserCommentSubscriptionClient) CreateBulk(builders ...*UserCommentSubscriptionCreate) *UserCommentSubscriptionCreateBulk {
-	return &UserCommentSubscriptionCreateBulk{config: c.config, builders: builders}
-}
-
-// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
-// a builder and applies setFunc on it.
-func (c *UserCommentSubscriptionClient) MapCreateBulk(slice any, setFunc func(*UserCommentSubscriptionCreate, int)) *UserCommentSubscriptionCreateBulk {
-	rv := reflect.ValueOf(slice)
-	if rv.Kind() != reflect.Slice {
-		return &UserCommentSubscriptionCreateBulk{err: fmt.Errorf("calling to UserCommentSubscriptionClient.MapCreateBulk with wrong type %T, need slice", slice)}
-	}
-	builders := make([]*UserCommentSubscriptionCreate, rv.Len())
-	for i := 0; i < rv.Len(); i++ {
-		builders[i] = c.Create()
-		setFunc(builders[i], i)
-	}
-	return &UserCommentSubscriptionCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for UserCommentSubscription.
-func (c *UserCommentSubscriptionClient) Update() *UserCommentSubscriptionUpdate {
-	mutation := newUserCommentSubscriptionMutation(c.config, OpUpdate)
-	return &UserCommentSubscriptionUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *UserCommentSubscriptionClient) UpdateOne(ucs *UserCommentSubscription) *UserCommentSubscriptionUpdateOne {
-	mutation := newUserCommentSubscriptionMutation(c.config, OpUpdateOne)
-	mutation.user = &ucs.UserID
-	mutation.comment = &ucs.CommentID
-	return &UserCommentSubscriptionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for UserCommentSubscription.
-func (c *UserCommentSubscriptionClient) Delete() *UserCommentSubscriptionDelete {
-	mutation := newUserCommentSubscriptionMutation(c.config, OpDelete)
-	return &UserCommentSubscriptionDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Query returns a query builder for UserCommentSubscription.
-func (c *UserCommentSubscriptionClient) Query() *UserCommentSubscriptionQuery {
-	return &UserCommentSubscriptionQuery{
-		config: c.config,
-		ctx:    &QueryContext{Type: TypeUserCommentSubscription},
-		inters: c.Interceptors(),
-	}
-}
-
-// QueryUser queries the user edge of a UserCommentSubscription.
-func (c *UserCommentSubscriptionClient) QueryUser(ucs *UserCommentSubscription) *UserQuery {
-	return c.Query().
-		Where(usercommentsubscription.UserID(ucs.UserID), usercommentsubscription.CommentID(ucs.CommentID)).
-		QueryUser()
-}
-
-// QueryComment queries the comment edge of a UserCommentSubscription.
-func (c *UserCommentSubscriptionClient) QueryComment(ucs *UserCommentSubscription) *ThreadCommentQuery {
-	return c.Query().
-		Where(usercommentsubscription.UserID(ucs.UserID), usercommentsubscription.CommentID(ucs.CommentID)).
-		QueryComment()
-}
-
-// Hooks returns the client hooks.
-func (c *UserCommentSubscriptionClient) Hooks() []Hook {
-	return c.hooks.UserCommentSubscription
-}
-
-// Interceptors returns the client interceptors.
-func (c *UserCommentSubscriptionClient) Interceptors() []Interceptor {
-	return c.inters.UserCommentSubscription
-}
-
-func (c *UserCommentSubscriptionClient) mutate(ctx context.Context, m *UserCommentSubscriptionMutation) (Value, error) {
-	switch m.Op() {
-	case OpCreate:
-		return (&UserCommentSubscriptionCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdate:
-		return (&UserCommentSubscriptionUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdateOne:
-		return (&UserCommentSubscriptionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpDelete, OpDeleteOne:
-		return (&UserCommentSubscriptionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
-	default:
-		return nil, fmt.Errorf("ent: unknown UserCommentSubscription mutation op: %q", m.Op())
-	}
-}
-
 // UserThreadLikeClient is a client for the UserThreadLike schema.
 type UserThreadLikeClient struct {
 	config
@@ -2096,132 +1975,14 @@ func (c *UserThreadLikeClient) mutate(ctx context.Context, m *UserThreadLikeMuta
 	}
 }
 
-// UserThreadSubscriptionClient is a client for the UserThreadSubscription schema.
-type UserThreadSubscriptionClient struct {
-	config
-}
-
-// NewUserThreadSubscriptionClient returns a client for the UserThreadSubscription from the given config.
-func NewUserThreadSubscriptionClient(c config) *UserThreadSubscriptionClient {
-	return &UserThreadSubscriptionClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `userthreadsubscription.Hooks(f(g(h())))`.
-func (c *UserThreadSubscriptionClient) Use(hooks ...Hook) {
-	c.hooks.UserThreadSubscription = append(c.hooks.UserThreadSubscription, hooks...)
-}
-
-// Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `userthreadsubscription.Intercept(f(g(h())))`.
-func (c *UserThreadSubscriptionClient) Intercept(interceptors ...Interceptor) {
-	c.inters.UserThreadSubscription = append(c.inters.UserThreadSubscription, interceptors...)
-}
-
-// Create returns a builder for creating a UserThreadSubscription entity.
-func (c *UserThreadSubscriptionClient) Create() *UserThreadSubscriptionCreate {
-	mutation := newUserThreadSubscriptionMutation(c.config, OpCreate)
-	return &UserThreadSubscriptionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of UserThreadSubscription entities.
-func (c *UserThreadSubscriptionClient) CreateBulk(builders ...*UserThreadSubscriptionCreate) *UserThreadSubscriptionCreateBulk {
-	return &UserThreadSubscriptionCreateBulk{config: c.config, builders: builders}
-}
-
-// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
-// a builder and applies setFunc on it.
-func (c *UserThreadSubscriptionClient) MapCreateBulk(slice any, setFunc func(*UserThreadSubscriptionCreate, int)) *UserThreadSubscriptionCreateBulk {
-	rv := reflect.ValueOf(slice)
-	if rv.Kind() != reflect.Slice {
-		return &UserThreadSubscriptionCreateBulk{err: fmt.Errorf("calling to UserThreadSubscriptionClient.MapCreateBulk with wrong type %T, need slice", slice)}
-	}
-	builders := make([]*UserThreadSubscriptionCreate, rv.Len())
-	for i := 0; i < rv.Len(); i++ {
-		builders[i] = c.Create()
-		setFunc(builders[i], i)
-	}
-	return &UserThreadSubscriptionCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for UserThreadSubscription.
-func (c *UserThreadSubscriptionClient) Update() *UserThreadSubscriptionUpdate {
-	mutation := newUserThreadSubscriptionMutation(c.config, OpUpdate)
-	return &UserThreadSubscriptionUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *UserThreadSubscriptionClient) UpdateOne(uts *UserThreadSubscription) *UserThreadSubscriptionUpdateOne {
-	mutation := newUserThreadSubscriptionMutation(c.config, OpUpdateOne)
-	mutation.user = &uts.UserID
-	mutation.thread = &uts.ThreadID
-	return &UserThreadSubscriptionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for UserThreadSubscription.
-func (c *UserThreadSubscriptionClient) Delete() *UserThreadSubscriptionDelete {
-	mutation := newUserThreadSubscriptionMutation(c.config, OpDelete)
-	return &UserThreadSubscriptionDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Query returns a query builder for UserThreadSubscription.
-func (c *UserThreadSubscriptionClient) Query() *UserThreadSubscriptionQuery {
-	return &UserThreadSubscriptionQuery{
-		config: c.config,
-		ctx:    &QueryContext{Type: TypeUserThreadSubscription},
-		inters: c.Interceptors(),
-	}
-}
-
-// QueryUser queries the user edge of a UserThreadSubscription.
-func (c *UserThreadSubscriptionClient) QueryUser(uts *UserThreadSubscription) *UserQuery {
-	return c.Query().
-		Where(userthreadsubscription.UserID(uts.UserID), userthreadsubscription.ThreadID(uts.ThreadID)).
-		QueryUser()
-}
-
-// QueryThread queries the thread edge of a UserThreadSubscription.
-func (c *UserThreadSubscriptionClient) QueryThread(uts *UserThreadSubscription) *ThreadQuery {
-	return c.Query().
-		Where(userthreadsubscription.UserID(uts.UserID), userthreadsubscription.ThreadID(uts.ThreadID)).
-		QueryThread()
-}
-
-// Hooks returns the client hooks.
-func (c *UserThreadSubscriptionClient) Hooks() []Hook {
-	return c.hooks.UserThreadSubscription
-}
-
-// Interceptors returns the client interceptors.
-func (c *UserThreadSubscriptionClient) Interceptors() []Interceptor {
-	return c.inters.UserThreadSubscription
-}
-
-func (c *UserThreadSubscriptionClient) mutate(ctx context.Context, m *UserThreadSubscriptionMutation) (Value, error) {
-	switch m.Op() {
-	case OpCreate:
-		return (&UserThreadSubscriptionCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdate:
-		return (&UserThreadSubscriptionUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdateOne:
-		return (&UserThreadSubscriptionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpDelete, OpDeleteOne:
-		return (&UserThreadSubscriptionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
-	default:
-		return nil, fmt.Errorf("ent: unknown UserThreadSubscription mutation op: %q", m.Op())
-	}
-}
-
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Board, Tag, Thread, ThreadComment, ThreadCommentAttachment, ThreadTag, User,
-		UserCommentLike, UserCommentSubscription, UserThreadLike,
-		UserThreadSubscription []ent.Hook
+		Board, Contact, Tag, Thread, ThreadComment, ThreadCommentAttachment, ThreadTag,
+		User, UserCommentLike, UserThreadLike []ent.Hook
 	}
 	inters struct {
-		Board, Tag, Thread, ThreadComment, ThreadCommentAttachment, ThreadTag, User,
-		UserCommentLike, UserCommentSubscription, UserThreadLike,
-		UserThreadSubscription []ent.Interceptor
+		Board, Contact, Tag, Thread, ThreadComment, ThreadCommentAttachment, ThreadTag,
+		User, UserCommentLike, UserThreadLike []ent.Interceptor
 	}
 )

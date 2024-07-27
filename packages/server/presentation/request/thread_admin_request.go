@@ -15,8 +15,8 @@ type ThreadAdminFindByIDRequest struct {
 }
 
 type ThreadAdminUpdateRequest struct {
-	Title        *string `json:"title,omitempty"`
+	Title        string  `json:"title,omitempty"`
 	Description  *string `json:"description,omitempty"`
-	Status       *int    `json:"status,omitempty"`
 	ThumbnailURL *string `json:"thumbnailUrl,omitempty"`
+	Status       int     `json:"status,omitempty"`
 }

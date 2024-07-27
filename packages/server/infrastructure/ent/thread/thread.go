@@ -42,14 +42,10 @@ const (
 	EdgeTags = "tags"
 	// EdgeLikedUsers holds the string denoting the liked_users edge name in mutations.
 	EdgeLikedUsers = "liked_users"
-	// EdgeSubscribedUsers holds the string denoting the subscribed_users edge name in mutations.
-	EdgeSubscribedUsers = "subscribed_users"
 	// EdgeThreadTags holds the string denoting the thread_tags edge name in mutations.
 	EdgeThreadTags = "thread_tags"
 	// EdgeUserThreadLike holds the string denoting the user_thread_like edge name in mutations.
 	EdgeUserThreadLike = "user_thread_like"
-	// EdgeUserThreadSubscription holds the string denoting the user_thread_subscription edge name in mutations.
-	EdgeUserThreadSubscription = "user_thread_subscription"
 	// Table holds the table name of the thread in the database.
 	Table = "threads"
 	// BoardTable is the table that holds the board relation/edge.
@@ -83,11 +79,6 @@ const (
 	// LikedUsersInverseTable is the table name for the User entity.
 	// It exists in this package in order to avoid circular dependency with the "user" package.
 	LikedUsersInverseTable = "users"
-	// SubscribedUsersTable is the table that holds the subscribed_users relation/edge. The primary key declared below.
-	SubscribedUsersTable = "user_thread_subscriptions"
-	// SubscribedUsersInverseTable is the table name for the User entity.
-	// It exists in this package in order to avoid circular dependency with the "user" package.
-	SubscribedUsersInverseTable = "users"
 	// ThreadTagsTable is the table that holds the thread_tags relation/edge.
 	ThreadTagsTable = "thread_tags"
 	// ThreadTagsInverseTable is the table name for the ThreadTag entity.
@@ -102,13 +93,6 @@ const (
 	UserThreadLikeInverseTable = "user_thread_likes"
 	// UserThreadLikeColumn is the table column denoting the user_thread_like relation/edge.
 	UserThreadLikeColumn = "thread_id"
-	// UserThreadSubscriptionTable is the table that holds the user_thread_subscription relation/edge.
-	UserThreadSubscriptionTable = "user_thread_subscriptions"
-	// UserThreadSubscriptionInverseTable is the table name for the UserThreadSubscription entity.
-	// It exists in this package in order to avoid circular dependency with the "userthreadsubscription" package.
-	UserThreadSubscriptionInverseTable = "user_thread_subscriptions"
-	// UserThreadSubscriptionColumn is the table column denoting the user_thread_subscription relation/edge.
-	UserThreadSubscriptionColumn = "thread_id"
 )
 
 // Columns holds all SQL columns for thread fields.
@@ -132,9 +116,6 @@ var (
 	// LikedUsersPrimaryKey and LikedUsersColumn2 are the table columns denoting the
 	// primary key for the liked_users relation (M2M).
 	LikedUsersPrimaryKey = []string{"user_id", "thread_id"}
-	// SubscribedUsersPrimaryKey and SubscribedUsersColumn2 are the table columns denoting the
-	// primary key for the subscribed_users relation (M2M).
-	SubscribedUsersPrimaryKey = []string{"user_id", "thread_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -271,20 +252,6 @@ func ByLikedUsers(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
-// BySubscribedUsersCount orders the results by subscribed_users count.
-func BySubscribedUsersCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newSubscribedUsersStep(), opts...)
-	}
-}
-
-// BySubscribedUsers orders the results by subscribed_users terms.
-func BySubscribedUsers(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newSubscribedUsersStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
 // ByThreadTagsCount orders the results by thread_tags count.
 func ByThreadTagsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -310,20 +277,6 @@ func ByUserThreadLikeCount(opts ...sql.OrderTermOption) OrderOption {
 func ByUserThreadLike(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newUserThreadLikeStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
-// ByUserThreadSubscriptionCount orders the results by user_thread_subscription count.
-func ByUserThreadSubscriptionCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newUserThreadSubscriptionStep(), opts...)
-	}
-}
-
-// ByUserThreadSubscription orders the results by user_thread_subscription terms.
-func ByUserThreadSubscription(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newUserThreadSubscriptionStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 func newBoardStep() *sqlgraph.Step {
@@ -361,13 +314,6 @@ func newLikedUsersStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2M, true, LikedUsersTable, LikedUsersPrimaryKey...),
 	)
 }
-func newSubscribedUsersStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(SubscribedUsersInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, true, SubscribedUsersTable, SubscribedUsersPrimaryKey...),
-	)
-}
 func newThreadTagsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -380,12 +326,5 @@ func newUserThreadLikeStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(UserThreadLikeInverseTable, UserThreadLikeColumn),
 		sqlgraph.Edge(sqlgraph.O2M, true, UserThreadLikeTable, UserThreadLikeColumn),
-	)
-}
-func newUserThreadSubscriptionStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(UserThreadSubscriptionInverseTable, UserThreadSubscriptionColumn),
-		sqlgraph.Edge(sqlgraph.O2M, true, UserThreadSubscriptionTable, UserThreadSubscriptionColumn),
 	)
 }

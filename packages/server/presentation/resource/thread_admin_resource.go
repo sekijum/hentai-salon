@@ -2,87 +2,81 @@ package resource
 
 import (
 	"server/domain/model"
+	"server/infrastructure/ent"
 	"time"
 )
 
 type ThreadAdminResource struct {
-	ID           int                                        `json:"id"`
-	BoardID      int                                        `json:"boardId"`
-	UserID       int                                        `json:"userId"`
-	Title        string                                     `json:"title"`
-	Description  string                                     `json:"description,omitempty"`
-	ThumbnailURL string                                     `json:"thumbnailUrl,omitempty"`
-	IPAddress    string                                     `json:"ipAddress"`
-	Status       int                                        `json:"status"`
-	StatusLabel  string                                     `json:"statusLabel"`
-	CreatedAt    string                                     `json:"createdAt"`
-	UpdatedAt    string                                     `json:"updatedAt"`
-	Board        *ThreadBoardAdminResource                  `json:"board"`
-	Comments     *ListResource[*ThreadCommentAdminResource] `json:"comments"`
+	ID           int                                      `json:"id"`
+	BoardID      int                                      `json:"boardId"`
+	UserID       int                                      `json:"userId"`
+	Title        string                                   `json:"title"`
+	Description  *string                                  `json:"description,omitempty"`
+	ThumbnailURL *string                                  `json:"thumbnailUrl,omitempty"`
+	IPAddress    string                                   `json:"ipAddress"`
+	Status       int                                      `json:"status"`
+	StatusLabel  string                                   `json:"statusLabel"`
+	CreatedAt    string                                   `json:"createdAt"`
+	UpdatedAt    string                                   `json:"updatedAt"`
+	Board        *BoardAdminResource                      `json:"board"`
+	Comments     *Collection[*ThreadCommentAdminResource] `json:"comments"`
 }
 
 type ThreadCommentAdminResource struct {
 	ID        int    `json:"id"`
 	ThreadID  int    `json:"threadId"`
-	UserID    int    `json:"userId"`
+	UserID    *int   `json:"userId"`
 	Content   string `json:"content"`
 	CreatedAt string `json:"createdAt"`
 	UpdatedAt string `json:"updatedAt"`
 }
 
-type ThreadBoardAdminResource struct {
-	ID    int    `json:"id"`
-	Title string `json:"title"`
-}
-
 type NewThreadAdminResourceParams struct {
 	Thread *model.Thread
-	Limit  int
-	Offset int
+	Limit  *int
+	Offset *int
 }
 
 func NewThreadAdminResource(params NewThreadAdminResourceParams) *ThreadAdminResource {
-	var threadCommentAdminResource []*ThreadCommentAdminResource
-	for _, comment := range params.Thread.EntThread.Edges.Comments {
-		userID := 0
-		if comment.UserID != nil {
-			userID = *comment.UserID
-		}
+	limit := 0
+	if params.Limit != nil {
+		limit = *params.Limit
+	}
 
+	offset := 0
+	if params.Offset != nil {
+		offset = *params.Offset
+	}
+
+	var threadCommentResourceList []*ThreadCommentAdminResource
+	for _, comment_i := range params.Thread.EntThread.Edges.Comments {
 		commentResource := &ThreadCommentAdminResource{
-			ID:        comment.ID,
-			ThreadID:  comment.ThreadID,
-			UserID:    userID,
-			Content:   comment.Content,
-			CreatedAt: comment.CreatedAt.Format(time.RFC3339),
-			UpdatedAt: comment.UpdatedAt.Format(time.RFC3339),
+			ID:        comment_i.ID,
+			ThreadID:  comment_i.ThreadID,
+			UserID:    comment_i.UserID,
+			Content:   comment_i.Content,
+			CreatedAt: comment_i.CreatedAt.Format(time.RFC3339),
+			UpdatedAt: comment_i.UpdatedAt.Format(time.RFC3339),
 		}
-		threadCommentAdminResource = append(threadCommentAdminResource, commentResource)
+		threadCommentResourceList = append(threadCommentResourceList, commentResource)
 	}
 
-	comments := &ListResource[*ThreadCommentAdminResource]{
+	commentCollection := NewCollection(NewCollectionParams[*ThreadCommentAdminResource]{
+		Data:       threadCommentResourceList,
 		TotalCount: len(params.Thread.EntThread.Edges.Comments),
-		Limit:      params.Limit,
-		Offset:     params.Offset,
-		Data:       threadCommentAdminResource,
-	}
+		Limit:      limit,
+		Offset:     offset,
+	})
 
-	var threadBoardAdminResource *ThreadBoardAdminResource
+	var threadBoardResource *BoardAdminResource
 	if params.Thread.EntThread.Edges.Board != nil {
-		threadBoardAdminResource = &ThreadBoardAdminResource{
-			ID:    params.Thread.EntThread.BoardID,
-			Title: params.Thread.EntThread.Edges.Board.Title,
-		}
-	}
-
-	description := ""
-	if params.Thread.EntThread.Description != nil {
-		description = *params.Thread.EntThread.Description
-	}
-
-	thumbnailURL := ""
-	if params.Thread.EntThread.ThumbnailURL != nil {
-		thumbnailURL = *params.Thread.EntThread.ThumbnailURL
+		threadBoardResource = NewBoardAdminResource(NewBoardAdminResourceParams{
+			Board: model.NewBoard(model.NewBoardParams{
+				EntBoard: &ent.Board{
+					ID:    params.Thread.EntThread.BoardID,
+					Title: params.Thread.EntThread.Edges.Board.Title,
+				},
+			})})
 	}
 
 	return &ThreadAdminResource{
@@ -90,14 +84,14 @@ func NewThreadAdminResource(params NewThreadAdminResourceParams) *ThreadAdminRes
 		BoardID:      params.Thread.EntThread.BoardID,
 		UserID:       params.Thread.EntThread.UserID,
 		Title:        params.Thread.EntThread.Title,
-		Description:  description,
-		ThumbnailURL: thumbnailURL,
+		Description:  params.Thread.EntThread.Description,
+		ThumbnailURL: params.Thread.EntThread.ThumbnailURL,
 		IPAddress:    params.Thread.EntThread.IPAddress,
 		Status:       params.Thread.EntThread.Status,
 		StatusLabel:  params.Thread.StatusToLabel(),
 		CreatedAt:    params.Thread.EntThread.CreatedAt.Format(time.RFC3339),
 		UpdatedAt:    params.Thread.EntThread.UpdatedAt.Format(time.RFC3339),
-		Comments:     comments,
-		Board:        threadBoardAdminResource,
+		Comments:     commentCollection,
+		Board:        threadBoardResource,
 	}
 }
