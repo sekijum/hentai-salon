@@ -310,7 +310,7 @@ func (svc *UserApplicationService) ForgotPassword(params UserApplicationServiceF
 	emailBody := fmt.Sprintf(`
 %sさん
 
-メルカリをご利用いただきありがとうございます。
+変態サロンをご利用いただきありがとうございます。
 パスワードの再設定は以下のリンクからお願いします。
 このリンクの有効期限は24時間です。
 
