@@ -1,18 +1,11 @@
 import { AxiosInstance } from 'axios';
 import { IStorage } from '~/plugins/storage';
 import dayjs, { type formatDate } from 'dayjs';
+import type {IUser} from './user';
 
-interface IType {
+interface INuxtApp {
   payload: {
-    user?: {
-      id: number,
-      name: string,
-      role: string,
-      email: string,
-      profileLink: string,
-      createdAt: string,
-      updatedAt: string,
-    },
+    user?: IUser,
     isLoggedIn: boolean,
     isAdmin: boolean,
     isMember: boolean,
@@ -24,9 +17,9 @@ interface IType {
 }
 
 declare module '#app' {
-  interface NuxtApp extends IType
+  interface NuxtApp extends INuxtApp
 }
 
 declare module 'vue' {
-  interface ComponentCustomProperties extends IType
+  interface ComponentCustomProperties extends INuxtApp
 }

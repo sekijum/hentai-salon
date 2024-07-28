@@ -93,14 +93,10 @@ func (svc *ThreadApplicationService) FindAll(params ThreadApplicationServiceFind
 		threadList, err = svc.threadDatasource.FindAll(datasource.ThreadDatasourceFindAllParams{
 			Ctx:       params.Ctx,
 			ThreadIDs: params.Qs.ThreadIDs,
-			Limit:     params.Qs.Limit,
-			Offset:    params.Qs.Offset,
 		})
 		if err != nil {
 			return nil, err
 		}
-
-		// 手動で並び替え
 		threadMap := make(map[int]*model.Thread)
 		for _, thread_i := range threadList {
 			threadMap[thread_i.EntThread.ID] = thread_i

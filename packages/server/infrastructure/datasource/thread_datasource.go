@@ -88,7 +88,8 @@ func (ds *ThreadDatasource) FindAll(params ThreadDatasourceFindAllParams) ([]*mo
 	q = q.
 		Limit(params.Limit).
 		Offset(params.Offset).
-		WithTags().WithBoard().
+		WithTags().
+		WithBoard().
 		WithComments(func(rq *ent.ThreadCommentQuery) {
 			rq.Select(threadcomment.FieldID)
 		})

@@ -13,9 +13,10 @@
       v-if="threads.threadsByHistory?.length"
       filter="history"
       title="スレッド閲覧履歴"
-      :items="threads.threadsByHistory"
+      :items="threads.threadsByHistory.slice(0, 5)"
       :clicked="() => router.push({ path: '/threads', query: { filter: 'history' } })"
       :isInfiniteScroll="false"
+      :threadLimit="threadLimit"
     />
     <ThreadList
       v-if="threads.threadsByPopular?.length"
@@ -24,6 +25,7 @@
       :items="threads.threadsByPopular"
       :clicked="() => router.push({ path: '/threads' })"
       :isInfiniteScroll="false"
+      :threadLimit="threadLimit"
     />
     <ThreadList
       v-if="threads.threadsByNewest?.length"
@@ -31,6 +33,7 @@
       title="新着"
       :items="threads.threadsByNewest"
       :isInfiniteScroll="true"
+      :threadLimit="threadLimit"
     />
   </div>
 </template>
@@ -48,6 +51,7 @@ const { getThreadViewHistory } = useStorage();
 const isMenuModal = useState('isMenuModal', () => false);
 
 const { payload, $api } = nuxtApp;
+const threadLimit = 10;
 
 const threads = ref<{
   threadsByPopular: IThread[];
@@ -102,7 +106,7 @@ async function fetchThreads() {
         params: {
           filter,
           threadIds: getThreadViewHistory(),
-          limit: 10,
+          limit: threadLimit,
         },
       });
       if (filter === 'popularity') {

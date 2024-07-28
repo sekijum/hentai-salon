@@ -111,10 +111,6 @@ const remainingTime = ref<{ minutes: number; seconds: number } | null>(null);
 
 const emit = defineEmits(['submit']);
 
-const snackbar = useState('isSnackbar', () => {
-  return { isSnackbar: false, text: '' };
-});
-
 const form = ref<FormState>({
   guestName: payload.isLoggedIn ? payload?.user?.name || '' : '',
   content: '',

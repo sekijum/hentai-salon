@@ -5,11 +5,11 @@
     <Menu :items="menuItems" />
 
     <template v-if="threads.data">
-      <Pagination :totalCount="threads.totalCount" :limit="limit" />
+      <Pagination :totalCount="threads.totalCount" :limit="threadLimit" />
 
-      <ThreadList filter="owner" :items="threads.data" :isInfiniteScroll="false" />
+      <ThreadList filter="owner" :items="threads.data" :isInfiniteScroll="false" :threadLimit="threadLimit" />
 
-      <Pagination :totalCount="threads.totalCount" :limit="limit" />
+      <Pagination :totalCount="threads.totalCount" :limit="threadLimit" />
     </template>
   </div>
 </template>
@@ -27,7 +27,7 @@ const route = useRoute();
 const nuxtApp = useNuxtApp();
 const { $api } = nuxtApp;
 const { getThreadViewHistory } = useStorage();
-const limit = 10;
+const threadLimit = 10;
 
 const menuItems = [
   { title: 'マイスレ', clicked: () => router.push('/users/me/threads'), icon: 'mdi-file-document-multiple-outline' },
@@ -51,7 +51,7 @@ async function fetchThreads() {
   const response = await $api.get<ICollection<IThread>>('/users/me/liked-threads', {
     params: {
       threadIds: getThreadViewHistory(),
-      limit,
+      limit: threadLimit,
     },
   });
   threads.value = response.data;

@@ -24,7 +24,7 @@
       filter="history"
       title="閲覧履歴"
       :items="threads?.threadsByHistory"
-      :isInfiniteScroll="true"
+      :isInfiniteScroll="false"
       :threadLimit="threadLimit"
     />
     <ThreadList
@@ -62,7 +62,7 @@
     <ThreadList
       v-if="route.query.filter === 'board' && threads.threadsByBoard.length"
       filter="board"
-      title="板"
+      :title="`#${board?.title}`"
       :items="threads?.threadsByBoard"
       :isInfiniteScroll="true"
       :threadLimit="threadLimit"
@@ -75,6 +75,7 @@ import ThreadList from '~/components/thread/ThreadList.vue';
 import Menu from '~/components/Menu.vue';
 import PageTitle from '~/components/PageTitle.vue';
 import type { IThread } from '~/types/thread';
+import type { IBoard } from '~/types/board';
 
 const route = useRoute();
 const router = useRouter();
@@ -100,6 +101,7 @@ const threads = ref<{
   threadsByBoard: [],
 });
 const threadLimit = 10;
+const board = ref<IBoard>();
 
 const menuItems = [
   {
@@ -160,11 +162,12 @@ async function fetchThreads() {
     } else if (route.query.filter === 'related') {
       threads.value.threadsByRelated = response.data;
     } else if (route.query.filter === 'board') {
+      board.value = response.data[0].board;
       threads.value.threadsByBoard = response.data;
     }
   } else {
     await Promise.all(
-      ['newest', 'popularity'].map(async filter => {
+      ['newest'].map(async filter => {
         const response = await $api.get<IThread[]>('/threads/', {
           params: {
             filter,
@@ -179,6 +182,7 @@ async function fetchThreads() {
         } else if (filter === 'newest') {
           threads.value.threadsByNewest = response.data;
         }
+        console.log(threads.value);
       }),
     );
   }

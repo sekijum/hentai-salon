@@ -76,6 +76,7 @@
       title="関連"
       :items="threads?.threadsByRelated"
       :isInfiniteScroll="true"
+      :threadLimit="threadLimit"
     />
   </div>
 </template>
@@ -98,6 +99,8 @@ const { setThreadViewHistory, getThreadViewHistory, getCommentLimit, getCommentS
 const { $api, payload } = nuxtApp;
 
 const commentLimit = getCommentLimit();
+const threadLimit = 10;
+
 const thread = ref<IThread>({
   id: 0,
   title: '',
@@ -108,10 +111,6 @@ const thread = ref<IThread>({
   comments: { totalCount: 0, limit: 0, offset: 0, data: [] },
   attachments: { totalCount: 0, limit: 0, offset: 0, data: [] },
   isLiked: false,
-});
-
-const snackbar = useState('isSnackbar', () => {
-  return { isSnackbar: false, text: '' };
 });
 
 const threads = ref<{ threadsByRelated: IThread[] }>({ threadsByRelated: [] });
@@ -165,13 +164,9 @@ function scrollToCommentBottom() {
 }
 
 onMounted(async () => {
-  snackbar.value.isSnackbar = true;
-  snackbar.value.text = '読み込み中です。';
   await fetchThread();
   await fetchThreads();
   setThreadViewHistory(parseInt(route.params.threadId.toString(), 10));
-  snackbar.value.isSnackbar = false;
-  snackbar.value.text = '';
 });
 
 async function fetchThread() {
@@ -191,7 +186,7 @@ async function fetchThreads() {
     params: {
       filter: 'related',
       threadIds: getThreadViewHistory(),
-      limit: 10,
+      limit: threadLimit,
     },
   });
   threads.value.threadsByRelated = response.data;

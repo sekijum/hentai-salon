@@ -11,7 +11,6 @@
             v-for="(item, index) in items"
             :key="item.id"
             :class="{ alternate: index % 2 === 0 }"
-            @click="() => router.push(`/threads/${item.id}`)"
             class="d-flex align-center p-2 item-row"
           >
             <v-row>
@@ -21,11 +20,20 @@
                 </div>
               </v-col>
               <v-col cols="9" class="d-flex flex-column justify-center">
-                <p class="item-title">
+                <p class="item-title" @click="() => router.push(`/threads/${item.id}`)">
                   {{ truncateTitle(item.title) }}
                 </p>
                 <div class="item-details">
-                  <small>{{ item.board?.title }}<v-icon small>mdi-comment</v-icon>{{ item.commentCount }}</small>
+                  <small>
+                    <span @click="() => router.push(`/threads?filter=board&boardId=${item?.board?.id}`)">
+                      {{ item.board?.title }}
+                    </span>
+                    /
+                    <span @click="() => router.push(`/threads/${item.id}`)">
+                      <v-icon small color="grey">mdi-comment</v-icon>
+                      <span>{{ item.commentCount }}</span>
+                    </span>
+                  </small>
                 </div>
               </v-col>
             </v-row>
@@ -38,7 +46,6 @@
           v-for="(item, index) in items"
           :key="item.id"
           :class="{ alternate: index % 2 === 0 }"
-          @click="() => router.push(`/threads/${item.id}`)"
           class="d-flex align-center p-2 item-row"
         >
           <v-row>
@@ -48,11 +55,20 @@
               </div>
             </v-col>
             <v-col cols="9" class="d-flex flex-column justify-center">
-              <p class="item-title">
+              <p class="item-title" @click="() => router.push(`/threads/${item.id}`)">
                 {{ truncateTitle(item.title) }}
               </p>
               <div class="item-details">
-                <small>{{ item.board?.title }}<v-icon small>mdi-comment</v-icon>{{ item.commentCount }}</small>
+                <small>
+                  <span @click="() => router.push(`/threads?filter=board&boardId=${item?.board?.id}`)">
+                    {{ item.board?.title }}
+                  </span>
+                  /
+                  <span @click="() => router.push(`/threads/${item.id}`)">
+                    <v-icon small color="grey">mdi-comment</v-icon>
+                    <span>{{ item.commentCount }}</span>
+                  </span>
+                </small>
               </div>
             </v-col>
           </v-row>
@@ -105,6 +121,7 @@ async function load({ done }: { done: (status: 'loading' | 'error' | 'empty' | '
 }
 
 async function fetchLoadThreads(offset: number) {
+  console.log(threadLimit.value, offset, props.filter);
   const response = await $api.get<IThread[]>('/threads/', {
     params: {
       filter: props.filter,
@@ -116,7 +133,7 @@ async function fetchLoadThreads(offset: number) {
     },
   });
 
-  if (!response.data || response.data.length <= threadLimit.value) {
+  if (!response.data || response.data.length < threadLimit.value) {
     return { canNextLoad: false };
   }
   items.value = [...items.value, ...response.data];
@@ -184,5 +201,9 @@ watch(
   background-color: #f0f0f0;
   padding: 10px;
   text-decoration: underline;
+}
+
+.interaction-text {
+  color: grey;
 }
 </style>

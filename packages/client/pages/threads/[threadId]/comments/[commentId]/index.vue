@@ -1,31 +1,31 @@
 <template>
-  <div v-if="threadComment">
+  <div v-if="comment">
     <PageTitle title="コメント詳細" />
 
     <v-divider />
 
     <CommentList
-      :comments="[threadComment]"
+      :comments="[comment]"
       :commentLimit="commentLimit"
-      :threadId="threadComment.thread.id"
+      :threadId="comment.thread.id"
       @replied="fetchComment"
     />
 
     <v-divider />
-    <Pagination :totalCount="threadComment.replies.totalCount" :limit="commentLimit" />
+    <Pagination :totalCount="comment.replies.totalCount" :limit="commentLimit" />
     <v-divider />
 
     <div id="comment-top" />
     <CommentList
-      v-if="threadComment.replies.data"
-      :comments="threadComment?.replies.data"
+      v-if="comment.replies.data"
+      :comments="comment?.replies.data"
       :commentLimit="commentLimit"
-      :threadId="threadComment.thread.id"
+      :threadId="comment.thread.id"
       @replied="fetchComment"
     />
     <div id="comment-bottom" />
 
-    <Pagination :totalCount="threadComment.replies.totalCount" :limit="commentLimit" />
+    <Pagination :totalCount="comment.replies.totalCount" :limit="commentLimit" />
 
     <v-btn icon large color="primary" class="fab fab-top" @click="scrollToCommentTop">
       <v-icon>mdi-arrow-up</v-icon>
@@ -43,6 +43,7 @@
       title="関連"
       :items="threads?.threadsByRelated"
       :isInfiniteScroll="true"
+      :threadLimit="threadLimit"
     />
   </div>
 </template>
@@ -62,13 +63,10 @@ const { getThreadViewHistory, getCommentLimit } = useStorage();
 const { $api } = nuxtApp;
 
 const commentLimit = getCommentLimit();
-const threadComment = ref<IThreadComment>();
+const threadLimit = 10;
+const comment = ref<IThreadComment>();
 
-const threads = ref<{
-  threadsByRelated: IThread[];
-}>({
-  threadsByRelated: [],
-});
+const threads = ref<{ threadsByRelated: IThread[] }>({ threadsByRelated: [] });
 
 function scrollToCommentTop() {
   const commentTop = document.getElementById('comment-top');
@@ -98,7 +96,7 @@ async function fetchComment() {
       offset: route.query.offset,
     },
   });
-  threadComment.value = response.data;
+  comment.value = response.data;
 }
 
 async function fetchThreads() {
@@ -108,7 +106,7 @@ async function fetchThreads() {
         params: {
           filter,
           threadIds: getThreadViewHistory(),
-          limit: 10,
+          limit: threadLimit,
         },
       });
       if (filter === 'related') {
@@ -125,20 +123,20 @@ watchEffect(() => {
 });
 
 useHead({
-  title: threadComment.value?.content,
+  title: comment.value?.content,
   meta: [
-    { name: 'description', content: threadComment.value?.content },
+    { name: 'description', content: comment.value?.content },
     {
       property: 'og:title',
-      content: threadComment.value?.content,
+      content: comment.value?.content,
     },
     {
       property: 'og:description',
-      content: threadComment.value?.content,
+      content: comment.value?.content,
     },
     {
       property: 'og:image',
-      content: threadComment.value?.attachments[0].url || '',
+      content: comment.value?.attachments[0].url || '',
     },
     {
       property: 'og:url',
