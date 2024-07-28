@@ -1,24 +1,30 @@
 <template>
-  <div v-if="threads">
-    <PageTitle title="マイスレ" />
+  <div v-if="comment">
+    <PageTitle title="お気に入りレス" />
 
     <Menu :items="menuItems" />
 
-    <template v-if="threads.data">
-      <Pagination :totalCount="threads.totalCount" :limit="limit" />
+    <Pagination :totalCount="comment?.totalCount" :limit="commentLimit" />
 
-      <ThreadList queryCriteria="owner" :items="threads.data" :isInfiniteScroll="false" />
-
-      <Pagination :totalCount="threads.totalCount" :limit="limit" />
+    <template v-for="comment in comment?.data" :key="comment.id">
+      <CommentItem
+        :comment="comment"
+        :commentLimit="commentLimit"
+        :threadId="comment.thread.id"
+        @replied="fetchComments"
+      />
     </template>
+
+    <Pagination :totalCount="comment.totalCount" :limit="commentLimit" />
   </div>
 </template>
 
 <script setup lang="ts">
 import PageTitle from '~/components/PageTitle.vue';
-import ThreadList from '~/components/thread/ThreadList.vue';
-import type { IThread } from '~/types/thread';
+import type { IThreadComment } from '~/types/thread-comment';
 import type { IListResource } from '~/types/list-resource';
+import CommentItem from '~/components/comment/CommentItem.vue';
+import Pagination from '~/components/Pagination.vue';
 
 definePageMeta({ middleware: ['logged-in-access-only'] });
 
@@ -26,8 +32,7 @@ const router = useRouter();
 const route = useRoute();
 const nuxtApp = useNuxtApp();
 const { $api } = nuxtApp;
-const { getThreadViewHistory } = useStorage();
-const limit = 10;
+const { getCommentLimit } = useStorage();
 
 const menuItems = [
   { title: 'マイスレ', clicked: () => router.push('/users/me/threads'), icon: 'mdi-file-document-multiple-outline' },
@@ -41,19 +46,23 @@ const menuItems = [
   { title: 'お気に入りレス', clicked: () => router.push('/users/me/liked-comments'), icon: 'mdi-message-star-outline' },
 ];
 
-const threads = ref<IListResource<IThread>>();
+const comment = ref<IListResource<IThreadComment>>();
+const commentLimit = getCommentLimit();
 
 onMounted(async () => {
-  await fetchThreads();
+  await fetchComments();
 });
 
-async function fetchThreads() {
-  const response = await $api.get<IListResource<IThread>>('/users/me/threads', {
-    params: {
-      threadIds: getThreadViewHistory(),
-      limit,
-    },
+async function fetchComments() {
+  const response = await $api.get<IListResource<IThreadComment>>('/users/me/liked-comments', {
+    params: { offset: route.query.offset, limit: commentLimit },
   });
-  threads.value = response.data;
+
+  comment.value = response.data;
 }
+
+watch(
+  () => route.query.offset,
+  () => fetchComments(),
+);
 </script>

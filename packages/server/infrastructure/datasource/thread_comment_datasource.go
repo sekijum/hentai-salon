@@ -6,6 +6,8 @@ import (
 	"server/infrastructure/ent"
 	"server/infrastructure/ent/threadcomment"
 	"server/infrastructure/ent/threadcommentattachment"
+	"server/infrastructure/ent/usercommentlike"
+	"time"
 )
 
 type ThreadCommentDatasource struct {
@@ -40,37 +42,9 @@ func (ds *ThreadCommentDatasource) GetCommentCount(params ThreadDatasourceGetCom
 	return count, nil
 }
 
-type ThreadCommentDatasourceFindAllByUserIDParams struct {
-	Ctx                   context.Context
-	UserID, Limit, Offset int
-}
-
-func (ds *ThreadCommentDatasource) FindAllByUserID(params ThreadCommentDatasourceFindAllByUserIDParams) ([]*model.ThreadComment, error) {
-	entCommentList, err := ds.client.ThreadComment.
-		Query().
-		Where(threadcomment.UserID(params.UserID)).
-		WithReplies().
-		WithAttachments().
-		WithThread().
-		WithAuthor().
-		Limit(params.Limit).
-		Offset(params.Offset).
-		All(params.Ctx)
-
-	if err != nil {
-		return nil, err
-	}
-
-	var threadCommentList []*model.ThreadComment
-	for _, comment_i := range entCommentList {
-		threadCommentList = append(threadCommentList, model.NewThreadComment(model.NewThreadCommentParams{EntThreadComment: comment_i}))
-	}
-
-	return threadCommentList, nil
-}
-
 type ThreadCommentDatasourceFindByIDParams struct {
 	Ctx                      context.Context
+	UserID                   *int
 	CommentID, Limit, Offset int
 }
 
@@ -83,18 +57,20 @@ func (ds *ThreadCommentDatasource) FindByID(params ThreadCommentDatasourceFindBy
 		WithParentComment(func(pq *ent.ThreadCommentQuery) {
 			pq.WithAuthor()
 		}).
-		WithReplies(func(rq *ent.ThreadCommentQuery) {
-			rq.Order(ent.Desc(threadcomment.FieldCreatedAt)).
+		WithReplies(func(q *ent.ThreadCommentQuery) {
+			q.Order(ent.Desc(threadcomment.FieldCreatedAt)).
 				Limit(params.Limit).
 				Offset(params.Offset).
 				WithAuthor().
-				WithReplies(func(rq *ent.ThreadCommentQuery) {
-					rq.Select(threadcomment.FieldID)
+				WithReplies(func(q *ent.ThreadCommentQuery) {
+					q.Select(threadcomment.FieldID)
 				}).
 				WithAttachments(func(aq *ent.ThreadCommentAttachmentQuery) {
 					aq.Order(ent.Asc(threadcommentattachment.FieldDisplayOrder))
-				})
+				}).
+				WithLikedUsers()
 		}).
+		WithLikedUsers().
 		Only(params.Ctx)
 
 	if err != nil {
@@ -159,4 +135,31 @@ func (ds *ThreadCommentDatasource) Create(params ThreadCommentDatasourceCreatePa
 	comment := model.NewThreadComment(model.NewThreadCommentParams{EntThreadComment: entComment})
 
 	return comment, nil
+}
+
+type ThreadCommentDatasourceLikeParams struct {
+	Ctx       context.Context
+	UserID    int
+	CommentID int
+}
+
+func (ds *ThreadCommentDatasource) Like(params ThreadCommentDatasourceLikeParams) error {
+	_, err := ds.client.UserCommentLike.Create().
+		SetUserID(params.UserID).
+		SetCommentID(params.CommentID).
+		SetLikedAt(time.Now()).
+		Save(params.Ctx)
+	return err
+}
+
+type ThreadCommentDatasourceUnLikeParams struct {
+	Ctx       context.Context
+	UserID    int
+	CommentID int
+}
+
+func (ds *ThreadCommentDatasource) Unlike(params ThreadCommentDatasourceUnLikeParams) (int, error) {
+	return ds.client.UserCommentLike.Delete().
+		Where(usercommentlike.UserIDEQ(params.UserID), usercommentlike.CommentIDEQ(params.CommentID)).
+		Exec(params.Ctx)
 }

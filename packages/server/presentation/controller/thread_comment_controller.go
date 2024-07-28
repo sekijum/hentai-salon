@@ -17,36 +17,6 @@ func NewThreadCommentController(threadCommentApplicationService *service.ThreadC
 	return &ThreadCommentController{threadCommentApplicationService: threadCommentApplicationService}
 }
 
-func (ctrl *ThreadCommentController) FindAllByUserID(ctx *gin.Context) {
-	userID, exists := ctx.Get("userID")
-	if !exists {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "ユーザーIDがコンテキストに存在しません"})
-		return
-	}
-
-	var qs request.ThreadCommentFindAllByUserIDRequest
-
-	if err := ctx.ShouldBindQuery(&qs); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	qs.Limit = ctx.GetInt("limit")
-	qs.Offset = ctx.GetInt("offset")
-
-	dto, err := ctrl.threadCommentApplicationService.FindAllByUserID(service.ThreadCommentApplicationServiceFindByUserIDParams{
-		Ctx:    ctx.Request.Context(),
-		UserID: userID.(int),
-		Qs:     qs,
-	})
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	ctx.JSON(http.StatusOK, dto)
-}
-
 func (ctrl *ThreadCommentController) FindById(ctx *gin.Context) {
 	commentID, err := strconv.Atoi(ctx.Param("commentID"))
 	if err != nil {
@@ -64,9 +34,17 @@ func (ctrl *ThreadCommentController) FindById(ctx *gin.Context) {
 	qs.Limit = ctx.GetInt("limit")
 	qs.Offset = ctx.GetInt("offset")
 
+	userID, exists := ctx.Get("userID")
+	var userIDPtr *int
+	if exists {
+		id := userID.(int)
+		userIDPtr = &id
+	}
+
 	dto, err := ctrl.threadCommentApplicationService.FindByID(service.ThreadCommentApplicationServiceFindByIDParams{
 		Ctx:       ctx.Request.Context(),
 		CommentID: commentID,
+		UserID:    userIDPtr,
 		Qs:        qs,
 	})
 	if err != nil {
@@ -153,4 +131,56 @@ func (ctrl *ThreadCommentController) Reply(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, dto)
+}
+
+func (ctrl *ThreadCommentController) Like(ctx *gin.Context) {
+	userID, exists := ctx.Get("userID")
+	if !exists {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "ユーザーIDがコンテキストに存在しません"})
+		return
+	}
+
+	commentID, err := strconv.Atoi(ctx.Param("commentID"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	err = ctrl.threadCommentApplicationService.Like(service.ThreadCommentApplicationServiceLikeParams{
+		Ctx:       ctx.Request.Context(),
+		UserID:    userID.(int),
+		CommentID: commentID,
+	})
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"message": "liked"})
+}
+
+func (ctrl *ThreadCommentController) Unlike(ctx *gin.Context) {
+	userID, exists := ctx.Get("userID")
+	if !exists {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "ユーザーIDがコンテキストに存在しません"})
+		return
+	}
+
+	commentID, err := strconv.Atoi(ctx.Param("commentID"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	err = ctrl.threadCommentApplicationService.Unlike(service.ThreadCommentApplicationServiceUnLikeParams{
+		Ctx:       ctx.Request.Context(),
+		UserID:    userID.(int),
+		CommentID: commentID,
+	})
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"message": "unliked"})
 }

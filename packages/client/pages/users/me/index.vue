@@ -7,10 +7,10 @@
     <br />
 
     <Form @submit="update" :validation-schema="schema" class="mx-2 mb-2" v-slot="{ meta }">
-      <div class="field">
-        <Field name="name" v-model="form.name" v-slot="{ errors }">
+      <div class="field mb-2">
+        <Field name="name" v-model="updateForm.name" v-slot="{ errors }">
           <v-text-field
-            v-model="form.name"
+            v-model="updateForm.name"
             label="名前(コメントの表示名になります)"
             variant="outlined"
             counter
@@ -22,10 +22,10 @@
         </Field>
       </div>
 
-      <div class="field">
-        <Field name="email" v-model="form.email" v-slot="{ errors }">
+      <div class="field mb-2">
+        <Field name="email" v-model="updateForm.email" v-slot="{ errors }">
           <v-text-field
-            v-model="form.email"
+            v-model="updateForm.email"
             label="メールアドレス"
             type="email"
             variant="outlined"
@@ -35,10 +35,10 @@
         </Field>
       </div>
 
-      <div class="field">
-        <Field name="profileLink" v-model="form.profileLink" v-slot="{ errors }">
+      <div class="field mb-2">
+        <Field name="profileLink" v-model="updateForm.profileLink" v-slot="{ errors }">
           <v-text-field
-            v-model="form.profileLink"
+            v-model="updateForm.profileLink"
             label="プロフィールリンク"
             type="url"
             variant="outlined"
@@ -56,10 +56,10 @@
     <br />
 
     <Form @submit="updatePassword" :validation-schema="passwordSchema" class="mx-2 mb-2" v-slot="{ meta }">
-      <div class="field">
-        <Field v-model="form.oldPassword" name="oldPassword" v-slot="{ errors }">
+      <div class="field mb-2">
+        <Field v-model="updatePasswordForm.oldPassword" name="oldPassword" v-slot="{ errors }">
           <v-text-field
-            v-model="form.oldPassword"
+            v-model="updatePasswordForm.oldPassword"
             label="現在のパスワード"
             type="password"
             variant="outlined"
@@ -69,10 +69,10 @@
         </Field>
       </div>
 
-      <div class="field">
-        <Field v-model="form.newPassword" name="newPassword" v-slot="{ errors }">
+      <div class="field mb-2">
+        <Field v-model="updatePasswordForm.newPassword" name="newPassword" v-slot="{ errors }">
           <v-text-field
-            v-model="form.newPassword"
+            v-model="updatePasswordForm.newPassword"
             label="新しいパスワード"
             type="password"
             variant="outlined"
@@ -96,14 +96,16 @@ import type { IUser } from '~/types/user';
 definePageMeta({ middleware: ['logged-in-access-only'] });
 
 const menuItems = [
-  { title: 'マイスレ', clicked: () => router.push('/users/me/threads'), icon: 'mdi-note' },
-  { title: 'ユーザー情報', clicked: () => router.push('/users/me'), icon: 'mdi-account' },
-  { title: 'マイレス', clicked: () => router.push('/users/me/comments'), icon: 'mdi-comment' },
+  { title: 'マイスレ', clicked: () => router.push('/users/me/threads'), icon: 'mdi-file-document-multiple-outline' },
+  { title: 'ユーザー情報', clicked: () => router.push('/users/me'), icon: 'mdi-account-cog-outline' },
+  { title: 'マイレス', clicked: () => router.push('/users/me/comments'), icon: 'mdi-message-text-outline' },
+  {
+    title: 'お気に入りスレ',
+    clicked: () => router.push('/users/me/liked-threads'),
+    icon: 'mdi-star-box-multiple-outline',
+  },
+  { title: 'お気に入りレス', clicked: () => router.push('/users/me/liked-comments'), icon: 'mdi-message-star-outline' },
 ];
-
-const snackbar = useState('isSnackbar', () => {
-  return { isSnackbar: false, text: '' };
-});
 
 const schema = yup.object({
   name: yup.string().required('必須項目です'),
@@ -121,12 +123,15 @@ const route = useRoute();
 const nuxtApp = useNuxtApp();
 const { payload, $api } = nuxtApp;
 
-const user = ref<IUser>({});
+const user = ref<IUser>();
 
-const form = ref({
-  name: user.value.name,
-  email: user.value.email,
-  profileLink: user.value.profileLink || null,
+const updateForm = ref({
+  name: '',
+  email: '',
+  profileLink: null as string | null,
+});
+
+const updatePasswordForm = ref({
   oldPassword: '',
   newPassword: '',
 });
@@ -138,26 +143,25 @@ onMounted(async () => {
 async function fetchUser() {
   const { data } = await $api.get<IUser>(`/users/${payload?.user?.id}`, {});
   user.value = data;
-  form.value.name = data.name;
-  form.value.email = data.email;
-  form.value.profileLink = data.profileLink;
+  updateForm.value.name = data.name;
+  updateForm.value.email = data.email;
+  updateForm.value.profileLink = data.profileLink;
 }
 
 async function update() {
   if (confirm('ユーザー情報を更新しますか？')) {
     try {
       // 空文字列をnullに変換
-      if (form.value.profileLink === '') {
-        form.value.profileLink = null;
+      if (updateForm.value.profileLink === '') {
+        updateForm.value.profileLink = null;
       }
 
       await $api.put('/users/me', {
-        name: form.value.name,
-        email: form.value.email,
-        profileLink: form.value.profileLink,
+        name: updateForm.value.name,
+        email: updateForm.value.email,
+        profileLink: updateForm.value.profileLink,
       });
-      snackbar.value.isSnackbar = true;
-      snackbar.value.text = 'ユーザー情報を更新しました。';
+      alert('ユーザー情報を更新しました。');
       fetchUser();
     } catch (err) {
       alert(err.response.data.error);
@@ -169,11 +173,10 @@ async function updatePassword() {
   if (confirm('パスワードを更新しますか？')) {
     try {
       await $api.patch('/users/me/password', {
-        oldPassword: form.value.oldPassword,
-        newPassword: form.value.newPassword,
+        oldPassword: updatePasswordForm.value.oldPassword,
+        newPassword: updatePasswordForm.value.newPassword,
       });
-      snackbar.value.isSnackbar = true;
-      snackbar.value.text = 'パスワードを更新しました。';
+      alert('パスワードを更新しました。');
       fetchUser();
     } catch (err) {
       alert('通信中にエラーが発生しました');

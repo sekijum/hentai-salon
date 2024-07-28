@@ -219,3 +219,119 @@ func (ctrl *UserController) ResetPassword(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, "パスワードを変更しました")
 }
+
+func (ctrl *UserController) FindLikedThreads(ctx *gin.Context) {
+	var qs request.UserFindLikedCommentsRequest
+	if err := ctx.ShouldBindQuery(&qs); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	userID, exists := ctx.Get("userID")
+	if !exists {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "ユーザーIDがコンテキストに存在しません"})
+		return
+	}
+
+	qs.Limit = ctx.GetInt("limit")
+	qs.Offset = ctx.GetInt("offset")
+
+	dto, err := ctrl.userApplicationService.FindLikedThreads(service.UserApplicationServiceFindLikedThreadsParams{
+		Ctx:    context.Background(),
+		UserID: userID.(int),
+		Qs:     qs,
+	})
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, dto)
+}
+
+func (ctrl *UserController) FindLikedComments(ctx *gin.Context) {
+	var qs request.UserFindUnLikedCommentsRequest
+	if err := ctx.ShouldBindQuery(&qs); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	userID, exists := ctx.Get("userID")
+	if !exists {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "ユーザーIDがコンテキストに存在しません"})
+		return
+	}
+
+	qs.Limit = ctx.GetInt("limit")
+	qs.Offset = ctx.GetInt("offset")
+
+	dto, err := ctrl.userApplicationService.FindLikedComments(service.UserApplicationServiceFindLikedCommentsParams{
+		Ctx:    context.Background(),
+		UserID: userID.(int),
+		Qs:     qs,
+	})
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, dto)
+}
+
+func (ctrl *UserController) FindThreads(ctx *gin.Context) {
+	var qs request.UserFindThreadsRequest
+	if err := ctx.ShouldBindQuery(&qs); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	userID, exists := ctx.Get("userID")
+	if !exists {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "ユーザーIDがコンテキストに存在しません"})
+		return
+	}
+
+	qs.Limit = ctx.GetInt("limit")
+	qs.Offset = ctx.GetInt("offset")
+
+	dto, err := ctrl.userApplicationService.FindThreads(service.UserApplicationServiceFindUserThreadsParams{
+		Ctx:    ctx.Request.Context(),
+		UserID: userID.(int),
+		Qs:     qs,
+	})
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, dto)
+}
+
+func (ctrl *UserController) FindComments(ctx *gin.Context) {
+	var qs request.UserFindCommentsRequest
+	if err := ctx.ShouldBindQuery(&qs); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	userID, exists := ctx.Get("userID")
+	if !exists {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "ユーザーIDがコンテキストに存在しません"})
+		return
+	}
+
+	qs.Limit = ctx.GetInt("limit")
+	qs.Offset = ctx.GetInt("offset")
+
+	comments, err := ctrl.userApplicationService.FindUserComments(service.UserApplicationServiceFindUserCommentsParams{
+		Ctx:    ctx.Request.Context(),
+		UserID: userID.(int),
+		Qs:     qs,
+	})
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, comments)
+}

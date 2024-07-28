@@ -16,7 +16,7 @@
             dense
             density="compact"
             :error-messages="errors"
-            :readonly="payload.isLoggedIn"
+            :disabled="payload.isLoggedIn"
           />
         </Field>
       </div>
@@ -180,7 +180,7 @@ function handleAttachmentsChange(event: Event): void {
   }
 }
 
-async function submit(): Promise<void> {
+async function submit(_: typeof form.value, { resetForm }: { resetForm: () => void }): Promise<void> {
   if (confirm('本当に書き込みますか？')) {
     try {
       if (attachmentFiles.value && attachmentFiles.value.length > 0) {
@@ -206,10 +206,11 @@ async function submit(): Promise<void> {
       } else {
         await $api.post(`/threads/${props.threadId}/comments/`, form.value);
       }
-      if (!payload.isLoggedIn) setLastCommentTime();
-      snackbar.value.isSnackbar = true;
-      snackbar.value.text = '書き込みました。';
-      form.value.content = '';
+      if (!payload.isLoggedIn) {
+        setLastCommentTime();
+      }
+      alert('書き込みました。');
+      resetForm();
       attachmentFiles.value = [];
       if (fileInput.value) {
         fileInput.value.reset();

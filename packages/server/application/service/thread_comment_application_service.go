@@ -17,52 +17,10 @@ func NewThreadCommentApplicationService(threadCommentDatasource *datasource.Thre
 	return &ThreadCommentApplicationService{threadCommentDatasource: threadCommentDatasource}
 }
 
-type ThreadCommentApplicationServiceFindByUserIDParams struct {
-	Ctx    context.Context
-	UserID int
-	Qs     request.ThreadCommentFindAllByUserIDRequest
-}
-
-func (svc *ThreadCommentApplicationService) FindAllByUserID(params ThreadCommentApplicationServiceFindByUserIDParams) (*resource.Collection[*resource.ThreadCommentResource], error) {
-	commentList, err := svc.threadCommentDatasource.FindAllByUserID(datasource.ThreadCommentDatasourceFindAllByUserIDParams{
-		Ctx:    params.Ctx,
-		UserID: params.UserID,
-		Limit:  params.Qs.Limit,
-		Offset: params.Qs.Offset,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	commentCount, err := svc.threadCommentDatasource.GetCommentCount(datasource.ThreadDatasourceGetCommentCountParams{
-		Ctx:    params.Ctx,
-		UserID: &params.UserID,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	var threadCommentResourceList []*resource.ThreadCommentResource
-	for _, comment_i := range commentList {
-		threadCommentResourceList = append(threadCommentResourceList, resource.NewThreadCommentResource(resource.NewThreadCommentResourceParams{
-			ThreadComment: comment_i,
-			ReplyCount:    len(comment_i.EntThreadComment.Edges.Replies),
-		}))
-	}
-
-	dto := resource.NewCollection(resource.NewCollectionParams[*resource.ThreadCommentResource]{
-		Data:       threadCommentResourceList,
-		TotalCount: commentCount,
-		Limit:      params.Qs.Limit,
-		Offset:     params.Qs.Offset,
-	})
-
-	return dto, nil
-}
-
 type ThreadCommentApplicationServiceFindByIDParams struct {
 	Ctx       context.Context
 	CommentID int
+	UserID    *int
 	Qs        request.ThreadCommentFindByIDRequest
 }
 
@@ -81,6 +39,7 @@ func (svc *ThreadCommentApplicationService) FindByID(params ThreadCommentApplica
 		ThreadComment: comment,
 		Limit:         params.Qs.Limit,
 		Offset:        params.Qs.Offset,
+		UserID:        params.UserID,
 		ReplyCount:    len(comment.EntThreadComment.Edges.Replies),
 	})
 
@@ -103,7 +62,7 @@ func (svc *ThreadCommentApplicationService) Create(params ThreadCommentApplicati
 			ThreadID:        params.ThreadID,
 			Content:         params.Body.Content,
 			IPAddress:       params.ClientIP,
-			GuestName:       &params.Body.GuestName,
+			GuestName:       params.Body.GuestName,
 			UserID:          params.UserID,
 			ParentCommentID: params.ParentCommentID,
 		},
@@ -146,4 +105,42 @@ func (svc *ThreadCommentApplicationService) Create(params ThreadCommentApplicati
 	})
 
 	return dto, nil
+}
+
+type ThreadCommentApplicationServiceLikeParams struct {
+	Ctx       context.Context
+	UserID    int
+	CommentID int
+}
+
+func (svc *ThreadCommentApplicationService) Like(params ThreadCommentApplicationServiceLikeParams) error {
+	err := svc.threadCommentDatasource.Like(datasource.ThreadCommentDatasourceLikeParams{
+		Ctx:       params.Ctx,
+		UserID:    params.UserID,
+		CommentID: params.CommentID,
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+type ThreadCommentApplicationServiceUnLikeParams struct {
+	Ctx       context.Context
+	UserID    int
+	CommentID int
+}
+
+func (svc *ThreadCommentApplicationService) Unlike(params ThreadCommentApplicationServiceUnLikeParams) error {
+	_, err := svc.threadCommentDatasource.Unlike(datasource.ThreadCommentDatasourceUnLikeParams{
+		Ctx:       params.Ctx,
+		UserID:    params.UserID,
+		CommentID: params.CommentID,
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

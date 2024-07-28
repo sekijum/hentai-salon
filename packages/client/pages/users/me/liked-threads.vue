@@ -1,6 +1,6 @@
 <template>
   <div v-if="threads">
-    <PageTitle title="マイスレ" />
+    <PageTitle title="お気に入りスレ" />
 
     <Menu :items="menuItems" />
 
@@ -48,7 +48,7 @@ onMounted(async () => {
 });
 
 async function fetchThreads() {
-  const response = await $api.get<IListResource<IThread>>('/users/me/threads', {
+  const response = await $api.get<IListResource<IThread>>('/users/me/liked-threads', {
     params: {
       threadIds: getThreadViewHistory(),
       limit,

@@ -66,6 +66,10 @@
 
     <Pagination :totalCount="thread.comments.totalCount" :limit="commentLimit" />
 
+    <v-btn icon large color="primary" class="fab fab-like" @click="toggleLike">
+      <v-icon>{{ thread.isLiked ? 'mdi-thumb-up' : 'mdi-thumb-up-outline' }}</v-icon>
+    </v-btn>
+
     <ThreadList
       v-if="threads.threadsByRelated?.length"
       queryCriteria="related"
@@ -91,7 +95,7 @@ const route = useRoute();
 const nuxtApp = useNuxtApp();
 const { setThreadViewHistory, getThreadViewHistory, getCommentLimit, getCommentSortOrder } = useStorage();
 
-const { $api } = nuxtApp;
+const { $api, payload } = nuxtApp;
 
 const commentLimit = getCommentLimit();
 const thread = ref<IThread>({
@@ -104,6 +108,7 @@ const thread = ref<IThread>({
   commentCount: 0,
   comments: { totalCount: 0, limit: 0, offset: 0, data: [] },
   attachments: [],
+  isLiked: false,
 });
 
 const snackbar = useState('isSnackbar', () => {
@@ -193,6 +198,20 @@ async function fetchThreads() {
   threads.value.threadsByRelated = response.data;
 }
 
+async function toggleLike() {
+  if (!payload.isLoggedIn) {
+    alert('ログインしてください。');
+    return;
+  }
+  if (thread.value.isLiked) {
+    await $api.post(`/threads/${thread.value.id}/unlike`);
+    thread.value.isLiked = false;
+  } else {
+    await $api.post(`/threads/${thread.value.id}/like`);
+    thread.value.isLiked = true;
+  }
+}
+
 useHead({
   title: thread.value?.title,
   meta: [
@@ -242,5 +261,10 @@ watch(
 
 .fab-bottom {
   bottom: 16px;
+}
+
+.fab-like {
+  bottom: 130px;
+  right: 16px;
 }
 </style>

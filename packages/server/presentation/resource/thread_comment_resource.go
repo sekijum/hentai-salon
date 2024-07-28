@@ -19,11 +19,13 @@ type ThreadCommentResource struct {
 	Attachments     []*ThreadCommentAttachmentResource  `json:"attachments"`
 	ReplyCount      int                                 `json:"replyCount"`
 	Replies         *Collection[*ThreadCommentResource] `json:"replies"`
+	IsLiked         bool                                `json:"isLiked"`
 }
 
 type NewThreadCommentResourceParams struct {
 	ThreadComment             *model.ThreadComment
 	CommentIDs                []int
+	UserID                    *int
 	ReplyCount, Limit, Offset int
 }
 
@@ -66,6 +68,7 @@ func NewThreadCommentResource(params NewThreadCommentResourceParams) *ThreadComm
 			ThreadComment: model.NewThreadComment(model.NewThreadCommentParams{EntThreadComment: reply_i}),
 			Offset:        params.Offset,
 			ReplyCount:    len(reply_i.Edges.Replies),
+			UserID:        params.UserID,
 		}))
 	}
 
@@ -89,6 +92,16 @@ func NewThreadCommentResource(params NewThreadCommentResourceParams) *ThreadComm
 		}
 	}
 
+	isLiked := false
+	if params.UserID != nil {
+		for _, likedUser_i := range params.ThreadComment.EntThreadComment.Edges.LikedUsers {
+			if likedUser_i.ID == *params.UserID {
+				isLiked = true
+				break
+			}
+		}
+	}
+
 	return &ThreadCommentResource{
 		ID:              params.ThreadComment.EntThreadComment.ID,
 		User:            userResource,
@@ -102,5 +115,6 @@ func NewThreadCommentResource(params NewThreadCommentResourceParams) *ThreadComm
 		Attachments:     attachmentResourceList,
 		ReplyCount:      params.ReplyCount,
 		Replies:         replyCollection,
+		IsLiked:         isLiked,
 	}
 }

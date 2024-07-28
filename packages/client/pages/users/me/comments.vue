@@ -35,9 +35,15 @@ const { $api } = nuxtApp;
 const { getCommentLimit } = useStorage();
 
 const menuItems = [
-  { title: 'マイスレ', clicked: () => router.push('/users/me/threads'), icon: 'mdi-note' },
-  { title: 'ユーザー情報', clicked: () => router.push('/users/me'), icon: 'mdi-account' },
-  { title: 'マイレス', clicked: () => router.push('/users/me/comments'), icon: 'mdi-comment' },
+  { title: 'マイスレ', clicked: () => router.push('/users/me/threads'), icon: 'mdi-file-document-multiple-outline' },
+  { title: 'ユーザー情報', clicked: () => router.push('/users/me'), icon: 'mdi-account-cog-outline' },
+  { title: 'マイレス', clicked: () => router.push('/users/me/comments'), icon: 'mdi-message-text-outline' },
+  {
+    title: 'お気に入りスレ',
+    clicked: () => router.push('/users/me/liked-threads'),
+    icon: 'mdi-star-box-multiple-outline',
+  },
+  { title: 'お気に入りレス', clicked: () => router.push('/users/me/liked-comments'), icon: 'mdi-message-star-outline' },
 ];
 
 const comment = ref<IListResource<IThreadComment>>();

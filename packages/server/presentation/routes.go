@@ -40,12 +40,16 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 	{
 		threadGroup.GET("/", controllers.ThreadController.FindAllList)
 		threadGroup.GET("/:threadID", controllers.ThreadController.FindById)
+		threadGroup.POST("/:threadID/like", controllers.ThreadController.Like)
+		threadGroup.POST("/:threadID/unlike", controllers.ThreadController.Unlike)
 
 		commentGroup := threadGroup.Group("/:threadID/comments")
 		{
 			commentGroup.GET("/:commentID", controllers.ThreadCommentController.FindById)
 			commentGroup.POST("/", controllers.ThreadCommentController.Create)
 			commentGroup.POST("/:commentID/reply", controllers.ThreadCommentController.Reply)
+			commentGroup.POST("/:commentID/like", controllers.ThreadCommentController.Like)
+			commentGroup.POST("/:commentID/unlike", controllers.ThreadCommentController.Unlike)
 		}
 	}
 
@@ -61,8 +65,10 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 		{
 			usersGroup.GET("/:userID", controllers.UserController.FindByID)
 			usersGroup.GET("/me", controllers.UserController.FindAuthenticatedUser)
-			usersGroup.GET("/me/comments", controllers.ThreadCommentController.FindAllByUserID)
-			usersGroup.GET("/me/threads", controllers.ThreadController.FindByUserID)
+			usersGroup.GET("/me/comments", controllers.UserController.FindComments)
+			usersGroup.GET("/me/threads", controllers.UserController.FindThreads)
+			usersGroup.GET("/me/liked-threads", controllers.UserController.FindLikedThreads)
+			usersGroup.GET("/me/liked-comments", controllers.UserController.FindLikedComments)
 			usersGroup.PUT("/me", controllers.UserController.Update)
 			usersGroup.PATCH("/me/password", controllers.UserController.UpdatePassword)
 		}

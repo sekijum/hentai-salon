@@ -16,6 +16,7 @@ export interface IThreadComment {
   updatedAt: string;
   attachments: IThreadCommentAttachment[];
   replyCount: number;
+  isLiked: boolean;
 }
 
 export interface IThread {
@@ -29,4 +30,5 @@ export interface IThread {
   commentCount: number;
   comments: IListResource<IThreadComment>;
   attachments: IThreadCommentAttachmentForThread[];
+  isLiked: boolean;
 }

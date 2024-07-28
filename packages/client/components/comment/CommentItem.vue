@@ -82,6 +82,9 @@
               <v-icon small>mdi-comment</v-icon>
               <span class="interaction-text">{{ comment.replyCount }}</span>
             </nuxt-link>
+            <v-icon class="interaction-link id-link" small @click="toggleLike">
+              {{ isLiked ? 'mdi-thumb-up' : 'mdi-thumb-up-outline' }}
+            </v-icon>
             <nuxt-link
               :to="`/threads/${threadId}/comments/${comment.id}`"
               class="interaction-link id-link"
@@ -131,11 +134,12 @@ const props = defineProps<{ comment: IThreadComment; commentLimit: number; threa
 const nuxtApp = useNuxtApp();
 const route = useRoute();
 
-const { $formatDate, payload } = nuxtApp;
+const { $formatDate, $api, payload } = nuxtApp;
 
 const selectedAttachment = ref<IThreadCommentAttachment | null>();
 const showReplyForm = ref(false);
 const emit = defineEmits(['replied']);
+const isLiked = ref(props.comment.isLiked);
 
 function toggleReplyForm() {
   showReplyForm.value = !showReplyForm.value;
@@ -152,6 +156,20 @@ function closeModalMedia() {
 function username() {
   const name = props.comment?.user?.name || props.comment?.guestName || '匿名';
   return `${name}`;
+}
+
+async function toggleLike() {
+  if (!payload.isLoggedIn) {
+    alert('ログインしてください。');
+    return;
+  }
+  if (isLiked.value) {
+    await $api.post(`/threads/${props.threadId}/comments/${props.comment.id}/unlike`);
+    isLiked.value = false;
+  } else {
+    await $api.post(`/threads/${props.threadId}/comments/${props.comment.id}/like`);
+    isLiked.value = true;
+  }
 }
 </script>
 
@@ -216,7 +234,7 @@ function username() {
 }
 
 .id-link {
-  margin-left: 20px;
+  margin-left: 15px;
 }
 
 .comment-content {

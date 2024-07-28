@@ -8,6 +8,8 @@ import (
 	"server/infrastructure/ent/thread"
 	"server/infrastructure/ent/threadcomment"
 	"server/infrastructure/ent/threadcommentattachment"
+	"server/infrastructure/ent/userthreadlike"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 )
@@ -167,30 +169,6 @@ func (ds *ThreadDatasource) FindByPopularity(params ThreadDatasourceFindByPopula
 	return threads, nil
 }
 
-type ThreadDatasourceFindAllByUserIDParams struct {
-	Ctx    context.Context
-	UserID int
-}
-
-func (ds *ThreadDatasource) FindAllByUserID(params ThreadDatasourceFindAllByUserIDParams) ([]*model.Thread, error) {
-	entThreadList, err := ds.client.Thread.Query().
-		Where(thread.UserIDEQ(params.UserID)).
-		WithTags().
-		WithComments().
-		All(params.Ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	var threads []*model.Thread
-	for _, entThread_i := range entThreadList {
-		threads = append(threads, model.NewThread(model.NewThreadParams{EntThread: entThread_i}))
-	}
-
-	return threads, nil
-
-}
-
 type ThreadDatasourceFindByTitleParams struct {
 	Ctx   context.Context
 	Title string
@@ -241,8 +219,10 @@ func (ds *ThreadDatasource) FindById(params ThreadDatasourceFindByIDParams) (*mo
 				}).
 				WithReplies(func(rq *ent.ThreadCommentQuery) {
 					rq.Select(thread.FieldID)
-				})
+				}).
+				WithLikedUsers()
 		}).
+		WithLikedUsers().
 		Only(params.Ctx)
 	if err != nil {
 		return nil, err
@@ -284,4 +264,32 @@ func (ds *ThreadDatasource) CreateTx(params ThreadDatasourceCreateTxParams) (*mo
 	thread := model.NewThread(model.NewThreadParams{EntThread: entThread})
 
 	return thread, nil
+}
+
+type ThreadDatasourceLikeParams struct {
+	Ctx      context.Context
+	UserID   int
+	ThreadID int
+}
+
+func (ds *ThreadDatasource) Like(params ThreadDatasourceLikeParams) error {
+	_, err := ds.client.UserThreadLike.Create().
+		SetUserID(params.UserID).
+		SetThreadID(params.ThreadID).
+		SetLikedAt(time.Now()).
+		Save(params.Ctx)
+	return err
+
+}
+
+type ThreadDatasourceUnlikeParams struct {
+	Ctx      context.Context
+	UserID   int
+	ThreadID int
+}
+
+func (ds *ThreadDatasource) Unlike(params ThreadDatasourceUnlikeParams) (int, error) {
+	return ds.client.UserThreadLike.Delete().
+		Where(userthreadlike.UserIDEQ(params.UserID), userthreadlike.ThreadIDEQ(params.ThreadID)).
+		Exec(params.Ctx)
 }

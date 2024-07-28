@@ -7,8 +7,11 @@ import (
 	"server/infrastructure/ent"
 	"server/infrastructure/ent/threadcomment"
 	"server/infrastructure/ent/user"
+	"server/infrastructure/ent/userthreadlike"
 	"strings"
 	"time"
+
+	"entgo.io/ent/dialect/sql"
 )
 
 type UserDatasource struct {
@@ -183,4 +186,122 @@ func (ds *UserDatasource) UpdatePassword(params UserDatasourceUpdatePasswordPara
 	user := model.NewUser(model.NewUserParams{EntUser: entUser})
 
 	return user, nil
+}
+
+type UserDatasourceFindLikedThreadsParams struct {
+	Ctx    context.Context
+	UserID int
+	Limit  int
+	Offset int
+}
+
+func (ds *UserDatasource) FindLikedThreads(params UserDatasourceFindLikedThreadsParams) ([]*model.Thread, error) {
+	entUser, err := ds.client.User.Query().
+		Where(user.ID(params.UserID)).
+		WithLikedThreads(func(q *ent.ThreadQuery) {
+			q.WithTags().WithBoard().WithComments().
+				Order(func(s *sql.Selector) {
+					s.OrderBy(sql.Desc(userthreadlike.FieldLikedAt))
+				}).
+				Limit(params.Limit).Offset(params.Offset)
+		}).
+		Only(params.Ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var threads []*model.Thread
+	for _, entThread_i := range entUser.Edges.LikedThreads {
+		threads = append(threads, model.NewThread(model.NewThreadParams{EntThread: entThread_i}))
+	}
+
+	return threads, nil
+}
+
+type UserDatasourceFindLikedCommentsParams struct {
+	Ctx    context.Context
+	UserID int
+	Limit  int
+	Offset int
+}
+
+func (ds *UserDatasource) FindLikedComments(params UserDatasourceFindLikedCommentsParams) ([]*model.ThreadComment, error) {
+	entUser, err := ds.client.User.Query().
+		Where(user.ID(params.UserID)).
+		WithLikedComments(func(q *ent.ThreadCommentQuery) {
+			q.WithReplies().WithAttachments().WithThread().WithLikedUsers().
+				Order(func(s *sql.Selector) {
+					s.OrderBy(sql.Desc(userthreadlike.FieldLikedAt))
+				}).
+				Limit(params.Limit).Offset(params.Offset)
+		}).
+		Only(params.Ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var comments []*model.ThreadComment
+	for _, entComment_i := range entUser.Edges.LikedComments {
+		comments = append(comments, model.NewThreadComment(model.NewThreadCommentParams{EntThreadComment: entComment_i}))
+	}
+
+	return comments, nil
+}
+
+type UserDatasourceFindThreadsParams struct {
+	Ctx    context.Context
+	UserID int
+	Limit  int
+	Offset int
+}
+
+func (ds *UserDatasource) FindThreads(params UserDatasourceFindThreadsParams) ([]*model.Thread, error) {
+	entUser, err := ds.client.User.Query().
+		Where(user.ID(params.UserID)).
+		WithThreads(func(q *ent.ThreadQuery) {
+			q.WithTags().WithBoard().WithComments()
+			q.Limit(params.Limit).Offset(params.Offset).
+				WithComments(func(q *ent.ThreadCommentQuery) {
+					q.Select(threadcomment.FieldID)
+				})
+		}).
+		Only(params.Ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var threads []*model.Thread
+	for _, entThread_i := range entUser.Edges.Threads {
+		threads = append(threads, model.NewThread(model.NewThreadParams{EntThread: entThread_i}))
+	}
+
+	return threads, nil
+}
+
+type UserDatasourceFindUserCommentsParams struct {
+	Ctx    context.Context
+	UserID int
+	Limit  int
+	Offset int
+}
+
+func (ds *UserDatasource) FindUserComments(params UserDatasourceFindUserCommentsParams) ([]*model.ThreadComment, error) {
+	entUser, err := ds.client.User.Query().
+		Where(user.ID(params.UserID)).
+		WithComments(func(q *ent.ThreadCommentQuery) {
+			q.WithThread().WithAuthor().WithAttachments().WithParentComment().WithReplies().WithLikedUsers().
+				Limit(params.Limit).Offset(params.Offset).
+				Order(ent.Desc(threadcomment.FieldCreatedAt))
+		}).
+		Only(params.Ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var comments []*model.ThreadComment
+	for _, entComment_i := range entUser.Edges.Comments {
+		comments = append(comments, model.NewThreadComment(model.NewThreadCommentParams{EntThreadComment: entComment_i}))
+	}
+
+	return comments, nil
 }

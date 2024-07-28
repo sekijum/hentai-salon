@@ -64,40 +64,18 @@ func (ctrl *ThreadController) FindById(ctx *gin.Context) {
 	qs.Limit = ctx.GetInt("limit")
 	qs.Offset = ctx.GetInt("offset")
 
+	userID, exists := ctx.Get("userID")
+	var userIDPtr *int
+	if exists {
+		id := userID.(int)
+		userIDPtr = &id
+	}
+
 	dto, err := ctrl.threadApplicationService.FindByID(service.ThreadApplicationServiceFindByIDParams{
 		Ctx:      context.Background(),
+		UserID:   userIDPtr,
 		ThreadID: threadID,
 		Qs:       qs,
-	})
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	ctx.JSON(http.StatusOK, dto)
-}
-
-func (ctrl *ThreadController) FindByUserID(ctx *gin.Context) {
-	userID, exists := ctx.Get("userID")
-	if !exists {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "ユーザーIDがコンテキストに存在しません"})
-		return
-	}
-
-	var qs request.ThreadFindAllByUserIDRequest
-
-	if err := ctx.ShouldBindQuery(&qs); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	qs.Limit = ctx.GetInt("limit")
-	qs.Offset = ctx.GetInt("offset")
-
-	dto, err := ctrl.threadApplicationService.FindByUserID(service.ThreadApplicationServiceFindByUserIDParams{
-		Ctx:    context.Background(),
-		UserID: userID.(int),
-		Qs:     qs,
 	})
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -133,4 +111,56 @@ func (ctrl *ThreadController) Create(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, dto)
+}
+
+func (ctrl *ThreadController) Like(ctx *gin.Context) {
+	threadID, err := strconv.Atoi(ctx.Param("threadID"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	userID, exists := ctx.Get("userID")
+	if !exists {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "ユーザーIDがコンテキストに存在しません"})
+		return
+	}
+
+	err = ctrl.threadApplicationService.Like(service.ThreadApplicationServiceLikeParams{
+		Ctx:      ctx.Request.Context(),
+		UserID:   userID.(int),
+		ThreadID: threadID,
+	})
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"message": "スレッドにいいねしました"})
+}
+
+func (ctrl *ThreadController) Unlike(ctx *gin.Context) {
+	threadID, err := strconv.Atoi(ctx.Param("threadID"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	userID, exists := ctx.Get("userID")
+	if !exists {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "ユーザーIDがコンテキストに存在しません"})
+		return
+	}
+
+	err = ctrl.threadApplicationService.Unlike(service.ThreadApplicationServiceUnlikeParams{
+		Ctx:      ctx.Request.Context(),
+		UserID:   userID.(int),
+		ThreadID: threadID,
+	})
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"message": "スレッドのいいねを外しました"})
 }

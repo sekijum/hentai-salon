@@ -1,10 +1,5 @@
 package request
 
-type ThreadCommentFindAllByUserIDRequest struct {
-	Limit  int `form:"limit"`
-	Offset int `form:"offset"`
-}
-
 type ThreadCommentFindByIDRequest struct {
 	Limit  int `form:"limit"`
 	Offset int `form:"offset"`
@@ -18,6 +13,6 @@ type ThreadCommentAttachmentRequest struct {
 
 type ThreadCommentCreateRequest struct {
 	Content     string                           `json:"content" binding:"required"`
-	GuestName   string                           `json:"guestName" binding:"omitempty"`
+	GuestName   *string                          `json:"guestName" binding:"omitempty"`
 	Attachments []ThreadCommentAttachmentRequest `json:"attachments" binding:"omitempty,dive"`
 }

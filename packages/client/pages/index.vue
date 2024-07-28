@@ -77,9 +77,7 @@ const guestMenuItems = computed(() => {
   if (payload.isMember || payload.isAdmin) {
     items = items.concat([
       { title: 'スレ作成', clicked: () => router.push('/threads/new'), icon: 'mdi-pencil' },
-      { title: 'ユーザー情報', clicked: () => router.push('/users/me'), icon: 'mdi-account' },
-      { title: 'マイスレ', clicked: () => router.push('/users/me/threads'), icon: 'mdi-note' },
-      { title: 'マイレス', clicked: () => router.push('/users/me/comments'), icon: 'mdi-comment' },
+      { title: 'マイページ', clicked: () => router.push('/users/me'), icon: 'mdi-account' },
     ]);
   }
 

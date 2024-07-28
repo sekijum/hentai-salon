@@ -165,49 +165,9 @@ func (svc *ThreadApplicationService) FindAll(params ThreadApplicationServiceFind
 	return dto, nil
 }
 
-type ThreadApplicationServiceFindByUserIDParams struct {
-	Ctx    context.Context
-	UserID int
-	Qs     request.ThreadFindAllByUserIDRequest
-}
-
-func (svc *ThreadApplicationService) FindByUserID(params ThreadApplicationServiceFindByUserIDParams) (*resource.Collection[*resource.ThreadResource], error) {
-	threadList, err := svc.threadDatasource.FindAllByUserID(datasource.ThreadDatasourceFindAllByUserIDParams{
-		Ctx:    params.Ctx,
-		UserID: params.UserID,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	threadCount, err := svc.threadDatasource.GetThreadCount(datasource.ThreadDatasourceGetCommentCountParams{
-		Ctx:    params.Ctx,
-		UserID: &params.UserID,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	var threadResourceList []*resource.ThreadResource
-	for _, thread := range threadList {
-		threadResourceList = append(threadResourceList, resource.NewThreadResource(resource.NewThreadResourceParams{
-			Thread:       thread,
-			CommentCount: len(thread.EntThread.Edges.Comments),
-		}))
-	}
-
-	dto := resource.NewCollection(resource.NewCollectionParams[*resource.ThreadResource]{
-		Data:       threadResourceList,
-		TotalCount: threadCount,
-		Limit:      params.Qs.Limit,
-		Offset:     params.Qs.Offset,
-	})
-
-	return dto, nil
-}
-
 type ThreadApplicationServiceFindByIDParams struct {
 	Ctx      context.Context
+	UserID   *int
 	ThreadID int
 	Qs       request.ThreadFindByIdRequest
 }
@@ -237,6 +197,7 @@ func (svc *ThreadApplicationService) FindByID(params ThreadApplicationServiceFin
 		CommentCount: commentCount,
 		Limit:        params.Qs.Limit,
 		Offset:       params.Qs.Offset,
+		UserID:       params.UserID,
 	})
 	return dto, nil
 }
@@ -312,4 +273,42 @@ func (svc *ThreadApplicationService) Create(params ThreadApplicationServiceCreat
 	dto := resource.NewThreadResource(resource.NewThreadResourceParams{Thread: thread})
 
 	return dto, nil
+}
+
+type ThreadApplicationServiceLikeParams struct {
+	Ctx      context.Context
+	UserID   int
+	ThreadID int
+}
+
+func (svc *ThreadApplicationService) Like(params ThreadApplicationServiceLikeParams) error {
+	err := svc.threadDatasource.Like(datasource.ThreadDatasourceLikeParams{
+		Ctx:      params.Ctx,
+		UserID:   params.UserID,
+		ThreadID: params.ThreadID,
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+type ThreadApplicationServiceUnlikeParams struct {
+	Ctx      context.Context
+	UserID   int
+	ThreadID int
+}
+
+func (svc *ThreadApplicationService) Unlike(params ThreadApplicationServiceUnlikeParams) error {
+	_, err := svc.threadDatasource.Unlike(datasource.ThreadDatasourceUnlikeParams{
+		Ctx:      params.Ctx,
+		UserID:   params.UserID,
+		ThreadID: params.ThreadID,
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
