@@ -1,6 +1,6 @@
 import type { IThread } from '~/types/thread';
 import type { IThreadComment } from '~/types/thread-comment';
-import type { IListResource } from '~/types/list-resource';
+import type { ICollection } from '~/types/collection';
 
 export interface IUser {
   id: number;
@@ -10,6 +10,6 @@ export interface IUser {
   profileLink: string;
   createdAt: string;
   updatedAt: string;
-  threads: IListResource<IThread>;
-  comments: IListResource<IThreadComment>;
+  threads: ICollection<IThread>;
+  comments: ICollection<IThreadComment>;
 }

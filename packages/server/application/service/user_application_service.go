@@ -455,9 +455,11 @@ func (svc *UserApplicationService) FindLikedThreads(params UserApplicationServic
 
 	var threadResourceList []*resource.ThreadResource
 	for _, thread_i := range threadList {
+		commentCount := (len(thread_i.EntThread.Edges.Comments))
 		threadResourceList = append(threadResourceList, resource.NewThreadResource(resource.NewThreadResourceParams{
 			Thread:       thread_i,
-			CommentCount: len(thread_i.EntThread.Edges.Comments),
+			CommentCount: &commentCount,
+			IncludeBoard: true,
 		}))
 	}
 
@@ -498,10 +500,15 @@ func (svc *UserApplicationService) FindLikedComments(params UserApplicationServi
 
 	var threadCommentResourceList []*resource.ThreadCommentResource
 	for _, comment_i := range commentList {
+		replyCount := len(comment_i.EntThreadComment.Edges.Replies)
 		threadCommentResourceList = append(threadCommentResourceList, resource.NewThreadCommentResource(resource.NewThreadCommentResourceParams{
-			ThreadComment: comment_i,
-			UserID:        &params.UserID,
-			ReplyCount:    len(comment_i.EntThreadComment.Edges.Replies),
+			ThreadComment:      comment_i,
+			UserID:             &params.UserID,
+			ReplyCount:         &replyCount,
+			IncludeReplies:     true,
+			IncludeUser:        true,
+			IncludeAttachments: true,
+			IncludeThread:      true,
 		}))
 	}
 
@@ -542,9 +549,11 @@ func (svc *UserApplicationService) FindThreads(params UserApplicationServiceFind
 
 	var threadResourceList []*resource.ThreadResource
 	for _, thread_i := range threadList {
+		commentCount := len(thread_i.EntThread.Edges.Comments)
 		threadResourceList = append(threadResourceList, resource.NewThreadResource(resource.NewThreadResourceParams{
 			Thread:       thread_i,
-			CommentCount: len(thread_i.EntThread.Edges.Comments),
+			CommentCount: &commentCount,
+			IncludeBoard: true,
 		}))
 	}
 
@@ -585,10 +594,16 @@ func (svc *UserApplicationService) FindUserComments(params UserApplicationServic
 
 	var threadCommentResourceList []*resource.ThreadCommentResource
 	for _, comment_i := range commentList {
+		replyCount := len(comment_i.EntThreadComment.Edges.Replies)
 		threadCommentResourceList = append(threadCommentResourceList, resource.NewThreadCommentResource(resource.NewThreadCommentResourceParams{
-			ThreadComment: comment_i,
-			ReplyCount:    len(comment_i.EntThreadComment.Edges.Replies),
-			UserID:        &params.UserID,
+			ThreadComment:        comment_i,
+			ReplyCount:           &replyCount,
+			UserID:               &params.UserID,
+			IncludeUser:          true,
+			IncludeThread:        true,
+			IncludeParentComment: true,
+			IncludeAttachments:   true,
+			IncludeReplies:       true,
 		}))
 	}
 

@@ -22,7 +22,7 @@
 <script setup lang="ts">
 import PageTitle from '~/components/PageTitle.vue';
 import type { IThreadComment } from '~/types/thread-comment';
-import type { IListResource } from '~/types/list-resource';
+import type { ICollection } from '~/types/collection';
 import CommentItem from '~/components/comment/CommentItem.vue';
 import Pagination from '~/components/Pagination.vue';
 
@@ -46,7 +46,7 @@ const menuItems = [
   { title: 'お気に入りレス', clicked: () => router.push('/users/me/liked-comments'), icon: 'mdi-message-star-outline' },
 ];
 
-const comment = ref<IListResource<IThreadComment>>();
+const comment = ref<ICollection<IThreadComment>>();
 const commentLimit = getCommentLimit();
 
 onMounted(async () => {
@@ -54,7 +54,7 @@ onMounted(async () => {
 });
 
 async function fetchComments() {
-  const response = await $api.get<IListResource<IThreadComment>>('/users/me/liked-comments', {
+  const response = await $api.get<ICollection<IThreadComment>>('/users/me/liked-comments', {
     params: { offset: route.query.offset, limit: commentLimit },
   });
 

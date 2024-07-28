@@ -78,6 +78,7 @@ const props = defineProps<{
   clicked?: () => void;
   isInfiniteScroll?: boolean;
   queryCriteria: string;
+  threadLimit: number;
 }>();
 
 const router = useRouter();
@@ -85,7 +86,7 @@ const route = useRoute();
 
 const { $api } = nuxtApp;
 const { getThreadViewHistory } = useStorage();
-const threadLimit = 10;
+const threadLimit = ref(props.threadLimit);
 const offset = ref(0);
 const items = ref<IThread[]>([...props?.items]);
 
@@ -98,7 +99,7 @@ function getImageSrc(thumbnailUrl: string) {
 }
 
 async function load({ done }: { done: (status: 'loading' | 'error' | 'empty' | 'ok') => void }) {
-  offset.value += threadLimit;
+  offset.value += threadLimit.value;
   const { canNextLoad } = await fetchLoadThreads(offset.value);
   canNextLoad ? done('ok') : done('empty');
 }
@@ -110,12 +111,12 @@ async function fetchLoadThreads(offset: number) {
       threadIds: getThreadViewHistory(),
       keyword: route.query.keyword,
       boardId: route.query.boardId,
-      limit: threadLimit,
+      limit: threadLimit.value,
       offset: offset || 0,
     },
   });
 
-  if (!response.data || response.data.length > threadLimit) {
+  if (!response.data || response.data.length <= threadLimit.value) {
     return { canNextLoad: false };
   }
   items.value = [...items.value, ...response.data];

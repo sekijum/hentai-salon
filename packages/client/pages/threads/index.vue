@@ -25,6 +25,7 @@
       title="閲覧履歴"
       :items="threads?.threadsByHistory"
       :isInfiniteScroll="true"
+      :threadLimit="threadLimit"
     />
     <ThreadList
       v-if="
@@ -33,7 +34,8 @@
       queryCriteria="popularity"
       title="人気"
       :items="threads?.threadsByPopular"
-      :isInfiniteScroll="false"
+      :isInfiniteScroll="true"
+      :threadLimit="threadLimit"
     />
     <ThreadList
       v-if="(route.query.queryCriteria === 'newest' || !route.query.queryCriteria) && threads.threadsByNewest.length"
@@ -41,6 +43,7 @@
       title="新着"
       :items="threads?.threadsByNewest"
       :isInfiniteScroll="true"
+      :threadLimit="threadLimit"
     />
     <ThreadList
       v-if="route.query.queryCriteria === 'keyword' && threads.threadsByKeyword.length"
@@ -48,6 +51,7 @@
       title="全板検索"
       :items="threads?.threadsByKeyword"
       :isInfiniteScroll="true"
+      :threadLimit="threadLimit"
     />
     <ThreadList
       v-if="route.query.queryCriteria === 'related' && threads.threadsByRelated.length"
@@ -55,6 +59,7 @@
       title="関連"
       :items="threads?.threadsByRelated"
       :isInfiniteScroll="true"
+      :threadLimit="threadLimit"
     />
     <ThreadList
       v-if="route.query.queryCriteria === 'board' && threads.threadsByBoard.length"
@@ -62,6 +67,7 @@
       title="板"
       :items="threads?.threadsByBoard"
       :isInfiniteScroll="true"
+      :threadLimit="threadLimit"
     />
   </div>
 </template>

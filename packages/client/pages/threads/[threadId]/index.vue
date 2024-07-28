@@ -23,8 +23,8 @@
     <template v-if="route.query.tab === 'media'">
       <div id="media-top" />
       <MediaGallery
-        v-if="thread.attachments"
-        :attachments="thread.attachments"
+        v-if="thread.comments.data"
+        :attachments="thread.attachments.data"
         :commentLimit="commentLimit"
         :threadId="thread.id"
       />
@@ -104,10 +104,9 @@ const thread = ref<IThread>({
   description: '',
   thumbnailUrl: '',
   tagNameList: [],
-  createdAt: '',
   commentCount: 0,
   comments: { totalCount: 0, limit: 0, offset: 0, data: [] },
-  attachments: [],
+  attachments: { totalCount: 0, limit: 0, offset: 0, data: [] },
   isLiked: false,
 });
 

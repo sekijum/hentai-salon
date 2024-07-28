@@ -18,7 +18,7 @@
 import PageTitle from '~/components/PageTitle.vue';
 import ThreadList from '~/components/thread/ThreadList.vue';
 import type { IThread } from '~/types/thread';
-import type { IListResource } from '~/types/list-resource';
+import type { ICollection } from '~/types/collection';
 
 definePageMeta({ middleware: ['logged-in-access-only'] });
 
@@ -41,14 +41,14 @@ const menuItems = [
   { title: 'お気に入りレス', clicked: () => router.push('/users/me/liked-comments'), icon: 'mdi-message-star-outline' },
 ];
 
-const threads = ref<IListResource<IThread>>();
+const threads = ref<ICollection<IThread>>();
 
 onMounted(async () => {
   await fetchThreads();
 });
 
 async function fetchThreads() {
-  const response = await $api.get<IListResource<IThread>>('/users/me/threads', {
+  const response = await $api.get<ICollection<IThread>>('/users/me/threads', {
     params: {
       threadIds: getThreadViewHistory(),
       limit,

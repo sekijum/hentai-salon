@@ -1,17 +1,12 @@
-import type { IListResource } from './list-resource';
+import type { ICollection } from './collection';
 import type { IThreadCommentAttachment } from './thread-comment-attachment';
 import type { IThreadComment as IComment } from './thread';
+import type { IUser } from './user';
 
 interface IThread {
   id: number;
   title: string;
   description: string;
-}
-
-interface IUser {
-  id: number;
-  name: string;
-  profileLink?: string;
 }
 
 export interface IThreadComment {
@@ -25,6 +20,6 @@ export interface IThreadComment {
   thread: IThread;
   parentCommentId: number;
   parentComment: IComment;
-  replies: IListResource<IComment>;
+  replies: ICollection<IComment>;
   replyCount: number;
 }

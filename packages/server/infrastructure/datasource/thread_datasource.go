@@ -155,6 +155,8 @@ func (ds *ThreadDatasource) FindByPopularity(params ThreadDatasourceFindByPopula
 		WithComments(func(rq *ent.ThreadCommentQuery) {
 			rq.Select(threadcomment.FieldID)
 		}).
+		Limit(params.Limit).
+		Offset(params.Offset).
 		Order(thread.ByCommentsCount(sql.OrderDesc())).
 		All(params.Ctx)
 	if err != nil {

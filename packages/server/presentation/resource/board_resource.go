@@ -7,8 +7,8 @@ import (
 type BoardResource struct {
 	Id           int     `json:"id"`
 	Title        string  `json:"title"`
-	Description  *string `json:"description"`
-	ThumbnailURL *string `json:"thumbnailUrl"`
+	Description  *string `json:"description,omitempty"`
+	ThumbnailURL *string `json:"thumbnailUrl,omitempty"`
 }
 
 type NewBoardResourceParams struct {

@@ -155,9 +155,11 @@ func (svc *ThreadApplicationService) FindAll(params ThreadApplicationServiceFind
 
 	var dto []*resource.ThreadResource
 	for _, thread_i := range threadList {
+		commentCount := len(thread_i.EntThread.Edges.Comments)
 		resource := resource.NewThreadResource(resource.NewThreadResourceParams{
 			Thread:       thread_i,
-			CommentCount: len(thread_i.EntThread.Edges.Comments),
+			CommentCount: &commentCount,
+			IncludeBoard: true,
 		})
 		dto = append(dto, resource)
 	}
@@ -193,11 +195,15 @@ func (svc *ThreadApplicationService) FindByID(params ThreadApplicationServiceFin
 	}
 
 	dto := resource.NewThreadResource(resource.NewThreadResourceParams{
-		Thread:       thread,
-		CommentCount: commentCount,
-		Limit:        params.Qs.Limit,
-		Offset:       params.Qs.Offset,
-		UserID:       params.UserID,
+		Thread:             thread,
+		CommentCount:       &commentCount,
+		Limit:              params.Qs.Limit,
+		Offset:             params.Qs.Offset,
+		UserID:             params.UserID,
+		IncludeComments:    true,
+		IncludeAttachments: true,
+		IncludeBoard:       true,
+		IncludeTagNameList: true,
 	})
 	return dto, nil
 }

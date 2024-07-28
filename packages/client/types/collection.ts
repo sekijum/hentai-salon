@@ -1,4 +1,4 @@
-export interface IListResource<T> {
+export interface ICollection<T> {
   totalCount: number;
   limit: number;
   offset: number;

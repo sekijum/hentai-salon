@@ -35,12 +35,18 @@ func (svc *ThreadCommentApplicationService) FindByID(params ThreadCommentApplica
 		return nil, err
 	}
 
+	replyCount := len(comment.EntThreadComment.Edges.Replies)
 	dto := resource.NewThreadCommentResource(resource.NewThreadCommentResourceParams{
-		ThreadComment: comment,
-		Limit:         params.Qs.Limit,
-		Offset:        params.Qs.Offset,
-		UserID:        params.UserID,
-		ReplyCount:    len(comment.EntThreadComment.Edges.Replies),
+		ThreadComment:        comment,
+		Limit:                params.Qs.Limit,
+		Offset:               params.Qs.Offset,
+		UserID:               params.UserID,
+		ReplyCount:           &replyCount,
+		IncludeReplies:       true,
+		IncludeParentComment: true,
+		IncludeAttachments:   true,
+		IncludeUser:          true,
+		IncludeThread:        true,
 	})
 
 	return dto, nil

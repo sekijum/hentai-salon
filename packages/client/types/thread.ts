@@ -1,4 +1,4 @@
-import type { IListResource } from './list-resource';
+import type { ICollection } from './collection';
 import type { IThreadCommentAttachment, IThreadCommentAttachmentForThread } from './thread-comment-attachment';
 
 interface IThreadBoard {
@@ -12,8 +12,6 @@ export interface IThreadComment {
   guestName?: string;
   content: string;
   parentCommentId?: number;
-  createdAt: string;
-  updatedAt: string;
   attachments: IThreadCommentAttachment[];
   replyCount: number;
   isLiked: boolean;
@@ -26,9 +24,8 @@ export interface IThread {
   description: string;
   thumbnailUrl: string;
   tagNameList: string[];
-  createdAt: string;
   commentCount: number;
-  comments: IListResource<IThreadComment>;
-  attachments: IThreadCommentAttachmentForThread[];
+  comments: ICollection<IThreadComment>;
+  attachments: ICollection<IThreadCommentAttachmentForThread>;
   isLiked: boolean;
 }
