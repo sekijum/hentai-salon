@@ -72,7 +72,7 @@
 
     <ThreadList
       v-if="threads.threadsByRelated?.length"
-      queryCriteria="related"
+      filter="related"
       title="関連"
       :items="threads?.threadsByRelated"
       :isInfiniteScroll="true"
@@ -189,7 +189,7 @@ async function fetchThread() {
 async function fetchThreads() {
   const response = await $api.get<IThread[]>('/threads/', {
     params: {
-      queryCriteria: 'related',
+      filter: 'related',
       threadIds: getThreadViewHistory(),
       limit: 10,
     },

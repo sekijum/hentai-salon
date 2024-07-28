@@ -39,7 +39,7 @@
 
     <ThreadList
       v-if="threads.threadsByRelated.length"
-      queryCriteria="related"
+      filter="related"
       title="関連"
       :items="threads?.threadsByRelated"
       :isInfiniteScroll="true"
@@ -103,15 +103,15 @@ async function fetchComment() {
 
 async function fetchThreads() {
   await Promise.all(
-    ['related'].map(async queryCriteria => {
+    ['related'].map(async filter => {
       const response = await $api.get<IThread[]>('/threads/', {
         params: {
-          queryCriteria,
+          filter,
           threadIds: getThreadViewHistory(),
           limit: 10,
         },
       });
-      if (queryCriteria === 'related') {
+      if (filter === 'related') {
         threads.value.threadsByRelated = response.data;
       }
     }),

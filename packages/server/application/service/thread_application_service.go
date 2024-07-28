@@ -41,7 +41,7 @@ func (svc *ThreadApplicationService) FindAll(params ThreadApplicationServiceFind
 	var threadList []*model.Thread
 	var err error
 
-	switch params.Qs.QueryCriteria {
+	switch params.Qs.Filter {
 	case "popularity":
 		threadList, err = svc.threadDatasource.FindByPopularity(datasource.ThreadDatasourceFindByPopularityParams{
 			Ctx:    params.Ctx,
@@ -150,7 +150,7 @@ func (svc *ThreadApplicationService) FindAll(params ThreadApplicationServiceFind
 			return nil, err
 		}
 	default:
-		return nil, errors.New("無効なQueryCriteriaです")
+		return nil, errors.New("無効なfilterです")
 	}
 
 	var dto []*resource.ThreadResource

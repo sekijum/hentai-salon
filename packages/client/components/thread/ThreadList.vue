@@ -77,7 +77,7 @@ const props = defineProps<{
   items: IThread[];
   clicked?: () => void;
   isInfiniteScroll?: boolean;
-  queryCriteria: string;
+  filter: string;
   threadLimit: number;
 }>();
 
@@ -107,7 +107,7 @@ async function load({ done }: { done: (status: 'loading' | 'error' | 'empty' | '
 async function fetchLoadThreads(offset: number) {
   const response = await $api.get<IThread[]>('/threads/', {
     params: {
-      queryCriteria: props.queryCriteria,
+      filter: props.filter,
       threadIds: getThreadViewHistory(),
       keyword: route.query.keyword,
       boardId: route.query.boardId,

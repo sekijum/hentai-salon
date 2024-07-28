@@ -11,15 +11,15 @@
 
     <ThreadList
       v-if="threads.threadsByHistory?.length"
-      queryCriteria="history"
+      filter="history"
       title="スレッド閲覧履歴"
       :items="threads.threadsByHistory"
-      :clicked="() => router.push({ path: '/threads', query: { queryCriteria: 'history' } })"
+      :clicked="() => router.push({ path: '/threads', query: { filter: 'history' } })"
       :isInfiniteScroll="false"
     />
     <ThreadList
       v-if="threads.threadsByPopular?.length"
-      queryCriteria="popularity"
+      filter="popularity"
       title="人気"
       :items="threads.threadsByPopular"
       :clicked="() => router.push({ path: '/threads' })"
@@ -27,7 +27,7 @@
     />
     <ThreadList
       v-if="threads.threadsByNewest?.length"
-      queryCriteria="newest"
+      filter="newest"
       title="新着"
       :items="threads.threadsByNewest"
       :isInfiniteScroll="true"
@@ -97,19 +97,19 @@ onMounted(async () => {
 
 async function fetchThreads() {
   await Promise.all(
-    ['history', 'newest', 'popularity'].map(async queryCriteria => {
+    ['history', 'newest', 'popularity'].map(async filter => {
       const response = await $api.get<IThread[]>('/threads/', {
         params: {
-          queryCriteria,
+          filter,
           threadIds: getThreadViewHistory(),
           limit: 10,
         },
       });
-      if (queryCriteria === 'popularity') {
+      if (filter === 'popularity') {
         threads.value.threadsByNewest = response.data;
-      } else if (queryCriteria === 'newest') {
+      } else if (filter === 'newest') {
         threads.value.threadsByPopular = response.data;
-      } else if (queryCriteria === 'history') {
+      } else if (filter === 'history') {
         threads.value.threadsByHistory = response.data;
       }
     }),

@@ -8,7 +8,7 @@
 
     <v-row class="">
       <v-col v-for="(board, index) in filteredBoards" :key="index" cols="4" class="board-item">
-        <v-card @click="() => router.push(`/threads?queryCriteria=board&boardId=${board.id}`)" class="board-card">
+        <v-card @click="() => router.push(`/threads?filter=board&boardId=${board.id}`)" class="board-card">
           <v-img :src="getImageSrc(board.thumbnailUrl)" aspect-ratio="1" class="board-image" :alt="board.title">
             <template v-slot:placeholder>
               <v-row align="center" class="fill-height ma-0" justify="center">

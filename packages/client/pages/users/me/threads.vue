@@ -7,7 +7,7 @@
     <template v-if="threads.data">
       <Pagination :totalCount="threads.totalCount" :limit="limit" />
 
-      <ThreadList queryCriteria="owner" :items="threads.data" :isInfiniteScroll="false" />
+      <ThreadList filter="owner" :items="threads.data" :isInfiniteScroll="false" />
 
       <Pagination :totalCount="threads.totalCount" :limit="limit" />
     </template>
