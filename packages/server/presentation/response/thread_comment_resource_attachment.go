@@ -1,22 +1,22 @@
-package resource
+package response
 
 import (
 	"server/domain/model"
 )
 
-type ThreadCommentAttachmentResource struct {
+type ThreadCommentAttachmentResponse struct {
 	URL          string `json:"url"`
 	DisplayOrder int    `json:"displayOrder"`
 	Type         string `json:"type"`
 	CommentID    int    `json:"commentId"`
 }
 
-type NewThreadCommentAttachmentResourceParams struct {
+type NewThreadCommentAttachmentResponseParams struct {
 	ThreadCommentAttachment *model.ThreadCommentAttachment
 }
 
-func NewThreadCommentAttachmentResource(params NewThreadCommentAttachmentResourceParams) *ThreadCommentAttachmentResource {
-	return &ThreadCommentAttachmentResource{
+func NewThreadCommentAttachmentResponse(params NewThreadCommentAttachmentResponseParams) *ThreadCommentAttachmentResponse {
+	return &ThreadCommentAttachmentResponse{
 		URL:          params.ThreadCommentAttachment.EntAttachment.URL,
 		DisplayOrder: params.ThreadCommentAttachment.EntAttachment.DisplayOrder,
 		Type:         params.ThreadCommentAttachment.TypeToString(),

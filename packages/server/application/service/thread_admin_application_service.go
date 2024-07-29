@@ -6,7 +6,7 @@ import (
 	"server/infrastructure/datasource"
 	"server/infrastructure/ent"
 	"server/presentation/request"
-	"server/presentation/resource"
+	"server/presentation/response"
 )
 
 type ThreadAdminApplicationService struct {
@@ -22,7 +22,7 @@ type ThreadAdminApplicationServiceFindAllParams struct {
 	Qs  request.ThreadAdminFindAllRequest
 }
 
-func (svc *ThreadAdminApplicationService) FindAll(params ThreadAdminApplicationServiceFindAllParams) (*resource.Collection[*resource.ThreadAdminResource], error) {
+func (svc *ThreadAdminApplicationService) FindAll(params ThreadAdminApplicationServiceFindAllParams) (*response.Collection[*response.ThreadAdminResponse], error) {
 	threadList, err := svc.threadAdminDatasource.FindAll(datasource.ThreadAdminDatasourceFindAllParams{
 		Ctx:       params.Ctx,
 		Limit:     params.Qs.Limit,
@@ -45,14 +45,14 @@ func (svc *ThreadAdminApplicationService) FindAll(params ThreadAdminApplicationS
 		return nil, err
 	}
 
-	var threadResourceList []*resource.ThreadAdminResource
+	var threadResponseList []*response.ThreadAdminResponse
 	for _, thread_i := range threadList {
-		threadResource := resource.NewThreadAdminResource(resource.NewThreadAdminResourceParams{Thread: thread_i})
-		threadResourceList = append(threadResourceList, threadResource)
+		threadResponse := response.NewThreadAdminResponse(response.NewThreadAdminResponseParams{Thread: thread_i})
+		threadResponseList = append(threadResponseList, threadResponse)
 	}
 
-	dto := resource.NewCollection(resource.NewCollectionParams[*resource.ThreadAdminResource]{
-		Data:       threadResourceList,
+	dto := response.NewCollection(response.NewCollectionParams[*response.ThreadAdminResponse]{
+		Data:       threadResponseList,
 		TotalCount: threadCount,
 		Limit:      params.Qs.Limit,
 		Offset:     params.Qs.Offset,
@@ -67,7 +67,7 @@ type ThreadAdminApplicationServiceFindByIDParams struct {
 	Qs       request.ThreadAdminFindByIDRequest
 }
 
-func (svc *ThreadAdminApplicationService) FindByID(params ThreadAdminApplicationServiceFindByIDParams) (*resource.ThreadAdminResource, error) {
+func (svc *ThreadAdminApplicationService) FindByID(params ThreadAdminApplicationServiceFindByIDParams) (*response.ThreadAdminResponse, error) {
 	thread, err := svc.threadAdminDatasource.FindByID(datasource.ThreadAdminDatasourceFindByIDParams{
 		Ctx:      params.Ctx,
 		ThreadID: params.ThreadID,
@@ -78,7 +78,7 @@ func (svc *ThreadAdminApplicationService) FindByID(params ThreadAdminApplication
 		return nil, err
 	}
 
-	dto := resource.NewThreadAdminResource(resource.NewThreadAdminResourceParams{Thread: thread})
+	dto := response.NewThreadAdminResponse(response.NewThreadAdminResponseParams{Thread: thread})
 
 	return dto, nil
 }
@@ -89,7 +89,7 @@ type ThreadAdminApplicationServiceUpdateParams struct {
 	Body     request.ThreadAdminUpdateRequest
 }
 
-func (svc *ThreadAdminApplicationService) Update(params ThreadAdminApplicationServiceUpdateParams) (*resource.ThreadAdminResource, error) {
+func (svc *ThreadAdminApplicationService) Update(params ThreadAdminApplicationServiceUpdateParams) (*response.ThreadAdminResponse, error) {
 	thread := model.NewThread(model.NewThreadParams{
 		EntThread: &ent.Thread{
 			ID:           params.ThreadID,
@@ -110,7 +110,7 @@ func (svc *ThreadAdminApplicationService) Update(params ThreadAdminApplicationSe
 		return nil, err
 	}
 
-	dto := resource.NewThreadAdminResource(resource.NewThreadAdminResourceParams{
+	dto := response.NewThreadAdminResponse(response.NewThreadAdminResponseParams{
 		Thread: thread,
 	})
 

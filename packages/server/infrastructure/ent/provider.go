@@ -37,7 +37,6 @@ func InitDatabase() (*Client, error) {
 		return nil, err
 	}
 
-	log.Println("Database connection and migration completed successfully!")
 	return client, nil
 }
 

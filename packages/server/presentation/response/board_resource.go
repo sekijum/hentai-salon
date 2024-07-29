@@ -1,22 +1,22 @@
-package resource
+package response
 
 import (
 	"server/domain/model"
 )
 
-type BoardResource struct {
+type BoardResponse struct {
 	Id           int     `json:"id"`
 	Title        string  `json:"title"`
 	Description  *string `json:"description,omitempty"`
 	ThumbnailURL *string `json:"thumbnailUrl,omitempty"`
 }
 
-type NewBoardResourceParams struct {
+type NewBoardResponseParams struct {
 	Board *model.Board
 }
 
-func NewBoardResource(params NewBoardResourceParams) *BoardResource {
-	return &BoardResource{
+func NewBoardResponse(params NewBoardResponseParams) *BoardResponse {
+	return &BoardResponse{
 		Id:           params.Board.EntBoard.ID,
 		Title:        params.Board.EntBoard.Title,
 		Description:  params.Board.EntBoard.Description,

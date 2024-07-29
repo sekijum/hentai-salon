@@ -6,8 +6,8 @@ import (
 	"server/domain/model"
 	"server/infrastructure/datasource"
 	"server/infrastructure/ent"
-	request "server/presentation/request"
-	resource "server/presentation/resource"
+	"server/presentation/request"
+	"server/presentation/response"
 )
 
 type BoardApplicationService struct {
@@ -22,7 +22,7 @@ type BoardApplicationServiceFindAllParams struct {
 	Ctx context.Context
 }
 
-func (svc *BoardApplicationService) FindAll(params BoardApplicationServiceFindAllParams) ([]*resource.BoardResource, error) {
+func (svc *BoardApplicationService) FindAll(params BoardApplicationServiceFindAllParams) ([]*response.BoardResponse, error) {
 	boardList, err := svc.boardDatasource.FindAll(datasource.BoardDatasourceFindAllParams{
 		Ctx: params.Ctx,
 	})
@@ -30,9 +30,9 @@ func (svc *BoardApplicationService) FindAll(params BoardApplicationServiceFindAl
 		return nil, err
 	}
 
-	var dto []*resource.BoardResource
+	var dto []*response.BoardResponse
 	for _, board_i := range boardList {
-		dto = append(dto, resource.NewBoardResource(resource.NewBoardResourceParams{
+		dto = append(dto, response.NewBoardResponse(response.NewBoardResponseParams{
 			Board: board_i,
 		}))
 	}
@@ -46,7 +46,7 @@ type BoardApplicationServiceCreateParams struct {
 	Body   request.BoardCreateRequest
 }
 
-func (svc *BoardApplicationService) Create(params BoardApplicationServiceCreateParams) (*resource.BoardResource, error) {
+func (svc *BoardApplicationService) Create(params BoardApplicationServiceCreateParams) (*response.BoardResponse, error) {
 	boardList, err := svc.boardDatasource.FindByTitle(datasource.BoardDatasourceFindByTitleParams{
 		Ctx:   params.Ctx,
 		Title: params.Body.Title,
@@ -78,7 +78,7 @@ func (svc *BoardApplicationService) Create(params BoardApplicationServiceCreateP
 		return nil, err
 	}
 
-	dto := resource.NewBoardResource(resource.NewBoardResourceParams{
+	dto := response.NewBoardResponse(response.NewBoardResponseParams{
 		Board: board,
 	})
 

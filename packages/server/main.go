@@ -3,13 +3,12 @@ package main
 import (
 	"log"
 	"os"
-	"time"
 
-	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 
 	presentation "server/presentation"
+	"server/presentation/middleware"
 	"server/shared/di"
 
 	"github.com/joho/godotenv"
@@ -33,25 +32,10 @@ func main() {
 
 	r := gin.Default()
 
+	r.Use(gin.Logger())
+	r.Use(gin.Recovery())
 	r.Use(gzip.Gzip(gzip.DefaultCompression))
-
-	config := cors.Config{
-		AllowOrigins: []string{"*"},
-		AllowMethods: []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
-		AllowHeaders: []string{
-			"Access-Control-Allow-Credentials",
-			"Access-Control-Allow-Headers",
-			"Content-Type",
-			"Content-Length",
-			"Accept-Encoding",
-			"Authorization",
-		},
-		ExposeHeaders:    []string{"Content-Length", "Authorization"},
-		AllowCredentials: true,
-		MaxAge:           24 * time.Hour,
-	}
-
-	r.Use(cors.New(config))
+	r.Use(middleware.CORS())
 
 	presentation.SetupRouter(r, controllers)
 

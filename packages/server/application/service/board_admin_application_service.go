@@ -6,7 +6,7 @@ import (
 	"server/infrastructure/datasource"
 	"server/infrastructure/ent"
 	"server/presentation/request"
-	"server/presentation/resource"
+	"server/presentation/response"
 )
 
 type BoardAdminApplicationService struct {
@@ -22,7 +22,7 @@ type BoardAdminApplicationServiceFindAllParams struct {
 	Qs  request.BoardAdminFindAllRequest
 }
 
-func (svc *BoardAdminApplicationService) FindAll(params BoardAdminApplicationServiceFindAllParams) (*resource.Collection[*resource.BoardAdminResource], error) {
+func (svc *BoardAdminApplicationService) FindAll(params BoardAdminApplicationServiceFindAllParams) (*response.Collection[*response.BoardAdminResponse], error) {
 	boardList, err := svc.boardDatasource.FindAll(datasource.BoardAdminFindAllParams{
 		Ctx:       params.Ctx,
 		Limit:     params.Qs.Limit,
@@ -45,15 +45,15 @@ func (svc *BoardAdminApplicationService) FindAll(params BoardAdminApplicationSer
 		return nil, err
 	}
 
-	var boardAdminResourceList []*resource.BoardAdminResource
+	var boardAdminResponseList []*response.BoardAdminResponse
 	for _, board_i := range boardList {
-		boardAdminResourceList = append(boardAdminResourceList, resource.NewBoardAdminResource(resource.NewBoardAdminResourceParams{
+		boardAdminResponseList = append(boardAdminResponseList, response.NewBoardAdminResponse(response.NewBoardAdminResponseParams{
 			Board: board_i,
 		}))
 	}
 
-	dto := resource.NewCollection(resource.NewCollectionParams[*resource.BoardAdminResource]{
-		Data:       boardAdminResourceList,
+	dto := response.NewCollection(response.NewCollectionParams[*response.BoardAdminResponse]{
+		Data:       boardAdminResponseList,
 		TotalCount: boardCount,
 		Limit:      params.Qs.Limit,
 		Offset:     params.Qs.Offset,
@@ -68,7 +68,7 @@ type BoardAdminApplicationServiceUpdateParams struct {
 	Body    request.BoardAdminUpdateRequest
 }
 
-func (svc *BoardAdminApplicationService) Update(params BoardAdminApplicationServiceUpdateParams) (*resource.BoardAdminResource, error) {
+func (svc *BoardAdminApplicationService) Update(params BoardAdminApplicationServiceUpdateParams) (*response.BoardAdminResponse, error) {
 	board := model.NewBoard(model.NewBoardParams{
 		EntBoard: &ent.Board{
 			ID:           params.BoardID,
@@ -89,7 +89,7 @@ func (svc *BoardAdminApplicationService) Update(params BoardAdminApplicationServ
 		return nil, err
 	}
 
-	dto := resource.NewBoardAdminResource(resource.NewBoardAdminResourceParams{
+	dto := response.NewBoardAdminResponse(response.NewBoardAdminResponseParams{
 		Board: board,
 	})
 

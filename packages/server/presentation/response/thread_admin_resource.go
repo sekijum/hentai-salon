@@ -1,4 +1,4 @@
-package resource
+package response
 
 import (
 	"server/domain/model"
@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-type ThreadAdminResource struct {
+type ThreadAdminResponse struct {
 	ID           int                                      `json:"id"`
 	BoardID      int                                      `json:"boardId"`
 	UserID       int                                      `json:"userId"`
@@ -18,11 +18,11 @@ type ThreadAdminResource struct {
 	StatusLabel  string                                   `json:"statusLabel"`
 	CreatedAt    string                                   `json:"createdAt"`
 	UpdatedAt    string                                   `json:"updatedAt"`
-	Board        *BoardAdminResource                      `json:"board"`
-	Comments     *Collection[*ThreadCommentAdminResource] `json:"comments"`
+	Board        *BoardAdminResponse                      `json:"board"`
+	Comments     *Collection[*ThreadCommentAdminResponse] `json:"comments"`
 }
 
-type ThreadCommentAdminResource struct {
+type ThreadCommentAdminResponse struct {
 	ID        int    `json:"id"`
 	ThreadID  int    `json:"threadId"`
 	UserID    *int   `json:"userId"`
@@ -31,13 +31,13 @@ type ThreadCommentAdminResource struct {
 	UpdatedAt string `json:"updatedAt"`
 }
 
-type NewThreadAdminResourceParams struct {
+type NewThreadAdminResponseParams struct {
 	Thread *model.Thread
 	Limit  *int
 	Offset *int
 }
 
-func NewThreadAdminResource(params NewThreadAdminResourceParams) *ThreadAdminResource {
+func NewThreadAdminResponse(params NewThreadAdminResponseParams) *ThreadAdminResponse {
 	limit := 0
 	if params.Limit != nil {
 		limit = *params.Limit
@@ -48,9 +48,9 @@ func NewThreadAdminResource(params NewThreadAdminResourceParams) *ThreadAdminRes
 		offset = *params.Offset
 	}
 
-	var threadCommentResourceList []*ThreadCommentAdminResource
+	var threadCommentResponseList []*ThreadCommentAdminResponse
 	for _, comment_i := range params.Thread.EntThread.Edges.Comments {
-		commentResource := &ThreadCommentAdminResource{
+		commentResponse := &ThreadCommentAdminResponse{
 			ID:        comment_i.ID,
 			ThreadID:  comment_i.ThreadID,
 			UserID:    comment_i.UserID,
@@ -58,19 +58,19 @@ func NewThreadAdminResource(params NewThreadAdminResourceParams) *ThreadAdminRes
 			CreatedAt: comment_i.CreatedAt.Format(time.RFC3339),
 			UpdatedAt: comment_i.UpdatedAt.Format(time.RFC3339),
 		}
-		threadCommentResourceList = append(threadCommentResourceList, commentResource)
+		threadCommentResponseList = append(threadCommentResponseList, commentResponse)
 	}
 
-	commentCollection := NewCollection(NewCollectionParams[*ThreadCommentAdminResource]{
-		Data:       threadCommentResourceList,
+	commentCollection := NewCollection(NewCollectionParams[*ThreadCommentAdminResponse]{
+		Data:       threadCommentResponseList,
 		TotalCount: len(params.Thread.EntThread.Edges.Comments),
 		Limit:      limit,
 		Offset:     offset,
 	})
 
-	var threadBoardResource *BoardAdminResource
+	var threadBoardResponse *BoardAdminResponse
 	if params.Thread.EntThread.Edges.Board != nil {
-		threadBoardResource = NewBoardAdminResource(NewBoardAdminResourceParams{
+		threadBoardResponse = NewBoardAdminResponse(NewBoardAdminResponseParams{
 			Board: model.NewBoard(model.NewBoardParams{
 				EntBoard: &ent.Board{
 					ID:    params.Thread.EntThread.BoardID,
@@ -79,7 +79,7 @@ func NewThreadAdminResource(params NewThreadAdminResourceParams) *ThreadAdminRes
 			})})
 	}
 
-	return &ThreadAdminResource{
+	return &ThreadAdminResponse{
 		ID:           params.Thread.EntThread.ID,
 		BoardID:      params.Thread.EntThread.BoardID,
 		UserID:       params.Thread.EntThread.UserID,
@@ -92,6 +92,6 @@ func NewThreadAdminResource(params NewThreadAdminResourceParams) *ThreadAdminRes
 		CreatedAt:    params.Thread.EntThread.CreatedAt.Format(time.RFC3339),
 		UpdatedAt:    params.Thread.EntThread.UpdatedAt.Format(time.RFC3339),
 		Comments:     commentCollection,
-		Board:        threadBoardResource,
+		Board:        threadBoardResponse,
 	}
 }

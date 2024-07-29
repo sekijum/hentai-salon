@@ -11,7 +11,7 @@ import (
 	"server/infrastructure/datasource"
 	"server/infrastructure/ent"
 	"server/presentation/request"
-	"server/presentation/resource"
+	"server/presentation/response"
 	"time"
 
 	mailpit "server/infrastructure/mailpit"
@@ -57,7 +57,7 @@ func (svc *UserApplicationService) FindByID(params UserApplicationServiceFindByI
 		return nil, err
 	}
 
-	dto := resource.NewUserResource(resource.NewUserResourceParams{User: user, Limit: params.Qs.Limit, Offset: params.Qs.Offset})
+	dto := response.NewUserResponse(response.NewUserResponseParams{User: user, Limit: params.Qs.Limit, Offset: params.Qs.Offset})
 
 	return dto, nil
 }
@@ -173,7 +173,7 @@ type UserApplicationGetAuthenticatedUserParams struct {
 	TokenString string
 }
 
-func (svc *UserApplicationService) GetAuthenticatedUser(params UserApplicationGetAuthenticatedUserParams) (*resource.UserResource, error) {
+func (svc *UserApplicationService) GetAuthenticatedUser(params UserApplicationGetAuthenticatedUserParams) (*response.UserResponse, error) {
 	secretKey := os.Getenv("JWT_SECRET_KEY")
 	if secretKey == "" {
 		return nil, errors.New("秘密鍵が設定されていません")
@@ -200,7 +200,7 @@ func (svc *UserApplicationService) GetAuthenticatedUser(params UserApplicationGe
 			return nil, errors.New("ユーザーの取得に失敗しました")
 		}
 
-		dto := resource.NewUserResource(resource.NewUserResourceParams{User: user})
+		dto := response.NewUserResponse(response.NewUserResponseParams{User: user})
 
 		return dto, nil
 	} else {
@@ -434,7 +434,7 @@ type UserApplicationServiceFindLikedThreadsParams struct {
 	Qs     request.UserFindLikedCommentsRequest
 }
 
-func (svc *UserApplicationService) FindLikedThreads(params UserApplicationServiceFindLikedThreadsParams) (*resource.Collection[*resource.ThreadResource], error) {
+func (svc *UserApplicationService) FindLikedThreads(params UserApplicationServiceFindLikedThreadsParams) (*response.Collection[*response.ThreadResponse], error) {
 	threadList, err := svc.userDatasource.FindLikedThreads(datasource.UserDatasourceFindLikedThreadsParams{
 		Ctx:    params.Ctx,
 		UserID: params.UserID,
@@ -453,18 +453,18 @@ func (svc *UserApplicationService) FindLikedThreads(params UserApplicationServic
 		return nil, err
 	}
 
-	var threadResourceList []*resource.ThreadResource
+	var threadResponseList []*response.ThreadResponse
 	for _, thread_i := range threadList {
 		commentCount := (len(thread_i.EntThread.Edges.Comments))
-		threadResourceList = append(threadResourceList, resource.NewThreadResource(resource.NewThreadResourceParams{
+		threadResponseList = append(threadResponseList, response.NewThreadResponse(response.NewThreadResponseParams{
 			Thread:       thread_i,
 			CommentCount: &commentCount,
 			IncludeBoard: true,
 		}))
 	}
 
-	dto := resource.NewCollection(resource.NewCollectionParams[*resource.ThreadResource]{
-		Data:       threadResourceList,
+	dto := response.NewCollection(response.NewCollectionParams[*response.ThreadResponse]{
+		Data:       threadResponseList,
 		TotalCount: threadCount,
 		Limit:      params.Qs.Limit,
 		Offset:     params.Qs.Offset,
@@ -479,7 +479,7 @@ type UserApplicationServiceFindLikedCommentsParams struct {
 	Qs     request.UserFindUnLikedCommentsRequest
 }
 
-func (svc *UserApplicationService) FindLikedComments(params UserApplicationServiceFindLikedCommentsParams) (*resource.Collection[*resource.ThreadCommentResource], error) {
+func (svc *UserApplicationService) FindLikedComments(params UserApplicationServiceFindLikedCommentsParams) (*response.Collection[*response.ThreadCommentResponse], error) {
 	commentList, err := svc.userDatasource.FindLikedComments(datasource.UserDatasourceFindLikedCommentsParams{
 		Ctx:    params.Ctx,
 		UserID: params.UserID,
@@ -498,10 +498,10 @@ func (svc *UserApplicationService) FindLikedComments(params UserApplicationServi
 		return nil, err
 	}
 
-	var threadCommentResourceList []*resource.ThreadCommentResource
+	var threadCommentResponseList []*response.ThreadCommentResponse
 	for _, comment_i := range commentList {
 		replyCount := len(comment_i.EntThreadComment.Edges.Replies)
-		threadCommentResourceList = append(threadCommentResourceList, resource.NewThreadCommentResource(resource.NewThreadCommentResourceParams{
+		threadCommentResponseList = append(threadCommentResponseList, response.NewThreadCommentResponse(response.NewThreadCommentResponseParams{
 			ThreadComment:      comment_i,
 			UserID:             &params.UserID,
 			ReplyCount:         &replyCount,
@@ -512,8 +512,8 @@ func (svc *UserApplicationService) FindLikedComments(params UserApplicationServi
 		}))
 	}
 
-	dto := resource.NewCollection(resource.NewCollectionParams[*resource.ThreadCommentResource]{
-		Data:       threadCommentResourceList,
+	dto := response.NewCollection(response.NewCollectionParams[*response.ThreadCommentResponse]{
+		Data:       threadCommentResponseList,
 		TotalCount: commentCount,
 		Limit:      params.Qs.Limit,
 		Offset:     params.Qs.Offset,
@@ -528,7 +528,7 @@ type UserApplicationServiceFindUserThreadsParams struct {
 	Qs     request.UserFindThreadsRequest
 }
 
-func (svc *UserApplicationService) FindThreads(params UserApplicationServiceFindUserThreadsParams) (*resource.Collection[*resource.ThreadResource], error) {
+func (svc *UserApplicationService) FindThreads(params UserApplicationServiceFindUserThreadsParams) (*response.Collection[*response.ThreadResponse], error) {
 	threadList, err := svc.userDatasource.FindThreads(datasource.UserDatasourceFindThreadsParams{
 		Ctx:    params.Ctx,
 		UserID: params.UserID,
@@ -547,18 +547,18 @@ func (svc *UserApplicationService) FindThreads(params UserApplicationServiceFind
 		return nil, err
 	}
 
-	var threadResourceList []*resource.ThreadResource
+	var threadResponseList []*response.ThreadResponse
 	for _, thread_i := range threadList {
 		commentCount := len(thread_i.EntThread.Edges.Comments)
-		threadResourceList = append(threadResourceList, resource.NewThreadResource(resource.NewThreadResourceParams{
+		threadResponseList = append(threadResponseList, response.NewThreadResponse(response.NewThreadResponseParams{
 			Thread:       thread_i,
 			CommentCount: &commentCount,
 			IncludeBoard: true,
 		}))
 	}
 
-	dto := resource.NewCollection(resource.NewCollectionParams[*resource.ThreadResource]{
-		Data:       threadResourceList,
+	dto := response.NewCollection(response.NewCollectionParams[*response.ThreadResponse]{
+		Data:       threadResponseList,
 		TotalCount: threadCount,
 		Limit:      params.Qs.Limit,
 		Offset:     params.Qs.Offset,
@@ -573,7 +573,7 @@ type UserApplicationServiceFindUserCommentsParams struct {
 	Qs     request.UserFindCommentsRequest
 }
 
-func (svc *UserApplicationService) FindUserComments(params UserApplicationServiceFindUserCommentsParams) (*resource.Collection[*resource.ThreadCommentResource], error) {
+func (svc *UserApplicationService) FindUserComments(params UserApplicationServiceFindUserCommentsParams) (*response.Collection[*response.ThreadCommentResponse], error) {
 	commentList, err := svc.userDatasource.FindUserComments(datasource.UserDatasourceFindUserCommentsParams{
 		Ctx:    params.Ctx,
 		UserID: params.UserID,
@@ -592,10 +592,10 @@ func (svc *UserApplicationService) FindUserComments(params UserApplicationServic
 		return nil, err
 	}
 
-	var threadCommentResourceList []*resource.ThreadCommentResource
+	var threadCommentResponseList []*response.ThreadCommentResponse
 	for _, comment_i := range commentList {
 		replyCount := len(comment_i.EntThreadComment.Edges.Replies)
-		threadCommentResourceList = append(threadCommentResourceList, resource.NewThreadCommentResource(resource.NewThreadCommentResourceParams{
+		threadCommentResponseList = append(threadCommentResponseList, response.NewThreadCommentResponse(response.NewThreadCommentResponseParams{
 			ThreadComment:        comment_i,
 			ReplyCount:           &replyCount,
 			UserID:               &params.UserID,
@@ -607,8 +607,8 @@ func (svc *UserApplicationService) FindUserComments(params UserApplicationServic
 		}))
 	}
 
-	dto := resource.NewCollection(resource.NewCollectionParams[*resource.ThreadCommentResource]{
-		Data:       threadCommentResourceList,
+	dto := response.NewCollection(response.NewCollectionParams[*response.ThreadCommentResponse]{
+		Data:       threadCommentResponseList,
 		TotalCount: commentCount,
 		Limit:      params.Qs.Limit,
 		Offset:     params.Qs.Offset,

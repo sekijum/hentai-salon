@@ -1,4 +1,4 @@
-package resource
+package response
 
 import (
 	"server/domain/model"
@@ -6,34 +6,34 @@ import (
 	"time"
 )
 
-type ThreadCommentResource struct {
+type ThreadCommentResponse struct {
 	ID              int                                 `json:"id"`
 	GuestName       *string                             `json:"guestName,omitempty"`
 	Content         string                              `json:"content"`
 	CreatedAt       string                              `json:"createdAt"`
 	ParentCommentID *int                                `json:"parentCommentId,omitempty"`
 	ReplyCount      *int                                `json:"replyCount"`
-	User            *UserResource                       `json:"user,omitempty"`
-	Thread          *ThreadResource                     `json:"thread,omitempty"`
-	ParentComment   *ThreadCommentResource              `json:"parentComment,omitempty"`
-	Attachments     []*ThreadCommentAttachmentResource  `json:"attachments,omitempty"`
-	Replies         *Collection[*ThreadCommentResource] `json:"replies,omitempty"`
+	User            *UserResponse                       `json:"user,omitempty"`
+	Thread          *ThreadResponse                     `json:"thread,omitempty"`
+	ParentComment   *ThreadCommentResponse              `json:"parentComment,omitempty"`
+	Attachments     []*ThreadCommentAttachmentResponse  `json:"attachments,omitempty"`
+	Replies         *Collection[*ThreadCommentResponse] `json:"replies,omitempty"`
 	IsLiked         *bool                               `json:"isLiked,omitempty"`
 }
 
-type NewThreadCommentResourceParams struct {
+type NewThreadCommentResponseParams struct {
 	ThreadComment                                                                        *model.ThreadComment
 	Limit, Offset                                                                        int
 	UserID, ReplyCount                                                                   *int
 	IncludeUser, IncludeThread, IncludeParentComment, IncludeAttachments, IncludeReplies bool
 }
 
-func NewThreadCommentResource(params NewThreadCommentResourceParams) *ThreadCommentResource {
+func NewThreadCommentResponse(params NewThreadCommentResponseParams) *ThreadCommentResponse {
 
-	var userResource *UserResource
+	var userResponse *UserResponse
 	if params.IncludeUser {
 		if params.ThreadComment.EntThreadComment.Edges.Author != nil {
-			userResource = NewUserResource(NewUserResourceParams{
+			userResponse = NewUserResponse(NewUserResponseParams{
 				User: model.NewUser(model.NewUserParams{
 					EntUser: &ent.User{
 						ID:          params.ThreadComment.EntThreadComment.Edges.Author.ID,
@@ -45,10 +45,10 @@ func NewThreadCommentResource(params NewThreadCommentResourceParams) *ThreadComm
 		}
 	}
 
-	var parentComment *ThreadCommentResource
+	var parentComment *ThreadCommentResponse
 	if params.IncludeParentComment {
 		if params.ThreadComment.EntThreadComment.Edges.ParentComment != nil {
-			parentComment = NewThreadCommentResource(NewThreadCommentResourceParams{
+			parentComment = NewThreadCommentResponse(NewThreadCommentResponseParams{
 				ThreadComment: model.NewThreadComment(model.NewThreadCommentParams{
 					EntThreadComment: params.ThreadComment.EntThreadComment.Edges.ParentComment,
 				}),
@@ -56,10 +56,10 @@ func NewThreadCommentResource(params NewThreadCommentResourceParams) *ThreadComm
 		}
 	}
 
-	var attachmentResourceList []*ThreadCommentAttachmentResource
+	var attachmentResponseList []*ThreadCommentAttachmentResponse
 	if params.IncludeAttachments {
 		for _, attachment_i := range params.ThreadComment.EntThreadComment.Edges.Attachments {
-			attachmentResourceList = append(attachmentResourceList, NewThreadCommentAttachmentResource(NewThreadCommentAttachmentResourceParams{
+			attachmentResponseList = append(attachmentResponseList, NewThreadCommentAttachmentResponse(NewThreadCommentAttachmentResponseParams{
 				ThreadCommentAttachment: model.NewThreadCommentAttachment(model.NewThreadCommentAttachmentParams{
 					EntAttachment: attachment_i,
 				}),
@@ -67,11 +67,11 @@ func NewThreadCommentResource(params NewThreadCommentResourceParams) *ThreadComm
 		}
 	}
 
-	var replyResourceList []*ThreadCommentResource
+	var replyResponseList []*ThreadCommentResponse
 	if params.IncludeReplies {
 		for _, reply_i := range params.ThreadComment.EntThreadComment.Edges.Replies {
 			replyCount := len(reply_i.Edges.Replies)
-			replyResourceList = append(replyResourceList, NewThreadCommentResource(NewThreadCommentResourceParams{
+			replyResponseList = append(replyResponseList, NewThreadCommentResponse(NewThreadCommentResponseParams{
 				ThreadComment: model.NewThreadComment(model.NewThreadCommentParams{EntThreadComment: reply_i}),
 				Offset:        params.Offset,
 				ReplyCount:    &replyCount,
@@ -80,24 +80,24 @@ func NewThreadCommentResource(params NewThreadCommentResourceParams) *ThreadComm
 		}
 	}
 
-	var replyCollection *Collection[*ThreadCommentResource]
+	var replyCollection *Collection[*ThreadCommentResponse]
 	if params.ReplyCount != nil {
-		replyCollection = NewCollection(NewCollectionParams[*ThreadCommentResource]{
-			Data:       replyResourceList,
+		replyCollection = NewCollection(NewCollectionParams[*ThreadCommentResponse]{
+			Data:       replyResponseList,
 			TotalCount: *params.ReplyCount,
 			Limit:      params.Limit,
 			Offset:     params.Offset,
 		})
 	}
 
-	var threadResource *ThreadResource
+	var threadResponse *ThreadResponse
 	if params.IncludeThread {
 		if params.ThreadComment.EntThreadComment.Edges.Thread != nil {
 			var description *string
 			if params.ThreadComment.EntThreadComment.Edges.Thread.Description != nil {
 				description = params.ThreadComment.EntThreadComment.Edges.Thread.Description
 			}
-			threadResource = &ThreadResource{
+			threadResponse = &ThreadResponse{
 				ID:          params.ThreadComment.EntThreadComment.Edges.Thread.ID,
 				Title:       params.ThreadComment.EntThreadComment.Edges.Thread.Title,
 				Description: description,
@@ -117,16 +117,16 @@ func NewThreadCommentResource(params NewThreadCommentResourceParams) *ThreadComm
 		isLiked = &liked
 	}
 
-	return &ThreadCommentResource{
+	return &ThreadCommentResponse{
 		ID:              params.ThreadComment.EntThreadComment.ID,
-		User:            userResource,
+		User:            userResponse,
 		GuestName:       params.ThreadComment.EntThreadComment.GuestName,
 		Content:         params.ThreadComment.EntThreadComment.Content,
 		CreatedAt:       params.ThreadComment.EntThreadComment.CreatedAt.Format(time.RFC3339),
 		ParentCommentID: params.ThreadComment.EntThreadComment.ParentCommentID,
 		ParentComment:   parentComment,
-		Thread:          threadResource,
-		Attachments:     attachmentResourceList,
+		Thread:          threadResponse,
+		Attachments:     attachmentResponseList,
 		ReplyCount:      params.ReplyCount,
 		Replies:         replyCollection,
 		IsLiked:         isLiked,

@@ -1,11 +1,11 @@
-package resource
+package response
 
 import (
 	"server/domain/model"
 	"time"
 )
 
-type BoardAdminResource struct {
+type BoardAdminResponse struct {
 	ID           int     `json:"id"`
 	UserID       int     `json:"userId"`
 	Title        string  `json:"title"`
@@ -17,12 +17,12 @@ type BoardAdminResource struct {
 	UpdatedAt    string  `json:"updatedAt"`
 }
 
-type NewBoardAdminResourceParams struct {
+type NewBoardAdminResponseParams struct {
 	Board *model.Board
 }
 
-func NewBoardAdminResource(params NewBoardAdminResourceParams) *BoardAdminResource {
-	return &BoardAdminResource{
+func NewBoardAdminResponse(params NewBoardAdminResponseParams) *BoardAdminResponse {
+	return &BoardAdminResponse{
 		ID:           params.Board.EntBoard.ID,
 		UserID:       params.Board.EntBoard.UserID,
 		Title:        params.Board.EntBoard.Title,

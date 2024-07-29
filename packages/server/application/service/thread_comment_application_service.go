@@ -6,7 +6,7 @@ import (
 	"server/infrastructure/datasource"
 	"server/infrastructure/ent"
 	"server/presentation/request"
-	"server/presentation/resource"
+	"server/presentation/response"
 )
 
 type ThreadCommentApplicationService struct {
@@ -24,7 +24,7 @@ type ThreadCommentApplicationServiceFindByIDParams struct {
 	Qs        request.ThreadCommentFindByIDRequest
 }
 
-func (svc *ThreadCommentApplicationService) FindByID(params ThreadCommentApplicationServiceFindByIDParams) (*resource.ThreadCommentResource, error) {
+func (svc *ThreadCommentApplicationService) FindByID(params ThreadCommentApplicationServiceFindByIDParams) (*response.ThreadCommentResponse, error) {
 	comment, err := svc.threadCommentDatasource.FindByID(datasource.ThreadCommentDatasourceFindByIDParams{
 		Ctx:       params.Ctx,
 		CommentID: params.CommentID,
@@ -36,7 +36,7 @@ func (svc *ThreadCommentApplicationService) FindByID(params ThreadCommentApplica
 	}
 
 	replyCount := len(comment.EntThreadComment.Edges.Replies)
-	dto := resource.NewThreadCommentResource(resource.NewThreadCommentResourceParams{
+	dto := response.NewThreadCommentResponse(response.NewThreadCommentResponseParams{
 		ThreadComment:        comment,
 		Limit:                params.Qs.Limit,
 		Offset:               params.Qs.Offset,
@@ -61,7 +61,7 @@ type ThreadCommentApplicationServiceCreateParams struct {
 	Body            request.ThreadCommentCreateRequest
 }
 
-func (svc *ThreadCommentApplicationService) Create(params ThreadCommentApplicationServiceCreateParams) (*resource.ThreadCommentResource, error) {
+func (svc *ThreadCommentApplicationService) Create(params ThreadCommentApplicationServiceCreateParams) (*response.ThreadCommentResponse, error) {
 
 	comment := model.NewThreadComment(model.NewThreadCommentParams{
 		EntThreadComment: &ent.ThreadComment{
@@ -106,7 +106,7 @@ func (svc *ThreadCommentApplicationService) Create(params ThreadCommentApplicati
 		return nil, err
 	}
 
-	dto := resource.NewThreadCommentResource(resource.NewThreadCommentResourceParams{
+	dto := response.NewThreadCommentResponse(response.NewThreadCommentResponseParams{
 		ThreadComment: comment,
 	})
 

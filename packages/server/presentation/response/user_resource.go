@@ -1,11 +1,11 @@
-package resource
+package response
 
 import (
 	"server/domain/model"
 	"time"
 )
 
-type UserResource struct {
+type UserResponse struct {
 	ID          int     `json:"id"`
 	Name        string  `json:"name"`
 	Email       string  `json:"email"`
@@ -16,13 +16,13 @@ type UserResource struct {
 	UpdatedAt   string  `json:"updatedAt"`
 }
 
-type NewUserResourceParams struct {
+type NewUserResponseParams struct {
 	User          *model.User
 	Limit, Offset int
 }
 
-func NewUserResource(params NewUserResourceParams) *UserResource {
-	return &UserResource{
+func NewUserResponse(params NewUserResponseParams) *UserResponse {
+	return &UserResponse{
 		ID:          params.User.EntUser.ID,
 		Name:        params.User.EntUser.Name,
 		Email:       params.User.EntUser.Email,

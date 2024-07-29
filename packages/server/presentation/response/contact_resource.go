@@ -1,11 +1,11 @@
-package resource
+package response
 
 import (
 	"server/domain/model"
 	"time"
 )
 
-type ContactResource struct {
+type ContactResponse struct {
 	ID        int       `json:"id"`
 	Email     string    `json:"email"`
 	Subject   string    `json:"subject"`
@@ -16,8 +16,8 @@ type ContactResource struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-func NewContactResource(contact *model.Contact) *ContactResource {
-	return &ContactResource{
+func NewContactResponse(contact *model.Contact) *ContactResponse {
+	return &ContactResponse{
 		ID:        contact.EntContact.ID,
 		Email:     contact.EntContact.Email,
 		Subject:   contact.EntContact.Subject,

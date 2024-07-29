@@ -18,7 +18,7 @@ func NewThreadController(threadApplicationService *service.ThreadApplicationServ
 	return &ThreadController{threadApplicationService: threadApplicationService}
 }
 
-func (ctrl *ThreadController) FindAllList(ctx *gin.Context) {
+func (ctrl *ThreadController) FindAll(ctx *gin.Context) {
 	var qs request.ThreadFindAllRequest
 
 	if err := ctx.ShouldBindQuery(&qs); err != nil {

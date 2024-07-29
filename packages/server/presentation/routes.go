@@ -8,12 +8,9 @@ import (
 )
 
 func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
-	paginationMiddleware := middleware.PaginationMiddleware()
-	optionalAuthMiddleware := middleware.OptionalAuthMiddleware()
+	r.Use(middleware.PaginationMiddleware(), middleware.OptionalAuthMiddleware())
 
-	r.Use(paginationMiddleware, optionalAuthMiddleware)
-
-	r.GET("/", func(c *gin.Context) {
+	r.GET("", func(c *gin.Context) {
 		c.JSON(200, gin.H{"message": "ok"})
 	})
 
@@ -38,15 +35,15 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 
 	threadGroup := r.Group("/threads")
 	{
-		threadGroup.GET("/", controllers.ThreadController.FindAllList)
+		threadGroup.GET("/", controllers.ThreadController.FindAll)
 		threadGroup.GET("/:threadID", controllers.ThreadController.FindById)
 		threadGroup.POST("/:threadID/like", controllers.ThreadController.Like)
 		threadGroup.POST("/:threadID/unlike", controllers.ThreadController.Unlike)
 
 		commentGroup := threadGroup.Group("/:threadID/comments")
 		{
+			commentGroup.POST("/:threadID/comments", controllers.ThreadCommentController.Create)
 			commentGroup.GET("/:commentID", controllers.ThreadCommentController.FindById)
-			commentGroup.POST("/", controllers.ThreadCommentController.Create)
 			commentGroup.POST("/:commentID/reply", controllers.ThreadCommentController.Reply)
 			commentGroup.POST("/:commentID/like", controllers.ThreadCommentController.Like)
 			commentGroup.POST("/:commentID/unlike", controllers.ThreadCommentController.Unlike)
@@ -54,10 +51,8 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 	}
 
 	// 認証必須ルート
-	authMiddleware := middleware.AuthMiddleware()
-
 	authGroup := r.Group("/")
-	authGroup.Use(authMiddleware)
+	r.Use(middleware.AuthMiddleware())
 	{
 		authGroup.POST("/threads", controllers.ThreadController.Create)
 
@@ -76,25 +71,25 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 
 	// 管理者ルート
 	adminGroup := r.Group("/admin")
-	adminGroup.Use(authMiddleware)
+	adminGroup.Use(middleware.AuthMiddleware())
 	{
 		adminGroup.POST("/boards", controllers.BoardController.Create)
 
 		usersGroup := adminGroup.Group("/users")
 		{
-			usersGroup.GET("/", controllers.UserAdminController.FindAll)
+			usersGroup.GET("", controllers.UserAdminController.FindAll)
 			usersGroup.PUT("/:userID", controllers.UserAdminController.Update)
 		}
 
 		boardsGroup := adminGroup.Group("/boards")
 		{
-			boardsGroup.GET("/", controllers.BoardAdminController.FindAll)
+			boardsGroup.GET("", controllers.BoardAdminController.FindAll)
 			boardsGroup.PUT("/:boardID", controllers.BoardAdminController.Update)
 		}
 
 		threadsGroup := adminGroup.Group("/threads")
 		{
-			threadsGroup.GET("/", controllers.ThreadAdminController.FindAll)
+			threadsGroup.GET("", controllers.ThreadAdminController.FindAll)
 			threadsGroup.GET("/:threadID", controllers.ThreadAdminController.FindByID)
 			threadsGroup.PUT("/:threadID", controllers.ThreadAdminController.Update)
 		}

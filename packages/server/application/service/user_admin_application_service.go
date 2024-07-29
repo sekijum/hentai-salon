@@ -6,7 +6,7 @@ import (
 	"server/infrastructure/datasource"
 	"server/infrastructure/ent"
 	"server/presentation/request"
-	"server/presentation/resource"
+	"server/presentation/response"
 )
 
 type UserAdminApplicationService struct {
@@ -22,7 +22,7 @@ type UserAdminApplicationServiceFindAllParams struct {
 	Qs  request.UserAdminFindAllRequest
 }
 
-func (svc *UserAdminApplicationService) FindAll(params UserAdminApplicationServiceFindAllParams) (*resource.Collection[*resource.UserAdminResource], error) {
+func (svc *UserAdminApplicationService) FindAll(params UserAdminApplicationServiceFindAllParams) (*response.Collection[*response.UserAdminResponse], error) {
 	userList, err := svc.userAdminDatasource.FindAll(datasource.UserAdminDatasourceFindAllParams{
 		Ctx:       params.Ctx,
 		Limit:     params.Qs.Limit,
@@ -45,15 +45,15 @@ func (svc *UserAdminApplicationService) FindAll(params UserAdminApplicationServi
 		return nil, err
 	}
 
-	var userResourceList []*resource.UserAdminResource
+	var userResponseList []*response.UserAdminResponse
 	for _, user_i := range userList {
-		userResourceList = append(userResourceList, resource.NewUserAdminResource(resource.NewUserAdminResourceParams{
+		userResponseList = append(userResponseList, response.NewUserAdminResponse(response.NewUserAdminResponseParams{
 			User: user_i,
 		}))
 	}
 
-	dto := resource.NewCollection(resource.NewCollectionParams[*resource.UserAdminResource]{
-		Data:       userResourceList,
+	dto := response.NewCollection(response.NewCollectionParams[*response.UserAdminResponse]{
+		Data:       userResponseList,
 		TotalCount: userCount,
 		Limit:      params.Qs.Limit,
 		Offset:     params.Qs.Offset,
@@ -68,7 +68,7 @@ type UserAdminApplicationServiceUpdateParams struct {
 	Body   request.UserAdminUpdateRequest
 }
 
-func (svc *UserAdminApplicationService) Update(params UserAdminApplicationServiceUpdateParams) (*resource.UserAdminResource, error) {
+func (svc *UserAdminApplicationService) Update(params UserAdminApplicationServiceUpdateParams) (*response.UserAdminResponse, error) {
 	user := model.NewUser(model.NewUserParams{
 		EntUser: &ent.User{
 			ID:    params.UserID,
@@ -89,7 +89,7 @@ func (svc *UserAdminApplicationService) Update(params UserAdminApplicationServic
 		return nil, err
 	}
 
-	dto := resource.NewUserAdminResource(resource.NewUserAdminResourceParams{User: user})
+	dto := response.NewUserAdminResponse(response.NewUserAdminResponseParams{User: user})
 
 	return dto, nil
 }

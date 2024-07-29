@@ -1,4 +1,4 @@
-package resource
+package response
 
 type Collection[T any] struct {
 	Data       []T `json:"data"`

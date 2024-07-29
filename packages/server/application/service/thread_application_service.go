@@ -6,8 +6,8 @@ import (
 	"server/domain/model"
 	"server/infrastructure/datasource"
 	"server/infrastructure/ent"
-	request "server/presentation/request"
-	resource "server/presentation/resource"
+	"server/presentation/request"
+	"server/presentation/response"
 )
 
 type ThreadApplicationService struct {
@@ -37,7 +37,7 @@ type ThreadApplicationServiceFindAllParams struct {
 	UserID int
 }
 
-func (svc *ThreadApplicationService) FindAll(params ThreadApplicationServiceFindAllParams) ([]*resource.ThreadResource, error) {
+func (svc *ThreadApplicationService) FindAll(params ThreadApplicationServiceFindAllParams) ([]*response.ThreadResponse, error) {
 	var threadList []*model.Thread
 	var err error
 
@@ -149,15 +149,15 @@ func (svc *ThreadApplicationService) FindAll(params ThreadApplicationServiceFind
 		return nil, errors.New("無効なfilterです")
 	}
 
-	var dto []*resource.ThreadResource
+	var dto []*response.ThreadResponse
 	for _, thread_i := range threadList {
 		commentCount := len(thread_i.EntThread.Edges.Comments)
-		resource := resource.NewThreadResource(resource.NewThreadResourceParams{
+		Response := response.NewThreadResponse(response.NewThreadResponseParams{
 			Thread:       thread_i,
 			CommentCount: &commentCount,
 			IncludeBoard: true,
 		})
-		dto = append(dto, resource)
+		dto = append(dto, Response)
 	}
 
 	return dto, nil
@@ -170,7 +170,7 @@ type ThreadApplicationServiceFindByIDParams struct {
 	Qs       request.ThreadFindByIdRequest
 }
 
-func (svc *ThreadApplicationService) FindByID(params ThreadApplicationServiceFindByIDParams) (*resource.ThreadResource, error) {
+func (svc *ThreadApplicationService) FindByID(params ThreadApplicationServiceFindByIDParams) (*response.ThreadResponse, error) {
 	thread, err := svc.threadDatasource.FindById(datasource.ThreadDatasourceFindByIDParams{
 		Ctx:       params.Ctx,
 		SortOrder: params.Qs.SortOrder,
@@ -190,7 +190,7 @@ func (svc *ThreadApplicationService) FindByID(params ThreadApplicationServiceFin
 		return nil, err
 	}
 
-	dto := resource.NewThreadResource(resource.NewThreadResourceParams{
+	dto := response.NewThreadResponse(response.NewThreadResponseParams{
 		Thread:             thread,
 		CommentCount:       &commentCount,
 		Limit:              params.Qs.Limit,
@@ -211,7 +211,7 @@ type ThreadApplicationServiceCreateParams struct {
 	Body     request.ThreadCreateRequest
 }
 
-func (svc *ThreadApplicationService) Create(params ThreadApplicationServiceCreateParams) (*resource.ThreadResource, error) {
+func (svc *ThreadApplicationService) Create(params ThreadApplicationServiceCreateParams) (*response.ThreadResponse, error) {
 	threadList, err := svc.threadDatasource.FindByTitle(datasource.ThreadDatasourceFindByTitleParams{
 		Ctx:   params.Ctx,
 		Title: params.Body.Title,
@@ -272,7 +272,7 @@ func (svc *ThreadApplicationService) Create(params ThreadApplicationServiceCreat
 		return nil, err
 	}
 
-	dto := resource.NewThreadResource(resource.NewThreadResourceParams{Thread: thread})
+	dto := response.NewThreadResponse(response.NewThreadResponseParams{Thread: thread})
 
 	return dto, nil
 }

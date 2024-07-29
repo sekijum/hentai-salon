@@ -6,7 +6,7 @@ import (
 	"server/infrastructure/datasource"
 	"server/infrastructure/ent"
 	"server/presentation/request"
-	"server/presentation/resource"
+	"server/presentation/response"
 )
 
 type ContactApplicationService struct {
@@ -23,7 +23,7 @@ type ContactApplicationServiceCreateParams struct {
 	Body     request.ContactCreateRequest
 }
 
-func (svc *ContactApplicationService) Create(params ContactApplicationServiceCreateParams) (*resource.ContactResource, error) {
+func (svc *ContactApplicationService) Create(params ContactApplicationServiceCreateParams) (*response.ContactResponse, error) {
 	contact := model.NewContact(model.NewContactParams{
 		EntContact: &ent.Contact{
 			Email:     params.Body.Email,
@@ -44,7 +44,7 @@ func (svc *ContactApplicationService) Create(params ContactApplicationServiceCre
 		return nil, err
 	}
 
-	dto := resource.NewContactResource(contact)
+	dto := response.NewContactResponse(contact)
 
 	return dto, nil
 }

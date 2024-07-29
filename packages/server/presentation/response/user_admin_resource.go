@@ -1,11 +1,11 @@
-package resource
+package response
 
 import (
 	"server/domain/model"
 	"time"
 )
 
-type UserAdminResource struct {
+type UserAdminResponse struct {
 	ID          int    `json:"id"`
 	Name        string `json:"name"`
 	Email       string `json:"email"`
@@ -17,12 +17,12 @@ type UserAdminResource struct {
 	UpdatedAt   string `json:"updatedAt"`
 }
 
-type NewUserAdminResourceParams struct {
+type NewUserAdminResponseParams struct {
 	User *model.User
 }
 
-func NewUserAdminResource(params NewUserAdminResourceParams) *UserAdminResource {
-	return &UserAdminResource{
+func NewUserAdminResponse(params NewUserAdminResponseParams) *UserAdminResponse {
+	return &UserAdminResponse{
 		ID:          params.User.EntUser.ID,
 		Name:        params.User.EntUser.Name,
 		Email:       params.User.EntUser.Email,
