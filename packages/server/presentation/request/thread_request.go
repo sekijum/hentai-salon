@@ -1,15 +1,15 @@
 package request
 
 type ThreadRequest struct {
-	Limit     int    `form:"limit"`
-	Offset    int    `form:"offset"`
-	SortOrder string `form:"sortOrder"`
+	Limit  int    `form:"limit"`
+	Offset int    `form:"offset"`
+	Order  string `form:"order"`
 }
 
 type ThreadFindByIdRequest struct {
-	Limit     int    `form:"limit"`
-	Offset    int    `form:"offset"`
-	SortOrder string `form:"sortOrder"`
+	Limit  int    `form:"limit"`
+	Offset int    `form:"offset"`
+	Order  string `form:"order"`
 }
 
 type ThreadFindAllRequest struct {

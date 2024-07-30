@@ -61,16 +61,16 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 	{
 		authGroup.POST("/threads", controllers.ThreadController.Create)
 
-		usersGroup := authGroup.Group("/users")
+		userGroup := authGroup.Group("/users")
 		{
-			usersGroup.GET("/:userID", controllers.UserController.FindByID)
-			usersGroup.GET("/me", controllers.UserController.FindAuthenticatedUser)
-			usersGroup.GET("/me/comments", controllers.UserController.FindComments)
-			usersGroup.GET("/me/threads", controllers.UserController.FindThreads)
-			usersGroup.GET("/me/liked-threads", controllers.UserController.FindLikedThreads)
-			usersGroup.GET("/me/liked-comments", controllers.UserController.FindLikedComments)
-			usersGroup.PUT("/me", controllers.UserController.Update)
-			usersGroup.PATCH("/me/password", controllers.UserController.UpdatePassword)
+			userGroup.GET("/:userID", controllers.UserController.FindByID)
+			userGroup.GET("/me", controllers.UserController.FindAuthenticatedUser)
+			userGroup.GET("/me/comments", controllers.UserController.FindComments)
+			userGroup.GET("/me/threads", controllers.UserController.FindThreads)
+			userGroup.GET("/me/liked-threads", controllers.UserController.FindLikedThreads)
+			userGroup.GET("/me/liked-comments", controllers.UserController.FindLikedComments)
+			userGroup.PUT("/me", controllers.UserController.Update)
+			userGroup.PATCH("/me/password", controllers.UserController.UpdatePassword)
 		}
 	}
 
@@ -80,23 +80,29 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 	{
 		adminGroup.POST("/boards", controllers.BoardController.Create)
 
-		usersGroup := adminGroup.Group("/users")
+		userGroup := adminGroup.Group("/users")
 		{
-			usersGroup.GET("", controllers.UserAdminController.FindAll)
-			usersGroup.PUT("/:userID", controllers.UserAdminController.Update)
+			userGroup.GET("", controllers.UserAdminController.FindAll)
+			userGroup.PUT("/:userID", controllers.UserAdminController.Update)
 		}
 
-		boardsGroup := adminGroup.Group("/boards")
+		contactGroup := adminGroup.Group("/contact")
 		{
-			boardsGroup.GET("", controllers.BoardAdminController.FindAll)
-			boardsGroup.PUT("/:boardID", controllers.BoardAdminController.Update)
+			contactGroup.GET("", controllers.ContactAdminController.FindAll)
+			contactGroup.PUT("/:contactID", controllers.ContactAdminController.Update)
 		}
 
-		threadsGroup := adminGroup.Group("/threads")
+		boardGroup := adminGroup.Group("/boards")
 		{
-			threadsGroup.GET("", controllers.ThreadAdminController.FindAll)
-			threadsGroup.GET("/:threadID", controllers.ThreadAdminController.FindByID)
-			threadsGroup.PUT("/:threadID", controllers.ThreadAdminController.Update)
+			boardGroup.GET("", controllers.BoardAdminController.FindAll)
+			boardGroup.PUT("/:boardID", controllers.BoardAdminController.Update)
+		}
+
+		threadGroup := adminGroup.Group("/threads")
+		{
+			threadGroup.GET("", controllers.ThreadAdminController.FindAll)
+			threadGroup.GET("/:threadID", controllers.ThreadAdminController.FindByID)
+			threadGroup.PUT("/:threadID", controllers.ThreadAdminController.Update)
 		}
 	}
 

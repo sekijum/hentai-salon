@@ -1,12 +1,16 @@
 <template>
   <v-container fluid>
     <v-breadcrumbs :items="['HOME', 'ユーザー']"></v-breadcrumbs>
-    <v-data-table
+    <v-data-table-server
+      v-model:items-per-page="itemsPerPage"
       :headers="headers"
-      :items="desserts"
-      :sort-by="[{ key: 'calories', order: 'asc' }]"
+      :items="serverItems"
+      :items-length="totalItems"
+      :loading="loading"
       :hover="true"
-      height="500"
+      item-value="id"
+      @update:options="loadItems"
+      items-per-page-text="表示行数"
       density="compact"
     >
       <template #top>
@@ -16,165 +20,201 @@
           <v-spacer></v-spacer>
           <v-dialog v-model="dialog" max-width="500px">
             <template #activator="{ props }">
-              <v-btn class="mb-2" color="primary" dark v-bind="props"> 作成 </v-btn>
+              <v-btn class="mb-2" color="primary" dark v-bind="props">作成</v-btn>
             </template>
             <v-card>
               <v-card-title>
-                <span class="text-h5">{{ formTitle }}</span>
+                <span class="text-h5">{{ formTitle() }}</span>
               </v-card-title>
               <v-card-text>
                 <v-container>
                   <v-row>
-                    <v-col cols="12" md="4" sm="6">
-                      <v-text-field v-model="editedItem.name" label="Dessert name"></v-text-field>
+                    <v-col cols="12">
+                      <v-text-field v-model="editedItem.name" label="名前"></v-text-field>
                     </v-col>
-                    <v-col cols="12" md="4" sm="6">
-                      <v-text-field v-model="editedItem.calories" label="Calories"></v-text-field>
+                    <v-col cols="12">
+                      <v-text-field v-model="editedItem.email" label="メール"></v-text-field>
                     </v-col>
-                    <v-col cols="12" md="4" sm="6">
-                      <v-text-field v-model="editedItem.fat" label="Fat (g)"></v-text-field>
+                    <v-col cols="12">
+                      <v-text-field v-model="editedItem.status" label="ステータス"></v-text-field>
                     </v-col>
-                    <v-col cols="12" md="4" sm="6">
-                      <v-text-field v-model="editedItem.carbs" label="Carbs (g)"></v-text-field>
-                    </v-col>
-                    <v-col cols="12" md="4" sm="6">
-                      <v-text-field v-model="editedItem.protein" label="Protein (g)"></v-text-field>
+                    <v-col cols="12">
+                      <v-text-field v-model="editedItem.role" label="権限"></v-text-field>
                     </v-col>
                   </v-row>
                 </v-container>
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="blue-darken-1" variant="text" @click="close">Cancel</v-btn>
-                <v-btn color="blue-darken-1" variant="text" @click="save">Save</v-btn>
+                <v-btn color="blue-darken-1" text @click="close">キャンセル</v-btn>
+                <v-btn color="blue-darken-1" text @click="save">保存</v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
           <v-dialog v-model="dialogDelete" max-width="500px">
             <v-card>
-              <v-card-title class="text-h5">Are you sure you want to delete this item?</v-card-title>
+              <v-card-title class="text-h5">本当に削除しますか？</v-card-title>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="blue-darken-1" variant="text" @click="closeDelete">Cancel</v-btn>
-                <v-btn color="blue-darken-1" variant="text" @click="deleteItemConfirm">OK</v-btn>
+                <v-btn color="blue-darken-1" text @click="closeDelete">キャンセル</v-btn>
+                <v-btn color="blue-darken-1" text @click="deleteItemConfirm">OK</v-btn>
                 <v-spacer></v-spacer>
               </v-card-actions>
             </v-card>
           </v-dialog>
         </v-toolbar>
       </template>
+      <template #item.createdAt="{ item }">
+        {{ $formatDate(item.createdAt) }}
+      </template>
       <template #item.actions="{ item }">
         <v-icon class="me-2" size="small" @click="editItem(item)">mdi-pencil</v-icon>
         <v-icon size="small" @click="deleteItem(item)">mdi-delete</v-icon>
       </template>
       <template #no-data>
-        <v-btn color="primary" @click="initialize">Reset</v-btn>
+        <v-btn color="primary" @click="loadItems">リセット</v-btn>
       </template>
-    </v-data-table>
+    </v-data-table-server>
   </v-container>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import { ref, computed } from 'vue';
+import { useRouter, useNuxtApp } from '#app';
+import type { ICollection } from '~/types/collection';
+
 definePageMeta({
   layout: 'admin',
   middleware: ['admin-access-only'],
 });
 
+interface IUser {
+  id: number;
+  name: string;
+  role: number;
+  roleLabel: string;
+  status: number;
+  statusLabel: string;
+  email: string;
+  profileLink: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 const router = useRouter();
 const nuxtApp = useNuxtApp();
-
-const { payload, $api } = nuxtApp;
+const { $api, $formatDate } = nuxtApp;
 
 const dialog = ref(false);
 const dialogDelete = ref(false);
 const editedIndex = ref(-1);
-const editedItem = ref({
+const editedItem = ref<IUser>({
+  id: 0,
   name: '',
-  calories: 0,
-  fat: 0,
-  carbs: 0,
-  protein: 0,
+  role: 0,
+  roleLabel: '',
+  status: 0,
+  statusLabel: '',
+  email: '',
+  profileLink: '',
+  createdAt: '',
+  updatedAt: '',
 });
 const defaultItem = {
+  id: 0,
   name: '',
-  calories: 0,
-  fat: 0,
-  carbs: 0,
-  protein: 0,
+  role: 0,
+  roleLabel: '',
+  status: 0,
+  statusLabel: '',
+  email: '',
+  profileLink: '',
+  createdAt: '',
+  updatedAt: '',
 };
 
 const headers = [
-  {
-    title: 'Dessert (100g serving)',
-    align: 'start',
-    sortable: false,
-    key: 'name',
-  },
-  { title: 'Calories', key: 'calories' },
-  { title: 'Fat (g)', key: 'fat' },
-  { title: 'Carbs (g)', key: 'carbs' },
-  { title: 'Protein (g)', key: 'protein' },
-  { title: 'Actions', key: 'actions', sortable: false },
+  { title: 'ID', align: 'start', sortable: true, key: 'id' },
+  { title: '名前', key: 'name' },
+  { title: 'メール', key: 'email' },
+  { title: '権限', key: 'roleLabel' },
+  { title: 'ステータス', key: 'statusLabel' },
+  { title: '登録日', key: 'createdAt' },
+  { title: '操作', key: 'actions', sortable: false },
 ];
 
-const desserts = ref([]);
+const itemsPerPage = ref(10);
+const totalItems = ref(0);
+const serverItems = ref<IUser[]>([]);
+const loading = ref(false);
 
-const formTitle = computed(() => (editedIndex.value === -1 ? 'New Item' : 'Edit Item'));
+function formTitle() {
+  return editedIndex.value === -1 ? '新規作成' : '編集';
+}
 
-const initialize = () => {
-  desserts.value = [
-    { name: 'Frozen Yogurt', calories: 159, fat: 6.0, carbs: 24, protein: 4.0 },
-    { name: 'Ice cream sandwich', calories: 237, fat: 9.0, carbs: 37, protein: 4.3 },
-    { name: 'Eclair', calories: 262, fat: 16.0, carbs: 23, protein: 6.0 },
-    { name: 'Cupcake', calories: 305, fat: 3.7, carbs: 67, protein: 4.3 },
-    { name: 'Gingerbread', calories: 356, fat: 16.0, carbs: 49, protein: 3.9 },
-    { name: 'Jelly bean', calories: 375, fat: 0.0, carbs: 94, protein: 0.0 },
-    { name: 'Lollipop', calories: 392, fat: 0.2, carbs: 98, protein: 0 },
-    { name: 'Honeycomb', calories: 408, fat: 3.2, carbs: 87, protein: 6.5 },
-    { name: 'Donut', calories: 452, fat: 25.0, carbs: 51, protein: 4.9 },
-    { name: 'KitKat', calories: 518, fat: 26.0, carbs: 65, protein: 7 },
-  ];
-};
-
-const editItem = item => {
-  editedIndex.value = desserts.value.indexOf(item);
+function editItem(item: IUser) {
+  editedIndex.value = serverItems.value.indexOf(item);
   editedItem.value = { ...item };
   dialog.value = true;
-};
+}
 
-const deleteItem = item => {
-  editedIndex.value = desserts.value.indexOf(item);
+function deleteItem(item: IUser) {
+  editedIndex.value = serverItems.value.indexOf(item);
   editedItem.value = { ...item };
   dialogDelete.value = true;
-};
+}
 
-const deleteItemConfirm = () => {
-  desserts.value.splice(editedIndex.value, 1);
+function deleteItemConfirm() {
+  serverItems.value.splice(editedIndex.value, 1);
   closeDelete();
-};
+}
 
-const close = () => {
+function close() {
   dialog.value = false;
   editedItem.value = { ...defaultItem };
   editedIndex.value = -1;
-};
+}
 
-const closeDelete = () => {
+function closeDelete() {
   dialogDelete.value = false;
   editedItem.value = { ...defaultItem };
   editedIndex.value = -1;
-};
+}
 
-const save = () => {
+function save() {
   if (editedIndex.value > -1) {
-    Object.assign(desserts.value[editedIndex.value], editedItem.value);
+    Object.assign(serverItems.value[editedIndex.value], editedItem.value);
   } else {
-    desserts.value.push(editedItem.value);
+    serverItems.value.push(editedItem.value);
   }
   close();
-};
+}
 
-onMounted(() => {
-  initialize;
-});
+async function loadItems(params: { page: number; itemsPerPage: number; sortBy: [] }) {
+  loading.value = true;
+  console.log({
+    page: params.page,
+    limit: params.itemsPerPage,
+    sort: params.sortBy.length ? params.sortBy[0].key : null,
+    order: params.sortBy.length ? params.sortBy[0].order : null,
+    offset: (params.page - 1) * params.itemsPerPage,
+  });
+  const response = await $api.get<ICollection<IUser>>('/admin/users', {
+    params: {
+      offset: (params.page - 1) * params.itemsPerPage,
+      limit: params.itemsPerPage,
+      sort: params.sortBy.length ? params.sortBy[0].key : null,
+      order: params.sortBy.length ? params.sortBy[0].order : null,
+    },
+  });
+  serverItems.value = response.data.data;
+  totalItems.value = response.data.totalCount;
+  loading.value = false;
+}
+
+onMounted(() => loadItems({ page: 1, itemsPerPage: itemsPerPage.value, sortBy: [] }));
 </script>
+
+<style scoped>
+/* 必要に応じてスタイルを追加 */
+</style>

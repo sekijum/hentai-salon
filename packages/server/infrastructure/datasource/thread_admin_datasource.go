@@ -17,27 +17,27 @@ func NewThreadAdminDatasource(client *ent.Client) *ThreadAdminDatasource {
 }
 
 type ThreadAdminDatasourceFindAllParams struct {
-	Ctx       context.Context
-	Limit     int
-	Offset    int
-	SortKey   *string
-	SortOrder *string
-	Keyword   *string
-	Status    *int
+	Ctx     context.Context
+	Limit   int
+	Offset  int
+	Sort    *string
+	Order   *string
+	Keyword *string
+	Status  *int
 }
 
 func (ds *ThreadAdminDatasource) FindAll(params ThreadAdminDatasourceFindAllParams) ([]*model.Thread, error) {
 	query := ds.client.Thread.Query().WithBoard()
 
-	sortKey := thread.FieldID
-	if params.SortKey != nil && *params.SortKey != "" {
-		sortKey = *params.SortKey
+	sort := thread.FieldID
+	if params.Sort != nil && *params.Sort != "" {
+		sort = *params.Sort
 	}
 
-	if params.SortOrder != nil && *params.SortOrder == "asc" {
-		query = query.Order(ent.Asc(sortKey))
+	if params.Order != nil && *params.Order == "asc" {
+		query = query.Order(ent.Asc(sort))
 	} else {
-		query = query.Order(ent.Desc(sortKey))
+		query = query.Order(ent.Desc(sort))
 	}
 
 	if params.Keyword != nil && *params.Keyword != "" {

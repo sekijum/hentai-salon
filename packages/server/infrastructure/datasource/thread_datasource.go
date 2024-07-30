@@ -48,7 +48,7 @@ type ThreadDatasourceFindAllParams struct {
 	BoardID   int
 	Keyword   string
 	ThreadIDs []int
-	SortOrder string
+	Order     string
 	Limit     int
 	Offset    int
 }
@@ -77,9 +77,9 @@ func (ds *ThreadDatasource) FindAll(params ThreadDatasourceFindAllParams) ([]*mo
 		q = q.Where(thread.IDIn(params.ThreadIDs...))
 	}
 
-	if params.SortOrder != "" {
+	if params.Order != "" {
 		orderFunc := ent.Desc
-		if params.SortOrder == "asc" {
+		if params.Order == "asc" {
 			orderFunc = ent.Asc
 		}
 		q = q.Order(orderFunc(thread.FieldCreatedAt))
@@ -198,13 +198,13 @@ func (ds *ThreadDatasource) FindByTitle(params ThreadDatasourceFindByTitleParams
 type ThreadDatasourceFindByIDParams struct {
 	Ctx           context.Context
 	ThreadID      int
-	SortOrder     string
+	Order         string
 	Limit, Offset int
 }
 
 func (ds *ThreadDatasource) FindById(params ThreadDatasourceFindByIDParams) (*model.Thread, error) {
 	orderFunc := ent.Desc
-	if params.SortOrder == "asc" {
+	if params.Order == "asc" {
 		orderFunc = ent.Asc
 	}
 

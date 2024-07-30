@@ -24,13 +24,13 @@ type ThreadAdminApplicationServiceFindAllParams struct {
 
 func (svc *ThreadAdminApplicationService) FindAll(params ThreadAdminApplicationServiceFindAllParams) (*response.Collection[*response.ThreadAdminResponse], error) {
 	threadList, err := svc.threadAdminDatasource.FindAll(datasource.ThreadAdminDatasourceFindAllParams{
-		Ctx:       params.Ctx,
-		Limit:     params.Qs.Limit,
-		Offset:    params.Qs.Offset,
-		SortKey:   params.Qs.SortKey,
-		SortOrder: params.Qs.SortOrder,
-		Keyword:   params.Qs.Keyword,
-		Status:    params.Qs.Status,
+		Ctx:     params.Ctx,
+		Limit:   params.Qs.Limit,
+		Offset:  params.Qs.Offset,
+		Sort:    params.Qs.Sort,
+		Order:   params.Qs.Order,
+		Keyword: params.Qs.Keyword,
+		Status:  params.Qs.Status,
 	})
 	if err != nil {
 		return nil, err

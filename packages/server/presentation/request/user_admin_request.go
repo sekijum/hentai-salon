@@ -1,12 +1,12 @@
 package request
 
 type UserAdminFindAllRequest struct {
-	Limit     int     `form:"limit"`
-	Offset    int     `form:"offset"`
-	SortOrder *string `form:"sortOrder"`
-	SortKey   *string `form:"sortKey"`
-	Keyword   *string `form:"keyword"`
-	Role      *int    `form:"role"`
+	Limit   int     `form:"limit"`
+	Offset  int     `form:"offset"`
+	Order   *string `form:"order"`
+	Sort    *string `form:"sort"`
+	Keyword *string `form:"keyword"`
+	Role    *int    `form:"role"`
 }
 
 type UserAdminUpdateRequest struct {

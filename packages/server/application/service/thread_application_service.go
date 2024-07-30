@@ -172,11 +172,11 @@ type ThreadApplicationServiceFindByIDParams struct {
 
 func (svc *ThreadApplicationService) FindByID(params ThreadApplicationServiceFindByIDParams) (*response.ThreadResponse, error) {
 	thread, err := svc.threadDatasource.FindById(datasource.ThreadDatasourceFindByIDParams{
-		Ctx:       params.Ctx,
-		SortOrder: params.Qs.SortOrder,
-		Limit:     params.Qs.Limit,
-		Offset:    params.Qs.Offset,
-		ThreadID:  params.ThreadID,
+		Ctx:      params.Ctx,
+		Order:    params.Qs.Order,
+		Limit:    params.Qs.Limit,
+		Offset:   params.Qs.Offset,
+		ThreadID: params.ThreadID,
 	})
 	if err != nil {
 		return nil, err

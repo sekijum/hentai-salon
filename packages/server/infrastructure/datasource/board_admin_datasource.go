@@ -16,13 +16,13 @@ func NewBoardAdminDatasource(client *ent.Client) *BoardAdminDatasource {
 	return &BoardAdminDatasource{client: client}
 }
 
-type BoardAdminGetBoardCountParams struct {
+type BoardAdminDatasourceGetBoardCountParams struct {
 	Ctx     context.Context
 	Keyword *string
 	Status  *int
 }
 
-func (ds *BoardAdminDatasource) GetBoardCount(params BoardAdminGetBoardCountParams) (int, error) {
+func (ds *BoardAdminDatasource) GetBoardCount(params BoardAdminDatasourceGetBoardCountParams) (int, error) {
 	query := ds.client.Board.Query()
 
 	if params.Keyword != nil && *params.Keyword != "" {
@@ -43,12 +43,12 @@ func (ds *BoardAdminDatasource) GetBoardCount(params BoardAdminGetBoardCountPara
 	return boardCount, nil
 }
 
-type BoardAdminFindByIDParams struct {
+type BoardAdminDatasourceFindByIDParams struct {
 	Ctx     context.Context
 	BoardID int
 }
 
-func (ds *BoardAdminDatasource) FindByID(params BoardAdminFindByIDParams) (*model.Board, error) {
+func (ds *BoardAdminDatasource) FindByID(params BoardAdminDatasourceFindByIDParams) (*model.Board, error) {
 	entBoard, err := ds.client.Board.Get(params.Ctx, params.BoardID)
 	if err != nil {
 		return nil, err
@@ -59,28 +59,28 @@ func (ds *BoardAdminDatasource) FindByID(params BoardAdminFindByIDParams) (*mode
 	return board, nil
 }
 
-type BoardAdminFindAllParams struct {
-	Ctx       context.Context
-	Limit     int
-	Offset    int
-	SortKey   *string
-	SortOrder *string
-	Keyword   *string
-	Status    *int
+type BoardAdminDatasourceFindAllParams struct {
+	Ctx     context.Context
+	Limit   int
+	Offset  int
+	Sort    *string
+	Order   *string
+	Keyword *string
+	Status  *int
 }
 
-func (ds *BoardAdminDatasource) FindAll(params BoardAdminFindAllParams) ([]*model.Board, error) {
+func (ds *BoardAdminDatasource) FindAll(params BoardAdminDatasourceFindAllParams) ([]*model.Board, error) {
 	query := ds.client.Board.Query()
 
-	sortKey := board.FieldID
-	if params.SortKey != nil && *params.SortKey != "" {
-		sortKey = *params.SortKey
+	Sort := board.FieldID
+	if params.Sort != nil && *params.Sort != "" {
+		Sort = *params.Sort
 	}
 
-	if params.SortOrder != nil && *params.SortOrder == "asc" {
-		query = query.Order(ent.Asc(sortKey))
+	if params.Order != nil && *params.Order == "asc" {
+		query = query.Order(ent.Asc(Sort))
 	} else {
-		query = query.Order(ent.Desc(sortKey))
+		query = query.Order(ent.Desc(Sort))
 	}
 
 	if params.Keyword != nil && *params.Keyword != "" {
@@ -110,12 +110,12 @@ func (ds *BoardAdminDatasource) FindAll(params BoardAdminFindAllParams) ([]*mode
 	return modelBoards, nil
 }
 
-type BoardAdminUpdateParams struct {
+type BoardAdminDatasourceUpdateParams struct {
 	Ctx   context.Context
 	Board *model.Board
 }
 
-func (ds *BoardAdminDatasource) Update(params BoardAdminUpdateParams) (*model.Board, error) {
+func (ds *BoardAdminDatasource) Update(params BoardAdminDatasourceUpdateParams) (*model.Board, error) {
 	update := ds.client.Board.UpdateOneID(params.Board.EntBoard.ID)
 
 	if params.Board.EntBoard.Title != "" {

@@ -33,6 +33,7 @@ var controllerSet = wire.NewSet(
 	controller.NewBoardAdminController,
 	controller.NewThreadAdminController,
 	controller.NewContactController,
+	controller.NewContactAdminController,
 )
 
 var serviceSet = wire.NewSet(
@@ -46,6 +47,7 @@ var serviceSet = wire.NewSet(
 	service.NewBoardAdminApplicationService,
 	service.NewThreadAdminApplicationService,
 	service.NewContactApplicationService,
+	service.NewContactAdminApplicationService,
 )
 
 var datasourceSet = wire.NewSet(
@@ -58,6 +60,7 @@ var datasourceSet = wire.NewSet(
 	datasource.NewBoardAdminDatasource,
 	datasource.NewThreadAdminDatasource,
 	datasource.NewContactDatasource,
+	datasource.NewContactAdminDatasource,
 )
 
 type ControllersSet struct {
@@ -71,6 +74,7 @@ type ControllersSet struct {
 	BoardAdminController    *controller.BoardAdminController
 	ThreadAdminController   *controller.ThreadAdminController
 	ContactController       *controller.ContactController
+	ContactAdminController  *controller.ContactAdminController
 }
 
 func InitializeControllers() (*ControllersSet, func(), error) {

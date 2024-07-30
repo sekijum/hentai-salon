@@ -24,13 +24,13 @@ type UserAdminApplicationServiceFindAllParams struct {
 
 func (svc *UserAdminApplicationService) FindAll(params UserAdminApplicationServiceFindAllParams) (*response.Collection[*response.UserAdminResponse], error) {
 	userList, err := svc.userAdminDatasource.FindAll(datasource.UserAdminDatasourceFindAllParams{
-		Ctx:       params.Ctx,
-		Limit:     params.Qs.Limit,
-		Offset:    params.Qs.Offset,
-		SortKey:   params.Qs.SortKey,
-		SortOrder: params.Qs.SortOrder,
-		Keyword:   params.Qs.Keyword,
-		Role:      params.Qs.Role,
+		Ctx:     params.Ctx,
+		Limit:   params.Qs.Limit,
+		Offset:  params.Qs.Offset,
+		Sort:    params.Qs.Sort,
+		Order:   params.Qs.Order,
+		Keyword: params.Qs.Keyword,
+		Role:    params.Qs.Role,
 	})
 	if err != nil {
 		return nil, err

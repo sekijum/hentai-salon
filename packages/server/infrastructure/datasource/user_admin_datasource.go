@@ -62,27 +62,27 @@ func (ds *UserAdminDatasource) FindByID(params UserAdminDatasourceFindByIDParams
 }
 
 type UserAdminDatasourceFindAllParams struct {
-	Ctx       context.Context
-	Limit     int
-	Offset    int
-	SortKey   *string
-	SortOrder *string
-	Keyword   *string
-	Role      *int
+	Ctx     context.Context
+	Limit   int
+	Offset  int
+	Sort    *string
+	Order   *string
+	Keyword *string
+	Role    *int
 }
 
 func (ds *UserAdminDatasource) FindAll(params UserAdminDatasourceFindAllParams) ([]*model.User, error) {
 	query := ds.client.User.Query()
 
-	sortKey := user.FieldID
-	if params.SortKey != nil && *params.SortKey != "" {
-		sortKey = *params.SortKey
+	sort := user.FieldID
+	if params.Sort != nil && *params.Sort != "" {
+		sort = *params.Sort
 	}
 
-	if params.SortOrder != nil && *params.SortOrder == "asc" {
-		query = query.Order(ent.Asc(sortKey))
+	if params.Order != nil && *params.Order == "asc" {
+		query = query.Order(ent.Asc(sort))
 	} else {
-		query = query.Order(ent.Desc(sortKey))
+		query = query.Order(ent.Desc(sort))
 	}
 
 	if params.Keyword != nil && *params.Keyword != "" {

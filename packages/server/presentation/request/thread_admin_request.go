@@ -1,12 +1,12 @@
 package request
 
 type ThreadAdminFindAllRequest struct {
-	Limit     int     `form:"limit"`
-	Offset    int     `form:"offset"`
-	SortKey   *string `form:"sortKey"`
-	SortOrder *string `form:"sortOrder"`
-	Keyword   *string `form:"keyword"`
-	Status    *int    `form:"status"`
+	Limit   int     `form:"limit"`
+	Offset  int     `form:"offset"`
+	Sort    *string `form:"sort"`
+	Order   *string `form:"order"`
+	Keyword *string `form:"keyword"`
+	Status  *int    `form:"status"`
 }
 
 type ThreadAdminFindByIDRequest struct {

@@ -10,11 +10,11 @@ import (
 )
 
 type BoardAdminApplicationService struct {
-	boardDatasource *datasource.BoardAdminDatasource
+	boardAdminDatasource *datasource.BoardAdminDatasource
 }
 
-func NewBoardAdminApplicationService(boardDatasource *datasource.BoardAdminDatasource) *BoardAdminApplicationService {
-	return &BoardAdminApplicationService{boardDatasource: boardDatasource}
+func NewBoardAdminApplicationService(boardAdminDatasource *datasource.BoardAdminDatasource) *BoardAdminApplicationService {
+	return &BoardAdminApplicationService{boardAdminDatasource: boardAdminDatasource}
 }
 
 type BoardAdminApplicationServiceFindAllParams struct {
@@ -23,20 +23,20 @@ type BoardAdminApplicationServiceFindAllParams struct {
 }
 
 func (svc *BoardAdminApplicationService) FindAll(params BoardAdminApplicationServiceFindAllParams) (*response.Collection[*response.BoardAdminResponse], error) {
-	boardList, err := svc.boardDatasource.FindAll(datasource.BoardAdminFindAllParams{
-		Ctx:       params.Ctx,
-		Limit:     params.Qs.Limit,
-		Offset:    params.Qs.Offset,
-		SortKey:   params.Qs.SortKey,
-		SortOrder: params.Qs.SortOrder,
-		Keyword:   params.Qs.Keyword,
-		Status:    params.Qs.Status,
+	boardList, err := svc.boardAdminDatasource.FindAll(datasource.BoardAdminDatasourceFindAllParams{
+		Ctx:     params.Ctx,
+		Limit:   params.Qs.Limit,
+		Offset:  params.Qs.Offset,
+		Sort:    params.Qs.Sort,
+		Order:   params.Qs.Order,
+		Keyword: params.Qs.Keyword,
+		Status:  params.Qs.Status,
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	boardCount, err := svc.boardDatasource.GetBoardCount(datasource.BoardAdminGetBoardCountParams{
+	boardCount, err := svc.boardAdminDatasource.GetBoardCount(datasource.BoardAdminDatasourceGetBoardCountParams{
 		Ctx:     params.Ctx,
 		Keyword: params.Qs.Keyword,
 		Status:  params.Qs.Status,
@@ -81,7 +81,7 @@ func (svc *BoardAdminApplicationService) Update(params BoardAdminApplicationServ
 		},
 	})
 
-	board, err := svc.boardDatasource.Update(datasource.BoardAdminUpdateParams{
+	board, err := svc.boardAdminDatasource.Update(datasource.BoardAdminDatasourceUpdateParams{
 		Ctx:   params.Ctx,
 		Board: board,
 	})

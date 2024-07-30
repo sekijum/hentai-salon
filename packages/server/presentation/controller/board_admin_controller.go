@@ -11,11 +11,11 @@ import (
 )
 
 type BoardAdminController struct {
-	boardApplicationService *service.BoardAdminApplicationService
+	boardAdminApplicationService *service.BoardAdminApplicationService
 }
 
-func NewBoardAdminController(boardApplicationService *service.BoardAdminApplicationService) *BoardAdminController {
-	return &BoardAdminController{boardApplicationService: boardApplicationService}
+func NewBoardAdminController(boardAdminApplicationService *service.BoardAdminApplicationService) *BoardAdminController {
+	return &BoardAdminController{boardAdminApplicationService: boardAdminApplicationService}
 }
 
 func (ctrl *BoardAdminController) FindAll(ctx *gin.Context) {
@@ -29,7 +29,7 @@ func (ctrl *BoardAdminController) FindAll(ctx *gin.Context) {
 	qs.Limit = ctx.GetInt("limit")
 	qs.Offset = ctx.GetInt("offset")
 
-	dto, err := ctrl.boardApplicationService.FindAll(service.BoardAdminApplicationServiceFindAllParams{
+	dto, err := ctrl.boardAdminApplicationService.FindAll(service.BoardAdminApplicationServiceFindAllParams{
 		Ctx: context.Background(),
 		Qs:  qs,
 	})
@@ -55,7 +55,7 @@ func (ctrl *BoardAdminController) Update(ctx *gin.Context) {
 		return
 	}
 
-	dto, err := ctrl.boardApplicationService.Update(service.BoardAdminApplicationServiceUpdateParams{
+	dto, err := ctrl.boardAdminApplicationService.Update(service.BoardAdminApplicationServiceUpdateParams{
 		Ctx:     context.Background(),
 		BoardID: boardId,
 		Body:    body,
