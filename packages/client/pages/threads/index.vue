@@ -20,7 +20,7 @@
     <v-btn type="submit" color="primary" block @click="search">全板検索</v-btn>
 
     <ThreadList
-      v-if="route.query.filter === 'history' && threads.threadsByHistory.length"
+      v-if="route.query.filter === 'history' && threads.threadsByHistory?.length"
       filter="history"
       title="閲覧履歴"
       :items="threads?.threadsByHistory"
@@ -28,7 +28,7 @@
       :threadLimit="threadLimit"
     />
     <ThreadList
-      v-if="(route.query.filter === 'popularity' || !route.query.filter) && threads.threadsByPopular.length"
+      v-if="(route.query.filter === 'popularity' || !route.query.filter) && threads.threadsByPopular?.length"
       filter="popularity"
       title="人気"
       :items="threads?.threadsByPopular"
@@ -36,7 +36,7 @@
       :threadLimit="threadLimit"
     />
     <ThreadList
-      v-if="(route.query.filter === 'newest' || !route.query.filter) && threads.threadsByNewest.length"
+      v-if="(route.query.filter === 'newest' || !route.query.filter) && threads.threadsByNewest?.length"
       filter="newest"
       title="新着"
       :items="threads?.threadsByNewest"
@@ -44,7 +44,7 @@
       :threadLimit="threadLimit"
     />
     <ThreadList
-      v-if="route.query.filter === 'keyword' && threads.threadsByKeyword.length"
+      v-if="route.query.filter === 'keyword' && threads.threadsByKeyword?.length"
       filter="keyword"
       title="全板検索"
       :items="threads?.threadsByKeyword"
@@ -52,7 +52,7 @@
       :threadLimit="threadLimit"
     />
     <ThreadList
-      v-if="route.query.filter === 'related' && threads.threadsByRelated.length"
+      v-if="route.query.filter === 'related' && threads.threadsByRelated?.length"
       filter="related"
       title="関連"
       :items="threads?.threadsByRelated"
@@ -60,7 +60,7 @@
       :threadLimit="threadLimit"
     />
     <ThreadList
-      v-if="route.query.filter === 'board' && threads.threadsByBoard.length"
+      v-if="route.query.filter === 'board' && threads.threadsByBoard?.length"
       filter="board"
       :title="`#${board?.title}`"
       :items="threads?.threadsByBoard"
@@ -142,7 +142,7 @@ onMounted(async () => {
 
 async function fetchThreads() {
   if (route.query.filter) {
-    const response = await $api.get<IThread[]>('/threads/', {
+    const response = await $api.get<IThread[]>('/threads', {
       params: {
         filter: route.query.filter,
         threadIds: getThreadViewHistory(),
@@ -168,7 +168,7 @@ async function fetchThreads() {
   } else {
     await Promise.all(
       ['newest'].map(async filter => {
-        const response = await $api.get<IThread[]>('/threads/', {
+        const response = await $api.get<IThread[]>('/threads', {
           params: {
             filter,
             threadIds: getThreadViewHistory(),

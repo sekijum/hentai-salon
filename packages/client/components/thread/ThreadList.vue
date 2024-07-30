@@ -122,7 +122,7 @@ async function load({ done }: { done: (status: 'loading' | 'error' | 'empty' | '
 
 async function fetchLoadThreads(offset: number) {
   console.log(threadLimit.value, offset, props.filter);
-  const response = await $api.get<IThread[]>('/threads/', {
+  const response = await $api.get<IThread[]>('/threads', {
     params: {
       filter: props.filter,
       threadIds: getThreadViewHistory(),

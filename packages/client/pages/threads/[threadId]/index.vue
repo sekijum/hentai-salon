@@ -182,7 +182,7 @@ async function fetchThread() {
 }
 
 async function fetchThreads() {
-  const response = await $api.get<IThread[]>('/threads/', {
+  const response = await $api.get<IThread[]>('/threads', {
     params: {
       filter: 'related',
       threadIds: getThreadViewHistory(),

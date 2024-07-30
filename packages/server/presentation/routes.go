@@ -8,7 +8,10 @@ import (
 )
 
 func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
-	r.Use(middleware.PaginationMiddleware(), middleware.OptionalAuthMiddleware())
+	paginationMiddleware := middleware.PaginationMiddleware()
+	optionalAuthMiddleware := middleware.OptionalAuthMiddleware()
+
+	r.Use(paginationMiddleware, optionalAuthMiddleware)
 
 	r.GET("", func(c *gin.Context) {
 		c.JSON(200, gin.H{"message": "ok"})
@@ -35,15 +38,15 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 
 	threadGroup := r.Group("/threads")
 	{
-		threadGroup.GET("/", controllers.ThreadController.FindAll)
+		threadGroup.GET("", controllers.ThreadController.FindAll)
 		threadGroup.GET("/:threadID", controllers.ThreadController.FindById)
 		threadGroup.POST("/:threadID/like", controllers.ThreadController.Like)
 		threadGroup.POST("/:threadID/unlike", controllers.ThreadController.Unlike)
 
 		commentGroup := threadGroup.Group("/:threadID/comments")
 		{
-			commentGroup.POST("/:threadID/comments", controllers.ThreadCommentController.Create)
 			commentGroup.GET("/:commentID", controllers.ThreadCommentController.FindById)
+			commentGroup.POST("", controllers.ThreadCommentController.Create)
 			commentGroup.POST("/:commentID/reply", controllers.ThreadCommentController.Reply)
 			commentGroup.POST("/:commentID/like", controllers.ThreadCommentController.Like)
 			commentGroup.POST("/:commentID/unlike", controllers.ThreadCommentController.Unlike)
@@ -51,8 +54,10 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 	}
 
 	// 認証必須ルート
+	authMiddleware := middleware.AuthMiddleware()
+
 	authGroup := r.Group("/")
-	r.Use(middleware.AuthMiddleware())
+	authGroup.Use(authMiddleware)
 	{
 		authGroup.POST("/threads", controllers.ThreadController.Create)
 
@@ -71,7 +76,7 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 
 	// 管理者ルート
 	adminGroup := r.Group("/admin")
-	adminGroup.Use(middleware.AuthMiddleware())
+	adminGroup.Use(authMiddleware)
 	{
 		adminGroup.POST("/boards", controllers.BoardController.Create)
 

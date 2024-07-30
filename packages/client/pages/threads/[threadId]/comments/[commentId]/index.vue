@@ -102,7 +102,7 @@ async function fetchComment() {
 async function fetchThreads() {
   await Promise.all(
     ['related'].map(async filter => {
-      const response = await $api.get<IThread[]>('/threads/', {
+      const response = await $api.get<IThread[]>('/threads', {
         params: {
           filter,
           threadIds: getThreadViewHistory(),
