@@ -434,7 +434,7 @@ type UserApplicationServiceFindLikedThreadsParams struct {
 	Qs     request.UserFindLikedCommentsRequest
 }
 
-func (svc *UserApplicationService) FindLikedThreads(params UserApplicationServiceFindLikedThreadsParams) (*response.Collection[*response.ThreadResponse], error) {
+func (svc *UserApplicationService) FindLikedThreads(params UserApplicationServiceFindLikedThreadsParams) ([]*response.ThreadResponse, error) {
 	threadList, err := svc.userDatasource.FindLikedThreads(datasource.UserDatasourceFindLikedThreadsParams{
 		Ctx:    params.Ctx,
 		UserID: params.UserID,
@@ -445,30 +445,15 @@ func (svc *UserApplicationService) FindLikedThreads(params UserApplicationServic
 		return nil, err
 	}
 
-	threadCount, err := svc.threadDatasource.GetThreadCount(datasource.ThreadDatasourceGetCommentCountParams{
-		Ctx:    params.Ctx,
-		UserID: &params.UserID,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	var threadResponseList []*response.ThreadResponse
+	var dto []*response.ThreadResponse
 	for _, thread_i := range threadList {
 		commentCount := (len(thread_i.EntThread.Edges.Comments))
-		threadResponseList = append(threadResponseList, response.NewThreadResponse(response.NewThreadResponseParams{
+		dto = append(dto, response.NewThreadResponse(response.NewThreadResponseParams{
 			Thread:       thread_i,
 			CommentCount: &commentCount,
 			IncludeBoard: true,
 		}))
 	}
-
-	dto := response.NewCollection(response.NewCollectionParams[*response.ThreadResponse]{
-		Data:       threadResponseList,
-		TotalCount: threadCount,
-		Limit:      params.Qs.Limit,
-		Offset:     params.Qs.Offset,
-	})
 
 	return dto, nil
 }
@@ -528,7 +513,7 @@ type UserApplicationServiceFindUserThreadsParams struct {
 	Qs     request.UserFindThreadsRequest
 }
 
-func (svc *UserApplicationService) FindThreads(params UserApplicationServiceFindUserThreadsParams) (*response.Collection[*response.ThreadResponse], error) {
+func (svc *UserApplicationService) FindThreads(params UserApplicationServiceFindUserThreadsParams) ([]*response.ThreadResponse, error) {
 	threadList, err := svc.userDatasource.FindThreads(datasource.UserDatasourceFindThreadsParams{
 		Ctx:    params.Ctx,
 		UserID: params.UserID,
@@ -539,30 +524,15 @@ func (svc *UserApplicationService) FindThreads(params UserApplicationServiceFind
 		return nil, err
 	}
 
-	threadCount, err := svc.threadDatasource.GetThreadCount(datasource.ThreadDatasourceGetCommentCountParams{
-		Ctx:    params.Ctx,
-		UserID: &params.UserID,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	var threadResponseList []*response.ThreadResponse
+	var dto []*response.ThreadResponse
 	for _, thread_i := range threadList {
 		commentCount := len(thread_i.EntThread.Edges.Comments)
-		threadResponseList = append(threadResponseList, response.NewThreadResponse(response.NewThreadResponseParams{
+		dto = append(dto, response.NewThreadResponse(response.NewThreadResponseParams{
 			Thread:       thread_i,
 			CommentCount: &commentCount,
 			IncludeBoard: true,
 		}))
 	}
-
-	dto := response.NewCollection(response.NewCollectionParams[*response.ThreadResponse]{
-		Data:       threadResponseList,
-		TotalCount: threadCount,
-		Limit:      params.Qs.Limit,
-		Offset:     params.Qs.Offset,
-	})
 
 	return dto, nil
 }

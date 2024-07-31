@@ -9,59 +9,33 @@
 
     <Menu :items="guestMenuItems" />
 
-    <ThreadList
-      v-if="threads.threadsByHistory?.length"
+    <ThreadItem
       filter="history"
       title="スレッド閲覧履歴"
-      :items="threads.threadsByHistory.slice(0, 5)"
       :clicked="() => router.push({ path: '/threads', query: { filter: 'history' } })"
       :isInfiniteScroll="false"
-      :threadLimit="threadLimit"
     />
-    <ThreadList
-      v-if="threads.threadsByPopular?.length"
+    <ThreadItem
       filter="popularity"
       title="人気"
-      :items="threads.threadsByPopular"
       :clicked="() => router.push({ path: '/threads' })"
       :isInfiniteScroll="false"
-      :threadLimit="threadLimit"
     />
-    <ThreadList
-      v-if="threads.threadsByNewest?.length"
-      filter="newest"
-      title="新着"
-      :items="threads.threadsByNewest"
-      :isInfiniteScroll="true"
-      :threadLimit="threadLimit"
-    />
+    <ThreadItem filter="newest" title="新着" :isInfiniteScroll="true" />
   </div>
 </template>
 
 <script setup lang="ts">
 import Menu from '~/components/Menu.vue';
-import ThreadList from '~/components/thread/ThreadList.vue';
-import type { IThread } from '~/types/thread';
+import ThreadItem from '~/components/thread/ThreadItem.vue';
 
 const config = useRuntimeConfig();
 const route = useRoute();
 const router = useRouter();
 const nuxtApp = useNuxtApp();
-const { getThreadViewHistory } = useStorage();
 const isMenuModal = useState('isMenuModal', () => false);
 
-const { payload, $api } = nuxtApp;
-const threadLimit = 10;
-
-const threads = ref<{
-  threadsByPopular: IThread[];
-  threadsByNewest: IThread[];
-  threadsByHistory: IThread[];
-}>({
-  threadsByPopular: [],
-  threadsByNewest: [],
-  threadsByHistory: [],
-});
+const { payload } = nuxtApp;
 
 const guestMenuItems = computed(() => {
   let items: { title: string; clicked: () => any; icon: string }[] = [
@@ -94,31 +68,6 @@ const guestMenuItems = computed(() => {
 
   return items;
 });
-
-onMounted(async () => {
-  await fetchThreads();
-});
-
-async function fetchThreads() {
-  await Promise.all(
-    ['history', 'newest', 'popularity'].map(async filter => {
-      const response = await $api.get<IThread[]>('/threads', {
-        params: {
-          filter,
-          threadIds: getThreadViewHistory(),
-          limit: threadLimit,
-        },
-      });
-      if (filter === 'popularity') {
-        threads.value.threadsByNewest = response.data;
-      } else if (filter === 'newest') {
-        threads.value.threadsByPopular = response.data;
-      } else if (filter === 'history') {
-        threads.value.threadsByHistory = response.data;
-      }
-    }),
-  );
-}
 
 useHead({
   title: '変態サロン',

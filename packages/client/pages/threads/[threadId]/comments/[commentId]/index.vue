@@ -37,14 +37,7 @@
 
     <v-divider />
 
-    <ThreadList
-      v-if="threads.threadsByRelated.length"
-      filter="related"
-      title="関連"
-      :items="threads?.threadsByRelated"
-      :isInfiniteScroll="true"
-      :threadLimit="threadLimit"
-    />
+    <ThreadItem filter="related" title="関連" :isInfiniteScroll="true" />
   </div>
 </template>
 
@@ -52,21 +45,17 @@
 import CommentList from '~/components/comment/CommentList.vue';
 import PageTitle from '~/components/PageTitle.vue';
 import Pagination from '~/components/Pagination.vue';
-import ThreadList from '~/components/thread/ThreadList.vue';
-import type { IThread } from '~/types/thread';
+import ThreadItem from '~/components/thread/ThreadItem.vue';
 import type { IThreadComment } from '~/types/thread-comment';
 
 const route = useRoute();
 const nuxtApp = useNuxtApp();
-const { getThreadViewHistory, getCommentLimit } = useStorage();
+const { getCommentLimit } = useStorage();
 
 const { $api } = nuxtApp;
 
 const commentLimit = getCommentLimit();
-const threadLimit = 10;
 const comment = ref<IThreadComment>();
-
-const threads = ref<{ threadsByRelated: IThread[] }>({ threadsByRelated: [] });
 
 function scrollToCommentTop() {
   const commentTop = document.getElementById('comment-top');
@@ -83,7 +72,6 @@ function scrollToCommentBottom() {
 }
 
 onMounted(async () => {
-  await fetchThreads();
   await fetchComment();
 });
 
@@ -97,23 +85,6 @@ async function fetchComment() {
     },
   });
   comment.value = response.data;
-}
-
-async function fetchThreads() {
-  await Promise.all(
-    ['related'].map(async filter => {
-      const response = await $api.get<IThread[]>('/threads', {
-        params: {
-          filter,
-          threadIds: getThreadViewHistory(),
-          limit: threadLimit,
-        },
-      });
-      if (filter === 'related') {
-        threads.value.threadsByRelated = response.data;
-      }
-    }),
-  );
 }
 
 watchEffect(() => {

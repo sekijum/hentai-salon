@@ -70,14 +70,7 @@
       <v-icon>{{ thread.isLiked ? 'mdi-thumb-up' : 'mdi-thumb-up-outline' }}</v-icon>
     </v-btn>
 
-    <ThreadList
-      v-if="threads.threadsByRelated?.length"
-      filter="related"
-      title="関連"
-      :items="threads?.threadsByRelated"
-      :isInfiniteScroll="true"
-      :threadLimit="threadLimit"
-    />
+    <ThreadItem filter="related" title="関連" :isInfiniteScroll="true" />
   </div>
 </template>
 
@@ -85,10 +78,10 @@
 import CommentList from '~/components/comment/CommentList.vue';
 import CommentForm from '~/components/comment/CommentForm.vue';
 import Menu from '~/components/Menu.vue';
+import ThreadItem from '~/components/thread/ThreadItem.vue';
 import PageTitle from '~/components/PageTitle.vue';
 import Pagination from '~/components/Pagination.vue';
 import MediaGallery from '~/components/MediaGallery.vue';
-import ThreadList from '~/components/thread/ThreadList.vue';
 import type { IThread } from '~/types/thread';
 
 const router = useRouter();
@@ -99,7 +92,6 @@ const { setThreadViewHistory, getThreadViewHistory, getCommentLimit, getCommentS
 const { $api, payload } = nuxtApp;
 
 const commentLimit = getCommentLimit();
-const threadLimit = 10;
 
 const thread = ref<IThread>({
   id: 0,
@@ -165,7 +157,6 @@ function scrollToCommentBottom() {
 
 onMounted(async () => {
   await fetchThread();
-  await fetchThreads();
   setThreadViewHistory(parseInt(route.params.threadId.toString(), 10));
 });
 
@@ -179,17 +170,6 @@ async function fetchThread() {
     },
   });
   thread.value = response.data;
-}
-
-async function fetchThreads() {
-  const response = await $api.get<IThread[]>('/threads', {
-    params: {
-      filter: 'related',
-      threadIds: getThreadViewHistory(),
-      limit: threadLimit,
-    },
-  });
-  threads.value.threadsByRelated = response.data;
 }
 
 async function toggleLike() {

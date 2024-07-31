@@ -1,22 +1,16 @@
 <template>
-  <div v-if="threads">
+  <div>
     <PageTitle title="マイスレ" />
 
     <Menu :items="menuItems" />
 
-    <template v-if="threads.data">
-      <Pagination :totalCount="threads.totalCount" :limit="threadLimit" />
-
-      <ThreadList filter="owner" :items="threads.data" :isInfiniteScroll="false" :threadLimit="threadLimit" />
-
-      <Pagination :totalCount="threads.totalCount" :limit="threadLimit" />
-    </template>
+    <ThreadItem filter="owner" :isInfiniteScroll="true" />
   </div>
 </template>
 
 <script setup lang="ts">
 import PageTitle from '~/components/PageTitle.vue';
-import ThreadList from '~/components/thread/ThreadList.vue';
+import ThreadItem from '~/components/thread/ThreadItem.vue';
 import type { IThread } from '~/types/thread';
 import type { ICollection } from '~/types/collection';
 
