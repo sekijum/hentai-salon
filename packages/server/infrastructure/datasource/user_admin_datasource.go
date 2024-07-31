@@ -75,11 +75,17 @@ func (ds *UserAdminDatasource) FindAll(params UserAdminDatasourceFindAllParams) 
 	query := ds.client.User.Query()
 
 	sort := user.FieldID
+	order := "desc" // デフォルトはIDの降順
+
 	if params.Sort != nil && *params.Sort != "" {
 		sort = *params.Sort
 	}
 
-	if params.Order != nil && *params.Order == "asc" {
+	if params.Order != nil && *params.Order != "" {
+		order = *params.Order
+	}
+
+	if order == "asc" {
 		query = query.Order(ent.Asc(sort))
 	} else {
 		query = query.Order(ent.Desc(sort))

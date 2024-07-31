@@ -2,29 +2,31 @@
   <v-container fluid>
     <v-breadcrumbs :items="['HOME', 'ユーザー']"></v-breadcrumbs>
     <v-data-table-server
+      v-model:sort-by="sortBy"
       v-model:items-per-page="itemsPerPage"
       :headers="headers"
       :items="serverItems"
       :items-length="totalItems"
-      :loading="loading"
       :hover="true"
       item-value="id"
       @update:options="loadItems"
       items-per-page-text="表示行数"
       density="compact"
+      must-sort
+      no-data-text="検索結果は0件です"
     >
       <template #top>
         <v-toolbar flat>
           <v-toolbar-title>ユーザー一覧</v-toolbar-title>
-          <v-divider class="mx-4" inset vertical></v-divider>
+          <v-divider inset vertical></v-divider>
           <v-spacer></v-spacer>
           <v-dialog v-model="dialog" max-width="500px">
             <template #activator="{ props }">
-              <v-btn class="mb-2" color="primary" dark v-bind="props">作成</v-btn>
+              <v-btn color="primary" dark v-bind="props">作成</v-btn>
             </template>
             <v-card>
               <v-card-title>
-                <span class="text-h5">{{ formTitle() }}</span>
+                <span>{{ formTitle() }}</span>
               </v-card-title>
               <v-card-text>
                 <v-container>
@@ -143,10 +145,20 @@ const headers = [
   { title: '操作', key: 'actions', sortable: false },
 ];
 
-const itemsPerPage = ref(10);
+type SortBy = {
+  key: string;
+  order: 'asc' | 'desc';
+};
+
+const initSortBy: SortBy = {
+  key: 'id',
+  order: 'desc',
+};
+
+const sortBy = ref<SortBy[]>([initSortBy]);
+const itemsPerPage = ref(20);
 const totalItems = ref(0);
 const serverItems = ref<IUser[]>([]);
-const loading = ref(false);
 
 function formTitle() {
   return editedIndex.value === -1 ? '新規作成' : '編集';
@@ -190,29 +202,24 @@ function save() {
   close();
 }
 
-async function loadItems(params: { page: number; itemsPerPage: number; sortBy: [] }) {
-  loading.value = true;
-  console.log({
-    page: params.page,
-    limit: params.itemsPerPage,
-    sort: params.sortBy.length ? params.sortBy[0].key : null,
-    order: params.sortBy.length ? params.sortBy[0].order : null,
-    offset: (params.page - 1) * params.itemsPerPage,
-  });
+async function loadItems(params: { page: number; itemsPerPage: number; sortBy: SortBy[] }) {
+  let order = params.sortBy.length ? params.sortBy[0].order : null;
+  let sort = params.sortBy.length ? params.sortBy[0].key : null;
+  sort = sort === 'roleLabel' ? 'role' : sort === 'statusLabel' ? 'status' : sort === 'createdAt' ? 'created_at' : null;
+
   const response = await $api.get<ICollection<IUser>>('/admin/users', {
     params: {
       offset: (params.page - 1) * params.itemsPerPage,
       limit: params.itemsPerPage,
-      sort: params.sortBy.length ? params.sortBy[0].key : null,
-      order: params.sortBy.length ? params.sortBy[0].order : null,
+      sort,
+      order,
     },
   });
   serverItems.value = response.data.data;
   totalItems.value = response.data.totalCount;
-  loading.value = false;
 }
 
-onMounted(() => loadItems({ page: 1, itemsPerPage: itemsPerPage.value, sortBy: [] }));
+onMounted(() => loadItems({ page: 1, itemsPerPage: itemsPerPage.value, sortBy: sortBy.value }));
 </script>
 
 <style scoped>
