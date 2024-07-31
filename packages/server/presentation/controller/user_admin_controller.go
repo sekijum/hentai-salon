@@ -18,6 +18,25 @@ func NewUserAdminController(userAdminApplicationService *service.UserAdminApplic
 	return &UserAdminController{userAdminApplicationService: userAdminApplicationService}
 }
 
+func (ctrl *UserAdminController) FindByID(ctx *gin.Context) {
+	userID, err := strconv.Atoi(ctx.Param("userID"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	dto, err := ctrl.userAdminApplicationService.FindByID(service.UserAdminApplicationServiceFindByIDParams{
+		Ctx:    context.Background(),
+		UserID: userID,
+	})
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, dto)
+}
+
 func (ctrl *UserAdminController) FindAll(ctx *gin.Context) {
 	var qs request.UserAdminFindAllRequest
 
@@ -44,7 +63,7 @@ func (ctrl *UserAdminController) FindAll(ctx *gin.Context) {
 func (ctrl *UserAdminController) Update(ctx *gin.Context) {
 	var body request.UserAdminUpdateRequest
 
-	userID, err := strconv.Atoi(ctx.Param("userId"))
+	userID, err := strconv.Atoi(ctx.Param("userID"))
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

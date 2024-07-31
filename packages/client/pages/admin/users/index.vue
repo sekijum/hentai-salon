@@ -1,6 +1,62 @@
 <template>
   <v-container fluid>
-    <v-breadcrumbs :items="['HOME', 'ユーザー']"></v-breadcrumbs>
+    <v-breadcrumbs
+      :items="[
+        {
+          title: 'ダッシュボード',
+          disabled: false,
+          href: '/admin',
+        },
+        {
+          title: 'ユーザー一覧',
+          disabled: false,
+          href: '/admin/users',
+        },
+      ]"
+    />
+
+    <v-text-field
+      v-model="search"
+      density="compact"
+      label="検索"
+      prepend-inner-icon="mdi-magnify"
+      variant="solo-filled"
+      flat
+      hide-details
+      single-line
+    />
+
+    <v-divider class="border-opacity-0" :thickness="20" />
+
+    <v-expansion-panels>
+      <v-expansion-panel title="検索の使い方の説明">
+        <v-expansion-panel-text>
+          <ul>
+            <li><strong>id:</strong> 特定のユーザーIDで検索します。例: <code>id:123</code></li>
+            <li>
+              <strong>role:</strong> 特定の権限を持つユーザーを検索します。以下の例を参照してください:
+              <ul>
+                <li>会員を検索: <code>role:0</code></li>
+                <li>管理者を検索: <code>role:1</code></li>
+              </ul>
+            </li>
+            <li>
+              <strong>status:</strong> 特定のステータスを持つユーザーを検索します。以下の例を参照してください:
+              <ul>
+                <li>有効なユーザーを検索: <code>status:0</code></li>
+                <li>退会済のユーザーを検索: <code>status:1</code></li>
+                <li>凍結されたユーザーを検索: <code>status:2</code></li>
+                <li>無効化されたユーザーを検索: <code>status:3</code></li>
+              </ul>
+            </li>
+            <li>また、名前やメールアドレスを部分一致で検索することも可能です。</li>
+          </ul>
+        </v-expansion-panel-text>
+      </v-expansion-panel>
+    </v-expansion-panels>
+
+    <v-divider class="border-opacity-0" :thickness="20" />
+
     <v-data-table-server
       v-model:sort-by="sortBy"
       v-model:items-per-page="itemsPerPage"
@@ -14,75 +70,27 @@
       density="compact"
       must-sort
       no-data-text="検索結果は0件です"
+      v-model:search="search"
     >
-      <template #top>
-        <v-toolbar flat>
-          <v-toolbar-title>ユーザー一覧</v-toolbar-title>
-          <v-divider inset vertical></v-divider>
-          <v-spacer></v-spacer>
-          <v-dialog v-model="dialog" max-width="500px">
-            <template #activator="{ props }">
-              <v-btn color="primary" dark v-bind="props">作成</v-btn>
-            </template>
-            <v-card>
-              <v-card-title>
-                <span>{{ formTitle() }}</span>
-              </v-card-title>
-              <v-card-text>
-                <v-container>
-                  <v-row>
-                    <v-col cols="12">
-                      <v-text-field v-model="editedItem.name" label="名前"></v-text-field>
-                    </v-col>
-                    <v-col cols="12">
-                      <v-text-field v-model="editedItem.email" label="メール"></v-text-field>
-                    </v-col>
-                    <v-col cols="12">
-                      <v-text-field v-model="editedItem.status" label="ステータス"></v-text-field>
-                    </v-col>
-                    <v-col cols="12">
-                      <v-text-field v-model="editedItem.role" label="権限"></v-text-field>
-                    </v-col>
-                  </v-row>
-                </v-container>
-              </v-card-text>
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn color="blue-darken-1" text @click="close">キャンセル</v-btn>
-                <v-btn color="blue-darken-1" text @click="save">保存</v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-          <v-dialog v-model="dialogDelete" max-width="500px">
-            <v-card>
-              <v-card-title class="text-h5">本当に削除しますか？</v-card-title>
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn color="blue-darken-1" text @click="closeDelete">キャンセル</v-btn>
-                <v-btn color="blue-darken-1" text @click="deleteItemConfirm">OK</v-btn>
-                <v-spacer></v-spacer>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-        </v-toolbar>
-      </template>
-      <template #item.createdAt="{ item }">
-        {{ $formatDate(item.createdAt) }}
-      </template>
-      <template #item.actions="{ item }">
-        <v-icon class="me-2" size="small" @click="editItem(item)">mdi-pencil</v-icon>
-        <v-icon size="small" @click="deleteItem(item)">mdi-delete</v-icon>
-      </template>
-      <template #no-data>
-        <v-btn color="primary" @click="loadItems">リセット</v-btn>
+      <template #item="{ item }">
+        <tr>
+          <td>{{ item.id }}</td>
+          <td>{{ item.name }}</td>
+          <td>{{ item.email }}</td>
+          <td>{{ item.roleLabel }}</td>
+          <td>{{ item.statusLabel }}</td>
+          <td>{{ $formatDate(item.createdAt) }}</td>
+          <td>
+            <v-icon class="me-2" size="small" @click="router.push(`/admin/users/${item.id}`)">mdi-pencil</v-icon>
+          </td>
+        </tr>
       </template>
     </v-data-table-server>
   </v-container>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { useRouter, useNuxtApp } from '#app';
+import { ref } from 'vue';
 import type { ICollection } from '~/types/collection';
 
 definePageMeta({
@@ -107,33 +115,20 @@ const router = useRouter();
 const nuxtApp = useNuxtApp();
 const { $api, $formatDate } = nuxtApp;
 
-const dialog = ref(false);
-const dialogDelete = ref(false);
-const editedIndex = ref(-1);
-const editedItem = ref<IUser>({
-  id: 0,
-  name: '',
-  role: 0,
-  roleLabel: '',
-  status: 0,
-  statusLabel: '',
-  email: '',
-  profileLink: '',
-  createdAt: '',
-  updatedAt: '',
-});
-const defaultItem = {
-  id: 0,
-  name: '',
-  role: 0,
-  roleLabel: '',
-  status: 0,
-  statusLabel: '',
-  email: '',
-  profileLink: '',
-  createdAt: '',
-  updatedAt: '',
+type SortBy = {
+  key: string;
+  order: 'asc' | 'desc';
 };
+
+const initSortBy: SortBy = {
+  key: 'id',
+  order: 'desc',
+};
+const search = ref('');
+const sortBy = ref<SortBy[]>([initSortBy]);
+const itemsPerPage = ref(20);
+const totalItems = ref(0);
+const serverItems = ref<IUser[]>([]);
 
 const headers = [
   { title: 'ID', align: 'start', sortable: true, key: 'id' },
@@ -145,64 +140,8 @@ const headers = [
   { title: '操作', key: 'actions', sortable: false },
 ];
 
-type SortBy = {
-  key: string;
-  order: 'asc' | 'desc';
-};
-
-const initSortBy: SortBy = {
-  key: 'id',
-  order: 'desc',
-};
-
-const sortBy = ref<SortBy[]>([initSortBy]);
-const itemsPerPage = ref(20);
-const totalItems = ref(0);
-const serverItems = ref<IUser[]>([]);
-
-function formTitle() {
-  return editedIndex.value === -1 ? '新規作成' : '編集';
-}
-
-function editItem(item: IUser) {
-  editedIndex.value = serverItems.value.indexOf(item);
-  editedItem.value = { ...item };
-  dialog.value = true;
-}
-
-function deleteItem(item: IUser) {
-  editedIndex.value = serverItems.value.indexOf(item);
-  editedItem.value = { ...item };
-  dialogDelete.value = true;
-}
-
-function deleteItemConfirm() {
-  serverItems.value.splice(editedIndex.value, 1);
-  closeDelete();
-}
-
-function close() {
-  dialog.value = false;
-  editedItem.value = { ...defaultItem };
-  editedIndex.value = -1;
-}
-
-function closeDelete() {
-  dialogDelete.value = false;
-  editedItem.value = { ...defaultItem };
-  editedIndex.value = -1;
-}
-
-function save() {
-  if (editedIndex.value > -1) {
-    Object.assign(serverItems.value[editedIndex.value], editedItem.value);
-  } else {
-    serverItems.value.push(editedItem.value);
-  }
-  close();
-}
-
-async function loadItems(params: { page: number; itemsPerPage: number; sortBy: SortBy[] }) {
+async function loadItems(params: { page: number; itemsPerPage: number; sortBy: SortBy[]; search: string }) {
+  console.log(params);
   let order = params.sortBy.length ? params.sortBy[0].order : null;
   let sort = params.sortBy.length ? params.sortBy[0].key : null;
   sort = sort === 'roleLabel' ? 'role' : sort === 'statusLabel' ? 'status' : sort === 'createdAt' ? 'created_at' : null;
@@ -213,15 +152,12 @@ async function loadItems(params: { page: number; itemsPerPage: number; sortBy: S
       limit: params.itemsPerPage,
       sort,
       order,
+      keyword: params.search,
     },
   });
-  serverItems.value = response.data.data;
+  serverItems.value = response.data.data ? response.data.data : [];
   totalItems.value = response.data.totalCount;
 }
 
-onMounted(() => loadItems({ page: 1, itemsPerPage: itemsPerPage.value, sortBy: sortBy.value }));
+onMounted(() => loadItems({ page: 1, itemsPerPage: itemsPerPage.value, sortBy: sortBy.value, search: '' }));
 </script>
-
-<style scoped>
-/* 必要に応じてスタイルを追加 */
-</style>

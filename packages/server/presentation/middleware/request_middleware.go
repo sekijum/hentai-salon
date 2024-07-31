@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func PaginationMiddleware() gin.HandlerFunc {
+func RequestMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defaultLimit := 20
 		defaultOffset := 0

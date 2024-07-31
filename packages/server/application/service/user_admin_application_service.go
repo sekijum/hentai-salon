@@ -17,6 +17,27 @@ func NewUserAdminApplicationService(userAdminDatasource *datasource.UserAdminDat
 	return &UserAdminApplicationService{userAdminDatasource: userAdminDatasource}
 }
 
+type UserAdminApplicationServiceFindByIDParams struct {
+	Ctx    context.Context
+	UserID int
+}
+
+func (svc *UserAdminApplicationService) FindByID(params UserAdminApplicationServiceFindByIDParams) (*response.UserAdminResponse, error) {
+	user, err := svc.userAdminDatasource.FindByID(datasource.UserAdminDatasourceFindByIDParams{
+		Ctx:    params.Ctx,
+		UserID: params.UserID,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	dto := response.NewUserAdminResponse(response.NewUserAdminResponseParams{
+		User: user,
+	})
+
+	return dto, nil
+}
+
 type UserAdminApplicationServiceFindAllParams struct {
 	Ctx context.Context
 	Qs  request.UserAdminFindAllRequest

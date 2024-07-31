@@ -5,6 +5,7 @@ import (
 	"server/domain/model"
 	"server/infrastructure/ent"
 	"server/infrastructure/ent/user"
+	"strconv"
 	"time"
 )
 
@@ -75,12 +76,11 @@ func (ds *UserAdminDatasource) FindAll(params UserAdminDatasourceFindAllParams) 
 	query := ds.client.User.Query()
 
 	sort := user.FieldID
-	order := "desc" // デフォルトはIDの降順
+	order := "desc"
 
 	if params.Sort != nil && *params.Sort != "" {
 		sort = *params.Sort
 	}
-
 	if params.Order != nil && *params.Order != "" {
 		order = *params.Order
 	}
@@ -92,11 +92,25 @@ func (ds *UserAdminDatasource) FindAll(params UserAdminDatasourceFindAllParams) 
 	}
 
 	if params.Keyword != nil && *params.Keyword != "" {
-		query = query.Where(user.NameContains(*params.Keyword))
-	}
-
-	if params.Role != nil && *params.Role != 0 {
-		query = query.Where(user.RoleEQ(*params.Role))
+		switch {
+		case len(*params.Keyword) > 4 && (*params.Keyword)[:5] == "role:":
+			if role, err := strconv.Atoi((*params.Keyword)[5:]); err == nil {
+				query = query.Where(user.RoleEQ(role))
+			}
+		case len(*params.Keyword) > 7 && (*params.Keyword)[:7] == "status:":
+			if status, err := strconv.Atoi((*params.Keyword)[7:]); err == nil {
+				query = query.Where(user.StatusEQ(status))
+			}
+		case len(*params.Keyword) > 3 && (*params.Keyword)[:3] == "id:":
+			if id, err := strconv.Atoi((*params.Keyword)[3:]); err == nil {
+				query = query.Where(user.IDEQ(id))
+			}
+		default:
+			query = query.Where(user.Or(
+				user.NameContainsFold(*params.Keyword),
+				user.EmailContainsFold(*params.Keyword),
+			))
+		}
 	}
 
 	query = query.Limit(params.Limit)
@@ -123,25 +137,12 @@ type UserAdminDatasourceUpdateParams struct {
 func (ds *UserAdminDatasource) Update(params UserAdminDatasourceUpdateParams) (*model.User, error) {
 	update := ds.client.User.UpdateOneID(params.User.EntUser.ID)
 
-	if params.User.EntUser.Role != 0 {
-		update = update.SetRole(params.User.EntUser.Role)
-	}
-	if params.User.EntUser.Name != "" {
-		update = update.SetName(params.User.EntUser.Name)
-	}
-	if params.User.EntUser.Email != "" {
-		update = update.SetEmail(params.User.EntUser.Email)
-	}
-	if params.User.EntUser.Password != "" {
-		update = update.SetPassword(params.User.EntUser.Password)
-	}
-	if params.User.EntUser.ProfileLink != nil {
-		update = update.SetProfileLink(*params.User.EntUser.ProfileLink)
-	}
-	if params.User.EntUser.Status != 0 {
-		update = update.SetStatus(params.User.EntUser.Status)
-	}
-	update = update.SetUpdatedAt(time.Now())
+	update = update.
+		SetName(params.User.EntUser.Name).
+		SetEmail(params.User.EntUser.Email).
+		SetRole(params.User.EntUser.Role).
+		SetStatus(params.User.EntUser.Status).
+		SetUpdatedAt(time.Now())
 
 	entUser, err := update.Save(params.Ctx)
 	if err != nil {

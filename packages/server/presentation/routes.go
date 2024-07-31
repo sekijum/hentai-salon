@@ -8,10 +8,7 @@ import (
 )
 
 func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
-	paginationMiddleware := middleware.PaginationMiddleware()
-	optionalAuthMiddleware := middleware.OptionalAuthMiddleware()
-
-	r.Use(paginationMiddleware, optionalAuthMiddleware)
+	r.Use(middleware.RequestMiddleware(), middleware.OptionalAuthMiddleware())
 
 	r.GET("", func(c *gin.Context) {
 		c.JSON(200, gin.H{"message": "ok"})
@@ -83,6 +80,7 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 		userGroup := adminGroup.Group("/users")
 		{
 			userGroup.GET("", controllers.UserAdminController.FindAll)
+			userGroup.GET("/:userID", controllers.UserAdminController.FindByID)
 			userGroup.PUT("/:userID", controllers.UserAdminController.Update)
 		}
 
