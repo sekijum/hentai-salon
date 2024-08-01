@@ -20,21 +20,31 @@ func NewUserAdminDatasource(client *ent.Client) *UserAdminDatasource {
 type UserAdminDatasourceGetUserCountParams struct {
 	Ctx     context.Context
 	Keyword *string
-	Role    *int
 }
 
 func (ds *UserAdminDatasource) GetUserCount(params UserAdminDatasourceGetUserCountParams) (int, error) {
 	query := ds.client.User.Query()
 
 	if params.Keyword != nil && *params.Keyword != "" {
-		query = query.Where(user.Or(
-			user.NameContains(*params.Keyword),
-			user.EmailContains(*params.Keyword),
-		))
-	}
-
-	if params.Role != nil && *params.Role != 0 {
-		query = query.Where(user.RoleEQ(*params.Role))
+		switch {
+		case len(*params.Keyword) > 4 && (*params.Keyword)[:5] == "role:":
+			if role, err := strconv.Atoi((*params.Keyword)[5:]); err == nil {
+				query = query.Where(user.RoleEQ(role))
+			}
+		case len(*params.Keyword) > 7 && (*params.Keyword)[:7] == "status:":
+			if status, err := strconv.Atoi((*params.Keyword)[7:]); err == nil {
+				query = query.Where(user.StatusEQ(status))
+			}
+		case len(*params.Keyword) > 3 && (*params.Keyword)[:3] == "id:":
+			if id, err := strconv.Atoi((*params.Keyword)[3:]); err == nil {
+				query = query.Where(user.IDEQ(id))
+			}
+		default:
+			query = query.Where(user.Or(
+				user.NameContainsFold(*params.Keyword),
+				user.EmailContainsFold(*params.Keyword),
+			))
+		}
 	}
 
 	userCount, err := query.Count(params.Ctx)
@@ -69,7 +79,6 @@ type UserAdminDatasourceFindAllParams struct {
 	Sort    *string
 	Order   *string
 	Keyword *string
-	Role    *int
 }
 
 func (ds *UserAdminDatasource) FindAll(params UserAdminDatasourceFindAllParams) ([]*model.User, error) {

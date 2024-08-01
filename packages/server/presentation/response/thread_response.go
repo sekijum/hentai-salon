@@ -50,9 +50,7 @@ func NewThreadResponse(params NewThreadResponseParams) *ThreadResponse {
 		for _, comment_i := range params.Thread.EntThread.Edges.Comments {
 			replyCount := len(comment_i.Edges.Replies)
 			commentResponseList = append(commentResponseList, NewThreadCommentResponse(NewThreadCommentResponseParams{
-				ThreadComment: model.NewThreadComment(model.NewThreadCommentParams{
-					EntThreadComment: comment_i,
-				}),
+				ThreadComment:      model.NewThreadComment(model.NewThreadCommentParams{EntThreadComment: comment_i}),
 				ReplyCount:         &replyCount,
 				UserID:             params.UserID,
 				IncludeAttachments: true,

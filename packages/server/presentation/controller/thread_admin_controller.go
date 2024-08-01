@@ -11,11 +11,11 @@ import (
 )
 
 type ThreadAdminController struct {
-	threadApplicationService *service.ThreadAdminApplicationService
+	threadAdminApplicationService *service.ThreadAdminApplicationService
 }
 
-func NewThreadAdminController(threadApplicationService *service.ThreadAdminApplicationService) *ThreadAdminController {
-	return &ThreadAdminController{threadApplicationService: threadApplicationService}
+func NewThreadAdminController(threadAdminApplicationService *service.ThreadAdminApplicationService) *ThreadAdminController {
+	return &ThreadAdminController{threadAdminApplicationService: threadAdminApplicationService}
 }
 
 func (ctrl *ThreadAdminController) FindAll(ctx *gin.Context) {
@@ -29,7 +29,7 @@ func (ctrl *ThreadAdminController) FindAll(ctx *gin.Context) {
 	qs.Limit = ctx.GetInt("limit")
 	qs.Offset = ctx.GetInt("offset")
 
-	dto, err := ctrl.threadApplicationService.FindAll(service.ThreadAdminApplicationServiceFindAllParams{
+	dto, err := ctrl.threadAdminApplicationService.FindAll(service.ThreadAdminApplicationServiceFindAllParams{
 		Ctx: context.Background(),
 		Qs:  qs,
 	})
@@ -42,7 +42,7 @@ func (ctrl *ThreadAdminController) FindAll(ctx *gin.Context) {
 }
 
 func (ctrl *ThreadAdminController) FindByID(ctx *gin.Context) {
-	threadID, err := strconv.Atoi(ctx.Param("threadId"))
+	threadID, err := strconv.Atoi(ctx.Param("threadID"))
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -58,7 +58,7 @@ func (ctrl *ThreadAdminController) FindByID(ctx *gin.Context) {
 	qs.Limit = ctx.GetInt("limit")
 	qs.Offset = ctx.GetInt("offset")
 
-	dto, err := ctrl.threadApplicationService.FindByID(service.ThreadAdminApplicationServiceFindByIDParams{
+	dto, err := ctrl.threadAdminApplicationService.FindByID(service.ThreadAdminApplicationServiceFindByIDParams{
 		Ctx:      context.Background(),
 		ThreadID: threadID,
 		Qs:       qs,
@@ -72,20 +72,20 @@ func (ctrl *ThreadAdminController) FindByID(ctx *gin.Context) {
 }
 
 func (ctrl *ThreadAdminController) Update(ctx *gin.Context) {
-	var body request.ThreadAdminUpdateRequest
 
-	threadID, err := strconv.Atoi(ctx.Param("threadId"))
+	threadID, err := strconv.Atoi(ctx.Param("threadID"))
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
+	var body request.ThreadAdminUpdateRequest
 	if err := ctx.ShouldBindJSON(&body); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	dto, err := ctrl.threadApplicationService.Update(service.ThreadAdminApplicationServiceUpdateParams{
+	dto, err := ctrl.threadAdminApplicationService.Update(service.ThreadAdminApplicationServiceUpdateParams{
 		Ctx:      context.Background(),
 		ThreadID: threadID,
 		Body:     body,

@@ -11,11 +11,30 @@ import (
 )
 
 type ContactAdminController struct {
-	ContactAdminApplicationService *service.ContactAdminApplicationService
+	contactAdminApplicationService *service.ContactAdminApplicationService
 }
 
-func NewContactAdminController(ContactAdminApplicationService *service.ContactAdminApplicationService) *ContactAdminController {
-	return &ContactAdminController{ContactAdminApplicationService: ContactAdminApplicationService}
+func NewContactAdminController(contactAdminApplicationService *service.ContactAdminApplicationService) *ContactAdminController {
+	return &ContactAdminController{contactAdminApplicationService: contactAdminApplicationService}
+}
+
+func (ctrl *ContactAdminController) FindByID(ctx *gin.Context) {
+	contactID, err := strconv.Atoi(ctx.Param("contactID"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	dto, err := ctrl.contactAdminApplicationService.FindByID(service.ContactAdminApplicationServiceFindByIDParams{
+		Ctx:       context.Background(),
+		ContactID: contactID,
+	})
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, dto)
 }
 
 func (ctrl *ContactAdminController) FindAll(ctx *gin.Context) {
@@ -29,7 +48,7 @@ func (ctrl *ContactAdminController) FindAll(ctx *gin.Context) {
 	qs.Limit = ctx.GetInt("limit")
 	qs.Offset = ctx.GetInt("offset")
 
-	dto, err := ctrl.ContactAdminApplicationService.FindAll(service.ContactAdminApplicationServiceFindAllParams{
+	dto, err := ctrl.contactAdminApplicationService.FindAll(service.ContactAdminApplicationServiceFindAllParams{
 		Ctx: context.Background(),
 		Qs:  qs,
 	})
@@ -44,7 +63,7 @@ func (ctrl *ContactAdminController) FindAll(ctx *gin.Context) {
 func (ctrl *ContactAdminController) Update(ctx *gin.Context) {
 	var body request.ContactAdminUpdateRequest
 
-	ContactId, err := strconv.Atoi(ctx.Param("ContactId"))
+	ContactID, err := strconv.Atoi(ctx.Param("contactID"))
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -55,9 +74,9 @@ func (ctrl *ContactAdminController) Update(ctx *gin.Context) {
 		return
 	}
 
-	dto, err := ctrl.ContactAdminApplicationService.Update(service.ContactAdminApplicationServiceUpdateParams{
+	dto, err := ctrl.contactAdminApplicationService.Update(service.ContactAdminApplicationServiceUpdateParams{
 		Ctx:       context.Background(),
-		ContactID: ContactId,
+		ContactID: ContactID,
 		Body:      body,
 	})
 	if err != nil {

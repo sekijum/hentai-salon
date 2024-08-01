@@ -6,27 +6,25 @@
 
     <Form @submit="submit" :validation-schema="schema" v-slot="{ meta }">
       <div class="field">
-        <Field name="title" v-slot="{ field, errorMessage }">
+        <Field name="title" v-model="form.title" v-slot="{ errors }">
           <v-text-field
             v-model="form.title"
-            v-bind="field"
             label="タイトル"
             variant="outlined"
             density="compact"
-            :error-messages="errorMessage ? [errorMessage] : []"
+            :error-messages="errors"
           />
         </Field>
       </div>
 
       <div class="field">
-        <Field name="description" v-slot="{ field, errorMessage }">
+        <Field name="description" v-model="form.description" v-slot="{ errors }">
           <v-textarea
             v-model="form.description"
-            v-bind="field"
             label="説明"
             variant="outlined"
             density="compact"
-            :error-messages="errorMessage ? [errorMessage] : []"
+            :error-messages="errors"
           />
         </Field>
       </div>

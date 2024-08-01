@@ -30,7 +30,6 @@ func (svc *ThreadAdminApplicationService) FindAll(params ThreadAdminApplicationS
 		Sort:    params.Qs.Sort,
 		Order:   params.Qs.Order,
 		Keyword: params.Qs.Keyword,
-		Status:  params.Qs.Status,
 	})
 	if err != nil {
 		return nil, err
@@ -39,7 +38,6 @@ func (svc *ThreadAdminApplicationService) FindAll(params ThreadAdminApplicationS
 	threadCount, err := svc.threadAdminDatasource.GetThreadCount(datasource.ThreadAdminDatasourceGetThreadCountParams{
 		Ctx:     params.Ctx,
 		Keyword: params.Qs.Keyword,
-		Status:  params.Qs.Status,
 	})
 	if err != nil {
 		return nil, err
@@ -47,7 +45,10 @@ func (svc *ThreadAdminApplicationService) FindAll(params ThreadAdminApplicationS
 
 	var threadResponseList []*response.ThreadAdminResponse
 	for _, thread_i := range threadList {
-		threadResponse := response.NewThreadAdminResponse(response.NewThreadAdminResponseParams{Thread: thread_i})
+		threadResponse := response.NewThreadAdminResponse(response.NewThreadAdminResponseParams{
+			Thread:       thread_i,
+			IncludeBoard: true,
+		})
 		threadResponseList = append(threadResponseList, threadResponse)
 	}
 
@@ -73,12 +74,28 @@ func (svc *ThreadAdminApplicationService) FindByID(params ThreadAdminApplication
 		ThreadID: params.ThreadID,
 		Limit:    params.Qs.Limit,
 		Offset:   params.Qs.Offset,
+		Order:    params.Qs.Order,
+		Sort:     params.Qs.Sort,
+		Keyword:  params.Qs.Keyword,
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	dto := response.NewThreadAdminResponse(response.NewThreadAdminResponseParams{Thread: thread})
+	threadCommentCount, err := svc.threadAdminDatasource.GetThreadCommentCount(datasource.ThreadAdminDatasourceGetThreadCommentCountParams{
+		Ctx:      params.Ctx,
+		ThreadID: params.ThreadID,
+		Keyword:  params.Qs.Keyword,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	dto := response.NewThreadAdminResponse(response.NewThreadAdminResponseParams{
+		Thread:          thread,
+		CommentCount:    threadCommentCount,
+		IncludeComments: true,
+	})
 
 	return dto, nil
 }

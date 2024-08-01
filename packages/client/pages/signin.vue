@@ -76,7 +76,6 @@ async function submit() {
     const response = await $api.post('/signin', credentials);
 
     const authHeader = response.headers.authorization;
-    console.log(response);
     const token = authHeader.split(' ')[1];
     $storage.setItem('access_token', token);
     alert('サインインしました。');

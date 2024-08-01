@@ -61,7 +61,6 @@ func (ctrl *UserAdminController) FindAll(ctx *gin.Context) {
 }
 
 func (ctrl *UserAdminController) Update(ctx *gin.Context) {
-	var body request.UserAdminUpdateRequest
 
 	userID, err := strconv.Atoi(ctx.Param("userID"))
 	if err != nil {
@@ -69,6 +68,7 @@ func (ctrl *UserAdminController) Update(ctx *gin.Context) {
 		return
 	}
 
+	var body request.UserAdminUpdateRequest
 	if err := ctx.ShouldBindJSON(&body); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

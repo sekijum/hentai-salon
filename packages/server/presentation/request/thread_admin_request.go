@@ -6,12 +6,14 @@ type ThreadAdminFindAllRequest struct {
 	Sort    *string `form:"sort"`
 	Order   *string `form:"order"`
 	Keyword *string `form:"keyword"`
-	Status  *int    `form:"status"`
 }
 
 type ThreadAdminFindByIDRequest struct {
-	Limit  int `form:"limit"`
-	Offset int `form:"offset"`
+	Limit   int     `form:"limit"`
+	Offset  int     `form:"offset"`
+	Sort    *string `form:"sort"`
+	Order   *string `form:"order"`
+	Keyword *string `form:"keyword"`
 }
 
 type ThreadAdminUpdateRequest struct {

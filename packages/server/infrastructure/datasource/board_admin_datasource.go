@@ -5,6 +5,7 @@ import (
 	"server/domain/model"
 	"server/infrastructure/ent"
 	"server/infrastructure/ent/board"
+	"strconv"
 	"time"
 )
 
@@ -26,14 +27,20 @@ func (ds *BoardAdminDatasource) GetBoardCount(params BoardAdminDatasourceGetBoar
 	query := ds.client.Board.Query()
 
 	if params.Keyword != nil && *params.Keyword != "" {
-		query = query.Where(board.Or(
-			board.TitleContains(*params.Keyword),
-			board.DescriptionContains(*params.Keyword),
-		))
-	}
-
-	if params.Status != nil && *params.Status != 0 {
-		query = query.Where(board.StatusEQ(*params.Status))
+		switch {
+		case len(*params.Keyword) > 7 && (*params.Keyword)[:7] == "status:":
+			if status, err := strconv.Atoi((*params.Keyword)[7:]); err == nil {
+				query = query.Where(board.StatusEQ(status))
+			}
+		case len(*params.Keyword) > 3 && (*params.Keyword)[:3] == "id:":
+			if id, err := strconv.Atoi((*params.Keyword)[3:]); err == nil {
+				query = query.Where(board.IDEQ(id))
+			}
+		default:
+			query = query.Where(board.Or(
+				board.TitleContainsFold(*params.Keyword),
+			))
+		}
 	}
 
 	boardCount, err := query.Count(params.Ctx)
@@ -72,26 +79,37 @@ type BoardAdminDatasourceFindAllParams struct {
 func (ds *BoardAdminDatasource) FindAll(params BoardAdminDatasourceFindAllParams) ([]*model.Board, error) {
 	query := ds.client.Board.Query()
 
-	Sort := board.FieldID
+	sort := board.FieldID
+	order := "desc"
+
 	if params.Sort != nil && *params.Sort != "" {
-		Sort = *params.Sort
+		sort = *params.Sort
+	}
+	if params.Order != nil && *params.Order != "" {
+		order = *params.Order
 	}
 
-	if params.Order != nil && *params.Order == "asc" {
-		query = query.Order(ent.Asc(Sort))
+	if order == "asc" {
+		query = query.Order(ent.Asc(sort))
 	} else {
-		query = query.Order(ent.Desc(Sort))
+		query = query.Order(ent.Desc(sort))
 	}
 
 	if params.Keyword != nil && *params.Keyword != "" {
-		query = query.Where(board.Or(
-			board.TitleContains(*params.Keyword),
-			board.DescriptionContains(*params.Keyword),
-		))
-	}
-
-	if params.Status != nil && *params.Status != 0 {
-		query = query.Where(board.StatusEQ(*params.Status))
+		switch {
+		case len(*params.Keyword) > 7 && (*params.Keyword)[:7] == "status:":
+			if status, err := strconv.Atoi((*params.Keyword)[7:]); err == nil {
+				query = query.Where(board.StatusEQ(status))
+			}
+		case len(*params.Keyword) > 3 && (*params.Keyword)[:3] == "id:":
+			if id, err := strconv.Atoi((*params.Keyword)[3:]); err == nil {
+				query = query.Where(board.IDEQ(id))
+			}
+		default:
+			query = query.Where(board.Or(
+				board.TitleContainsFold(*params.Keyword),
+			))
+		}
 	}
 
 	query = query.Limit(params.Limit)
@@ -118,19 +136,11 @@ type BoardAdminDatasourceUpdateParams struct {
 func (ds *BoardAdminDatasource) Update(params BoardAdminDatasourceUpdateParams) (*model.Board, error) {
 	update := ds.client.Board.UpdateOneID(params.Board.EntBoard.ID)
 
-	if params.Board.EntBoard.Title != "" {
-		update = update.SetTitle(params.Board.EntBoard.Title)
-	}
-	if params.Board.EntBoard.Description != nil {
-		update = update.SetDescription(*params.Board.EntBoard.Description)
-	}
-	if params.Board.EntBoard.Status != 0 {
-		update = update.SetStatus(params.Board.EntBoard.Status)
-	}
-	if params.Board.EntBoard.ThumbnailURL != nil {
-		update = update.SetThumbnailURL(*params.Board.EntBoard.ThumbnailURL)
-	}
-	update = update.SetUpdatedAt(time.Now())
+	update = update.SetTitle(params.Board.EntBoard.Title).
+		SetDescription(*params.Board.EntBoard.Description).
+		SetThumbnailURL(*params.Board.EntBoard.ThumbnailURL).
+		SetStatus(params.Board.EntBoard.Status).
+		SetUpdatedAt(time.Now())
 
 	entBoard, err := update.Save(params.Ctx)
 	if err != nil {

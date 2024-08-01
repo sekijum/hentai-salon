@@ -18,8 +18,9 @@
                 small
                 class="spaced-button"
                 @click="clearThreadViewHistory"
-                >削除</v-btn
               >
+                削除
+              </v-btn>
               <v-switch
                 v-else-if="item.key === 'comment-sort-order'"
                 v-model="commentSortOrder"
@@ -27,7 +28,7 @@
                 small
                 class="centered-switch"
                 @change="setCommentSortOrder(commentSortOrder ? 'desc' : 'asc')"
-              ></v-switch>
+              />
               <v-switch
                 v-else-if="item.key === 'display-first-100-comments'"
                 v-model="displayFirst100Comments"
@@ -35,7 +36,7 @@
                 small
                 class="centered-switch"
                 @change="setCommentLimit(displayFirst100Comments ? 100 : 0)"
-              ></v-switch>
+              />
               <v-switch
                 v-else-if="item.key === 'theme'"
                 v-model="theme"
@@ -44,10 +45,10 @@
                 class="centered-switch"
                 @change="
                   () => {
-                    setTheme(theme ? 'light' : 'dark'), router.go(0);
+                    setTheme(theme ? 'dark' : 'light'), router.go(0);
                   }
                 "
-              ></v-switch>
+              />
             </div>
           </v-col>
         </template>
@@ -71,7 +72,7 @@ const {
   clearThreadViewHistory,
 } = useStorage();
 
-const theme = ref(getTheme() === 'light' ? true : false);
+const theme = ref(getTheme() === 'dark' ? true : false);
 const commentSortOrder = ref(getCommentSortOrder() === 'desc' ? true : false);
 const displayFirst100Comments = ref(getCommentLimit() === 100 ? true : false);
 

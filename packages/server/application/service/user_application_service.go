@@ -117,6 +117,7 @@ func (svc *UserApplicationService) Signup(params UserApplicationServiceSignupPar
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"userID": user.EntUser.ID,
+		"role":   user.EntUser.Role,
 		"exp":    time.Now().AddDate(0, 1, 0).Unix(),
 	})
 
@@ -157,6 +158,7 @@ func (svc *UserApplicationService) Signin(params UserApplicationServiceSigninPar
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"userID": user.EntUser.ID,
+		"role":   user.EntUser.Role,
 		"exp":    time.Now().AddDate(0, 1, 0).Unix(),
 	})
 

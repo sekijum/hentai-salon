@@ -22,61 +22,44 @@ type ThreadAdminResponse struct {
 	Comments     *Collection[*ThreadCommentAdminResponse] `json:"comments"`
 }
 
-type ThreadCommentAdminResponse struct {
-	ID        int    `json:"id"`
-	ThreadID  int    `json:"threadId"`
-	UserID    *int   `json:"userId"`
-	Content   string `json:"content"`
-	CreatedAt string `json:"createdAt"`
-	UpdatedAt string `json:"updatedAt"`
-}
-
 type NewThreadAdminResponseParams struct {
-	Thread *model.Thread
-	Limit  *int
-	Offset *int
+	Thread                        *model.Thread
+	Limit, Offset, CommentCount   int
+	IncludeComments, IncludeBoard bool
 }
 
 func NewThreadAdminResponse(params NewThreadAdminResponseParams) *ThreadAdminResponse {
-	limit := 0
-	if params.Limit != nil {
-		limit = *params.Limit
-	}
-
-	offset := 0
-	if params.Offset != nil {
-		offset = *params.Offset
-	}
-
 	var threadCommentResponseList []*ThreadCommentAdminResponse
-	for _, comment_i := range params.Thread.EntThread.Edges.Comments {
-		commentResponse := &ThreadCommentAdminResponse{
-			ID:        comment_i.ID,
-			ThreadID:  comment_i.ThreadID,
-			UserID:    comment_i.UserID,
-			Content:   comment_i.Content,
-			CreatedAt: comment_i.CreatedAt.Format(time.RFC3339),
-			UpdatedAt: comment_i.UpdatedAt.Format(time.RFC3339),
+	var commentCollection *Collection[*ThreadCommentAdminResponse]
+	if params.IncludeComments {
+		for _, comment_i := range params.Thread.EntThread.Edges.Comments {
+			commentResponse := NewThreadCommentAdminResponse(NewThreadCommentAdminResponseParams{
+				ThreadComment: model.NewThreadComment(model.NewThreadCommentParams{
+					EntThreadComment: comment_i,
+				}),
+			})
+			threadCommentResponseList = append(threadCommentResponseList, commentResponse)
 		}
-		threadCommentResponseList = append(threadCommentResponseList, commentResponse)
-	}
 
-	commentCollection := NewCollection(NewCollectionParams[*ThreadCommentAdminResponse]{
-		Data:       threadCommentResponseList,
-		TotalCount: len(params.Thread.EntThread.Edges.Comments),
-		Limit:      limit,
-		Offset:     offset,
-	})
+		commentCollection = NewCollection(NewCollectionParams[*ThreadCommentAdminResponse]{
+			Data:       threadCommentResponseList,
+			TotalCount: params.CommentCount,
+			Limit:      params.Limit,
+			Offset:     params.Offset,
+		})
+	}
 
 	var threadBoardResponse *BoardAdminResponse
-	if params.Thread.EntThread.Edges.Board != nil {
-		threadBoardResponse = NewBoardAdminResponse(NewBoardAdminResponseParams{
-			Board: model.NewBoard(model.NewBoardParams{
-				EntBoard: &ent.Board{
-					ID:    params.Thread.EntThread.BoardID,
-					Title: params.Thread.EntThread.Edges.Board.Title,
-				},
-			})})
+	if params.IncludeBoard {
+		if params.Thread.EntThread.Edges.Board != nil {
+			threadBoardResponse = NewBoardAdminResponse(NewBoardAdminResponseParams{
+				Board: model.NewBoard(model.NewBoardParams{
+					EntBoard: &ent.Board{
+						ID:    params.Thread.EntThread.BoardID,
+						Title: params.Thread.EntThread.Edges.Board.Title,
+					},
+				})})
+		}
 	}
 
 	return &ThreadAdminResponse{

@@ -17,6 +17,27 @@ func NewBoardAdminApplicationService(boardAdminDatasource *datasource.BoardAdmin
 	return &BoardAdminApplicationService{boardAdminDatasource: boardAdminDatasource}
 }
 
+type BoardAdminApplicationServiceFindByIDParams struct {
+	Ctx     context.Context
+	BoardID int
+}
+
+func (svc *BoardAdminApplicationService) FindByID(params BoardAdminApplicationServiceFindByIDParams) (*response.BoardAdminResponse, error) {
+	board, err := svc.boardAdminDatasource.FindByID(datasource.BoardAdminDatasourceFindByIDParams{
+		Ctx:     params.Ctx,
+		BoardID: params.BoardID,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	dto := response.NewBoardAdminResponse(response.NewBoardAdminResponseParams{
+		Board: board,
+	})
+
+	return dto, nil
+}
+
 type BoardAdminApplicationServiceFindAllParams struct {
 	Ctx context.Context
 	Qs  request.BoardAdminFindAllRequest

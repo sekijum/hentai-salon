@@ -13,15 +13,19 @@
           href: '/admin/users',
         },
         {
-          title: user.id.toString(),
+          title: user.name,
           disabled: true,
         },
       ]"
     />
 
-    <Form @submit="submit" :validation-schema="schema" class="mx-2 mb-2" v-slot="{ meta, errors }">
+    <Form @submit="submit" :validation-schema="schema" v-slot="{ meta, errors }">
       <div class="field mb-2">
-        <v-text-field v-model="form.id" label="ID" type="text" variant="outlined" density="compact" disabled />
+        <v-text-field v-model="user.id" label="ID" type="text" variant="outlined" density="compact" disabled />
+      </div>
+
+      <div class="field mb-2">
+        <v-text-field v-model="user.createdAt" label="登録日" type="text" variant="outlined" density="compact" />
       </div>
 
       <div class="field mb-2">
@@ -82,17 +86,6 @@
         </Field>
       </div>
 
-      <div class="field mb-2">
-        <v-text-field
-          v-model="form.createdAt"
-          label="登録日"
-          type="text"
-          variant="outlined"
-          density="compact"
-          disabled
-        />
-      </div>
-
       <v-btn type="submit" color="primary" block :disabled="!meta.valid">保存</v-btn>
     </Form>
   </v-container>
@@ -126,12 +119,10 @@ const { $api, $formatDate } = useNuxtApp();
 const user = ref<IUser>();
 
 const form = ref({
-  id: 0,
   name: '',
   email: '',
   role: 0,
   status: 0,
-  createdAt: '',
 });
 
 const roleList = [
@@ -169,7 +160,7 @@ const schema = yup.object({
 
 async function submit() {
   try {
-    await $api.put(`/admin/users/${form.value.id}`, form.value);
+    await $api.put(`/admin/users/${user?.value?.id}`, form.value);
     alert('ユーザー情報が更新されました。');
     await fetchUser();
   } catch (err) {
@@ -178,15 +169,13 @@ async function submit() {
 }
 
 async function fetchUser() {
-  const { data } = await $api.get(`/admin/users/${route.params.userId}`);
+  const { data } = await $api.get<IUser>(`/admin/users/${route.params.userId}`);
   user.value = data;
   form.value = {
-    id: data.id,
     name: data.name,
     email: data.email,
     role: data.role,
     status: data.status,
-    createdAt: $formatDate(data.createdAt),
   };
 }
 

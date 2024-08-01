@@ -51,7 +51,6 @@ func (svc *UserAdminApplicationService) FindAll(params UserAdminApplicationServi
 		Sort:    params.Qs.Sort,
 		Order:   params.Qs.Order,
 		Keyword: params.Qs.Keyword,
-		Role:    params.Qs.Role,
 	})
 	if err != nil {
 		return nil, err
@@ -60,7 +59,6 @@ func (svc *UserAdminApplicationService) FindAll(params UserAdminApplicationServi
 	userCount, err := svc.userAdminDatasource.GetUserCount(datasource.UserAdminDatasourceGetUserCountParams{
 		Ctx:     params.Ctx,
 		Keyword: params.Qs.Keyword,
-		Role:    params.Qs.Role,
 	})
 	if err != nil {
 		return nil, err

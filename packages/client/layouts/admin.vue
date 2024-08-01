@@ -21,17 +21,24 @@
           value="board-management"
         />
         <v-list-item
-          prepend-icon="mdi-forum"
+          prepend-icon="mdi-text-box-multiple-outline"
           title="スレ管理"
           @click="navigate('/admin/threads')"
           value="thread-management"
         />
         <v-list-item
+          prepend-icon="mdi-email"
+          title="問い合わせ"
+          @click="navigate('/admin/contacts')"
+          value="inquiry-management"
+        />
+        <v-list-item
           prepend-icon="mdi-arrow-right-bold"
           title="クライアント画面へ"
           @click="navigate('/')"
-          value="board-management"
+          value="client-view"
         />
+        <v-list-item prepend-icon="mdi-database" title="adminer" @click="openAdminer" value="client-view" />
       </v-list>
     </v-navigation-drawer>
 
@@ -43,14 +50,18 @@
 
 <script setup lang="ts">
 const router = useRouter();
+const config = useRuntimeConfig();
 
 function navigate(to: string) {
   router.push(to);
 }
 
 const nuxtApp = useNuxtApp();
-
 const { payload } = nuxtApp;
+
+function openAdminer() {
+  open(config.public.adminerUrl, '_blank');
+}
 </script>
 
 <style scoped></style>

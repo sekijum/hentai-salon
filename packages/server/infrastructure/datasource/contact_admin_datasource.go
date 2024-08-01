@@ -5,6 +5,7 @@ import (
 	"server/domain/model"
 	"server/infrastructure/ent"
 	"server/infrastructure/ent/contact"
+	"strconv"
 	"time"
 )
 
@@ -26,14 +27,21 @@ func (ds *ContactAdminDatasource) GetContactCount(params ContactAdminDatasourceG
 	query := ds.client.Contact.Query()
 
 	if params.Keyword != nil && *params.Keyword != "" {
-		query = query.Where(contact.Or(
-			contact.SubjectContains(*params.Keyword),
-			contact.MessageContains(*params.Keyword),
-		))
-	}
-
-	if params.Status != nil && *params.Status != 0 {
-		query = query.Where(contact.StatusEQ(*params.Status))
+		switch {
+		case len(*params.Keyword) > 7 && (*params.Keyword)[:7] == "status:":
+			if status, err := strconv.Atoi((*params.Keyword)[7:]); err == nil {
+				query = query.Where(contact.StatusEQ(status))
+			}
+		case len(*params.Keyword) > 3 && (*params.Keyword)[:3] == "id:":
+			if id, err := strconv.Atoi((*params.Keyword)[3:]); err == nil {
+				query = query.Where(contact.IDEQ(id))
+			}
+		default:
+			query = query.Where(contact.Or(
+				contact.SubjectContainsFold(*params.Keyword),
+				contact.MessageContainsFold(*params.Keyword),
+			))
+		}
 	}
 
 	ContactCount, err := query.Count(params.Ctx)
@@ -66,36 +74,45 @@ type ContactAdminDatasourceFindAllParams struct {
 	Sort    *string
 	Order   *string
 	Keyword *string
-	Status  *int
 }
 
 func (ds *ContactAdminDatasource) FindAll(params ContactAdminDatasourceFindAllParams) ([]*model.Contact, error) {
 	query := ds.client.Contact.Query()
 
 	sort := contact.FieldID
+	order := "desc"
+
 	if params.Sort != nil && *params.Sort != "" {
 		sort = *params.Sort
 	}
+	if params.Order != nil && *params.Order != "" {
+		order = *params.Order
+	}
 
-	if params.Order != nil && *params.Order == "asc" {
+	if order == "asc" {
 		query = query.Order(ent.Asc(sort))
 	} else {
 		query = query.Order(ent.Desc(sort))
 	}
 
 	if params.Keyword != nil && *params.Keyword != "" {
-		query = query.Where(contact.Or(
-			contact.SubjectContains(*params.Keyword),
-			contact.MessageContains(*params.Keyword),
-		))
+		switch {
+		case len(*params.Keyword) > 7 && (*params.Keyword)[:7] == "status:":
+			if status, err := strconv.Atoi((*params.Keyword)[7:]); err == nil {
+				query = query.Where(contact.StatusEQ(status))
+			}
+		case len(*params.Keyword) > 3 && (*params.Keyword)[:3] == "id:":
+			if id, err := strconv.Atoi((*params.Keyword)[3:]); err == nil {
+				query = query.Where(contact.IDEQ(id))
+			}
+		default:
+			query = query.Where(contact.Or(
+				contact.SubjectContainsFold(*params.Keyword),
+				contact.MessageContainsFold(*params.Keyword),
+				contact.EmailContainsFold(*params.Keyword),
+			))
+		}
 	}
-
-	if params.Status != nil && *params.Status != 0 {
-		query = query.Where(contact.StatusEQ(*params.Status))
-	}
-
-	query = query.Limit(params.Limit)
-	query = query.Offset(params.Offset)
 
 	entContacts, err := query.All(params.Ctx)
 	if err != nil {
@@ -116,11 +133,9 @@ type ContactAdminDatasourceUpdateParams struct {
 }
 
 func (ds *ContactAdminDatasource) Update(params ContactAdminDatasourceUpdateParams) (*model.Contact, error) {
-	update := ds.client.Contact.UpdateOneID(params.Contact.EntContact.ID)
+	update := ds.client.Contact.UpdateOneID(params.Contact.EntContact.ID).
+		SetStatus(params.Contact.EntContact.Status)
 
-	if params.Contact.EntContact.Status != 0 {
-		update = update.SetStatus(params.Contact.EntContact.Status)
-	}
 	update = update.SetUpdatedAt(time.Now())
 
 	entContact, err := update.Save(params.Ctx)

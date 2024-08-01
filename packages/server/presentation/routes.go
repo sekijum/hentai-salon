@@ -51,10 +51,8 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 	}
 
 	// 認証必須ルート
-	authMiddleware := middleware.AuthMiddleware()
-
 	authGroup := r.Group("/")
-	authGroup.Use(authMiddleware)
+	authGroup.Use(middleware.AuthMiddleware())
 	{
 		authGroup.POST("/threads", controllers.ThreadController.Create)
 
@@ -72,8 +70,8 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 	}
 
 	// 管理者ルート
-	adminGroup := r.Group("/admin")
-	adminGroup.Use(authMiddleware)
+	adminGroup := authGroup.Group("/admin")
+	adminGroup.Use(middleware.AdminMiddleware())
 	{
 		adminGroup.POST("/boards", controllers.BoardController.Create)
 
@@ -84,15 +82,17 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 			userGroup.PUT("/:userID", controllers.UserAdminController.Update)
 		}
 
-		contactGroup := adminGroup.Group("/contact")
+		contactGroup := adminGroup.Group("/contacts")
 		{
 			contactGroup.GET("", controllers.ContactAdminController.FindAll)
+			contactGroup.GET("/:contactID", controllers.ContactAdminController.FindByID)
 			contactGroup.PUT("/:contactID", controllers.ContactAdminController.Update)
 		}
 
 		boardGroup := adminGroup.Group("/boards")
 		{
 			boardGroup.GET("", controllers.BoardAdminController.FindAll)
+			boardGroup.GET("/:boardID", controllers.BoardAdminController.FindByID)
 			boardGroup.PUT("/:boardID", controllers.BoardAdminController.Update)
 		}
 

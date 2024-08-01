@@ -62,7 +62,7 @@ const guestMenuItems = computed(() => {
   if (payload.isAdmin) {
     items = items.concat([
       { title: '板作成', clicked: () => router.push('/boards/new'), icon: 'mdi-plus-box' },
-      { title: 'adminer', clicked: () => open(config.public.adminerUrl, '_blank'), icon: 'mdi-database' },
+      { title: '管理画面', clicked: () => router.push('/admin'), icon: 'mdi-shield-account' },
     ]);
   }
 

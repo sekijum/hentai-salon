@@ -5,6 +5,9 @@ import (
 	"server/domain/model"
 	"server/infrastructure/ent"
 	"server/infrastructure/ent/thread"
+	"server/infrastructure/ent/threadcomment"
+	"server/infrastructure/ent/user"
+	"strconv"
 	"time"
 )
 
@@ -23,38 +26,49 @@ type ThreadAdminDatasourceFindAllParams struct {
 	Sort    *string
 	Order   *string
 	Keyword *string
-	Status  *int
 }
 
 func (ds *ThreadAdminDatasource) FindAll(params ThreadAdminDatasourceFindAllParams) ([]*model.Thread, error) {
-	query := ds.client.Thread.Query().WithBoard()
+	q := ds.client.Thread.Query().WithBoard()
 
 	sort := thread.FieldID
+	order := "desc"
+
 	if params.Sort != nil && *params.Sort != "" {
 		sort = *params.Sort
 	}
+	if params.Order != nil && *params.Order != "" {
+		order = *params.Order
+	}
 
-	if params.Order != nil && *params.Order == "asc" {
-		query = query.Order(ent.Asc(sort))
+	if order == "asc" {
+		q = q.Order(ent.Asc(sort))
 	} else {
-		query = query.Order(ent.Desc(sort))
+		q = q.Order(ent.Desc(sort))
 	}
 
 	if params.Keyword != nil && *params.Keyword != "" {
-		query = query.Where(thread.Or(
-			thread.TitleContains(*params.Keyword),
-			thread.DescriptionContains(*params.Keyword),
-		))
+		switch {
+		case len(*params.Keyword) > 7 && (*params.Keyword)[:7] == "status:":
+			if status, err := strconv.Atoi((*params.Keyword)[7:]); err == nil {
+				q = q.Where(thread.StatusEQ(status))
+			}
+		case len(*params.Keyword) > 3 && (*params.Keyword)[:3] == "id:":
+			if id, err := strconv.Atoi((*params.Keyword)[3:]); err == nil {
+				q = q.Where(thread.IDEQ(id))
+			}
+		default:
+			q = q.Where(thread.Or(
+				thread.TitleContainsFold(*params.Keyword),
+				thread.DescriptionContainsFold(*params.Keyword),
+			))
+		}
 	}
 
-	if params.Status != nil && *params.Status != 0 {
-		query = query.Where(thread.StatusEQ(*params.Status))
-	}
+	q = q.Limit(params.Limit)
+	q = q.Offset(params.Offset)
 
-	query = query.Limit(params.Limit)
-	query = query.Offset(params.Offset)
-
-	entThreadList, err := query.All(params.Ctx)
+	entThreadList, err := q.All(params.Ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -70,28 +84,69 @@ func (ds *ThreadAdminDatasource) FindAll(params ThreadAdminDatasourceFindAllPara
 type ThreadAdminDatasourceGetThreadCountParams struct {
 	Ctx     context.Context
 	Keyword *string
-	Status  *int
 }
 
 func (ds *ThreadAdminDatasource) GetThreadCount(params ThreadAdminDatasourceGetThreadCountParams) (int, error) {
-	query := ds.client.Thread.Query()
+	q := ds.client.Thread.Query()
 
 	if params.Keyword != nil && *params.Keyword != "" {
-		query = query.Where(thread.Or(
-			thread.TitleContains(*params.Keyword),
-			thread.DescriptionContains(*params.Keyword),
-		))
+		switch {
+		case len(*params.Keyword) > 7 && (*params.Keyword)[:7] == "status:":
+			if status, err := strconv.Atoi((*params.Keyword)[7:]); err == nil {
+				q = q.Where(thread.StatusEQ(status))
+			}
+		case len(*params.Keyword) > 3 && (*params.Keyword)[:3] == "id:":
+			if id, err := strconv.Atoi((*params.Keyword)[3:]); err == nil {
+				q = q.Where(thread.IDEQ(id))
+			}
+		default:
+			q = q.Where(thread.Or(
+				thread.TitleContainsFold(*params.Keyword),
+				thread.DescriptionContainsFold(*params.Keyword),
+			))
+		}
 	}
 
-	if params.Status != nil && *params.Status != 0 {
-		query = query.Where(thread.StatusEQ(*params.Status))
-	}
-
-	threadCount, err := query.Count(params.Ctx)
+	threadCount, err := q.Count(params.Ctx)
 	if err != nil {
 		return 0, err
 	}
 	return threadCount, nil
+}
+
+type ThreadAdminDatasourceGetThreadCommentCountParams struct {
+	Ctx      context.Context
+	ThreadID int
+	Sort     *string
+	Order    *string
+	Keyword  *string
+}
+
+func (ds *ThreadAdminDatasource) GetThreadCommentCount(params ThreadAdminDatasourceGetThreadCommentCountParams) (int, error) {
+	q := ds.client.Thread.Query().
+		Where(thread.ID(params.ThreadID)).
+		QueryComments()
+
+	if params.Keyword != nil && *params.Keyword != "" {
+		switch {
+		case len(*params.Keyword) > 7 && (*params.Keyword)[:7] == "status:":
+			if status, err := strconv.Atoi((*params.Keyword)[7:]); err == nil {
+				q = q.Where(threadcomment.StatusEQ(status))
+			}
+		case len(*params.Keyword) > 3 && (*params.Keyword)[:3] == "id:":
+			if id, err := strconv.Atoi((*params.Keyword)[3:]); err == nil {
+				q = q.Where(threadcomment.IDEQ(id))
+			}
+		default:
+			q = q.Where(threadcomment.ContentContainsFold(*params.Keyword))
+		}
+	}
+
+	threadCommentCount, err := q.Count(params.Ctx)
+	if err != nil {
+		return 0, err
+	}
+	return threadCommentCount, nil
 }
 
 type ThreadAdminDatasourceFindByIDParams struct {
@@ -99,16 +154,54 @@ type ThreadAdminDatasourceFindByIDParams struct {
 	ThreadID int
 	Limit    int
 	Offset   int
+	Sort     *string
+	Order    *string
+	Keyword  *string
 }
 
 func (ds *ThreadAdminDatasource) FindByID(params ThreadAdminDatasourceFindByIDParams) (*model.Thread, error) {
 	entThread, err := ds.client.Thread.Query().
 		Where(thread.ID(params.ThreadID)).
 		WithComments(func(q *ent.ThreadCommentQuery) {
-			q.Limit(params.Limit).Offset(params.Offset)
+			sort := user.FieldID
+			order := "desc"
+
+			if params.Sort != nil && *params.Sort != "" {
+				sort = *params.Sort
+			}
+			if params.Order != nil && *params.Order != "" {
+				order = *params.Order
+			}
+
+			if order == "asc" {
+				q = q.Order(ent.Asc(sort))
+			} else {
+				q = q.Order(ent.Desc(sort))
+			}
+
+			if params.Keyword != nil && *params.Keyword != "" {
+				switch {
+				case len(*params.Keyword) > 7 && (*params.Keyword)[:7] == "status:":
+					if status, err := strconv.Atoi((*params.Keyword)[7:]); err == nil {
+						q = q.Where(threadcomment.StatusEQ(status))
+					}
+				case len(*params.Keyword) > 3 && (*params.Keyword)[:3] == "id:":
+					if id, err := strconv.Atoi((*params.Keyword)[3:]); err == nil {
+						q = q.Where(threadcomment.IDEQ(id))
+					}
+				default:
+					q = q.Where(threadcomment.Or(
+						threadcomment.ContentContainsFold(*params.Keyword),
+					))
+				}
+			}
+
+			q = q.Limit(params.Limit)
+			q = q.Offset(params.Offset)
+
+			q.All(params.Ctx)
 		}).
 		WithBoard().
-		WithComments().
 		Only(params.Ctx)
 	if err != nil {
 		return nil, err
@@ -127,20 +220,18 @@ type ThreadAdminDatasourceUpdateParams struct {
 func (ds *ThreadAdminDatasource) Update(params ThreadAdminDatasourceUpdateParams) (*model.Thread, error) {
 	update := ds.client.Thread.UpdateOneID(params.Thread.EntThread.ID)
 
-	if params.Thread.EntThread.Title != "" {
-		update = update.SetTitle(params.Thread.EntThread.Title)
-	}
+	update.
+		SetTitle(params.Thread.EntThread.Title).
+		SetStatus(params.Thread.EntThread.Status).
+		SetUpdatedAt(time.Now())
+
 	if params.Thread.EntThread.Description != nil {
-		update = update.SetDescription(*params.Thread.EntThread.Description)
-	}
-	if params.Thread.EntThread.Status != 0 {
-		update = update.SetStatus(params.Thread.EntThread.Status)
-	}
-	if params.Thread.EntThread.ThumbnailURL != nil {
-		update = update.SetThumbnailURL(*params.Thread.EntThread.ThumbnailURL)
+		update.SetDescription(*params.Thread.EntThread.Description)
 	}
 
-	update = update.SetUpdatedAt(time.Now())
+	if params.Thread.EntThread.ThumbnailURL != nil {
+		update.SetThumbnailURL(*params.Thread.EntThread.ThumbnailURL)
+	}
 
 	entThread, err := update.Save(params.Ctx)
 	if err != nil {

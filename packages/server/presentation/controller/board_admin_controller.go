@@ -18,6 +18,25 @@ func NewBoardAdminController(boardAdminApplicationService *service.BoardAdminApp
 	return &BoardAdminController{boardAdminApplicationService: boardAdminApplicationService}
 }
 
+func (ctrl *BoardAdminController) FindByID(ctx *gin.Context) {
+	boardID, err := strconv.Atoi(ctx.Param("boardID"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	dto, err := ctrl.boardAdminApplicationService.FindByID(service.BoardAdminApplicationServiceFindByIDParams{
+		Ctx:     context.Background(),
+		BoardID: boardID,
+	})
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, dto)
+}
+
 func (ctrl *BoardAdminController) FindAll(ctx *gin.Context) {
 	var qs request.BoardAdminFindAllRequest
 
@@ -44,7 +63,7 @@ func (ctrl *BoardAdminController) FindAll(ctx *gin.Context) {
 func (ctrl *BoardAdminController) Update(ctx *gin.Context) {
 	var body request.BoardAdminUpdateRequest
 
-	boardId, err := strconv.Atoi(ctx.Param("boardId"))
+	boardID, err := strconv.Atoi(ctx.Param("boardID"))
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -57,7 +76,7 @@ func (ctrl *BoardAdminController) Update(ctx *gin.Context) {
 
 	dto, err := ctrl.boardAdminApplicationService.Update(service.BoardAdminApplicationServiceUpdateParams{
 		Ctx:     context.Background(),
-		BoardID: boardId,
+		BoardID: boardID,
 		Body:    body,
 	})
 	if err != nil {

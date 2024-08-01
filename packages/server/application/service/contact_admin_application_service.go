@@ -17,6 +17,27 @@ func NewContactAdminApplicationService(ContactAdminDatasource *datasource.Contac
 	return &ContactAdminApplicationService{ContactAdminDatasource: ContactAdminDatasource}
 }
 
+type ContactAdminApplicationServiceFindByIDParams struct {
+	Ctx       context.Context
+	ContactID int
+}
+
+func (svc *ContactAdminApplicationService) FindByID(params ContactAdminApplicationServiceFindByIDParams) (*response.ContactAdminResponse, error) {
+	contact, err := svc.ContactAdminDatasource.FindByID(datasource.ContactAdminDatasourceFindByIDParams{
+		Ctx:       params.Ctx,
+		ContactID: params.ContactID,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	dto := response.NewContactAdminResponse(response.NewContactAdminResponseParams{
+		Contact: contact,
+	})
+
+	return dto, nil
+}
+
 type ContactAdminApplicationServiceFindAllParams struct {
 	Ctx context.Context
 	Qs  request.ContactAdminFindAllRequest
@@ -30,7 +51,6 @@ func (svc *ContactAdminApplicationService) FindAll(params ContactAdminApplicatio
 		Sort:    params.Qs.Sort,
 		Order:   params.Qs.Order,
 		Keyword: params.Qs.Keyword,
-		Status:  params.Qs.Status,
 	})
 	if err != nil {
 		return nil, err

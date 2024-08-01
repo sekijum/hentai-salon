@@ -8,9 +8,9 @@
           href: '/admin',
         },
         {
-          title: 'ユーザー一覧',
+          title: '板一覧',
           disabled: false,
-          href: '/admin/users',
+          href: '/admin/boards',
         },
       ]"
     />
@@ -34,19 +34,12 @@
           <ul>
             <li><strong>id:</strong> 特定のユーザーIDで検索します。例: <code>id:123</code></li>
             <li>
-              <strong>role:</strong> 特定の権限を持つユーザーを検索します。以下の例を参照してください:
+              <strong>status:</strong> 特定のステータスを持つボードを検索します。以下の例を参照してください:
               <ul>
-                <li>会員を検索: <code>role:0</code></li>
-                <li>管理者を検索: <code>role:1</code></li>
-              </ul>
-            </li>
-            <li>
-              <strong>status:</strong> 特定のステータスを持つユーザーを検索します。以下の例を参照してください:
-              <ul>
-                <li>有効なユーザーを検索: <code>status:0</code></li>
-                <li>退会済のユーザーを検索: <code>status:1</code></li>
-                <li>凍結されたユーザーを検索: <code>status:2</code></li>
-                <li>無効化されたユーザーを検索: <code>status:3</code></li>
+                <li>公開されているボードを検索: <code>status:0</code></li>
+                <li>非公開のボードを検索: <code>status:1</code></li>
+                <li>保留中のボードを検索: <code>status:2</code></li>
+                <li>アーカイブされたボードを検索: <code>status:3</code></li>
               </ul>
             </li>
             <li>また、名前やメールアドレスを部分一致で検索することも可能です。</li>
@@ -61,11 +54,11 @@
       v-model:sort-by="sortBy"
       v-model:items-per-page="itemsPerPage"
       :headers="headers"
-      :items="users"
+      :items="boards"
       :items-length="totalCount"
       :hover="true"
       item-value="id"
-      @update:options="fetchUsers"
+      @update:options="fetchBoards"
       items-per-page-text="表示行数"
       density="compact"
       must-sort
@@ -75,13 +68,11 @@
       <template #item="{ item }">
         <tr>
           <td>{{ item.id }}</td>
-          <td>{{ item.name }}</td>
-          <td>{{ item.email }}</td>
-          <td>{{ item.roleLabel }}</td>
+          <td>{{ item.title }}</td>
           <td>{{ item.statusLabel }}</td>
           <td>{{ $formatDate(item.createdAt) }}</td>
           <td>
-            <v-icon class="me-2" size="small" @click="router.push(`/admin/users/${item.id}`)">mdi-pencil</v-icon>
+            <v-icon class="me-2" size="small" @click="router.push(`/admin/boards/${item.id}`)">mdi-pencil</v-icon>
           </td>
         </tr>
       </template>
@@ -97,17 +88,16 @@ definePageMeta({
   middleware: ['admin-access-only'],
 });
 
-interface IUser {
-  id: number;
-  name: string;
-  role: number;
-  roleLabel: string;
-  status: number;
-  statusLabel: string;
-  email: string;
-  profileLink: string;
-  createdAt: string;
-  updatedAt: string;
+interface IBoard {
+  id: 96;
+  userId: 9;
+  title: '掲示板4b5ba504';
+  description: '掲示板の説明94836a7b';
+  status: 0;
+  statusLabel: '公開';
+  thumbnailUrl: 'https://picsum.photos/seed/95/550/397.webp';
+  updatedAt: '2024-07-27T11:35:01Z';
+  createdAt: '2024-07-27T11:35:01Z';
 }
 
 const router = useRouter();
@@ -127,24 +117,22 @@ const search = ref('');
 const sortBy = ref<SortBy[]>([initSortBy]);
 const itemsPerPage = ref(20);
 const totalCount = ref(0);
-const users = ref<IUser[]>([]);
+const boards = ref<IBoard[]>([]);
 
 const headers = [
   { title: 'ID', align: 'start', sortable: true, key: 'id' },
-  { title: '名前', key: 'name' },
-  { title: 'メール', key: 'email' },
-  { title: '権限', key: 'roleLabel' },
-  { title: 'ステータス', key: 'statusLabel' },
+  { title: '名前', key: 'タイトル' },
+  { title: 'メール', key: 'status' },
   { title: '登録日', key: 'createdAt' },
   { title: '操作', key: 'actions', sortable: false },
 ];
 
-async function fetchUsers(params: { page: number; itemsPerPage: number; sortBy: SortBy[]; search: string }) {
+async function fetchBoards(params: { page: number; itemsPerPage: number; sortBy: SortBy[]; search: string }) {
   let order = params.sortBy.length ? params.sortBy[0].order : null;
   let sort = params.sortBy.length ? params.sortBy[0].key : null;
-  sort = sort === 'roleLabel' ? 'role' : sort === 'statusLabel' ? 'status' : sort === 'createdAt' ? 'created_at' : sort;
+  sort = sort === 'statusLabel' ? 'status' : sort === 'createdAt' ? 'created_at' : sort;
 
-  const response = await $api.get<ICollection<IUser>>('/admin/users', {
+  const response = await $api.get<ICollection<IBoard>>('/admin/boards', {
     params: {
       offset: (params.page - 1) * params.itemsPerPage,
       limit: params.itemsPerPage,
@@ -153,9 +141,9 @@ async function fetchUsers(params: { page: number; itemsPerPage: number; sortBy: 
       keyword: params.search,
     },
   });
-  users.value = response.data.data ? response.data.data : [];
+  boards.value = response.data.data ? response.data.data : [];
   totalCount.value = response.data.totalCount;
 }
 
-onMounted(() => fetchUsers({ page: 1, itemsPerPage: itemsPerPage.value, sortBy: sortBy.value, search: '' }));
+onMounted(() => fetchBoards({ page: 1, itemsPerPage: itemsPerPage.value, sortBy: sortBy.value, search: '' }));
 </script>
