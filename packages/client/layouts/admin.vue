@@ -9,28 +9,40 @@
 
       <v-list density="compact" nav>
         <v-list-item
-          prepend-icon="mdi-account-group"
-          title="ユーザー管理"
-          @click="navigate('/admin/users')"
-          value="member-management"
+          prepend-icon="mdi-view-dashboard"
+          title="ダッシュボード"
+          @click="navigate('/admin')"
+          value="dashboard"
         />
         <v-list-item
-          prepend-icon="mdi-view-dashboard"
+          prepend-icon="mdi-account"
+          title="ユーザー管理"
+          @click="navigate('/admin/users')"
+          value="user-management"
+        />
+        <v-list-item
+          prepend-icon="mdi-view-list"
           title="板管理"
           @click="navigate('/admin/boards')"
           value="board-management"
         />
         <v-list-item
-          prepend-icon="mdi-text-box-multiple-outline"
+          prepend-icon="mdi-forum-outline"
           title="スレ管理"
           @click="navigate('/admin/threads')"
           value="thread-management"
         />
         <v-list-item
-          prepend-icon="mdi-email"
+          prepend-icon="mdi-email-outline"
           title="問い合わせ"
           @click="navigate('/admin/contacts')"
           value="inquiry-management"
+        />
+        <v-list-item
+          prepend-icon="mdi-tag-outline"
+          title="タグ"
+          @click="navigate('/admin/tags')"
+          value="tag-management"
         />
         <v-list-item
           prepend-icon="mdi-arrow-right-bold"
@@ -38,7 +50,7 @@
           @click="navigate('/')"
           value="client-view"
         />
-        <v-list-item prepend-icon="mdi-database" title="adminer" @click="openAdminer" value="client-view" />
+        <v-list-item prepend-icon="mdi-database" title="adminer" @click="openAdminer" value="adminer" />
       </v-list>
     </v-navigation-drawer>
 

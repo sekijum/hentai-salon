@@ -78,7 +78,23 @@
           <td>{{ item.name }}</td>
           <td>{{ item.email }}</td>
           <td>{{ item.roleLabel }}</td>
-          <td>{{ item.statusLabel }}</td>
+          <td>
+            <v-select
+              v-model="item.status"
+              :items="statusList"
+              :item-props="statusProps"
+              label="ステータス"
+              variant="outlined"
+              density="compact"
+              hide-details
+              counter
+              dense
+              single-line
+              :item-title="'text'"
+              :item-value="'value'"
+              @update:modelValue="updateStatus(item.id, item.status)"
+            />
+          </td>
           <td>{{ $formatDate(item.createdAt) }}</td>
           <td>
             <v-icon class="me-2" size="small" @click="router.push(`/admin/users/${item.id}`)">mdi-pencil</v-icon>
@@ -139,6 +155,20 @@ const headers = [
   { title: '操作', key: 'actions', sortable: false },
 ];
 
+const statusList = [
+  { text: '有効', value: 0, subtitle: '現在アクティブなユーザー' },
+  { text: '退会済', value: 1, subtitle: 'ユーザーが自主的に退会した状態' },
+  { text: '凍結', value: 2, subtitle: 'アカウントが一時的に使用できない状態' },
+  { text: '無効', value: 3, subtitle: 'アカウントが無効化されている状態' },
+];
+
+function statusProps(item: (typeof statusList)[0]) {
+  return {
+    title: item.text,
+    subtitle: item.subtitle,
+  };
+}
+
 async function fetchUsers(params: { page: number; itemsPerPage: number; sortBy: SortBy[]; search: string }) {
   let order = params.sortBy.length ? params.sortBy[0].order : null;
   let sort = params.sortBy.length ? params.sortBy[0].key : null;
@@ -155,6 +185,12 @@ async function fetchUsers(params: { page: number; itemsPerPage: number; sortBy: 
   });
   users.value = response.data.data ? response.data.data : [];
   totalCount.value = response.data.totalCount;
+}
+
+async function updateStatus(userId: number, status: number) {
+  await $api.patch(`/admin/users/${userId}/status`, {
+    status,
+  });
 }
 
 onMounted(() => fetchUsers({ page: 1, itemsPerPage: itemsPerPage.value, sortBy: sortBy.value, search: '' }));

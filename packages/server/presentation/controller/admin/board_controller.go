@@ -86,3 +86,30 @@ func (ctrl *BoardController) Update(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, dto)
 }
+
+func (ctrl *BoardController) UpdateStatus(ctx *gin.Context) {
+
+	boardID, err := strconv.Atoi(ctx.Param("boardID"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	var body request_admin.BoardUpdateStatusRequest
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	err = ctrl.boardApplicationService.UpdateStatus(service_admin.BoardApplicationServiceUpdateStatusParams{
+		Ctx:     context.Background(),
+		BoardID: boardID,
+		Body:    body,
+	})
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, nil)
+}

@@ -97,3 +97,30 @@ func (ctrl *ThreadController) Update(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, dto)
 }
+
+func (ctrl *ThreadController) UpdateStatus(ctx *gin.Context) {
+
+	threadID, err := strconv.Atoi(ctx.Param("threadID"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	var body request_admin.ThreadUpdateStatusRequest
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	err = ctrl.threadApplicationService.UpdateStatus(service_admin.ThreadApplicationServiceUpdateStatusParams{
+		Ctx:      context.Background(),
+		ThreadID: threadID,
+		Body:     body,
+	})
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, nil)
+}

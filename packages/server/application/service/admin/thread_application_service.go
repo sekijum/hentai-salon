@@ -133,3 +133,30 @@ func (svc *ThreadApplicationService) Update(params ThreadApplicationServiceUpdat
 
 	return dto, nil
 }
+
+type ThreadApplicationServiceUpdateStatusParams struct {
+	Ctx      context.Context
+	ThreadID int
+	Body     request_admin.ThreadUpdateStatusRequest
+}
+
+func (svc *ThreadApplicationService) UpdateStatus(params ThreadApplicationServiceUpdateStatusParams) error {
+	thread := model.NewThread(model.NewThreadParams{
+		EntThread: &ent.Thread{
+			ID: params.ThreadID,
+		},
+		OptionList: []func(*model.Thread){
+			model.WithThreadStatus(model.ThreadStatus(params.Body.Status)),
+		},
+	})
+
+	_, err := svc.threadDatasource.UpdateStatus(datasource_admin.ThreadDatasourceUpdateStatusParams{
+		Ctx:    params.Ctx,
+		Thread: *thread,
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

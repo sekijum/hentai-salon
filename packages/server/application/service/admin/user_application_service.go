@@ -112,3 +112,32 @@ func (svc *UserApplicationService) Update(params UserApplicationServiceUpdatePar
 
 	return dto, nil
 }
+
+type UserApplicationServiceUpdateStatusParams struct {
+	Ctx    context.Context
+	UserID int
+	Body   request_admin.UserUpdateStatusRequest
+}
+
+func (svc *UserApplicationService) UpdateStatus(params UserApplicationServiceUpdateStatusParams) (*response_admin.UserResponse, error) {
+	user := model.NewUser(model.NewUserParams{
+		EntUser: &ent.User{
+			ID: params.UserID,
+		},
+		OptionList: []func(*model.User){
+			model.WithUserStatus(model.UserStatus(params.Body.Status)),
+		},
+	})
+
+	user, err := svc.userDatasource.UpdateStatus(datasource_admin.UserDatasourceUpdateStatusParams{
+		Ctx:  params.Ctx,
+		User: *user,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	dto := response_admin.NewUserResponse(response_admin.NewUserResponseParams{User: user})
+
+	return dto, nil
+}

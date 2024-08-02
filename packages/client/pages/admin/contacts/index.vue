@@ -69,7 +69,23 @@
           <td>{{ item.id }}</td>
           <td>{{ item.email }}</td>
           <td>{{ item.subject }}</td>
-          <td>{{ item.statusLabel }}</td>
+          <td>
+            <v-select
+              v-model="item.status"
+              :items="statusList"
+              :item-props="statusProps"
+              label="ステータス"
+              variant="outlined"
+              density="compact"
+              hide-details
+              counter
+              dense
+              single-line
+              :item-title="'text'"
+              :item-value="'value'"
+              @update:modelValue="updateStatus(item.id, item.status)"
+            />
+          </td>
           <td>{{ $formatDate(item.createdAt) }}</td>
           <td>
             <v-icon class="me-2" size="small" @click="router.push(`/admin/contacts/${item.id}`)">mdi-pencil</v-icon>
@@ -127,6 +143,19 @@ const headers = [
   { title: '操作', key: 'actions', sortable: false },
 ];
 
+const statusList = [
+  { text: '未対応', value: 0, subtitle: '問い合わせがまだ対応されていない状態' },
+  { text: '対応中', value: 1, subtitle: '問い合わせが対応中である状態' },
+  { text: '完了', value: 2, subtitle: '問い合わせが完了した状態' },
+];
+
+function statusProps(item: (typeof statusList)[0]) {
+  return {
+    title: item.text,
+    subtitle: item.subtitle,
+  };
+}
+
 async function fetchContacts(params: { page: number; itemsPerPage: number; sortBy: SortBy[]; search: string }) {
   let order = params.sortBy.length ? params.sortBy[0].order : null;
   let sort = params.sortBy.length ? params.sortBy[0].key : null;
@@ -143,6 +172,12 @@ async function fetchContacts(params: { page: number; itemsPerPage: number; sortB
   });
   contacts.value = response.data.data ? response.data.data : [];
   totalCount.value = response.data.totalCount;
+}
+
+async function updateStatus(tagId: number, status: number) {
+  await $api.patch(`/admin/contacts/${tagId}/status`, {
+    status,
+  });
 }
 
 onMounted(() => fetchContacts({ page: 1, itemsPerPage: itemsPerPage.value, sortBy: sortBy.value, search: '' }));

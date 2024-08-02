@@ -122,7 +122,7 @@ const schema = yup.object({
 
 async function submit() {
   try {
-    await $api.put(`/admin/contacts/${contact?.value?.id}`, form.value);
+    await $api.patch(`/admin/contacts/${contact?.value?.id}/status`, form.value);
     alert('問い合わせ情報が更新されました。');
     await fetchContact();
   } catch (err) {

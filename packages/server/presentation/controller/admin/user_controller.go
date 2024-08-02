@@ -86,3 +86,30 @@ func (ctrl *UserController) Update(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, dto)
 }
+
+func (ctrl *UserController) UpdateStatus(ctx *gin.Context) {
+
+	userID, err := strconv.Atoi(ctx.Param("userID"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	var body request_admin.UserUpdateStatusRequest
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	dto, err := ctrl.userApplicationService.UpdateStatus(service_admin.UserApplicationServiceUpdateStatusParams{
+		Ctx:    context.Background(),
+		UserID: userID,
+		Body:   body,
+	})
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, dto)
+}

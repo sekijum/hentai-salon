@@ -2,7 +2,6 @@ package datasource_admin
 
 import (
 	"context"
-	"server/domain/model"
 	"server/infrastructure/ent"
 )
 
@@ -15,9 +14,8 @@ func NewThreadCommentDatasource(client *ent.Client) *ThreadCommentDatasource {
 }
 
 type ThreadCommentDatasourceDeleteParams struct {
-	Ctx           context.Context
-	CommentID     int
-	ThreadComment model.ThreadComment
+	Ctx       context.Context
+	CommentID int
 }
 
 func (ds *ThreadCommentDatasource) Delete(params ThreadCommentDatasourceDeleteParams) error {

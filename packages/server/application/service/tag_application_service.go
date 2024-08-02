@@ -18,13 +18,13 @@ type TagApplicationServiceFindNameListParams struct {
 }
 
 func (svc *TagApplicationService) FindNameList(params TagApplicationServiceFindNameListParams) ([]string, error) {
-	entTagList, err := svc.tagDatasource.FindAll(datasource.TagDatasourceFindAllParams{Ctx: params.Ctx})
+	tagList, err := svc.tagDatasource.FindAll(datasource.TagDatasourceFindAllParams{Ctx: params.Ctx})
 	if err != nil {
 		return nil, err
 	}
 
 	var tagNameList []string
-	for _, tag_i := range entTagList {
+	for _, tag_i := range tagList {
 		tagNameList = append(tagNameList, tag_i.EntTag.Name)
 	}
 	return tagNameList, nil

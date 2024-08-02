@@ -164,3 +164,27 @@ func (ds *UserDatasource) Update(params UserDatasourceUpdateParams) (*model.User
 
 	return user, nil
 }
+
+type UserDatasourceUpdateStatusParams struct {
+	Ctx  context.Context
+	User model.User
+}
+
+func (ds *UserDatasource) UpdateStatus(params UserDatasourceUpdateStatusParams) (*model.User, error) {
+	update := ds.client.User.UpdateOneID(params.User.EntUser.ID)
+
+	update = update.
+		SetStatus(params.User.EntUser.Status).
+		SetUpdatedAt(time.Now())
+
+	entUser, err := update.Save(params.Ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	user := model.NewUser(model.NewUserParams{
+		EntUser: entUser,
+	})
+
+	return user, nil
+}

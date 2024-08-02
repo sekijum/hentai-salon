@@ -79,6 +79,7 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 		{
 			userGroup.GET("", controllers.UserAdminController.FindAll)
 			userGroup.GET("/:userID", controllers.UserAdminController.FindByID)
+			userGroup.PATCH("/:userID/status", controllers.UserAdminController.UpdateStatus)
 			userGroup.PUT("/:userID", controllers.UserAdminController.Update)
 		}
 
@@ -86,7 +87,7 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 		{
 			contactGroup.GET("", controllers.ContactAdminController.FindAll)
 			contactGroup.GET("/:contactID", controllers.ContactAdminController.FindByID)
-			contactGroup.PUT("/:contactID", controllers.ContactAdminController.Update)
+			contactGroup.PATCH("/:contactID/status", controllers.ContactAdminController.UpdateStatus)
 		}
 
 		boardGroup := adminGroup.Group("/boards")
@@ -94,6 +95,13 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 			boardGroup.GET("", controllers.BoardAdminController.FindAll)
 			boardGroup.GET("/:boardID", controllers.BoardAdminController.FindByID)
 			boardGroup.PUT("/:boardID", controllers.BoardAdminController.Update)
+			boardGroup.PATCH("/:boardID/status", controllers.BoardAdminController.UpdateStatus)
+		}
+
+		tagGroup := adminGroup.Group("/tags")
+		{
+			tagGroup.GET("", controllers.TagAdminController.FindAll)
+			tagGroup.DELETE("/:tagID", controllers.TagAdminController.Delete)
 		}
 
 		threadGroup := adminGroup.Group("/threads")
@@ -101,6 +109,7 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 			threadGroup.GET("", controllers.ThreadAdminController.FindAll)
 			threadGroup.GET("/:threadID", controllers.ThreadAdminController.FindByID)
 			threadGroup.PUT("/:threadID", controllers.ThreadAdminController.Update)
+			threadGroup.PATCH("/:threadID/status", controllers.ThreadAdminController.UpdateStatus)
 
 			commentGroup := threadGroup.Group("/:threadID/comments")
 			{

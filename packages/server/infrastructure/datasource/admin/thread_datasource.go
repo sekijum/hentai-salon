@@ -4,6 +4,7 @@ import (
 	"context"
 	"server/domain/model"
 	"server/infrastructure/ent"
+	"server/infrastructure/ent/board"
 	"server/infrastructure/ent/thread"
 	"server/infrastructure/ent/threadcomment"
 	"server/infrastructure/ent/user"
@@ -29,7 +30,9 @@ type ThreadDatasourceFindAllParams struct {
 }
 
 func (ds *ThreadDatasource) FindAll(params ThreadDatasourceFindAllParams) ([]*model.Thread, error) {
-	q := ds.client.Thread.Query().WithBoard()
+	q := ds.client.Thread.Query().
+		Where(thread.HasBoardWith(board.StatusEQ(0))).
+		WithBoard()
 
 	sort := thread.FieldID
 	order := "desc"
@@ -154,6 +157,7 @@ type ThreadDatasourceFindByIDParams struct {
 func (ds *ThreadDatasource) FindByID(params ThreadDatasourceFindByIDParams) (*model.Thread, error) {
 	entThread, err := ds.client.Thread.Query().
 		Where(thread.ID(params.ThreadID)).
+		Where(thread.HasBoardWith(board.StatusEQ(0))).
 		WithComments(func(q *ent.ThreadCommentQuery) {
 			sort := user.FieldID
 			order := "desc"
@@ -220,6 +224,30 @@ func (ds *ThreadDatasource) Update(params ThreadDatasourceUpdateParams) (*model.
 	if params.Thread.EntThread.ThumbnailURL != nil {
 		update.SetThumbnailURL(*params.Thread.EntThread.ThumbnailURL)
 	}
+
+	entThread, err := update.Save(params.Ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	thread := model.NewThread(model.NewThreadParams{
+		EntThread: entThread,
+	})
+
+	return thread, nil
+}
+
+type ThreadDatasourceUpdateStatusParams struct {
+	Ctx    context.Context
+	Thread model.Thread
+}
+
+func (ds *ThreadDatasource) UpdateStatus(params ThreadDatasourceUpdateStatusParams) (*model.Thread, error) {
+	update := ds.client.Thread.UpdateOneID(params.Thread.EntThread.ID)
+
+	update.
+		SetStatus(params.Thread.EntThread.Status).
+		SetUpdatedAt(time.Now())
 
 	entThread, err := update.Save(params.Ctx)
 	if err != nil {

@@ -60,8 +60,8 @@ func (ctrl *ContactController) FindAll(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, dto)
 }
 
-func (ctrl *ContactController) Update(ctx *gin.Context) {
-	var body request_admin.ContactUpdateRequest
+func (ctrl *ContactController) UpdateStatus(ctx *gin.Context) {
+	var body request_admin.ContactUpdateStatusRequest
 
 	ContactID, err := strconv.Atoi(ctx.Param("contactID"))
 	if err != nil {
@@ -74,7 +74,7 @@ func (ctrl *ContactController) Update(ctx *gin.Context) {
 		return
 	}
 
-	dto, err := ctrl.contactApplicationService.Update(service_admin.ContactApplicationServiceUpdateParams{
+	dto, err := ctrl.contactApplicationService.UpdateStatus(service_admin.ContactApplicationServiceUpdateParams{
 		Ctx:       context.Background(),
 		ContactID: ContactID,
 		Body:      body,

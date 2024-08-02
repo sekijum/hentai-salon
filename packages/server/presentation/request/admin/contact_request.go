@@ -9,6 +9,6 @@ type ContactFindAllRequest struct {
 	Status  *int    `form:"status"`
 }
 
-type ContactUpdateRequest struct {
+type ContactUpdateStatusRequest struct {
 	Status int `json:"status,omitempty"`
 }

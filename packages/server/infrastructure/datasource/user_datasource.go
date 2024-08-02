@@ -30,6 +30,7 @@ type UserDatasourceFindByIDParams struct {
 func (ds *UserDatasource) FindByID(params UserDatasourceFindByIDParams) (*model.User, error) {
 	entUser, err := ds.client.User.Query().
 		Where(user.ID(params.UserID)).
+		Where(user.StatusEQ(0)).
 		WithComments(func(q *ent.ThreadCommentQuery) {
 			q.WithAttachments().
 				WithAuthor().

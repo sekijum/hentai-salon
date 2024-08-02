@@ -153,3 +153,27 @@ func (ds *BoardDatasource) Update(params BoardDatasourceUpdateParams) (*model.Bo
 
 	return board, nil
 }
+
+type BoardDatasourceUpdateStatusParams struct {
+	Ctx   context.Context
+	Board *model.Board
+}
+
+func (ds *BoardDatasource) UpdateStatus(params BoardDatasourceUpdateStatusParams) (*model.Board, error) {
+	update := ds.client.Board.UpdateOneID(params.Board.EntBoard.ID)
+
+	update = update.
+		SetStatus(params.Board.EntBoard.Status).
+		SetUpdatedAt(time.Now())
+
+	entBoard, err := update.Save(params.Ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	board := model.NewBoard(model.NewBoardParams{
+		EntBoard: entBoard,
+	})
+
+	return board, nil
+}

@@ -83,6 +83,7 @@
               single-line
               :item-title="'text'"
               :item-value="'value'"
+              @update:modelValue="updateStatus(item.id, item.status)"
             />
           </td>
           <td>{{ $formatDate(item.createdAt) }}</td>
@@ -128,6 +129,7 @@ interface IThread {
   };
 }
 
+const route = useRoute();
 const router = useRouter();
 const nuxtApp = useNuxtApp();
 const { $api, $formatDate } = nuxtApp;
@@ -185,6 +187,12 @@ async function fetchThreads(params: { page: number; itemsPerPage: number; sortBy
   });
   threads.value = response.data.data ? response.data.data : [];
   totalCount.value = response.data.totalCount;
+}
+
+async function updateStatus(threadId: number, status: number) {
+  await $api.patch(`/admin/threads/${threadId}/status`, {
+    status,
+  });
 }
 
 onMounted(() => fetchThreads({ page: 1, itemsPerPage: itemsPerPage.value, sortBy: sortBy.value, search: '' }));

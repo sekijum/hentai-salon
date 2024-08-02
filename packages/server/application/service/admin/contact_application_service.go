@@ -85,10 +85,10 @@ func (svc *ContactApplicationService) FindAll(params ContactApplicationServiceFi
 type ContactApplicationServiceUpdateParams struct {
 	Ctx       context.Context
 	ContactID int
-	Body      request_admin.ContactUpdateRequest
+	Body      request_admin.ContactUpdateStatusRequest
 }
 
-func (svc *ContactApplicationService) Update(params ContactApplicationServiceUpdateParams) (*response_admin.ContactResponse, error) {
+func (svc *ContactApplicationService) UpdateStatus(params ContactApplicationServiceUpdateParams) (*response_admin.ContactResponse, error) {
 	Contact := model.NewContact(model.NewContactParams{
 		EntContact: &ent.Contact{
 			ID: params.ContactID,
@@ -98,7 +98,7 @@ func (svc *ContactApplicationService) Update(params ContactApplicationServiceUpd
 		},
 	})
 
-	Contact, err := svc.ContactDatasource.Update(datasource_admin.ContactDatasourceUpdateParams{
+	Contact, err := svc.ContactDatasource.UpdateStatus(datasource_admin.ContactDatasourceUpdateStatusParams{
 		Ctx:     params.Ctx,
 		Contact: Contact,
 	})

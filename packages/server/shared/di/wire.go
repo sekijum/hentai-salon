@@ -39,6 +39,7 @@ var controllerSet = wire.NewSet(
 	controller.NewContactController,
 	controller_admin.NewContactController,
 	controller_admin.NewThreadCommentController,
+	controller_admin.NewTagController,
 )
 
 var serviceSet = wire.NewSet(
@@ -54,6 +55,7 @@ var serviceSet = wire.NewSet(
 	service.NewContactApplicationService,
 	service_admin.NewContactApplicationService,
 	service_admin.NewThreadCommentApplicationService,
+	service_admin.NewTagApplicationService,
 )
 
 var datasourceSet = wire.NewSet(
@@ -68,6 +70,7 @@ var datasourceSet = wire.NewSet(
 	datasource.NewContactDatasource,
 	datasource_admin.NewContactDatasource,
 	datasource_admin.NewThreadCommentDatasource,
+	datasource_admin.NewTagDatasource,
 )
 
 type ControllersSet struct {
@@ -83,6 +86,7 @@ type ControllersSet struct {
 	ContactController            *controller.ContactController
 	ContactAdminController       *controller_admin.ContactController
 	ThreadCommentAdminController *controller_admin.ThreadCommentController
+	TagAdminController           *controller_admin.TagController
 }
 
 func InitializeControllers() (*ControllersSet, func(), error) {

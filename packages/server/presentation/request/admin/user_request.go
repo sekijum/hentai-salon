@@ -15,3 +15,7 @@ type UserUpdateRequest struct {
 	Role   int    `json:"role,omitempty"`
 	Status int    `json:"status,omitempty"`
 }
+
+type UserUpdateStatusRequest struct {
+	Status int `json:"status,omitempty"`
+}

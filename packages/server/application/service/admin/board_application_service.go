@@ -116,3 +116,30 @@ func (svc *BoardApplicationService) Update(params BoardApplicationServiceUpdateP
 
 	return dto, nil
 }
+
+type BoardApplicationServiceUpdateStatusParams struct {
+	Ctx     context.Context
+	BoardID int
+	Body    request_admin.BoardUpdateStatusRequest
+}
+
+func (svc *BoardApplicationService) UpdateStatus(params BoardApplicationServiceUpdateStatusParams) error {
+	board := model.NewBoard(model.NewBoardParams{
+		EntBoard: &ent.Board{
+			ID: params.BoardID,
+		},
+		OptionList: []func(*model.Board){
+			model.WithBoardStatus(model.BoardStatus(params.Body.Status)),
+		},
+	})
+
+	_, err := svc.boardDatasource.UpdateStatus(datasource_admin.BoardDatasourceUpdateStatusParams{
+		Ctx:   params.Ctx,
+		Board: board,
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

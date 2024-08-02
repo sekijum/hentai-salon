@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"entgo.io/ent"
+	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
@@ -23,7 +24,7 @@ func (Tag) Fields() []ent.Field {
 
 func (Tag) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("threads", Thread.Type).Ref("tags").Through("thread_tags", ThreadTag.Type),
+		edge.From("threads", Thread.Type).Ref("tags").Through("thread_tags", ThreadTag.Type).Annotations(entsql.OnDelete(entsql.Cascade)),
 	}
 }
 

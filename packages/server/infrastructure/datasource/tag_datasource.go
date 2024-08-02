@@ -46,7 +46,7 @@ type TagDatasourceFindAllParams struct {
 }
 
 func (ds *TagDatasource) FindAll(params TagDatasourceFindAllParams) ([]*model.Tag, error) {
-	entTagList, err := ds.client.Tag.Query().All(params.Ctx)
+	entTagList, err := ds.client.Tag.Query().WithThreads().All(params.Ctx)
 	if err != nil {
 		return nil, err
 	}

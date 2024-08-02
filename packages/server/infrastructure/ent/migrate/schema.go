@@ -198,7 +198,7 @@ var (
 				Symbol:     "thread_tags_tags_tag",
 				Columns:    []*schema.Column{ThreadTagsColumns[1]},
 				RefColumns: []*schema.Column{TagsColumns[0]},
-				OnDelete:   schema.NoAction,
+				OnDelete:   schema.Cascade,
 			},
 		},
 	}

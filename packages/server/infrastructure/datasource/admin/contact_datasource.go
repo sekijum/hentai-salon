@@ -127,12 +127,12 @@ func (ds *ContactDatasource) FindAll(params ContactDatasourceFindAllParams) ([]*
 	return modelContacts, nil
 }
 
-type ContactDatasourceUpdateParams struct {
+type ContactDatasourceUpdateStatusParams struct {
 	Ctx     context.Context
 	Contact *model.Contact
 }
 
-func (ds *ContactDatasource) Update(params ContactDatasourceUpdateParams) (*model.Contact, error) {
+func (ds *ContactDatasource) UpdateStatus(params ContactDatasourceUpdateStatusParams) (*model.Contact, error) {
 	update := ds.client.Contact.UpdateOneID(params.Contact.EntContact.ID).
 		SetStatus(params.Contact.EntContact.Status)
 

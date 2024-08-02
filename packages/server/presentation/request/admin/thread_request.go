@@ -22,3 +22,7 @@ type ThreadUpdateRequest struct {
 	ThumbnailURL *string `json:"thumbnailUrl,omitempty"`
 	Status       int     `json:"status,omitempty"`
 }
+
+type ThreadUpdateStatusRequest struct {
+	Status int `json:"status,omitempty"`
+}

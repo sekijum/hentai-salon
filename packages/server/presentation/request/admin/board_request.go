@@ -15,3 +15,7 @@ type BoardUpdateRequest struct {
 	Status       int     `json:"status,omitempty"`
 	ThumbnailURL *string `json:"thumbnailUrl,omitempty"`
 }
+
+type BoardUpdateStatusRequest struct {
+	Status int `json:"status,omitempty"`
+}
