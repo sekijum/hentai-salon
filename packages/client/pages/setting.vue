@@ -4,7 +4,7 @@
 
     <v-divider />
 
-    <div v-for="item in menuItems" :key="item.name" :class="{ highlight: item.type === 'header' }" class="bordered-row">
+    <div v-for="item in menuItems" :key="item.name" class="bordered-row">
       <v-row class="align-center">
         <template v-if="item.type === 'header'">
           <div class="header-text">{{ item.name }}</div>
@@ -92,9 +92,6 @@ useHead({
 </script>
 
 <style scoped>
-.highlight {
-  background-color: #f0f0f0;
-}
 .bordered-row {
   border-top: 1px solid #ddd;
   border-bottom: 1px solid #ddd;

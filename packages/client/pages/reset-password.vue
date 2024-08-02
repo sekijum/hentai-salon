@@ -81,7 +81,6 @@ onMounted(async () => {
     await $api.post('/verify-reset-password-token', { token: token.value });
   } catch (err) {
     alert('通信中にエラーが発生しました');
-    router.push('/');
   }
 });
 </script>

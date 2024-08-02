@@ -14,6 +14,7 @@ import (
 	"server/presentation/response"
 	"time"
 
+	aws "server/infrastructure/aws"
 	mailpit "server/infrastructure/mailpit"
 
 	"github.com/dgrijalva/jwt-go"
@@ -24,6 +25,7 @@ type UserApplicationService struct {
 	threadDatasource        *datasource.ThreadDatasource
 	threadCommentDatasource *datasource.ThreadCommentDatasource
 	mailpitClient           *mailpit.MailpitClient
+	sesClient               *aws.SESClient
 }
 
 func NewUserApplicationService(
@@ -31,12 +33,14 @@ func NewUserApplicationService(
 	threadDatasource *datasource.ThreadDatasource,
 	threadCommentDatasource *datasource.ThreadCommentDatasource,
 	mailpitClient *mailpit.MailpitClient,
+	sesClient *aws.SESClient,
 ) *UserApplicationService {
 	return &UserApplicationService{
 		userDatasource:          userDatasource,
 		threadDatasource:        threadDatasource,
 		threadCommentDatasource: threadCommentDatasource,
 		mailpitClient:           mailpitClient,
+		sesClient:               sesClient,
 	}
 }
 
@@ -336,9 +340,17 @@ Webページを開く
 
 ※このメールは返信しても届きません。`, user.EntUser.Name, resetURL, clientURL)
 
-	err = svc.mailpitClient.SendEmail(params.Body.Email, emailSubject, emailBody)
-	if err != nil {
-		return fmt.Errorf("メールの送信に失敗しました: %v", err)
+	environment := os.Getenv("ENVIRONMENT")
+	if environment == "production" {
+		err = svc.sesClient.SendEmail(params.Body.Email, emailSubject, emailBody)
+		if err != nil {
+			return fmt.Errorf("メールの送信に失敗しました: %v", err)
+		}
+	} else {
+		err = svc.mailpitClient.SendEmail(params.Body.Email, emailSubject, emailBody)
+		if err != nil {
+			return fmt.Errorf("メールの送信に失敗しました: %v", err)
+		}
 	}
 
 	return nil

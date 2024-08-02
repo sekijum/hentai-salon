@@ -81,8 +81,7 @@ async function submit() {
     alert('サインインしました。');
     router.push('/');
   } catch (err) {
-    console.log(err);
-    // alert(err.response.data.error);
+    alert('通信中にエラーが発生しました');
   }
 }
 

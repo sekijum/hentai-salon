@@ -31,7 +31,12 @@ func InitializeControllers() (*ControllersSet, func(), error) {
 	threadDatasource := datasource.NewThreadDatasource(client)
 	threadCommentDatasource := datasource.NewThreadCommentDatasource(client)
 	mailpitClient := mailpit.NewMailpitClient()
-	userApplicationService := service.NewUserApplicationService(userDatasource, threadDatasource, threadCommentDatasource, mailpitClient)
+	sesClient, err := aws.NewSESClient()
+	if err != nil {
+		cleanup()
+		return nil, nil, err
+	}
+	userApplicationService := service.NewUserApplicationService(userDatasource, threadDatasource, threadCommentDatasource, mailpitClient, sesClient)
 	userController := controller.NewUserController(userApplicationService)
 	tagDatasource := datasource.NewTagDatasource(client)
 	threadApplicationService := service.NewThreadApplicationService(client, threadDatasource, threadCommentDatasource, tagDatasource)
@@ -67,18 +72,22 @@ func InitializeControllers() (*ControllersSet, func(), error) {
 	contactAdminDatasource := datasource.NewContactAdminDatasource(client)
 	contactAdminApplicationService := service.NewContactAdminApplicationService(contactAdminDatasource)
 	contactAdminController := controller.NewContactAdminController(contactAdminApplicationService)
+	threadCommentAdminDatasource := datasource.NewThreadCommentAdminDatasource(client)
+	threadCommentAdminApplicationService := service.NewThreadCommentAdminApplicationService(threadCommentAdminDatasource)
+	threadCommentAdminController := controller.NewThreadCommentAdminController(threadCommentAdminApplicationService)
 	controllersSet := &ControllersSet{
-		BoardController:         boardController,
-		UserController:          userController,
-		ThreadController:        threadController,
-		ThreadCommentController: threadCommentController,
-		TagController:           tagController,
-		StorageController:       storageController,
-		UserAdminController:     userAdminController,
-		BoardAdminController:    boardAdminController,
-		ThreadAdminController:   threadAdminController,
-		ContactController:       contactController,
-		ContactAdminController:  contactAdminController,
+		BoardController:              boardController,
+		UserController:               userController,
+		ThreadController:             threadController,
+		ThreadCommentController:      threadCommentController,
+		TagController:                tagController,
+		StorageController:            storageController,
+		UserAdminController:          userAdminController,
+		BoardAdminController:         boardAdminController,
+		ThreadAdminController:        threadAdminController,
+		ContactController:            contactController,
+		ContactAdminController:       contactAdminController,
+		ThreadCommentAdminController: threadCommentAdminController,
 	}
 	return controllersSet, func() {
 		cleanup()
@@ -87,24 +96,25 @@ func InitializeControllers() (*ControllersSet, func(), error) {
 
 // wire.go:
 
-var externalServiceSet = wire.NewSet(ent.ProvideClient, aws.NewS3Client, minio.NewMinioClient, mailpit.NewMailpitClient)
+var externalServiceSet = wire.NewSet(ent.ProvideClient, aws.NewS3Client, aws.NewSESClient, minio.NewMinioClient, mailpit.NewMailpitClient)
 
-var controllerSet = wire.NewSet(controller.NewBoardController, controller.NewUserController, controller.NewThreadController, controller.NewThreadCommentController, controller.NewTagController, controller.NewStorageController, controller.NewUserAdminController, controller.NewBoardAdminController, controller.NewThreadAdminController, controller.NewContactController, controller.NewContactAdminController)
+var controllerSet = wire.NewSet(controller.NewBoardController, controller.NewUserController, controller.NewThreadController, controller.NewThreadCommentController, controller.NewTagController, controller.NewStorageController, controller.NewUserAdminController, controller.NewBoardAdminController, controller.NewThreadAdminController, controller.NewContactController, controller.NewContactAdminController, controller.NewThreadCommentAdminController)
 
-var serviceSet = wire.NewSet(service.NewBoardApplicationService, service.NewUserApplicationService, service.NewThreadApplicationService, service.NewThreadCommentApplicationService, service.NewTagApplicationService, service.NewStorageApplicationService, service.NewUserAdminApplicationService, service.NewBoardAdminApplicationService, service.NewThreadAdminApplicationService, service.NewContactApplicationService, service.NewContactAdminApplicationService)
+var serviceSet = wire.NewSet(service.NewBoardApplicationService, service.NewUserApplicationService, service.NewThreadApplicationService, service.NewThreadCommentApplicationService, service.NewTagApplicationService, service.NewStorageApplicationService, service.NewUserAdminApplicationService, service.NewBoardAdminApplicationService, service.NewThreadAdminApplicationService, service.NewContactApplicationService, service.NewContactAdminApplicationService, service.NewThreadCommentAdminApplicationService)
 
-var datasourceSet = wire.NewSet(datasource.NewBoardDatasource, datasource.NewUserDatasource, datasource.NewThreadDatasource, datasource.NewThreadCommentDatasource, datasource.NewTagDatasource, datasource.NewUserAdminDatasource, datasource.NewBoardAdminDatasource, datasource.NewThreadAdminDatasource, datasource.NewContactDatasource, datasource.NewContactAdminDatasource)
+var datasourceSet = wire.NewSet(datasource.NewBoardDatasource, datasource.NewUserDatasource, datasource.NewThreadDatasource, datasource.NewThreadCommentDatasource, datasource.NewTagDatasource, datasource.NewUserAdminDatasource, datasource.NewBoardAdminDatasource, datasource.NewThreadAdminDatasource, datasource.NewContactDatasource, datasource.NewContactAdminDatasource, datasource.NewThreadCommentAdminDatasource)
 
 type ControllersSet struct {
-	BoardController         *controller.BoardController
-	UserController          *controller.UserController
-	ThreadController        *controller.ThreadController
-	ThreadCommentController *controller.ThreadCommentController
-	TagController           *controller.TagController
-	StorageController       *controller.StorageController
-	UserAdminController     *controller.UserAdminController
-	BoardAdminController    *controller.BoardAdminController
-	ThreadAdminController   *controller.ThreadAdminController
-	ContactController       *controller.ContactController
-	ContactAdminController  *controller.ContactAdminController
+	BoardController              *controller.BoardController
+	UserController               *controller.UserController
+	ThreadController             *controller.ThreadController
+	ThreadCommentController      *controller.ThreadCommentController
+	TagController                *controller.TagController
+	StorageController            *controller.StorageController
+	UserAdminController          *controller.UserAdminController
+	BoardAdminController         *controller.BoardAdminController
+	ThreadAdminController        *controller.ThreadAdminController
+	ContactController            *controller.ContactController
+	ContactAdminController       *controller.ContactAdminController
+	ThreadCommentAdminController *controller.ThreadCommentAdminController
 }

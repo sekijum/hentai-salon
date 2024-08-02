@@ -1,10 +1,5 @@
 <template>
-  <div
-    v-for="(item, index) in items"
-    :key="item.id"
-    :class="{ alternate: index % 2 === 0 }"
-    class="d-flex align-center p-2 item-row"
-  >
+  <div v-for="(item, index) in items" :key="item.id" class="d-flex align-center p-2 item-row">
     <v-row>
       <v-col cols="3" class="d-flex align-center">
         <div class="fixed-image mr-1">
@@ -48,10 +43,6 @@ function getImageSrc(thumbnailUrl: string) {
 </script>
 
 <style scoped>
-.alternate {
-  background-color: #f5f5f5;
-}
-
 .fixed-image {
   width: 100px;
   height: 100px;

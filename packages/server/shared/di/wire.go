@@ -18,6 +18,7 @@ import (
 var externalServiceSet = wire.NewSet(
 	ent.ProvideClient,
 	aws.NewS3Client,
+	aws.NewSESClient,
 	minio.NewMinioClient,
 	mailpit.NewMailpitClient,
 )
@@ -34,6 +35,7 @@ var controllerSet = wire.NewSet(
 	controller.NewThreadAdminController,
 	controller.NewContactController,
 	controller.NewContactAdminController,
+	controller.NewThreadCommentAdminController,
 )
 
 var serviceSet = wire.NewSet(
@@ -48,6 +50,7 @@ var serviceSet = wire.NewSet(
 	service.NewThreadAdminApplicationService,
 	service.NewContactApplicationService,
 	service.NewContactAdminApplicationService,
+	service.NewThreadCommentAdminApplicationService,
 )
 
 var datasourceSet = wire.NewSet(
@@ -61,20 +64,22 @@ var datasourceSet = wire.NewSet(
 	datasource.NewThreadAdminDatasource,
 	datasource.NewContactDatasource,
 	datasource.NewContactAdminDatasource,
+	datasource.NewThreadCommentAdminDatasource,
 )
 
 type ControllersSet struct {
-	BoardController         *controller.BoardController
-	UserController          *controller.UserController
-	ThreadController        *controller.ThreadController
-	ThreadCommentController *controller.ThreadCommentController
-	TagController           *controller.TagController
-	StorageController       *controller.StorageController
-	UserAdminController     *controller.UserAdminController
-	BoardAdminController    *controller.BoardAdminController
-	ThreadAdminController   *controller.ThreadAdminController
-	ContactController       *controller.ContactController
-	ContactAdminController  *controller.ContactAdminController
+	BoardController              *controller.BoardController
+	UserController               *controller.UserController
+	ThreadController             *controller.ThreadController
+	ThreadCommentController      *controller.ThreadCommentController
+	TagController                *controller.TagController
+	StorageController            *controller.StorageController
+	UserAdminController          *controller.UserAdminController
+	BoardAdminController         *controller.BoardAdminController
+	ThreadAdminController        *controller.ThreadAdminController
+	ContactController            *controller.ContactController
+	ContactAdminController       *controller.ContactAdminController
+	ThreadCommentAdminController *controller.ThreadCommentAdminController
 }
 
 func InitializeControllers() (*ControllersSet, func(), error) {

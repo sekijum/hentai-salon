@@ -200,7 +200,7 @@ async function submit(_: typeof form.value, { resetForm }: { resetForm: () => vo
           parentCommentId: props.parentCommentId,
         });
       } else {
-        await $api.post(`/threads/${props.threadId}/comments/`, form.value);
+        await $api.post(`/threads/${props.threadId}/comments`, form.value);
       }
       if (!payload.isLoggedIn) {
         setLastCommentTime();
@@ -259,27 +259,8 @@ onMounted(() => {
   margin-bottom: 0px;
 }
 
-.clear-button {
-  background-color: #f0f0f0;
-  color: black;
-}
-
-.submit-button {
-  background-color: #007bff;
-  color: white;
-}
-
-.submit-button:hover {
-  background-color: #0056b3;
-}
-
-.clear-button:hover {
-  background-color: #e0e0e0;
-}
-
 .note {
   font-size: 12px;
-  color: grey;
   text-align: center;
   margin-top: 8px;
 }

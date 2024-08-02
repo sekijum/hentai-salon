@@ -101,6 +101,11 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 			threadGroup.GET("", controllers.ThreadAdminController.FindAll)
 			threadGroup.GET("/:threadID", controllers.ThreadAdminController.FindByID)
 			threadGroup.PUT("/:threadID", controllers.ThreadAdminController.Update)
+
+			commentGroup := threadGroup.Group("/:threadID/comments")
+			{
+				commentGroup.PUT("/:commentID", controllers.ThreadCommentAdminController.Update)
+			}
 		}
 	}
 

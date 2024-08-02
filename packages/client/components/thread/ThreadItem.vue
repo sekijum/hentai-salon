@@ -1,8 +1,6 @@
 <template>
   <div>
-    <div v-if="title" class="section-title">
-      <h2 class="font-weight-regular">{{ title }}</h2>
-    </div>
+    <h2 v-if="title" class="font-weight-regular">{{ title }}</h2>
 
     <div class="thread-section">
       <template v-if="isInfiniteScroll">
@@ -114,14 +112,9 @@ onMounted(() => {
   width: 100%;
 }
 
-.section-title h2 {
-  color: orange;
-}
-
 .more-link {
   text-align: center;
   cursor: pointer;
-  background-color: #f0f0f0;
   padding: 10px;
   text-decoration: underline;
 }
