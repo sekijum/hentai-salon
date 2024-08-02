@@ -104,7 +104,7 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 
 			commentGroup := threadGroup.Group("/:threadID/comments")
 			{
-				commentGroup.PUT("/:commentID", controllers.ThreadCommentAdminController.Update)
+				commentGroup.DELETE("/:commentID", controllers.ThreadCommentAdminController.Delete)
 			}
 		}
 	}

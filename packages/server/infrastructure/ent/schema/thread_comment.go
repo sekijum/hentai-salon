@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"entgo.io/ent"
+	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
@@ -21,7 +22,6 @@ func (ThreadComment) Fields() []ent.Field {
 		field.String("guest_name").Optional().Nillable().MaxLen(20).Comment("ゲストユーザーの場合"),
 		field.Text("content"),
 		field.String("ip_address").MaxLen(64).Comment("コメント者のIPアドレス"),
-		field.Int("status").Default(0).Comment("0: Visible, 1: Deleted"),
 		field.Time("created_at").Default(time.Now),
 		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),
 	}
@@ -33,7 +33,7 @@ func (ThreadComment) Edges() []ent.Edge {
 		edge.From("author", User.Type).Ref("comments").Unique().Field("user_id"),
 		edge.From("parent_comment", ThreadComment.Type).Ref("replies").Unique().Field("parent_comment_id"),
 		edge.To("replies", ThreadComment.Type),
-		edge.To("attachments", ThreadCommentAttachment.Type),
+		edge.To("attachments", ThreadCommentAttachment.Type).Annotations(entsql.OnDelete(entsql.Cascade)),
 		edge.From("liked_users", User.Type).Ref("liked_comments").Through("user_comment_like", UserCommentLike.Type),
 	}
 }

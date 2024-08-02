@@ -3315,8 +3315,6 @@ type ThreadCommentMutation struct {
 	guest_name            *string
 	content               *string
 	ip_address            *string
-	status                *int
-	addstatus             *int
 	created_at            *time.Time
 	updated_at            *time.Time
 	clearedFields         map[string]struct{}
@@ -3699,62 +3697,6 @@ func (m *ThreadCommentMutation) ResetIPAddress() {
 	m.ip_address = nil
 }
 
-// SetStatus sets the "status" field.
-func (m *ThreadCommentMutation) SetStatus(i int) {
-	m.status = &i
-	m.addstatus = nil
-}
-
-// Status returns the value of the "status" field in the mutation.
-func (m *ThreadCommentMutation) Status() (r int, exists bool) {
-	v := m.status
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldStatus returns the old "status" field's value of the ThreadComment entity.
-// If the ThreadComment object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ThreadCommentMutation) OldStatus(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldStatus requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
-	}
-	return oldValue.Status, nil
-}
-
-// AddStatus adds i to the "status" field.
-func (m *ThreadCommentMutation) AddStatus(i int) {
-	if m.addstatus != nil {
-		*m.addstatus += i
-	} else {
-		m.addstatus = &i
-	}
-}
-
-// AddedStatus returns the value that was added to the "status" field in this mutation.
-func (m *ThreadCommentMutation) AddedStatus() (r int, exists bool) {
-	v := m.addstatus
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetStatus resets all changes to the "status" field.
-func (m *ThreadCommentMutation) ResetStatus() {
-	m.status = nil
-	m.addstatus = nil
-}
-
 // SetCreatedAt sets the "created_at" field.
 func (m *ThreadCommentMutation) SetCreatedAt(t time.Time) {
 	m.created_at = &t
@@ -4117,7 +4059,7 @@ func (m *ThreadCommentMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ThreadCommentMutation) Fields() []string {
-	fields := make([]string, 0, 9)
+	fields := make([]string, 0, 8)
 	if m.thread != nil {
 		fields = append(fields, threadcomment.FieldThreadID)
 	}
@@ -4135,9 +4077,6 @@ func (m *ThreadCommentMutation) Fields() []string {
 	}
 	if m.ip_address != nil {
 		fields = append(fields, threadcomment.FieldIPAddress)
-	}
-	if m.status != nil {
-		fields = append(fields, threadcomment.FieldStatus)
 	}
 	if m.created_at != nil {
 		fields = append(fields, threadcomment.FieldCreatedAt)
@@ -4165,8 +4104,6 @@ func (m *ThreadCommentMutation) Field(name string) (ent.Value, bool) {
 		return m.Content()
 	case threadcomment.FieldIPAddress:
 		return m.IPAddress()
-	case threadcomment.FieldStatus:
-		return m.Status()
 	case threadcomment.FieldCreatedAt:
 		return m.CreatedAt()
 	case threadcomment.FieldUpdatedAt:
@@ -4192,8 +4129,6 @@ func (m *ThreadCommentMutation) OldField(ctx context.Context, name string) (ent.
 		return m.OldContent(ctx)
 	case threadcomment.FieldIPAddress:
 		return m.OldIPAddress(ctx)
-	case threadcomment.FieldStatus:
-		return m.OldStatus(ctx)
 	case threadcomment.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	case threadcomment.FieldUpdatedAt:
@@ -4249,13 +4184,6 @@ func (m *ThreadCommentMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetIPAddress(v)
 		return nil
-	case threadcomment.FieldStatus:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetStatus(v)
-		return nil
 	case threadcomment.FieldCreatedAt:
 		v, ok := value.(time.Time)
 		if !ok {
@@ -4278,9 +4206,6 @@ func (m *ThreadCommentMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *ThreadCommentMutation) AddedFields() []string {
 	var fields []string
-	if m.addstatus != nil {
-		fields = append(fields, threadcomment.FieldStatus)
-	}
 	return fields
 }
 
@@ -4289,8 +4214,6 @@ func (m *ThreadCommentMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *ThreadCommentMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case threadcomment.FieldStatus:
-		return m.AddedStatus()
 	}
 	return nil, false
 }
@@ -4300,13 +4223,6 @@ func (m *ThreadCommentMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *ThreadCommentMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case threadcomment.FieldStatus:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddStatus(v)
-		return nil
 	}
 	return fmt.Errorf("unknown ThreadComment numeric field %s", name)
 }
@@ -4372,9 +4288,6 @@ func (m *ThreadCommentMutation) ResetField(name string) error {
 		return nil
 	case threadcomment.FieldIPAddress:
 		m.ResetIPAddress()
-		return nil
-	case threadcomment.FieldStatus:
-		m.ResetStatus()
 		return nil
 	case threadcomment.FieldCreatedAt:
 		m.ResetCreatedAt()

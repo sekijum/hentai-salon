@@ -83,20 +83,6 @@ func (tcc *ThreadCommentCreate) SetIPAddress(s string) *ThreadCommentCreate {
 	return tcc
 }
 
-// SetStatus sets the "status" field.
-func (tcc *ThreadCommentCreate) SetStatus(i int) *ThreadCommentCreate {
-	tcc.mutation.SetStatus(i)
-	return tcc
-}
-
-// SetNillableStatus sets the "status" field if the given value is not nil.
-func (tcc *ThreadCommentCreate) SetNillableStatus(i *int) *ThreadCommentCreate {
-	if i != nil {
-		tcc.SetStatus(*i)
-	}
-	return tcc
-}
-
 // SetCreatedAt sets the "created_at" field.
 func (tcc *ThreadCommentCreate) SetCreatedAt(t time.Time) *ThreadCommentCreate {
 	tcc.mutation.SetCreatedAt(t)
@@ -240,10 +226,6 @@ func (tcc *ThreadCommentCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (tcc *ThreadCommentCreate) defaults() {
-	if _, ok := tcc.mutation.Status(); !ok {
-		v := threadcomment.DefaultStatus
-		tcc.mutation.SetStatus(v)
-	}
 	if _, ok := tcc.mutation.CreatedAt(); !ok {
 		v := threadcomment.DefaultCreatedAt()
 		tcc.mutation.SetCreatedAt(v)
@@ -274,9 +256,6 @@ func (tcc *ThreadCommentCreate) check() error {
 		if err := threadcomment.IPAddressValidator(v); err != nil {
 			return &ValidationError{Name: "ip_address", err: fmt.Errorf(`ent: validator failed for field "ThreadComment.ip_address": %w`, err)}
 		}
-	}
-	if _, ok := tcc.mutation.Status(); !ok {
-		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "ThreadComment.status"`)}
 	}
 	if _, ok := tcc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "ThreadComment.created_at"`)}
@@ -330,10 +309,6 @@ func (tcc *ThreadCommentCreate) createSpec() (*ThreadComment, *sqlgraph.CreateSp
 	if value, ok := tcc.mutation.IPAddress(); ok {
 		_spec.SetField(threadcomment.FieldIPAddress, field.TypeString, value)
 		_node.IPAddress = value
-	}
-	if value, ok := tcc.mutation.Status(); ok {
-		_spec.SetField(threadcomment.FieldStatus, field.TypeInt, value)
-		_node.Status = value
 	}
 	if value, ok := tcc.mutation.CreatedAt(); ok {
 		_spec.SetField(threadcomment.FieldCreatedAt, field.TypeTime, value)

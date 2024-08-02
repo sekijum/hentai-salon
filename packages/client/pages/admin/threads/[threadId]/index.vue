@@ -141,23 +141,10 @@
             <tr>
               <td>{{ item.id }}</td>
               <td>{{ item.content }}</td>
-              <td>
-                <v-select
-                  v-model="item.status"
-                  :items="threadCommentstatusList"
-                  :item-props="statusProps"
-                  label="ステータス"
-                  variant="outlined"
-                  density="compact"
-                  hide-details
-                  counter
-                  dense
-                  single-line
-                  :item-title="'text'"
-                  :item-value="'value'"
-                />
-              </td>
               <td>{{ $formatDate(item.createdAt) }}</td>
+              <td>
+                <v-icon size="small" @click="() => deleteComment(item.id)">mdi-delete</v-icon>
+              </td>
             </tr>
           </template>
         </v-data-table-server>
@@ -243,19 +230,14 @@ const form = ref({
 const headers = [
   { title: 'ID', align: 'start', sortable: true, key: 'id' },
   { title: '内容', key: 'content' },
-  { title: 'ステータス', key: 'statusLabel' },
   { title: '登録日', key: 'createdAt' },
+  { title: '操作', key: 'actions', sortable: false },
 ];
 
 const statusList = [
   { text: '公開', value: 0, subtitle: 'スレッドが現在公開されている状態' },
   { text: '保留', value: 1, subtitle: 'スレッドが現在保留されている状態' },
   { text: 'アーカイブ', value: 2, subtitle: 'スレッドがアーカイブされている状態' },
-];
-
-const threadCommentstatusList = [
-  { text: '可視', value: 0, subtitle: 'コメントが現在表示されている状態' },
-  { text: '削除', value: 1, subtitle: 'コメントが削除されている状態' },
 ];
 
 function statusProps(item: (typeof statusList)[0]) {
@@ -276,6 +258,18 @@ async function submit() {
     await $api.put(`/admin/threads/${thread?.value?.id}`, form.value);
     console.log(form.value);
     alert('スレッド情報が更新されました。');
+    await fetchThread({ page: 1, itemsPerPage: itemsPerPage.value, sortBy: sortBy.value, search: '' });
+  } catch (err) {
+    alert('通信中にエラーが発生しました');
+  }
+}
+
+async function deleteComment(commentId: number) {
+  try {
+    if (confirm('本当に削除しますか？')) {
+      await $api.delete(`/admin/threads/${thread?.value?.id}/comments/${commentId}`);
+      alert('コメントが削除されました。');
+    }
     await fetchThread({ page: 1, itemsPerPage: itemsPerPage.value, sortBy: sortBy.value, search: '' });
   } catch (err) {
     alert('通信中にエラーが発生しました');

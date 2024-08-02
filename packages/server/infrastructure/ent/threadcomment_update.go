@@ -133,27 +133,6 @@ func (tcu *ThreadCommentUpdate) SetNillableIPAddress(s *string) *ThreadCommentUp
 	return tcu
 }
 
-// SetStatus sets the "status" field.
-func (tcu *ThreadCommentUpdate) SetStatus(i int) *ThreadCommentUpdate {
-	tcu.mutation.ResetStatus()
-	tcu.mutation.SetStatus(i)
-	return tcu
-}
-
-// SetNillableStatus sets the "status" field if the given value is not nil.
-func (tcu *ThreadCommentUpdate) SetNillableStatus(i *int) *ThreadCommentUpdate {
-	if i != nil {
-		tcu.SetStatus(*i)
-	}
-	return tcu
-}
-
-// AddStatus adds i to the "status" field.
-func (tcu *ThreadCommentUpdate) AddStatus(i int) *ThreadCommentUpdate {
-	tcu.mutation.AddStatus(i)
-	return tcu
-}
-
 // SetCreatedAt sets the "created_at" field.
 func (tcu *ThreadCommentUpdate) SetCreatedAt(t time.Time) *ThreadCommentUpdate {
 	tcu.mutation.SetCreatedAt(t)
@@ -411,12 +390,6 @@ func (tcu *ThreadCommentUpdate) sqlSave(ctx context.Context) (n int, err error) 
 	}
 	if value, ok := tcu.mutation.IPAddress(); ok {
 		_spec.SetField(threadcomment.FieldIPAddress, field.TypeString, value)
-	}
-	if value, ok := tcu.mutation.Status(); ok {
-		_spec.SetField(threadcomment.FieldStatus, field.TypeInt, value)
-	}
-	if value, ok := tcu.mutation.AddedStatus(); ok {
-		_spec.AddField(threadcomment.FieldStatus, field.TypeInt, value)
 	}
 	if value, ok := tcu.mutation.CreatedAt(); ok {
 		_spec.SetField(threadcomment.FieldCreatedAt, field.TypeTime, value)
@@ -780,27 +753,6 @@ func (tcuo *ThreadCommentUpdateOne) SetNillableIPAddress(s *string) *ThreadComme
 	return tcuo
 }
 
-// SetStatus sets the "status" field.
-func (tcuo *ThreadCommentUpdateOne) SetStatus(i int) *ThreadCommentUpdateOne {
-	tcuo.mutation.ResetStatus()
-	tcuo.mutation.SetStatus(i)
-	return tcuo
-}
-
-// SetNillableStatus sets the "status" field if the given value is not nil.
-func (tcuo *ThreadCommentUpdateOne) SetNillableStatus(i *int) *ThreadCommentUpdateOne {
-	if i != nil {
-		tcuo.SetStatus(*i)
-	}
-	return tcuo
-}
-
-// AddStatus adds i to the "status" field.
-func (tcuo *ThreadCommentUpdateOne) AddStatus(i int) *ThreadCommentUpdateOne {
-	tcuo.mutation.AddStatus(i)
-	return tcuo
-}
-
 // SetCreatedAt sets the "created_at" field.
 func (tcuo *ThreadCommentUpdateOne) SetCreatedAt(t time.Time) *ThreadCommentUpdateOne {
 	tcuo.mutation.SetCreatedAt(t)
@@ -1088,12 +1040,6 @@ func (tcuo *ThreadCommentUpdateOne) sqlSave(ctx context.Context) (_node *ThreadC
 	}
 	if value, ok := tcuo.mutation.IPAddress(); ok {
 		_spec.SetField(threadcomment.FieldIPAddress, field.TypeString, value)
-	}
-	if value, ok := tcuo.mutation.Status(); ok {
-		_spec.SetField(threadcomment.FieldStatus, field.TypeInt, value)
-	}
-	if value, ok := tcuo.mutation.AddedStatus(); ok {
-		_spec.AddField(threadcomment.FieldStatus, field.TypeInt, value)
 	}
 	if value, ok := tcuo.mutation.CreatedAt(); ok {
 		_spec.SetField(threadcomment.FieldCreatedAt, field.TypeTime, value)

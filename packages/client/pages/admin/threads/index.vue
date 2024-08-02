@@ -69,7 +69,22 @@
           <td>{{ item.id }}</td>
           <td>{{ item.title }}</td>
           <td>{{ item.board.title }}</td>
-          <td>{{ item.statusLabel }}</td>
+          <td>
+            <v-select
+              v-model="item.status"
+              :items="statusList"
+              :item-props="statusProps"
+              label="ステータス"
+              variant="outlined"
+              density="compact"
+              hide-details
+              counter
+              dense
+              single-line
+              :item-title="'text'"
+              :item-value="'value'"
+            />
+          </td>
           <td>{{ $formatDate(item.createdAt) }}</td>
           <td>
             <v-icon class="me-2" size="small" @click="router.push(`/admin/threads/${item.id}`)">mdi-pencil</v-icon>
@@ -140,6 +155,19 @@ const headers = [
   { title: '登録日', key: 'createdAt' },
   { title: '操作', key: 'actions', sortable: false },
 ];
+
+const statusList = [
+  { text: '公開', value: 0, subtitle: 'スレッドが現在公開されている状態' },
+  { text: '保留', value: 1, subtitle: 'スレッドが現在保留されている状態' },
+  { text: 'アーカイブ', value: 2, subtitle: 'スレッドがアーカイブされている状態' },
+];
+
+function statusProps(item: (typeof statusList)[0]) {
+  return {
+    title: item.text,
+    subtitle: item.subtitle,
+  };
+}
 
 async function fetchThreads(params: { page: number; itemsPerPage: number; sortBy: SortBy[]; search: string }) {
   let order = params.sortBy.length ? params.sortBy[0].order : null;

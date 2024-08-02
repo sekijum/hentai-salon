@@ -96,8 +96,7 @@ func (ds *ThreadCommentDatasource) Create(params ThreadCommentDatasourceCreatePa
 	q := tx.ThreadComment.Create().
 		SetThreadID(params.ThreadComment.EntThreadComment.ThreadID).
 		SetContent(params.ThreadComment.EntThreadComment.Content).
-		SetIPAddress(params.ThreadComment.EntThreadComment.IPAddress).
-		SetStatus(params.ThreadComment.EntThreadComment.Status)
+		SetIPAddress(params.ThreadComment.EntThreadComment.IPAddress)
 
 	if params.ThreadComment.EntThreadComment.UserID != nil {
 		q.SetUserID(*params.ThreadComment.EntThreadComment.UserID)

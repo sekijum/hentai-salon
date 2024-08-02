@@ -14,20 +14,16 @@ func NewThreadCommentDatasource(client *ent.Client) *ThreadCommentDatasource {
 	return &ThreadCommentDatasource{client: client}
 }
 
-type ThreadCommentDatasourceUpdateParams struct {
+type ThreadCommentDatasourceDeleteParams struct {
 	Ctx           context.Context
 	CommentID     int
 	ThreadComment model.ThreadComment
 }
 
-func (ds *ThreadCommentDatasource) Update(params ThreadCommentDatasourceUpdateParams) error {
-	update := ds.client.ThreadComment.UpdateOneID(params.CommentID)
-	update.SetStatus(params.ThreadComment.EntThreadComment.Status)
-
-	_, err := update.Save(params.Ctx)
+func (ds *ThreadCommentDatasource) Delete(params ThreadCommentDatasourceDeleteParams) error {
+	err := ds.client.ThreadComment.DeleteOneID(params.CommentID).Exec(params.Ctx)
 	if err != nil {
 		return err
 	}
-
 	return nil
 }

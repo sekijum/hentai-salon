@@ -112,16 +112,12 @@ func init() {
 	threadcommentDescIPAddress := threadcommentFields[6].Descriptor()
 	// threadcomment.IPAddressValidator is a validator for the "ip_address" field. It is called by the builders before save.
 	threadcomment.IPAddressValidator = threadcommentDescIPAddress.Validators[0].(func(string) error)
-	// threadcommentDescStatus is the schema descriptor for status field.
-	threadcommentDescStatus := threadcommentFields[7].Descriptor()
-	// threadcomment.DefaultStatus holds the default value on creation for the status field.
-	threadcomment.DefaultStatus = threadcommentDescStatus.Default.(int)
 	// threadcommentDescCreatedAt is the schema descriptor for created_at field.
-	threadcommentDescCreatedAt := threadcommentFields[8].Descriptor()
+	threadcommentDescCreatedAt := threadcommentFields[7].Descriptor()
 	// threadcomment.DefaultCreatedAt holds the default value on creation for the created_at field.
 	threadcomment.DefaultCreatedAt = threadcommentDescCreatedAt.Default.(func() time.Time)
 	// threadcommentDescUpdatedAt is the schema descriptor for updated_at field.
-	threadcommentDescUpdatedAt := threadcommentFields[9].Descriptor()
+	threadcommentDescUpdatedAt := threadcommentFields[8].Descriptor()
 	// threadcomment.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	threadcomment.DefaultUpdatedAt = threadcommentDescUpdatedAt.Default.(func() time.Time)
 	// threadcomment.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

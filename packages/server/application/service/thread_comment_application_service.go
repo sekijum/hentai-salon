@@ -72,9 +72,6 @@ func (svc *ThreadCommentApplicationService) Create(params ThreadCommentApplicati
 			UserID:          params.UserID,
 			ParentCommentID: params.ParentCommentID,
 		},
-		OptionList: []func(*model.ThreadComment){
-			model.WithThreadCommentStatus(model.ThreadCommentStatusVisible),
-		},
 	})
 
 	if params.UserID != nil {

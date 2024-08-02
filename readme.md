@@ -19,6 +19,18 @@ dokcer compose down
 
 ```
 
+### generate
+
+```
+docker compose exec server go generate ./infrastructure/ent
+```
+
+### マイグレーションフィアル生成
+
+```
+docker compose exec server go run -mod=mod ./infrastructure/ent/migrate/main.go {{ マイグレーション名 }}
+```
+
 ### マイグレーション
 
 ```

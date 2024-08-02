@@ -91,10 +91,6 @@ func (ds *ThreadDatasource) GetThreadCount(params ThreadDatasourceGetThreadCount
 
 	if params.Keyword != nil && *params.Keyword != "" {
 		switch {
-		case len(*params.Keyword) > 7 && (*params.Keyword)[:7] == "status:":
-			if status, err := strconv.Atoi((*params.Keyword)[7:]); err == nil {
-				q = q.Where(thread.StatusEQ(status))
-			}
 		case len(*params.Keyword) > 3 && (*params.Keyword)[:3] == "id:":
 			if id, err := strconv.Atoi((*params.Keyword)[3:]); err == nil {
 				q = q.Where(thread.IDEQ(id))
@@ -129,10 +125,6 @@ func (ds *ThreadDatasource) GetThreadCommentCount(params ThreadDatasourceGetThre
 
 	if params.Keyword != nil && *params.Keyword != "" {
 		switch {
-		case len(*params.Keyword) > 7 && (*params.Keyword)[:7] == "status:":
-			if status, err := strconv.Atoi((*params.Keyword)[7:]); err == nil {
-				q = q.Where(threadcomment.StatusEQ(status))
-			}
 		case len(*params.Keyword) > 3 && (*params.Keyword)[:3] == "id:":
 			if id, err := strconv.Atoi((*params.Keyword)[3:]); err == nil {
 				q = q.Where(threadcomment.IDEQ(id))
@@ -181,10 +173,6 @@ func (ds *ThreadDatasource) FindByID(params ThreadDatasourceFindByIDParams) (*mo
 
 			if params.Keyword != nil && *params.Keyword != "" {
 				switch {
-				case len(*params.Keyword) > 7 && (*params.Keyword)[:7] == "status:":
-					if status, err := strconv.Atoi((*params.Keyword)[7:]); err == nil {
-						q = q.Where(threadcomment.StatusEQ(status))
-					}
 				case len(*params.Keyword) > 3 && (*params.Keyword)[:3] == "id:":
 					if id, err := strconv.Atoi((*params.Keyword)[3:]); err == nil {
 						q = q.Where(threadcomment.IDEQ(id))

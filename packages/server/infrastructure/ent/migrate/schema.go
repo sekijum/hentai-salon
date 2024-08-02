@@ -43,7 +43,7 @@ var (
 	// ContactsColumns holds the columns for the "contacts" table.
 	ContactsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "email", Type: field.TypeString, Size: 254},
+		{Name: "email", Type: field.TypeString, Size: 255},
 		{Name: "subject", Type: field.TypeString, Size: 255},
 		{Name: "message", Type: field.TypeString, Size: 2147483647},
 		{Name: "ip_address", Type: field.TypeString, Size: 64},
@@ -122,7 +122,6 @@ var (
 		{Name: "guest_name", Type: field.TypeString, Nullable: true, Size: 20},
 		{Name: "content", Type: field.TypeString, Size: 2147483647},
 		{Name: "ip_address", Type: field.TypeString, Size: 64},
-		{Name: "status", Type: field.TypeInt, Default: 0},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "thread_id", Type: field.TypeInt},
@@ -137,19 +136,19 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "thread_comments_threads_comments",
-				Columns:    []*schema.Column{ThreadCommentsColumns[7]},
+				Columns:    []*schema.Column{ThreadCommentsColumns[6]},
 				RefColumns: []*schema.Column{ThreadsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "thread_comments_thread_comments_replies",
-				Columns:    []*schema.Column{ThreadCommentsColumns[8]},
+				Columns:    []*schema.Column{ThreadCommentsColumns[7]},
 				RefColumns: []*schema.Column{ThreadCommentsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "thread_comments_users_comments",
-				Columns:    []*schema.Column{ThreadCommentsColumns[9]},
+				Columns:    []*schema.Column{ThreadCommentsColumns[8]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -174,7 +173,7 @@ var (
 				Symbol:     "thread_comment_attachments_thread_comments_attachments",
 				Columns:    []*schema.Column{ThreadCommentAttachmentsColumns[5]},
 				RefColumns: []*schema.Column{ThreadCommentsColumns[0]},
-				OnDelete:   schema.NoAction,
+				OnDelete:   schema.Cascade,
 			},
 		},
 	}
@@ -207,7 +206,7 @@ var (
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "name", Type: field.TypeString, Size: 20},
-		{Name: "email", Type: field.TypeString, Unique: true, Size: 254},
+		{Name: "email", Type: field.TypeString, Unique: true, Size: 255},
 		{Name: "password", Type: field.TypeString},
 		{Name: "profile_link", Type: field.TypeString, Nullable: true},
 		{Name: "status", Type: field.TypeInt, Default: 0},

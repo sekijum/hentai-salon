@@ -31,8 +31,6 @@ type ThreadComment struct {
 	Content string `json:"content,omitempty"`
 	// コメント者のIPアドレス
 	IPAddress string `json:"ip_address,omitempty"`
-	// 0: Visible, 1: Deleted
-	Status int `json:"status,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -138,7 +136,7 @@ func (*ThreadComment) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case threadcomment.FieldID, threadcomment.FieldThreadID, threadcomment.FieldParentCommentID, threadcomment.FieldUserID, threadcomment.FieldStatus:
+		case threadcomment.FieldID, threadcomment.FieldThreadID, threadcomment.FieldParentCommentID, threadcomment.FieldUserID:
 			values[i] = new(sql.NullInt64)
 		case threadcomment.FieldGuestName, threadcomment.FieldContent, threadcomment.FieldIPAddress:
 			values[i] = new(sql.NullString)
@@ -203,12 +201,6 @@ func (tc *ThreadComment) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field ip_address", values[i])
 			} else if value.Valid {
 				tc.IPAddress = value.String
-			}
-		case threadcomment.FieldStatus:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field status", values[i])
-			} else if value.Valid {
-				tc.Status = int(value.Int64)
 			}
 		case threadcomment.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -316,9 +308,6 @@ func (tc *ThreadComment) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("ip_address=")
 	builder.WriteString(tc.IPAddress)
-	builder.WriteString(", ")
-	builder.WriteString("status=")
-	builder.WriteString(fmt.Sprintf("%v", tc.Status))
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(tc.CreatedAt.Format(time.ANSIC))
