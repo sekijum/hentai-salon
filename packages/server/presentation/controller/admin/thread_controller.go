@@ -1,25 +1,25 @@
-package controller
+package controller_admin
 
 import (
 	"context"
 	"net/http"
-	"server/application/service"
-	"server/presentation/request"
+	service_admin "server/application/service/admin"
+	request_admin "server/presentation/request/admin"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
-type ThreadAdminController struct {
-	threadAdminApplicationService *service.ThreadAdminApplicationService
+type ThreadController struct {
+	threadApplicationService *service_admin.ThreadApplicationService
 }
 
-func NewThreadAdminController(threadAdminApplicationService *service.ThreadAdminApplicationService) *ThreadAdminController {
-	return &ThreadAdminController{threadAdminApplicationService: threadAdminApplicationService}
+func NewThreadController(threadApplicationService *service_admin.ThreadApplicationService) *ThreadController {
+	return &ThreadController{threadApplicationService: threadApplicationService}
 }
 
-func (ctrl *ThreadAdminController) FindAll(ctx *gin.Context) {
-	var qs request.ThreadAdminFindAllRequest
+func (ctrl *ThreadController) FindAll(ctx *gin.Context) {
+	var qs request_admin.ThreadFindAllRequest
 
 	if err := ctx.ShouldBindQuery(&qs); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -29,7 +29,7 @@ func (ctrl *ThreadAdminController) FindAll(ctx *gin.Context) {
 	qs.Limit = ctx.GetInt("limit")
 	qs.Offset = ctx.GetInt("offset")
 
-	dto, err := ctrl.threadAdminApplicationService.FindAll(service.ThreadAdminApplicationServiceFindAllParams{
+	dto, err := ctrl.threadApplicationService.FindAll(service_admin.ThreadApplicationServiceFindAllParams{
 		Ctx: context.Background(),
 		Qs:  qs,
 	})
@@ -41,14 +41,14 @@ func (ctrl *ThreadAdminController) FindAll(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, dto)
 }
 
-func (ctrl *ThreadAdminController) FindByID(ctx *gin.Context) {
+func (ctrl *ThreadController) FindByID(ctx *gin.Context) {
 	threadID, err := strconv.Atoi(ctx.Param("threadID"))
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	var qs request.ThreadAdminFindByIDRequest
+	var qs request_admin.ThreadFindByIDRequest
 
 	if err := ctx.ShouldBindQuery(&qs); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -58,7 +58,7 @@ func (ctrl *ThreadAdminController) FindByID(ctx *gin.Context) {
 	qs.Limit = ctx.GetInt("limit")
 	qs.Offset = ctx.GetInt("offset")
 
-	dto, err := ctrl.threadAdminApplicationService.FindByID(service.ThreadAdminApplicationServiceFindByIDParams{
+	dto, err := ctrl.threadApplicationService.FindByID(service_admin.ThreadApplicationServiceFindByIDParams{
 		Ctx:      context.Background(),
 		ThreadID: threadID,
 		Qs:       qs,
@@ -71,7 +71,7 @@ func (ctrl *ThreadAdminController) FindByID(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, dto)
 }
 
-func (ctrl *ThreadAdminController) Update(ctx *gin.Context) {
+func (ctrl *ThreadController) Update(ctx *gin.Context) {
 
 	threadID, err := strconv.Atoi(ctx.Param("threadID"))
 	if err != nil {
@@ -79,13 +79,13 @@ func (ctrl *ThreadAdminController) Update(ctx *gin.Context) {
 		return
 	}
 
-	var body request.ThreadAdminUpdateRequest
+	var body request_admin.ThreadUpdateRequest
 	if err := ctx.ShouldBindJSON(&body); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	dto, err := ctrl.threadAdminApplicationService.Update(service.ThreadAdminApplicationServiceUpdateParams{
+	dto, err := ctrl.threadApplicationService.Update(service_admin.ThreadApplicationServiceUpdateParams{
 		Ctx:      context.Background(),
 		ThreadID: threadID,
 		Body:     body,

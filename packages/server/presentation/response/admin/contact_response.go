@@ -1,11 +1,11 @@
-package response
+package response_admin
 
 import (
 	"server/domain/model"
 	"time"
 )
 
-type ContactAdminResponse struct {
+type ContactResponse struct {
 	ID          int    `json:"id"`
 	Email       string `json:"email"`
 	Subject     string `json:"subject"`
@@ -16,12 +16,12 @@ type ContactAdminResponse struct {
 	UpdatedAt   string `json:"updatedAt"`
 }
 
-type NewContactAdminResponseParams struct {
+type NewContactResponseParams struct {
 	Contact *model.Contact
 }
 
-func NewContactAdminResponse(params NewContactAdminResponseParams) *ContactAdminResponse {
-	return &ContactAdminResponse{
+func NewContactResponse(params NewContactResponseParams) *ContactResponse {
+	return &ContactResponse{
 		ID:          params.Contact.EntContact.ID,
 		Email:       params.Contact.EntContact.Email,
 		Subject:     params.Contact.EntContact.Subject,

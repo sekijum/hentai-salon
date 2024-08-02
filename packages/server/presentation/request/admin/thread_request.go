@@ -1,6 +1,6 @@
-package request
+package request_admin
 
-type ThreadAdminFindAllRequest struct {
+type ThreadFindAllRequest struct {
 	Limit   int     `form:"limit"`
 	Offset  int     `form:"offset"`
 	Sort    *string `form:"sort"`
@@ -8,7 +8,7 @@ type ThreadAdminFindAllRequest struct {
 	Keyword *string `form:"keyword"`
 }
 
-type ThreadAdminFindByIDRequest struct {
+type ThreadFindByIDRequest struct {
 	Limit   int     `form:"limit"`
 	Offset  int     `form:"offset"`
 	Sort    *string `form:"sort"`
@@ -16,7 +16,7 @@ type ThreadAdminFindByIDRequest struct {
 	Keyword *string `form:"keyword"`
 }
 
-type ThreadAdminUpdateRequest struct {
+type ThreadUpdateRequest struct {
 	Title        string  `json:"title,omitempty"`
 	Description  *string `json:"description,omitempty"`
 	ThumbnailURL *string `json:"thumbnailUrl,omitempty"`

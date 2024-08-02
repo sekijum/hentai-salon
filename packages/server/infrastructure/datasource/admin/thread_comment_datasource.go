@@ -1,4 +1,4 @@
-package datasource
+package datasource_admin
 
 import (
 	"context"
@@ -6,21 +6,21 @@ import (
 	"server/infrastructure/ent"
 )
 
-type ThreadCommentAdminDatasource struct {
+type ThreadCommentDatasource struct {
 	client *ent.Client
 }
 
-func NewThreadCommentAdminDatasource(client *ent.Client) *ThreadCommentAdminDatasource {
-	return &ThreadCommentAdminDatasource{client: client}
+func NewThreadCommentDatasource(client *ent.Client) *ThreadCommentDatasource {
+	return &ThreadCommentDatasource{client: client}
 }
 
-type ThreadCommentAdminDatasourceUpdateParams struct {
+type ThreadCommentDatasourceUpdateParams struct {
 	Ctx           context.Context
 	CommentID     int
 	ThreadComment model.ThreadComment
 }
 
-func (ds *ThreadCommentAdminDatasource) Update(params ThreadCommentAdminDatasourceUpdateParams) error {
+func (ds *ThreadCommentDatasource) Update(params ThreadCommentDatasourceUpdateParams) error {
 	update := ds.client.ThreadComment.UpdateOneID(params.CommentID)
 	update.SetStatus(params.ThreadComment.EntThreadComment.Status)
 

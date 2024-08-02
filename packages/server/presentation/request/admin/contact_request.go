@@ -1,6 +1,6 @@
-package request
+package request_admin
 
-type ContactAdminFindAllRequest struct {
+type ContactFindAllRequest struct {
 	Limit   int     `form:"limit"`
 	Offset  int     `form:"offset"`
 	Order   *string `form:"order"`
@@ -9,6 +9,6 @@ type ContactAdminFindAllRequest struct {
 	Status  *int    `form:"status"`
 }
 
-type ContactAdminUpdateRequest struct {
+type ContactUpdateRequest struct {
 	Status int `json:"status,omitempty"`
 }

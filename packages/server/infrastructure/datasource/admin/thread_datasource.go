@@ -1,4 +1,4 @@
-package datasource
+package datasource_admin
 
 import (
 	"context"
@@ -11,15 +11,15 @@ import (
 	"time"
 )
 
-type ThreadAdminDatasource struct {
+type ThreadDatasource struct {
 	client *ent.Client
 }
 
-func NewThreadAdminDatasource(client *ent.Client) *ThreadAdminDatasource {
-	return &ThreadAdminDatasource{client: client}
+func NewThreadDatasource(client *ent.Client) *ThreadDatasource {
+	return &ThreadDatasource{client: client}
 }
 
-type ThreadAdminDatasourceFindAllParams struct {
+type ThreadDatasourceFindAllParams struct {
 	Ctx     context.Context
 	Limit   int
 	Offset  int
@@ -28,7 +28,7 @@ type ThreadAdminDatasourceFindAllParams struct {
 	Keyword *string
 }
 
-func (ds *ThreadAdminDatasource) FindAll(params ThreadAdminDatasourceFindAllParams) ([]*model.Thread, error) {
+func (ds *ThreadDatasource) FindAll(params ThreadDatasourceFindAllParams) ([]*model.Thread, error) {
 	q := ds.client.Thread.Query().WithBoard()
 
 	sort := thread.FieldID
@@ -81,12 +81,12 @@ func (ds *ThreadAdminDatasource) FindAll(params ThreadAdminDatasourceFindAllPara
 	return threadList, nil
 }
 
-type ThreadAdminDatasourceGetThreadCountParams struct {
+type ThreadDatasourceGetThreadCountParams struct {
 	Ctx     context.Context
 	Keyword *string
 }
 
-func (ds *ThreadAdminDatasource) GetThreadCount(params ThreadAdminDatasourceGetThreadCountParams) (int, error) {
+func (ds *ThreadDatasource) GetThreadCount(params ThreadDatasourceGetThreadCountParams) (int, error) {
 	q := ds.client.Thread.Query()
 
 	if params.Keyword != nil && *params.Keyword != "" {
@@ -114,7 +114,7 @@ func (ds *ThreadAdminDatasource) GetThreadCount(params ThreadAdminDatasourceGetT
 	return threadCount, nil
 }
 
-type ThreadAdminDatasourceGetThreadCommentCountParams struct {
+type ThreadDatasourceGetThreadCommentCountParams struct {
 	Ctx      context.Context
 	ThreadID int
 	Sort     *string
@@ -122,7 +122,7 @@ type ThreadAdminDatasourceGetThreadCommentCountParams struct {
 	Keyword  *string
 }
 
-func (ds *ThreadAdminDatasource) GetThreadCommentCount(params ThreadAdminDatasourceGetThreadCommentCountParams) (int, error) {
+func (ds *ThreadDatasource) GetThreadCommentCount(params ThreadDatasourceGetThreadCommentCountParams) (int, error) {
 	q := ds.client.Thread.Query().
 		Where(thread.ID(params.ThreadID)).
 		QueryComments()
@@ -149,7 +149,7 @@ func (ds *ThreadAdminDatasource) GetThreadCommentCount(params ThreadAdminDatasou
 	return threadCommentCount, nil
 }
 
-type ThreadAdminDatasourceFindByIDParams struct {
+type ThreadDatasourceFindByIDParams struct {
 	Ctx      context.Context
 	ThreadID int
 	Limit    int
@@ -159,7 +159,7 @@ type ThreadAdminDatasourceFindByIDParams struct {
 	Keyword  *string
 }
 
-func (ds *ThreadAdminDatasource) FindByID(params ThreadAdminDatasourceFindByIDParams) (*model.Thread, error) {
+func (ds *ThreadDatasource) FindByID(params ThreadDatasourceFindByIDParams) (*model.Thread, error) {
 	entThread, err := ds.client.Thread.Query().
 		Where(thread.ID(params.ThreadID)).
 		WithComments(func(q *ent.ThreadCommentQuery) {
@@ -212,12 +212,12 @@ func (ds *ThreadAdminDatasource) FindByID(params ThreadAdminDatasourceFindByIDPa
 	return thread, nil
 }
 
-type ThreadAdminDatasourceUpdateParams struct {
+type ThreadDatasourceUpdateParams struct {
 	Ctx    context.Context
 	Thread model.Thread
 }
 
-func (ds *ThreadAdminDatasource) Update(params ThreadAdminDatasourceUpdateParams) (*model.Thread, error) {
+func (ds *ThreadDatasource) Update(params ThreadDatasourceUpdateParams) (*model.Thread, error) {
 	update := ds.client.Thread.UpdateOneID(params.Thread.EntThread.ID)
 
 	update.

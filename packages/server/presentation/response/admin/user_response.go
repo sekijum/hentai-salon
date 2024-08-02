@@ -1,11 +1,11 @@
-package response
+package response_admin
 
 import (
 	"server/domain/model"
 	"time"
 )
 
-type UserAdminResponse struct {
+type UserResponse struct {
 	ID          int    `json:"id"`
 	Name        string `json:"name"`
 	Email       string `json:"email"`
@@ -17,12 +17,12 @@ type UserAdminResponse struct {
 	UpdatedAt   string `json:"updatedAt"`
 }
 
-type NewUserAdminResponseParams struct {
+type NewUserResponseParams struct {
 	User *model.User
 }
 
-func NewUserAdminResponse(params NewUserAdminResponseParams) *UserAdminResponse {
-	return &UserAdminResponse{
+func NewUserResponse(params NewUserResponseParams) *UserResponse {
+	return &UserResponse{
 		ID:          params.User.EntUser.ID,
 		Name:        params.User.EntUser.Name,
 		Email:       params.User.EntUser.Email,

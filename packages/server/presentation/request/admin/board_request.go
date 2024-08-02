@@ -1,6 +1,6 @@
-package request
+package request_admin
 
-type BoardAdminFindAllRequest struct {
+type BoardFindAllRequest struct {
 	Limit   int     `form:"limit"`
 	Offset  int     `form:"offset"`
 	Order   *string `form:"order"`
@@ -9,7 +9,7 @@ type BoardAdminFindAllRequest struct {
 	Status  *int    `form:"status"`
 }
 
-type BoardAdminUpdateRequest struct {
+type BoardUpdateRequest struct {
 	Title        string  `json:"title,omitempty"`
 	Description  *string `json:"description,omitempty"`
 	Status       int     `json:"status,omitempty"`

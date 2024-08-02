@@ -1,31 +1,31 @@
-package controller
+package controller_admin
 
 import (
 	"context"
 	"net/http"
-	"server/application/service"
-	"server/presentation/request"
+	service_admin "server/application/service/admin"
+	request_admin "server/presentation/request/admin"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
-type ContactAdminController struct {
-	contactAdminApplicationService *service.ContactAdminApplicationService
+type ContactController struct {
+	contactApplicationService *service_admin.ContactApplicationService
 }
 
-func NewContactAdminController(contactAdminApplicationService *service.ContactAdminApplicationService) *ContactAdminController {
-	return &ContactAdminController{contactAdminApplicationService: contactAdminApplicationService}
+func NewContactController(contactApplicationService *service_admin.ContactApplicationService) *ContactController {
+	return &ContactController{contactApplicationService: contactApplicationService}
 }
 
-func (ctrl *ContactAdminController) FindByID(ctx *gin.Context) {
+func (ctrl *ContactController) FindByID(ctx *gin.Context) {
 	contactID, err := strconv.Atoi(ctx.Param("contactID"))
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	dto, err := ctrl.contactAdminApplicationService.FindByID(service.ContactAdminApplicationServiceFindByIDParams{
+	dto, err := ctrl.contactApplicationService.FindByID(service_admin.ContactApplicationServiceFindByIDParams{
 		Ctx:       context.Background(),
 		ContactID: contactID,
 	})
@@ -37,8 +37,8 @@ func (ctrl *ContactAdminController) FindByID(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, dto)
 }
 
-func (ctrl *ContactAdminController) FindAll(ctx *gin.Context) {
-	var qs request.ContactAdminFindAllRequest
+func (ctrl *ContactController) FindAll(ctx *gin.Context) {
+	var qs request_admin.ContactFindAllRequest
 
 	if err := ctx.ShouldBindQuery(&qs); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -48,7 +48,7 @@ func (ctrl *ContactAdminController) FindAll(ctx *gin.Context) {
 	qs.Limit = ctx.GetInt("limit")
 	qs.Offset = ctx.GetInt("offset")
 
-	dto, err := ctrl.contactAdminApplicationService.FindAll(service.ContactAdminApplicationServiceFindAllParams{
+	dto, err := ctrl.contactApplicationService.FindAll(service_admin.ContactApplicationServiceFindAllParams{
 		Ctx: context.Background(),
 		Qs:  qs,
 	})
@@ -60,8 +60,8 @@ func (ctrl *ContactAdminController) FindAll(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, dto)
 }
 
-func (ctrl *ContactAdminController) Update(ctx *gin.Context) {
-	var body request.ContactAdminUpdateRequest
+func (ctrl *ContactController) Update(ctx *gin.Context) {
+	var body request_admin.ContactUpdateRequest
 
 	ContactID, err := strconv.Atoi(ctx.Param("contactID"))
 	if err != nil {
@@ -74,7 +74,7 @@ func (ctrl *ContactAdminController) Update(ctx *gin.Context) {
 		return
 	}
 
-	dto, err := ctrl.contactAdminApplicationService.Update(service.ContactAdminApplicationServiceUpdateParams{
+	dto, err := ctrl.contactApplicationService.Update(service_admin.ContactApplicationServiceUpdateParams{
 		Ctx:       context.Background(),
 		ContactID: ContactID,
 		Body:      body,

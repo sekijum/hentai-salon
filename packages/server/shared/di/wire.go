@@ -5,12 +5,15 @@ package di
 
 import (
 	"server/application/service"
+	service_admin "server/application/service/admin"
 	"server/infrastructure/aws"
 	"server/infrastructure/datasource"
+	datasource_admin "server/infrastructure/datasource/admin"
 	"server/infrastructure/ent"
 	"server/infrastructure/mailpit"
 	"server/infrastructure/minio"
 	"server/presentation/controller"
+	controller_admin "server/presentation/controller/admin"
 
 	"github.com/google/wire"
 )
@@ -30,12 +33,12 @@ var controllerSet = wire.NewSet(
 	controller.NewThreadCommentController,
 	controller.NewTagController,
 	controller.NewStorageController,
-	controller.NewUserAdminController,
-	controller.NewBoardAdminController,
-	controller.NewThreadAdminController,
+	controller_admin.NewUserController,
+	controller_admin.NewBoardController,
+	controller_admin.NewThreadController,
 	controller.NewContactController,
-	controller.NewContactAdminController,
-	controller.NewThreadCommentAdminController,
+	controller_admin.NewContactController,
+	controller_admin.NewThreadCommentController,
 )
 
 var serviceSet = wire.NewSet(
@@ -45,12 +48,12 @@ var serviceSet = wire.NewSet(
 	service.NewThreadCommentApplicationService,
 	service.NewTagApplicationService,
 	service.NewStorageApplicationService,
-	service.NewUserAdminApplicationService,
-	service.NewBoardAdminApplicationService,
-	service.NewThreadAdminApplicationService,
+	service_admin.NewUserApplicationService,
+	service_admin.NewBoardApplicationService,
+	service_admin.NewThreadApplicationService,
 	service.NewContactApplicationService,
-	service.NewContactAdminApplicationService,
-	service.NewThreadCommentAdminApplicationService,
+	service_admin.NewContactApplicationService,
+	service_admin.NewThreadCommentApplicationService,
 )
 
 var datasourceSet = wire.NewSet(
@@ -59,12 +62,12 @@ var datasourceSet = wire.NewSet(
 	datasource.NewThreadDatasource,
 	datasource.NewThreadCommentDatasource,
 	datasource.NewTagDatasource,
-	datasource.NewUserAdminDatasource,
-	datasource.NewBoardAdminDatasource,
-	datasource.NewThreadAdminDatasource,
+	datasource_admin.NewUserDatasource,
+	datasource_admin.NewBoardDatasource,
+	datasource_admin.NewThreadDatasource,
 	datasource.NewContactDatasource,
-	datasource.NewContactAdminDatasource,
-	datasource.NewThreadCommentAdminDatasource,
+	datasource_admin.NewContactDatasource,
+	datasource_admin.NewThreadCommentDatasource,
 )
 
 type ControllersSet struct {
@@ -74,12 +77,12 @@ type ControllersSet struct {
 	ThreadCommentController      *controller.ThreadCommentController
 	TagController                *controller.TagController
 	StorageController            *controller.StorageController
-	UserAdminController          *controller.UserAdminController
-	BoardAdminController         *controller.BoardAdminController
-	ThreadAdminController        *controller.ThreadAdminController
+	UserAdminController          *controller_admin.UserController
+	BoardAdminController         *controller_admin.BoardController
+	ThreadAdminController        *controller_admin.ThreadController
 	ContactController            *controller.ContactController
-	ContactAdminController       *controller.ContactAdminController
-	ThreadCommentAdminController *controller.ThreadCommentAdminController
+	ContactAdminController       *controller_admin.ContactController
+	ThreadCommentAdminController *controller_admin.ThreadCommentController
 }
 
 func InitializeControllers() (*ControllersSet, func(), error) {

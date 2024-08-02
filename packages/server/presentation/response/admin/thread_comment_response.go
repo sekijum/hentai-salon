@@ -1,11 +1,11 @@
-package response
+package response_admin
 
 import (
 	"server/domain/model"
 	"time"
 )
 
-type ThreadCommentAdminResponse struct {
+type ThreadCommentResponse struct {
 	ID          int    `json:"id"`
 	ThreadID    int    `json:"threadId"`
 	UserID      *int   `json:"userId"`
@@ -16,15 +16,15 @@ type ThreadCommentAdminResponse struct {
 	UpdatedAt   string `json:"updatedAt"`
 }
 
-type NewThreadCommentAdminResponseParams struct {
+type NewThreadCommentResponseParams struct {
 	ThreadComment                 *model.ThreadComment
 	Limit, Offset, CommentCount   int
 	IncludeComments, IncludeBoard bool
 }
 
-func NewThreadCommentAdminResponse(params NewThreadCommentAdminResponseParams) *ThreadCommentAdminResponse {
+func NewThreadCommentResponse(params NewThreadCommentResponseParams) *ThreadCommentResponse {
 
-	return &ThreadCommentAdminResponse{
+	return &ThreadCommentResponse{
 		ID:          params.ThreadComment.EntThreadComment.ID,
 		Content:     params.ThreadComment.EntThreadComment.Content,
 		Status:      params.ThreadComment.EntThreadComment.Status,

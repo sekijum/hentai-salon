@@ -1,6 +1,6 @@
-package request
+package request_admin
 
-type UserAdminFindAllRequest struct {
+type UserFindAllRequest struct {
 	Limit   int     `form:"limit"`
 	Offset  int     `form:"offset"`
 	Order   *string `form:"order"`
@@ -9,7 +9,7 @@ type UserAdminFindAllRequest struct {
 	Role    *int    `form:"role"`
 }
 
-type UserAdminUpdateRequest struct {
+type UserUpdateRequest struct {
 	Name   string `json:"name,omitempty"`
 	Email  string `json:"email,omitempty"`
 	Role   int    `json:"role,omitempty"`

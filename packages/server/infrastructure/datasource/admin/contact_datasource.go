@@ -1,4 +1,4 @@
-package datasource
+package datasource_admin
 
 import (
 	"context"
@@ -9,21 +9,21 @@ import (
 	"time"
 )
 
-type ContactAdminDatasource struct {
+type ContactDatasource struct {
 	client *ent.Client
 }
 
-func NewContactAdminDatasource(client *ent.Client) *ContactAdminDatasource {
-	return &ContactAdminDatasource{client: client}
+func NewContactDatasource(client *ent.Client) *ContactDatasource {
+	return &ContactDatasource{client: client}
 }
 
-type ContactAdminDatasourceGetContactCountParams struct {
+type ContactDatasourceGetContactCountParams struct {
 	Ctx     context.Context
 	Keyword *string
 	Status  *int
 }
 
-func (ds *ContactAdminDatasource) GetContactCount(params ContactAdminDatasourceGetContactCountParams) (int, error) {
+func (ds *ContactDatasource) GetContactCount(params ContactDatasourceGetContactCountParams) (int, error) {
 	query := ds.client.Contact.Query()
 
 	if params.Keyword != nil && *params.Keyword != "" {
@@ -51,12 +51,12 @@ func (ds *ContactAdminDatasource) GetContactCount(params ContactAdminDatasourceG
 	return ContactCount, nil
 }
 
-type ContactAdminDatasourceFindByIDParams struct {
+type ContactDatasourceFindByIDParams struct {
 	Ctx       context.Context
 	ContactID int
 }
 
-func (ds *ContactAdminDatasource) FindByID(params ContactAdminDatasourceFindByIDParams) (*model.Contact, error) {
+func (ds *ContactDatasource) FindByID(params ContactDatasourceFindByIDParams) (*model.Contact, error) {
 	entContact, err := ds.client.Contact.Get(params.Ctx, params.ContactID)
 	if err != nil {
 		return nil, err
@@ -67,7 +67,7 @@ func (ds *ContactAdminDatasource) FindByID(params ContactAdminDatasourceFindByID
 	return Contact, nil
 }
 
-type ContactAdminDatasourceFindAllParams struct {
+type ContactDatasourceFindAllParams struct {
 	Ctx     context.Context
 	Limit   int
 	Offset  int
@@ -76,7 +76,7 @@ type ContactAdminDatasourceFindAllParams struct {
 	Keyword *string
 }
 
-func (ds *ContactAdminDatasource) FindAll(params ContactAdminDatasourceFindAllParams) ([]*model.Contact, error) {
+func (ds *ContactDatasource) FindAll(params ContactDatasourceFindAllParams) ([]*model.Contact, error) {
 	query := ds.client.Contact.Query()
 
 	sort := contact.FieldID
@@ -127,12 +127,12 @@ func (ds *ContactAdminDatasource) FindAll(params ContactAdminDatasourceFindAllPa
 	return modelContacts, nil
 }
 
-type ContactAdminDatasourceUpdateParams struct {
+type ContactDatasourceUpdateParams struct {
 	Ctx     context.Context
 	Contact *model.Contact
 }
 
-func (ds *ContactAdminDatasource) Update(params ContactAdminDatasourceUpdateParams) (*model.Contact, error) {
+func (ds *ContactDatasource) Update(params ContactDatasourceUpdateParams) (*model.Contact, error) {
 	update := ds.client.Contact.UpdateOneID(params.Contact.EntContact.ID).
 		SetStatus(params.Contact.EntContact.Status)
 

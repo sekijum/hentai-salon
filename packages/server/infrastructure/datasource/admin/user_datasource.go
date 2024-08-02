@@ -1,4 +1,4 @@
-package datasource
+package datasource_admin
 
 import (
 	"context"
@@ -9,20 +9,20 @@ import (
 	"time"
 )
 
-type UserAdminDatasource struct {
+type UserDatasource struct {
 	client *ent.Client
 }
 
-func NewUserAdminDatasource(client *ent.Client) *UserAdminDatasource {
-	return &UserAdminDatasource{client: client}
+func NewUserDatasource(client *ent.Client) *UserDatasource {
+	return &UserDatasource{client: client}
 }
 
-type UserAdminDatasourceGetUserCountParams struct {
+type UserDatasourceGetUserCountParams struct {
 	Ctx     context.Context
 	Keyword *string
 }
 
-func (ds *UserAdminDatasource) GetUserCount(params UserAdminDatasourceGetUserCountParams) (int, error) {
+func (ds *UserDatasource) GetUserCount(params UserDatasourceGetUserCountParams) (int, error) {
 	query := ds.client.User.Query()
 
 	if params.Keyword != nil && *params.Keyword != "" {
@@ -54,12 +54,12 @@ func (ds *UserAdminDatasource) GetUserCount(params UserAdminDatasourceGetUserCou
 	return userCount, nil
 }
 
-type UserAdminDatasourceFindByIDParams struct {
+type UserDatasourceFindByIDParams struct {
 	Ctx    context.Context
 	UserID int
 }
 
-func (ds *UserAdminDatasource) FindByID(params UserAdminDatasourceFindByIDParams) (*model.User, error) {
+func (ds *UserDatasource) FindByID(params UserDatasourceFindByIDParams) (*model.User, error) {
 	entUser, err := ds.client.User.Get(params.Ctx, params.UserID)
 	if err != nil {
 		if ent.IsNotFound(err) {
@@ -72,7 +72,7 @@ func (ds *UserAdminDatasource) FindByID(params UserAdminDatasourceFindByIDParams
 	return user, nil
 }
 
-type UserAdminDatasourceFindAllParams struct {
+type UserDatasourceFindAllParams struct {
 	Ctx     context.Context
 	Limit   int
 	Offset  int
@@ -81,7 +81,7 @@ type UserAdminDatasourceFindAllParams struct {
 	Keyword *string
 }
 
-func (ds *UserAdminDatasource) FindAll(params UserAdminDatasourceFindAllParams) ([]*model.User, error) {
+func (ds *UserDatasource) FindAll(params UserDatasourceFindAllParams) ([]*model.User, error) {
 	query := ds.client.User.Query()
 
 	sort := user.FieldID
@@ -138,12 +138,12 @@ func (ds *UserAdminDatasource) FindAll(params UserAdminDatasourceFindAllParams) 
 	return modelUsers, nil
 }
 
-type UserAdminDatasourceUpdateParams struct {
+type UserDatasourceUpdateParams struct {
 	Ctx  context.Context
 	User model.User
 }
 
-func (ds *UserAdminDatasource) Update(params UserAdminDatasourceUpdateParams) (*model.User, error) {
+func (ds *UserDatasource) Update(params UserDatasourceUpdateParams) (*model.User, error) {
 	update := ds.client.User.UpdateOneID(params.User.EntUser.ID)
 
 	update = update.

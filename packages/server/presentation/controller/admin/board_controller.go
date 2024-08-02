@@ -1,31 +1,31 @@
-package controller
+package controller_admin
 
 import (
 	"context"
 	"net/http"
-	"server/application/service"
-	"server/presentation/request"
+	service_admin "server/application/service/admin"
+	request_admin "server/presentation/request/admin"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
-type BoardAdminController struct {
-	boardAdminApplicationService *service.BoardAdminApplicationService
+type BoardController struct {
+	boardApplicationService *service_admin.BoardApplicationService
 }
 
-func NewBoardAdminController(boardAdminApplicationService *service.BoardAdminApplicationService) *BoardAdminController {
-	return &BoardAdminController{boardAdminApplicationService: boardAdminApplicationService}
+func NewBoardController(boardApplicationService *service_admin.BoardApplicationService) *BoardController {
+	return &BoardController{boardApplicationService: boardApplicationService}
 }
 
-func (ctrl *BoardAdminController) FindByID(ctx *gin.Context) {
+func (ctrl *BoardController) FindByID(ctx *gin.Context) {
 	boardID, err := strconv.Atoi(ctx.Param("boardID"))
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	dto, err := ctrl.boardAdminApplicationService.FindByID(service.BoardAdminApplicationServiceFindByIDParams{
+	dto, err := ctrl.boardApplicationService.FindByID(service_admin.BoardApplicationServiceFindByIDParams{
 		Ctx:     context.Background(),
 		BoardID: boardID,
 	})
@@ -37,8 +37,8 @@ func (ctrl *BoardAdminController) FindByID(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, dto)
 }
 
-func (ctrl *BoardAdminController) FindAll(ctx *gin.Context) {
-	var qs request.BoardAdminFindAllRequest
+func (ctrl *BoardController) FindAll(ctx *gin.Context) {
+	var qs request_admin.BoardFindAllRequest
 
 	if err := ctx.ShouldBindQuery(&qs); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -48,7 +48,7 @@ func (ctrl *BoardAdminController) FindAll(ctx *gin.Context) {
 	qs.Limit = ctx.GetInt("limit")
 	qs.Offset = ctx.GetInt("offset")
 
-	dto, err := ctrl.boardAdminApplicationService.FindAll(service.BoardAdminApplicationServiceFindAllParams{
+	dto, err := ctrl.boardApplicationService.FindAll(service_admin.BoardApplicationServiceFindAllParams{
 		Ctx: context.Background(),
 		Qs:  qs,
 	})
@@ -60,8 +60,8 @@ func (ctrl *BoardAdminController) FindAll(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, dto)
 }
 
-func (ctrl *BoardAdminController) Update(ctx *gin.Context) {
-	var body request.BoardAdminUpdateRequest
+func (ctrl *BoardController) Update(ctx *gin.Context) {
+	var body request_admin.BoardUpdateRequest
 
 	boardID, err := strconv.Atoi(ctx.Param("boardID"))
 	if err != nil {
@@ -74,7 +74,7 @@ func (ctrl *BoardAdminController) Update(ctx *gin.Context) {
 		return
 	}
 
-	dto, err := ctrl.boardAdminApplicationService.Update(service.BoardAdminApplicationServiceUpdateParams{
+	dto, err := ctrl.boardApplicationService.Update(service_admin.BoardApplicationServiceUpdateParams{
 		Ctx:     context.Background(),
 		BoardID: boardID,
 		Body:    body,

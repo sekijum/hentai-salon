@@ -1,4 +1,4 @@
-package datasource
+package datasource_admin
 
 import (
 	"context"
@@ -9,21 +9,21 @@ import (
 	"time"
 )
 
-type BoardAdminDatasource struct {
+type BoardDatasource struct {
 	client *ent.Client
 }
 
-func NewBoardAdminDatasource(client *ent.Client) *BoardAdminDatasource {
-	return &BoardAdminDatasource{client: client}
+func NewBoardDatasource(client *ent.Client) *BoardDatasource {
+	return &BoardDatasource{client: client}
 }
 
-type BoardAdminDatasourceGetBoardCountParams struct {
+type BoardDatasourceGetBoardCountParams struct {
 	Ctx     context.Context
 	Keyword *string
 	Status  *int
 }
 
-func (ds *BoardAdminDatasource) GetBoardCount(params BoardAdminDatasourceGetBoardCountParams) (int, error) {
+func (ds *BoardDatasource) GetBoardCount(params BoardDatasourceGetBoardCountParams) (int, error) {
 	query := ds.client.Board.Query()
 
 	if params.Keyword != nil && *params.Keyword != "" {
@@ -50,12 +50,12 @@ func (ds *BoardAdminDatasource) GetBoardCount(params BoardAdminDatasourceGetBoar
 	return boardCount, nil
 }
 
-type BoardAdminDatasourceFindByIDParams struct {
+type BoardDatasourceFindByIDParams struct {
 	Ctx     context.Context
 	BoardID int
 }
 
-func (ds *BoardAdminDatasource) FindByID(params BoardAdminDatasourceFindByIDParams) (*model.Board, error) {
+func (ds *BoardDatasource) FindByID(params BoardDatasourceFindByIDParams) (*model.Board, error) {
 	entBoard, err := ds.client.Board.Get(params.Ctx, params.BoardID)
 	if err != nil {
 		return nil, err
@@ -66,7 +66,7 @@ func (ds *BoardAdminDatasource) FindByID(params BoardAdminDatasourceFindByIDPara
 	return board, nil
 }
 
-type BoardAdminDatasourceFindAllParams struct {
+type BoardDatasourceFindAllParams struct {
 	Ctx     context.Context
 	Limit   int
 	Offset  int
@@ -76,7 +76,7 @@ type BoardAdminDatasourceFindAllParams struct {
 	Status  *int
 }
 
-func (ds *BoardAdminDatasource) FindAll(params BoardAdminDatasourceFindAllParams) ([]*model.Board, error) {
+func (ds *BoardDatasource) FindAll(params BoardDatasourceFindAllParams) ([]*model.Board, error) {
 	query := ds.client.Board.Query()
 
 	sort := board.FieldID
@@ -128,12 +128,12 @@ func (ds *BoardAdminDatasource) FindAll(params BoardAdminDatasourceFindAllParams
 	return modelBoards, nil
 }
 
-type BoardAdminDatasourceUpdateParams struct {
+type BoardDatasourceUpdateParams struct {
 	Ctx   context.Context
 	Board *model.Board
 }
 
-func (ds *BoardAdminDatasource) Update(params BoardAdminDatasourceUpdateParams) (*model.Board, error) {
+func (ds *BoardDatasource) Update(params BoardDatasourceUpdateParams) (*model.Board, error) {
 	update := ds.client.Board.UpdateOneID(params.Board.EntBoard.ID)
 
 	update = update.SetTitle(params.Board.EntBoard.Title).
