@@ -63,7 +63,9 @@
         </v-col>
         <v-col cols="6">
           <template v-if="canCommentState || payload.isLoggedIn">
-            <v-btn type="submit" class="submit-button" block :disabled="!meta?.valid">書き込みをする</v-btn>
+            <v-btn type="submit" class="submit-button" block :disabled="!meta?.valid" color="primary">
+              書き込みをする
+            </v-btn>
           </template>
           <template v-else>
             <v-btn type="submit" class="submit-button" block disabled>

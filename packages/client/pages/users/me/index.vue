@@ -169,7 +169,7 @@ async function update() {
   }
 }
 
-async function updatePassword() {
+async function updatePassword(_, { resetForm }: { resetForm: () => void }) {
   if (confirm('パスワードを更新しますか？')) {
     try {
       await $api.patch('/users/me/password', {
@@ -178,6 +178,7 @@ async function updatePassword() {
       });
       alert('パスワードを更新しました。');
       fetchUser();
+      resetForm();
     } catch (err) {
       alert('通信中にエラーが発生しました');
     }

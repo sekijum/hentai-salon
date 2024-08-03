@@ -19,7 +19,10 @@ type ThreadCommentDatasourceDeleteParams struct {
 }
 
 func (ds *ThreadCommentDatasource) Delete(params ThreadCommentDatasourceDeleteParams) error {
-	err := ds.client.ThreadComment.DeleteOneID(params.CommentID).Exec(params.Ctx)
+	err := ds.client.
+		ThreadComment.
+		DeleteOneID(params.CommentID).
+		Exec(params.Ctx)
 	if err != nil {
 		return err
 	}

@@ -30,7 +30,9 @@ type ThreadDatasourceFindAllParams struct {
 }
 
 func (ds *ThreadDatasource) FindAll(params ThreadDatasourceFindAllParams) ([]*model.Thread, error) {
-	q := ds.client.Thread.Query().
+	q := ds.client.
+		Thread.
+		Query().
 		Where(thread.HasBoardWith(board.StatusEQ(0))).
 		WithBoard()
 
@@ -122,7 +124,9 @@ type ThreadDatasourceGetThreadCommentCountParams struct {
 }
 
 func (ds *ThreadDatasource) GetThreadCommentCount(params ThreadDatasourceGetThreadCommentCountParams) (int, error) {
-	q := ds.client.Thread.Query().
+	q := ds.client.
+		Thread.
+		Query().
 		Where(thread.ID(params.ThreadID)).
 		QueryComments()
 
@@ -155,7 +159,9 @@ type ThreadDatasourceFindByIDParams struct {
 }
 
 func (ds *ThreadDatasource) FindByID(params ThreadDatasourceFindByIDParams) (*model.Thread, error) {
-	entThread, err := ds.client.Thread.Query().
+	entThread, err := ds.client.
+		Thread.
+		Query().
 		Where(thread.ID(params.ThreadID)).
 		Where(thread.HasBoardWith(board.StatusEQ(0))).
 		WithComments(func(q *ent.ThreadCommentQuery) {
@@ -210,7 +216,9 @@ type ThreadDatasourceUpdateParams struct {
 }
 
 func (ds *ThreadDatasource) Update(params ThreadDatasourceUpdateParams) (*model.Thread, error) {
-	update := ds.client.Thread.UpdateOneID(params.Thread.EntThread.ID)
+	update := ds.client.
+		Thread.
+		UpdateOneID(params.Thread.EntThread.ID)
 
 	update.
 		SetTitle(params.Thread.EntThread.Title).
@@ -243,7 +251,9 @@ type ThreadDatasourceUpdateStatusParams struct {
 }
 
 func (ds *ThreadDatasource) UpdateStatus(params ThreadDatasourceUpdateStatusParams) (*model.Thread, error) {
-	update := ds.client.Thread.UpdateOneID(params.Thread.EntThread.ID)
+	update := ds.client.
+		Thread.
+		UpdateOneID(params.Thread.EntThread.ID)
 
 	update.
 		SetStatus(params.Thread.EntThread.Status).

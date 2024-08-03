@@ -23,31 +23,31 @@ type UserDatasourceGetUserCountParams struct {
 }
 
 func (ds *UserDatasource) GetUserCount(params UserDatasourceGetUserCountParams) (int, error) {
-	query := ds.client.User.Query()
+	q := ds.client.User.Query()
 
 	if params.Keyword != nil && *params.Keyword != "" {
 		switch {
 		case len(*params.Keyword) > 4 && (*params.Keyword)[:5] == "role:":
 			if role, err := strconv.Atoi((*params.Keyword)[5:]); err == nil {
-				query = query.Where(user.RoleEQ(role))
+				q = q.Where(user.RoleEQ(role))
 			}
 		case len(*params.Keyword) > 7 && (*params.Keyword)[:7] == "status:":
 			if status, err := strconv.Atoi((*params.Keyword)[7:]); err == nil {
-				query = query.Where(user.StatusEQ(status))
+				q = q.Where(user.StatusEQ(status))
 			}
 		case len(*params.Keyword) > 3 && (*params.Keyword)[:3] == "id:":
 			if id, err := strconv.Atoi((*params.Keyword)[3:]); err == nil {
-				query = query.Where(user.IDEQ(id))
+				q = q.Where(user.IDEQ(id))
 			}
 		default:
-			query = query.Where(user.Or(
+			q = q.Where(user.Or(
 				user.NameContainsFold(*params.Keyword),
 				user.EmailContainsFold(*params.Keyword),
 			))
 		}
 	}
 
-	userCount, err := query.Count(params.Ctx)
+	userCount, err := q.Count(params.Ctx)
 	if err != nil {
 		return 0, err
 	}
@@ -60,7 +60,9 @@ type UserDatasourceFindByIDParams struct {
 }
 
 func (ds *UserDatasource) FindByID(params UserDatasourceFindByIDParams) (*model.User, error) {
-	entUser, err := ds.client.User.Get(params.Ctx, params.UserID)
+	entUser, err := ds.client.
+		User.
+		Get(params.Ctx, params.UserID)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return nil, err
@@ -82,7 +84,7 @@ type UserDatasourceFindAllParams struct {
 }
 
 func (ds *UserDatasource) FindAll(params UserDatasourceFindAllParams) ([]*model.User, error) {
-	query := ds.client.User.Query()
+	q := ds.client.User.Query()
 
 	sort := user.FieldID
 	order := "desc"
@@ -95,37 +97,37 @@ func (ds *UserDatasource) FindAll(params UserDatasourceFindAllParams) ([]*model.
 	}
 
 	if order == "asc" {
-		query = query.Order(ent.Asc(sort))
+		q = q.Order(ent.Asc(sort))
 	} else {
-		query = query.Order(ent.Desc(sort))
+		q = q.Order(ent.Desc(sort))
 	}
 
 	if params.Keyword != nil && *params.Keyword != "" {
 		switch {
 		case len(*params.Keyword) > 4 && (*params.Keyword)[:5] == "role:":
 			if role, err := strconv.Atoi((*params.Keyword)[5:]); err == nil {
-				query = query.Where(user.RoleEQ(role))
+				q = q.Where(user.RoleEQ(role))
 			}
 		case len(*params.Keyword) > 7 && (*params.Keyword)[:7] == "status:":
 			if status, err := strconv.Atoi((*params.Keyword)[7:]); err == nil {
-				query = query.Where(user.StatusEQ(status))
+				q = q.Where(user.StatusEQ(status))
 			}
 		case len(*params.Keyword) > 3 && (*params.Keyword)[:3] == "id:":
 			if id, err := strconv.Atoi((*params.Keyword)[3:]); err == nil {
-				query = query.Where(user.IDEQ(id))
+				q = q.Where(user.IDEQ(id))
 			}
 		default:
-			query = query.Where(user.Or(
+			q = q.Where(user.Or(
 				user.NameContainsFold(*params.Keyword),
 				user.EmailContainsFold(*params.Keyword),
 			))
 		}
 	}
 
-	query = query.Limit(params.Limit)
-	query = query.Offset(params.Offset)
+	q = q.Limit(params.Limit)
+	q = q.Offset(params.Offset)
 
-	entUserList, err := query.All(params.Ctx)
+	entUserList, err := q.All(params.Ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -144,16 +146,18 @@ type UserDatasourceUpdateParams struct {
 }
 
 func (ds *UserDatasource) Update(params UserDatasourceUpdateParams) (*model.User, error) {
-	update := ds.client.User.UpdateOneID(params.User.EntUser.ID)
+	q := ds.client.
+		User.
+		UpdateOneID(params.User.EntUser.ID)
 
-	update = update.
+	q = q.
 		SetName(params.User.EntUser.Name).
 		SetEmail(params.User.EntUser.Email).
 		SetRole(params.User.EntUser.Role).
 		SetStatus(params.User.EntUser.Status).
 		SetUpdatedAt(time.Now())
 
-	entUser, err := update.Save(params.Ctx)
+	entUser, err := q.Save(params.Ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -171,13 +175,13 @@ type UserDatasourceUpdateStatusParams struct {
 }
 
 func (ds *UserDatasource) UpdateStatus(params UserDatasourceUpdateStatusParams) (*model.User, error) {
-	update := ds.client.User.UpdateOneID(params.User.EntUser.ID)
+	q := ds.client.User.UpdateOneID(params.User.EntUser.ID)
 
-	update = update.
+	q = q.
 		SetStatus(params.User.EntUser.Status).
 		SetUpdatedAt(time.Now())
 
-	entUser, err := update.Save(params.Ctx)
+	entUser, err := q.Save(params.Ctx)
 	if err != nil {
 		return nil, err
 	}

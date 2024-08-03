@@ -203,7 +203,7 @@ func (svc *UserApplicationService) GetAuthenticatedUser(params UserApplicationGe
 			UserID: userID,
 		})
 		if err != nil {
-			return nil, errors.New("ユーザーの取得に失敗しました")
+			return nil, err
 		}
 
 		dto := response.NewUserResponse(response.NewUserResponseParams{User: user})

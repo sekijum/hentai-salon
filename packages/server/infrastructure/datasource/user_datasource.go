@@ -28,7 +28,9 @@ type UserDatasourceFindByIDParams struct {
 }
 
 func (ds *UserDatasource) FindByID(params UserDatasourceFindByIDParams) (*model.User, error) {
-	entUser, err := ds.client.User.Query().
+	entUser, err := ds.client.
+		User.
+		Query().
 		Where(user.ID(params.UserID)).
 		Where(user.StatusEQ(0)).
 		WithComments(func(q *ent.ThreadCommentQuery) {
@@ -60,7 +62,11 @@ type UserDatasourceIsEmailDuplicatedParams struct {
 }
 
 func (ds *UserDatasource) IsEmailDuplicated(params UserDatasourceIsEmailDuplicatedParams) (bool, error) {
-	q := ds.client.User.Query().Where(user.EmailEQ(params.Email))
+	q := ds.client.
+		User.
+		Query().
+		Where(user.EmailEQ(params.Email)).
+		Where(user.StatusEQ(0))
 	if params.ExcludeID != nil {
 		q = q.Where(user.IDNEQ(*params.ExcludeID))
 	}
@@ -82,7 +88,12 @@ type UserDatasourceFindByEmailParams struct {
 }
 
 func (ds *UserDatasource) FindByEmail(params UserDatasourceFindByEmailParams) (*model.User, error) {
-	entUser, err := ds.client.User.Query().Where(user.EmailEQ(params.Email)).Only(params.Ctx)
+	entUser, err := ds.client.
+		User.
+		Query().
+		Where(user.EmailEQ(params.Email)).
+		Where(user.StatusEQ(0)).
+		Only(params.Ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return nil, nil
@@ -133,31 +144,18 @@ type UserDatasourceUpdateParams struct {
 }
 
 func (ds *UserDatasource) Update(params UserDatasourceUpdateParams) (*model.User, error) {
-	entUser, err := ds.client.User.Get(params.Ctx, params.User.EntUser.ID)
-	if err != nil {
-		return nil, err
-	}
+	q := ds.client.User.UpdateOneID(params.User.EntUser.ID)
 
-	update := entUser.Update()
-
-	if params.User.EntUser.Name != "" {
-		update.SetName(params.User.EntUser.Name)
-	}
-	if params.User.EntUser.Email != "" {
-		update.SetEmail(params.User.EntUser.Email)
-	}
-	if params.User.EntUser.Password != "" {
-		update.SetPassword(params.User.EntUser.Password)
-	}
+	q = q.
+		SetName(params.User.EntUser.Name).
+		SetEmail(params.User.EntUser.Email).
+		SetStatus(params.User.EntUser.Status).
+		SetUpdatedAt(time.Now())
 	if params.User.EntUser.ProfileLink != nil {
-		update.SetProfileLink(*params.User.EntUser.ProfileLink)
+		q.SetProfileLink(*params.User.EntUser.ProfileLink)
 	}
-	if params.User.EntUser.Status != 0 {
-		update.SetStatus(params.User.EntUser.Status)
-	}
-	update.SetUpdatedAt(time.Now())
 
-	entUser, err = update.Save(params.Ctx)
+	entUser, err := q.Save(params.Ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -197,10 +195,15 @@ type UserDatasourceFindLikedThreadsParams struct {
 }
 
 func (ds *UserDatasource) FindLikedThreads(params UserDatasourceFindLikedThreadsParams) ([]*model.Thread, error) {
-	entUser, err := ds.client.User.Query().
+	entUser, err := ds.client.
+		User.
+		Query().
 		Where(user.ID(params.UserID)).
+		Where(user.StatusEQ(0)).
 		WithLikedThreads(func(q *ent.ThreadQuery) {
-			q.WithTags().WithBoard().WithComments().
+			q.WithTags().
+				WithBoard().
+				WithComments().
 				Order(func(s *sql.Selector) {
 					s.OrderBy(sql.Desc(userthreadlike.FieldLikedAt))
 				}).
@@ -227,14 +230,21 @@ type UserDatasourceFindLikedCommentsParams struct {
 }
 
 func (ds *UserDatasource) FindLikedComments(params UserDatasourceFindLikedCommentsParams) ([]*model.ThreadComment, error) {
-	entUser, err := ds.client.User.Query().
+	entUser, err := ds.client.
+		User.
+		Query().
 		Where(user.ID(params.UserID)).
+		Where(user.StatusEQ(0)).
 		WithLikedComments(func(q *ent.ThreadCommentQuery) {
-			q.WithReplies().WithAttachments().WithThread().WithLikedUsers().
+			q.WithReplies().
+				WithAttachments().
+				WithThread().
+				WithLikedUsers().
 				Order(func(s *sql.Selector) {
 					s.OrderBy(sql.Desc(userthreadlike.FieldLikedAt))
 				}).
-				Limit(params.Limit).Offset(params.Offset)
+				Limit(params.Limit).
+				Offset(params.Offset)
 		}).
 		Only(params.Ctx)
 	if err != nil {
@@ -257,10 +267,15 @@ type UserDatasourceFindThreadsParams struct {
 }
 
 func (ds *UserDatasource) FindThreads(params UserDatasourceFindThreadsParams) ([]*model.Thread, error) {
-	entUser, err := ds.client.User.Query().
+	entUser, err := ds.client.
+		User.
+		Query().
 		Where(user.ID(params.UserID)).
+		Where(user.StatusEQ(0)).
 		WithThreads(func(q *ent.ThreadQuery) {
-			q.WithTags().WithBoard().WithComments()
+			q.WithTags().
+				WithBoard().
+				WithComments()
 			q.Limit(params.Limit).Offset(params.Offset).
 				WithComments(func(q *ent.ThreadCommentQuery) {
 					q.Select(threadcomment.FieldID)
@@ -287,11 +302,20 @@ type UserDatasourceFindUserCommentsParams struct {
 }
 
 func (ds *UserDatasource) FindUserComments(params UserDatasourceFindUserCommentsParams) ([]*model.ThreadComment, error) {
-	entUser, err := ds.client.User.Query().
+	entUser, err := ds.client.
+		User.
+		Query().
 		Where(user.ID(params.UserID)).
+		Where(user.StatusEQ(0)).
 		WithComments(func(q *ent.ThreadCommentQuery) {
-			q.WithThread().WithAuthor().WithAttachments().WithParentComment().WithReplies().WithLikedUsers().
-				Limit(params.Limit).Offset(params.Offset).
+			q.WithThread().
+				WithAuthor().
+				WithAttachments().
+				WithParentComment().
+				WithReplies().
+				WithLikedUsers().
+				Limit(params.Limit).
+				Offset(params.Offset).
 				Order(ent.Desc(threadcomment.FieldCreatedAt))
 		}).
 		Only(params.Ctx)

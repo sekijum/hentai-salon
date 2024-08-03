@@ -20,7 +20,12 @@ type BoardDatasourceFindAllParams struct {
 }
 
 func (ds *BoardDatasource) FindAll(params BoardDatasourceFindAllParams) ([]*model.Board, error) {
-	entBoards, err := ds.client.Board.Query().WithThreads().All(params.Ctx)
+	entBoards, err := ds.client.
+		Board.
+		Query().
+		WithThreads().
+		Where(board.StatusEQ(0)).
+		All(params.Ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +44,13 @@ type BoardDatasourceFindByTitleParams struct {
 }
 
 func (ds *BoardDatasource) FindByTitle(params BoardDatasourceFindByTitleParams) ([]*model.Board, error) {
-	entBoards, err := ds.client.Board.Query().Where(board.TitleEQ(params.Title)).WithThreads().All(params.Ctx)
+	entBoards, err := ds.client.
+		Board.
+		Query().
+		Where(board.TitleEQ(params.Title)).
+		WithThreads().
+		Where(board.StatusEQ(0)).
+		All(params.Ctx)
 	if err != nil {
 		return nil, err
 	}

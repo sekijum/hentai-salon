@@ -22,7 +22,9 @@ type TagDatasourceFindAllIDsParams struct {
 }
 
 func (ds *TagDatasource) FindAllIDs(params TagDatasourceFindAllIDsParams) ([]int, error) {
-	q := ds.client.Tag.Query()
+	q := ds.client.
+		Tag.
+		Query()
 
 	if len(params.ThreadIDs) > 0 {
 		q = q.Where(tag.HasThreadsWith(thread.IDIn(params.ThreadIDs...)))
@@ -46,7 +48,11 @@ type TagDatasourceFindAllParams struct {
 }
 
 func (ds *TagDatasource) FindAll(params TagDatasourceFindAllParams) ([]*model.Tag, error) {
-	entTagList, err := ds.client.Tag.Query().WithThreads().All(params.Ctx)
+	entTagList, err := ds.client.
+		Tag.
+		Query().
+		WithThreads().
+		All(params.Ctx)
 	if err != nil {
 		return nil, err
 	}

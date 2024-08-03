@@ -29,8 +29,10 @@ type ThreadDatasourceGetThreadCountParams struct {
 }
 
 func (ds *ThreadDatasource) GetThreadCount(params ThreadDatasourceGetCommentCountParams) (int, error) {
-	q := ds.client.Thread.Query()
-
+	q := ds.client.
+		Thread.
+		Query().
+		Where(thread.StatusEQ(0))
 	if params.UserID != nil {
 		q = q.Where(thread.UserID(*params.UserID))
 	}
@@ -54,16 +56,16 @@ type ThreadDatasourceFindAllParams struct {
 }
 
 func (ds *ThreadDatasource) FindAll(params ThreadDatasourceFindAllParams) ([]*model.Thread, error) {
-	q := ds.client.Thread.Query()
-
+	q := ds.client.
+		Thread.
+		Query().
+		Where(thread.StatusEQ(0))
 	if params.UserID != 0 {
 		q = q.Where(thread.UserIDEQ(params.UserID))
 	}
-
 	if params.BoardID != 0 {
 		q = q.Where(thread.BoardIDEQ(params.BoardID))
 	}
-
 	if params.Keyword != "" {
 		q = q.Where(
 			thread.Or(
@@ -116,13 +118,16 @@ type ThreadDatasourceFindByRelatedTagParams struct {
 }
 
 func (ds *ThreadDatasource) FindByRelatedTag(params ThreadDatasourceFindByRelatedTagParams) ([]*model.Thread, error) {
-	entThreadList, err := ds.client.Thread.Query().
+	entThreadList, err := ds.client.
+		Thread.
+		Query().
 		Where(
 			thread.And(
 				thread.HasTagsWith(tag.IDIn(params.TagIDs...)),
 				thread.Not(thread.IDIn(params.ThreadIDs...)),
 			),
 		).
+		Where(thread.StatusEQ(0)).
 		Limit(params.Limit).
 		Offset(params.Offset).
 		WithTags().
@@ -151,6 +156,7 @@ type ThreadDatasourceFindByPopularityParams struct {
 
 func (ds *ThreadDatasource) FindByPopularity(params ThreadDatasourceFindByPopularityParams) ([]*model.Thread, error) {
 	entThreadList, err := ds.client.Thread.Query().
+		Where(thread.StatusEQ(0)).
 		WithTags().
 		WithBoard().
 		WithComments(func(rq *ent.ThreadCommentQuery) {
@@ -180,6 +186,7 @@ type ThreadDatasourceFindByTitleParams struct {
 func (ds *ThreadDatasource) FindByTitle(params ThreadDatasourceFindByTitleParams) ([]*model.Thread, error) {
 	entThreadList, err := ds.client.Thread.Query().
 		Where(thread.TitleEQ(params.Title)).
+		Where(thread.StatusEQ(0)).
 		WithTags().
 		WithComments().
 		All(params.Ctx)
@@ -208,8 +215,11 @@ func (ds *ThreadDatasource) FindById(params ThreadDatasourceFindByIDParams) (*mo
 		orderFunc = ent.Asc
 	}
 
-	entThread, err := ds.client.Thread.Query().
+	entThread, err := ds.client.
+		Thread.
+		Query().
 		Where(thread.IDEQ(params.ThreadID)).
+		Where(thread.StatusEQ(0)).
 		WithTags().
 		WithBoard().
 		WithComments(func(q *ent.ThreadCommentQuery) {
@@ -244,7 +254,9 @@ type ThreadDatasourceCreateTxParams struct {
 }
 
 func (ds *ThreadDatasource) CreateTx(params ThreadDatasourceCreateTxParams) (*model.Thread, error) {
-	q := params.Tx.Thread.Create().
+	q := params.Tx.
+		Thread.
+		Create().
 		SetTitle(params.Thread.EntThread.Title).
 		SetUserID(params.Thread.EntThread.UserID).
 		SetBoardID(params.Thread.EntThread.BoardID).
@@ -276,7 +288,9 @@ type ThreadDatasourceLikeParams struct {
 }
 
 func (ds *ThreadDatasource) Like(params ThreadDatasourceLikeParams) error {
-	_, err := ds.client.UserThreadLike.Create().
+	_, err := ds.client.
+		UserThreadLike.
+		Create().
 		SetUserID(params.UserID).
 		SetThreadID(params.ThreadID).
 		SetLikedAt(time.Now()).
@@ -293,6 +307,9 @@ type ThreadDatasourceUnlikeParams struct {
 
 func (ds *ThreadDatasource) Unlike(params ThreadDatasourceUnlikeParams) (int, error) {
 	return ds.client.UserThreadLike.Delete().
-		Where(userthreadlike.UserIDEQ(params.UserID), userthreadlike.ThreadIDEQ(params.ThreadID)).
+		Where(
+			userthreadlike.UserIDEQ(params.UserID),
+			userthreadlike.ThreadIDEQ(params.ThreadID),
+		).
 		Exec(params.Ctx)
 }

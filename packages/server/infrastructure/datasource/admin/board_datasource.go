@@ -24,26 +24,26 @@ type BoardDatasourceGetBoardCountParams struct {
 }
 
 func (ds *BoardDatasource) GetBoardCount(params BoardDatasourceGetBoardCountParams) (int, error) {
-	query := ds.client.Board.Query()
+	q := ds.client.Board.Query()
 
 	if params.Keyword != nil && *params.Keyword != "" {
 		switch {
 		case len(*params.Keyword) > 7 && (*params.Keyword)[:7] == "status:":
 			if status, err := strconv.Atoi((*params.Keyword)[7:]); err == nil {
-				query = query.Where(board.StatusEQ(status))
+				q = q.Where(board.StatusEQ(status))
 			}
 		case len(*params.Keyword) > 3 && (*params.Keyword)[:3] == "id:":
 			if id, err := strconv.Atoi((*params.Keyword)[3:]); err == nil {
-				query = query.Where(board.IDEQ(id))
+				q = q.Where(board.IDEQ(id))
 			}
 		default:
-			query = query.Where(board.Or(
+			q = q.Where(board.Or(
 				board.TitleContainsFold(*params.Keyword),
 			))
 		}
 	}
 
-	boardCount, err := query.Count(params.Ctx)
+	boardCount, err := q.Count(params.Ctx)
 	if err != nil {
 		return 0, err
 	}
@@ -56,7 +56,9 @@ type BoardDatasourceFindByIDParams struct {
 }
 
 func (ds *BoardDatasource) FindByID(params BoardDatasourceFindByIDParams) (*model.Board, error) {
-	entBoard, err := ds.client.Board.Get(params.Ctx, params.BoardID)
+	entBoard, err := ds.client.
+		Board.
+		Get(params.Ctx, params.BoardID)
 	if err != nil {
 		return nil, err
 	}
@@ -77,7 +79,7 @@ type BoardDatasourceFindAllParams struct {
 }
 
 func (ds *BoardDatasource) FindAll(params BoardDatasourceFindAllParams) ([]*model.Board, error) {
-	query := ds.client.Board.Query()
+	q := ds.client.Board.Query()
 
 	sort := board.FieldID
 	order := "desc"
@@ -90,32 +92,32 @@ func (ds *BoardDatasource) FindAll(params BoardDatasourceFindAllParams) ([]*mode
 	}
 
 	if order == "asc" {
-		query = query.Order(ent.Asc(sort))
+		q = q.Order(ent.Asc(sort))
 	} else {
-		query = query.Order(ent.Desc(sort))
+		q = q.Order(ent.Desc(sort))
 	}
 
 	if params.Keyword != nil && *params.Keyword != "" {
 		switch {
 		case len(*params.Keyword) > 7 && (*params.Keyword)[:7] == "status:":
 			if status, err := strconv.Atoi((*params.Keyword)[7:]); err == nil {
-				query = query.Where(board.StatusEQ(status))
+				q = q.Where(board.StatusEQ(status))
 			}
 		case len(*params.Keyword) > 3 && (*params.Keyword)[:3] == "id:":
 			if id, err := strconv.Atoi((*params.Keyword)[3:]); err == nil {
-				query = query.Where(board.IDEQ(id))
+				q = q.Where(board.IDEQ(id))
 			}
 		default:
-			query = query.Where(board.Or(
+			q = q.Where(board.Or(
 				board.TitleContainsFold(*params.Keyword),
 			))
 		}
 	}
 
-	query = query.Limit(params.Limit)
-	query = query.Offset(params.Offset)
+	q = q.Limit(params.Limit)
+	q = q.Offset(params.Offset)
 
-	entBoards, err := query.All(params.Ctx)
+	entBoards, err := q.All(params.Ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -134,15 +136,17 @@ type BoardDatasourceUpdateParams struct {
 }
 
 func (ds *BoardDatasource) Update(params BoardDatasourceUpdateParams) (*model.Board, error) {
-	update := ds.client.Board.UpdateOneID(params.Board.EntBoard.ID)
+	q := ds.client.
+		Board.
+		UpdateOneID(params.Board.EntBoard.ID)
 
-	update = update.SetTitle(params.Board.EntBoard.Title).
+	q = q.SetTitle(params.Board.EntBoard.Title).
 		SetDescription(*params.Board.EntBoard.Description).
 		SetThumbnailURL(*params.Board.EntBoard.ThumbnailURL).
 		SetStatus(params.Board.EntBoard.Status).
 		SetUpdatedAt(time.Now())
 
-	entBoard, err := update.Save(params.Ctx)
+	entBoard, err := q.Save(params.Ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -160,13 +164,15 @@ type BoardDatasourceUpdateStatusParams struct {
 }
 
 func (ds *BoardDatasource) UpdateStatus(params BoardDatasourceUpdateStatusParams) (*model.Board, error) {
-	update := ds.client.Board.UpdateOneID(params.Board.EntBoard.ID)
+	q := ds.client.
+		Board.
+		UpdateOneID(params.Board.EntBoard.ID)
 
-	update = update.
+	q = q.
 		SetStatus(params.Board.EntBoard.Status).
 		SetUpdatedAt(time.Now())
 
-	entBoard, err := update.Save(params.Ctx)
+	entBoard, err := q.Save(params.Ctx)
 	if err != nil {
 		return nil, err
 	}

@@ -25,7 +25,9 @@ type ThreadDatasourceGetCommentCountParams struct {
 }
 
 func (ds *ThreadCommentDatasource) GetCommentCount(params ThreadDatasourceGetCommentCountParams) (int, error) {
-	q := ds.client.ThreadComment.Query()
+	q := ds.client.
+		ThreadComment.
+		Query()
 
 	if params.ThreadID != nil {
 		q = q.Where(threadcomment.ThreadID(*params.ThreadID))
@@ -49,7 +51,9 @@ type ThreadCommentDatasourceFindByIDParams struct {
 }
 
 func (ds *ThreadCommentDatasource) FindByID(params ThreadCommentDatasourceFindByIDParams) (*model.ThreadComment, error) {
-	entComment, err := ds.client.ThreadComment.Query().
+	entComment, err := ds.client.
+		ThreadComment.
+		Query().
 		Where(threadcomment.IDEQ(params.CommentID)).
 		WithAttachments().
 		WithThread().
@@ -143,7 +147,9 @@ type ThreadCommentDatasourceLikeParams struct {
 }
 
 func (ds *ThreadCommentDatasource) Like(params ThreadCommentDatasourceLikeParams) error {
-	_, err := ds.client.UserCommentLike.Create().
+	_, err := ds.client.
+		UserCommentLike.
+		Create().
 		SetUserID(params.UserID).
 		SetCommentID(params.CommentID).
 		SetLikedAt(time.Now()).
@@ -159,6 +165,9 @@ type ThreadCommentDatasourceUnLikeParams struct {
 
 func (ds *ThreadCommentDatasource) Unlike(params ThreadCommentDatasourceUnLikeParams) (int, error) {
 	return ds.client.UserCommentLike.Delete().
-		Where(usercommentlike.UserIDEQ(params.UserID), usercommentlike.CommentIDEQ(params.CommentID)).
+		Where(
+			usercommentlike.UserIDEQ(params.UserID),
+			usercommentlike.CommentIDEQ(params.CommentID),
+		).
 		Exec(params.Ctx)
 }

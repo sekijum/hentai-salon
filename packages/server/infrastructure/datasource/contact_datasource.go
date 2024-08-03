@@ -21,7 +21,9 @@ type ContactDatasourceCreateParams struct {
 }
 
 func (ds *ContactDatasource) Create(params ContactDatasourceCreateParams) (*model.Contact, error) {
-	q := ds.client.Contact.Create().
+	q := ds.client.
+		Contact.
+		Create().
 		SetEmail(params.Contact.EntContact.Email).
 		SetSubject(params.Contact.EntContact.Subject).
 		SetMessage(params.Contact.EntContact.Message).
