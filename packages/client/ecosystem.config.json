@@ -1,7 +1,7 @@
 {
   "apps": [
     {
-      "name": "prod",
+      "name": "prd",
       "cwd": "/client",
       "script": "./build/index.js",
       "instances": "max",
