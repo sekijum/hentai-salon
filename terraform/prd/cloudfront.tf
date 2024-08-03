@@ -1,8 +1,4 @@
-data "aws_s3_bucket" "dloft_attachments_01" {
-  bucket = local.bucket_name
-}
-
-resource "aws_cloudfront_origin_access_control" "dloft_attachments_01" {
+resource "aws_cloudfront_origin_access_control" "this" {
   name                              = local.static_domain
   origin_access_control_origin_type = "s3"
   signing_behavior                  = "always"
@@ -19,7 +15,7 @@ resource "aws_cloudfront_distribution" "static" {
     max_ttl                = 31536000
     min_ttl                = 0
     smooth_streaming       = false
-    target_origin_id       = data.aws_s3_bucket.dloft_attachments_01.id
+    target_origin_id       = aws_s3_bucket.this.id
     trusted_signers        = []
     viewer_protocol_policy = "redirect-to-https"
 
@@ -35,9 +31,9 @@ resource "aws_cloudfront_distribution" "static" {
   http_version    = "http2"
 
   origin {
-    domain_name              = data.aws_s3_bucket.dloft_attachments_01.bucket_domain_name
-    origin_id                = data.aws_s3_bucket.dloft_attachments_01.id
-    origin_access_control_id = aws_cloudfront_origin_access_control.dloft_attachments_01.id
+    domain_name              = aws_s3_bucket.this.bucket_domain_name
+    origin_id                = aws_s3_bucket.this.id
+    origin_access_control_id = aws_cloudfront_origin_access_control.this.id
   }
   price_class = "PriceClass_All"
   restrictions {
@@ -52,7 +48,8 @@ resource "aws_cloudfront_distribution" "static" {
     # `https://limitusus.hatenablog.com/entry/2017/07/12/110343`
     # `https://qiita.com/tos-miyake/items/f0e5f28f2a69e4d39422`
     # acm_certificate_arn            = var.data_aws_acm_certificate_this_arn
-    acm_certificate_arn      = "arn:aws:acm:us-east-1:728047905319:certificate/9fed689c-9c33-476a-8ec0-858b7305e438"
+    # acm_certificate_arn      = "arn:aws:acm:us-east-1:728047905319:certificate/9fed689c-9c33-476a-8ec0-858b7305e438"
+    acm_certificate_arn      = aws_acm_certificate.host_domain.arn
     minimum_protocol_version = "TLSv1.2_2019"
     ssl_support_method       = "sni-only"
   }
@@ -60,15 +57,10 @@ resource "aws_cloudfront_distribution" "static" {
   wait_for_deployment = true
 }
 
-data "aws_route53_zone" "this" {
-  name         = local.host_domain
-  private_zone = false
-}
-
 resource "aws_route53_record" "static_subdomain" {
   name    = local.static_domain
   type    = "A"
-  zone_id = data.aws_route53_zone.this.zone_id
+  zone_id = aws_route53_zone.this.zone_id
   alias {
     evaluate_target_health = false
     name                   = aws_cloudfront_distribution.static.domain_name

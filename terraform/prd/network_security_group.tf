@@ -68,6 +68,37 @@ resource "aws_security_group_rule" "server_from_client" {
   source_security_group_id = aws_security_group.client.id
 }
 
+# adminer
+resource "aws_security_group" "adminer" {
+  name   = "${local.app_name}-adminer"
+  vpc_id = aws_vpc.this.id
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags = {
+    Name = "${local.app_name}-adminer"
+  }
+}
+resource "aws_security_group_rule" "adminer_from_this" {
+  security_group_id = aws_security_group.adminer.id
+  type              = "ingress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  self              = true
+}
+resource "aws_security_group_rule" "adminer_from_alb" {
+  security_group_id        = aws_security_group.adminer.id
+  type                     = "ingress"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  source_security_group_id = aws_security_group.alb.id
+}
+
 # client
 resource "aws_security_group" "client" {
   name   = "${local.app_name}-client"
@@ -120,4 +151,12 @@ resource "aws_security_group_rule" "rds_from_server" {
   to_port                  = 3306
   protocol                 = "tcp"
   source_security_group_id = aws_security_group.server.id
+}
+resource "aws_security_group_rule" "rds_from_adminer" {
+  security_group_id        = aws_security_group.rds.id
+  type                     = "ingress"
+  from_port                = 3306
+  to_port                  = 3306
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.adminer.id
 }

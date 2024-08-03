@@ -29,7 +29,7 @@ resource "aws_lb_listener" "https" {
   load_balancer_arn = aws_lb.this.arn
   port              = 443
   protocol          = "HTTPS"
-  certificate_arn   = data.aws_acm_certificate.host_domain.arn
+  certificate_arn   = aws_acm_certificate.host_domain.arn
   default_action {
     type = "fixed-response"
     fixed_response {
@@ -37,18 +37,6 @@ resource "aws_lb_listener" "https" {
       message_body = "Fixed response content"
       status_code  = "200"
     }
-  }
-}
-
-resource "aws_lb_target_group" "adminer" {
-  name                 = "${local.app_name}-adminer"
-  vpc_id               = aws_vpc.this.id
-  target_type          = "ip"
-  port                 = 8081
-  protocol             = "HTTP"
-  deregistration_delay = 60
-  health_check {
-    path = "/"
   }
 }
 
@@ -76,6 +64,18 @@ resource "aws_lb_target_group" "client" {
   }
 }
 
+resource "aws_lb_target_group" "adminer" {
+  name                 = "${local.app_name}-adminer"
+  vpc_id               = aws_vpc.this.id
+  target_type          = "ip"
+  port                 = 80
+  protocol             = "HTTP"
+  deregistration_delay = 60
+  health_check {
+    path = "/"
+  }
+}
+
 resource "aws_lb_listener_rule" "forward_server" {
   listener_arn = aws_lb_listener.https.arn
   priority     = 10
@@ -92,22 +92,6 @@ resource "aws_lb_listener_rule" "forward_server" {
   }
 }
 
-resource "aws_lb_listener_rule" "forward_adminer" {
-  listener_arn = aws_lb_listener.https.arn
-  priority     = 20
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.adminer.arn
-  }
-  condition {
-    host_header {
-      values = [
-        local.adminer_domain
-      ]
-    }
-  }
-}
-
 resource "aws_lb_listener_rule" "forward_client" {
   listener_arn = aws_lb_listener.https.arn
   priority     = 30
@@ -119,6 +103,22 @@ resource "aws_lb_listener_rule" "forward_client" {
     host_header {
       values = [
         local.client_domain
+      ]
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "forward_adminer" {
+  listener_arn = aws_lb_listener.https.arn
+  priority     = 20
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.adminer.arn
+  }
+  condition {
+    host_header {
+      values = [
+        local.adminer_domain
       ]
     }
   }

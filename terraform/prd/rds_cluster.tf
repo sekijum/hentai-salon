@@ -16,9 +16,9 @@ resource "aws_rds_cluster" "this" {
   engine                    = "aurora-mysql"
   engine_version            = "8.0.mysql_aurora.3.02.2"
   port                      = "3306"
-  database_name             = data.aws_ssm_parameter.DB_NAME.value
-  master_username           = data.aws_ssm_parameter.DB_USER.value
-  master_password           = data.aws_ssm_parameter.DB_PASS.value
+  database_name             = aws_ssm_parameter.db_name.value
+  master_username           = aws_ssm_parameter.db_user.value
+  master_password           = aws_ssm_parameter.db_pass.value
   backup_retention_period   = 7
   preferred_backup_window   = "04:00-05:00"
   deletion_protection       = true
