@@ -1,0 +1,32 @@
+services:
+  server:
+    container_name: hentai-salon-server
+    image: ${ECR_SERVER_URI}
+    platform: linux/x86_64
+    build:
+      context: .
+      dockerfile: docker/server/Dockerfile
+
+  nginx-server:
+    container_name: hentai-salon-nginx-server
+    image: ${ECR_NGINX_SERVER_URI}
+    platform: linux/x86_64
+    build:
+      context: .
+      dockerfile: docker/nginx/client/Dockerfile
+
+  client:
+    container_name: stg-bastion-nest
+    image: ${ECR_CLIENT_URI}
+    platform: linux/x86_64
+    build:
+      context: .
+      dockerfile: docker/client/Dockerfile
+
+  nginx-client:
+    container_name: hentai-salon-nginx-client
+    image: ${ECR_NGINX_CLIENT_URI}
+    platform: linux/x86_64
+    build:
+      context: .
+      dockerfile: docker/nginx/server/Dockerfile

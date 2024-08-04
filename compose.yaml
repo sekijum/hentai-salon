@@ -1,0 +1,131 @@
+services:
+  server:
+    container_name: hentai-salon-server
+    build:
+      context: .
+      dockerfile: docker/server/Dockerfile
+      target: dev
+    depends_on:
+      - mysql
+      - minio
+    volumes:
+      - ./packages/server:/server
+    networks:
+      - hentai_salon
+
+  client:
+    container_name: hentai-salon-client
+    build:
+      context: .
+      dockerfile: docker/client/Dockerfile
+      target: dev
+    restart: always
+    tty: true
+    init: true
+    depends_on:
+      - server
+    volumes:
+      - ./packages/client:/client
+    networks:
+      - hentai_salon
+
+  mysql:
+    image: mysql:8.0
+    container_name: hentai-salon-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASS}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASS}
+      TZ: 'Asia/Tokyo'
+    volumes:
+      - ./docker/db/data:/var/lib/mysql
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./docker/mysql/sql:/docker-entrypoint-initdb.d
+    ports:
+      - 3306:3306
+    restart: always
+    networks:
+      - hentai_salon
+
+  adminer:
+    image: adminer
+    container_name: hentai-salon-adminer
+    restart: always
+    depends_on:
+      - mysql
+    environment:
+      ADMINER_DEFAULT_SERVER: ${DB_HOST}
+    ports:
+      - 8081:8080
+    networks:
+      - hentai_salon
+
+  minio:
+    image: minio/minio
+    container_name: hentai-salon-minio
+    ports:
+      - 9000:9000
+      - 9001:9001
+    volumes:
+      - ./docker/minio/data:/export
+      - ./docker/minio/config:/root/.minio
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    command: server /export --console-address ":9001"
+    networks:
+      - hentai_salon
+
+  nginx-client:
+    container_name: hentai-salon-nginx-client
+    build:
+      context: .
+      dockerfile: docker/nginx/client/Dockerfile
+    ports:
+      - 3000:80
+    depends_on:
+      - client
+    networks:
+      - hentai_salon
+
+  nginx-server:
+    container_name: hentai-salon-nginx-server
+    build:
+      context: .
+      dockerfile: docker/nginx/server/Dockerfile
+    ports:
+      - 8080:80
+    depends_on:
+      - server
+    networks:
+      - hentai_salon
+
+  mailpit:
+    image: axllent/mailpit
+    container_name: hentai-salon-mailpit
+    ports:
+      - 1025:1025
+      - 8025:8025
+    networks:
+      - hentai_salon
+
+  infra:
+    container_name: infra
+    platform: linux/x86_64
+    build:
+      context: .
+      dockerfile: docker/infra/Dockerfile
+    ports:
+      - 22:22
+    volumes:
+      - ./:/infra
+      - ~/.aws:/root/.aws:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    tty: true
+    networks:
+      - hentai_salon
+
+networks:
+  hentai_salon:
+    external: true

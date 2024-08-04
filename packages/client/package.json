@@ -1,0 +1,29 @@
+{
+  "name": "nuxt-app",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "prd": "pm2-runtime start ecosystem.config.json --only prd",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "fmt": "prettier --write ./"
+  },
+  "dependencies": {
+    "@mdi/font": "^7.4.47",
+    "axios": "^1.7.2",
+    "dayjs": "^1.11.11",
+    "nuxt": "^3.12.2",
+    "vee-validate": "^4.13.2",
+    "video.js": "^8.12.0",
+    "vue": "^3.4.31",
+    "vue-gtag": "^2.0.1",
+    "yup": "^1.4.0"
+  },
+  "devDependencies": {
+    "vite-plugin-vuetify": "^2.0.3",
+    "vuetify": "^3.6.10"
+  }
+}
