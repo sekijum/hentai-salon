@@ -9,9 +9,9 @@ resource "aws_ecs_task_definition" "server" {
   container_definitions = jsonencode(
     [
       {
-        name = "server"
+        name = "app"
         essential : true
-        image        = "${aws_ecr_repository.server.repository_url}:latest"
+        image        = "${aws_ecr_repository.server_app.repository_url}:latest"
         portMappings = [{ containerPort = 8080 }]
         secrets = [
           {
@@ -23,21 +23,21 @@ resource "aws_ecs_task_definition" "server" {
           logDriver = "awslogs"
           options = {
             awslogs-region : "ap-northeast-1"
-            awslogs-group : aws_cloudwatch_log_group.server.name
+            awslogs-group : aws_cloudwatch_log_group.server_app.name
             awslogs-stream-prefix : "ecs"
           }
         }
       },
       {
-        name = "nginx-server"
+        name = "proxy"
         essential : true
-        image        = "${aws_ecr_repository.nginx_server.repository_url}:latest"
+        image        = "${aws_ecr_repository.proxy_server_proxy.repository_url}:latest"
         portMappings = [{ containerPort = 80 }]
         logConfiguration = {
           logDriver = "awslogs"
           options = {
             awslogs-region : "ap-northeast-1"
-            awslogs-group : aws_cloudwatch_log_group.nginx_server.name
+            awslogs-group : aws_cloudwatch_log_group.server_proxy.name
             awslogs-stream-prefix : "ecs"
           }
         }
@@ -57,9 +57,9 @@ resource "aws_ecs_task_definition" "client" {
   container_definitions = jsonencode(
     [
       {
-        name = "client"
+        name = "app"
         essential : true
-        image        = "${aws_ecr_repository.client.repository_url}:latest"
+        image        = "${aws_ecr_repository.client_app.repository_url}:latest"
         portMappings = [{ containerPort = 3000 }]
         secrets = [
           {
@@ -71,21 +71,21 @@ resource "aws_ecs_task_definition" "client" {
           logDriver = "awslogs"
           options = {
             awslogs-region : "ap-northeast-1"
-            awslogs-group : aws_cloudwatch_log_group.client.name
+            awslogs-group : aws_cloudwatch_log_group.client_app.name
             awslogs-stream-prefix : "ecs"
           }
         }
       },
       {
-        name = "nginx-client"
+        name = "proxy"
         essential : true
-        image        = "${aws_ecr_repository.nginx_client.repository_url}:latest"
+        image        = "${aws_ecr_repository.client_proxy.repository_url}:latest"
         portMappings = [{ containerPort = 80 }]
         logConfiguration = {
           logDriver = "awslogs"
           options = {
             awslogs-region : "ap-northeast-1"
-            awslogs-group : aws_cloudwatch_log_group.nginx_client.name
+            awslogs-group : aws_cloudwatch_log_group.client_proxy.name
             awslogs-stream-prefix : "ecs"
           }
         }

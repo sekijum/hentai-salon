@@ -1,5 +1,6 @@
 locals {
-  env = "prd"
+  env         = "prd"
+  aws_profile = "hentai-salon"
 
   app_name       = "hentai-salon-${local.env}"
   host_domain    = "hentai-salon.com"

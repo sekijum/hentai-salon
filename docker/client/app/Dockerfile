@@ -3,7 +3,7 @@ FROM node:20.15-slim as base
 ENV LANG C.UTF-8
 ENV TZ Asia/Tokyo
 ENV PORT 3000
-ENV ROOTPATH /client
+ENV ROOTPATH /app
 ENV NPM_CONFIG_PREFIX /home/node/.npm-global
 ENV PATH $PATH:/home/node/.npm-global/bin
 

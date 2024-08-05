@@ -56,4 +56,6 @@ docker/redis/*
 docker/localstack/*
 docker/minio/*
 
-terraform/prd/_terraform.tfvars
+terraform/prd/terraform.tfvars
+.github/workflows/.secrets
+**/.terraform/*

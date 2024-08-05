@@ -1,31 +1,58 @@
 services:
-  server:
-    container_name: hentai-salon-server
+  server-app:
+    container_name: hentai-salon-server-app
     build:
       context: .
-      dockerfile: docker/server/Dockerfile
+      dockerfile: docker/server/app/Dockerfile
       target: dev
     depends_on:
       - mysql
       - minio
+      - mailpit
     volumes:
-      - ./packages/server:/server
+      - ./packages/server:/app
     networks:
       - hentai_salon
 
-  client:
-    container_name: hentai-salon-client
+  server-proxy:
+    container_name: hentai-salon-server-proxy
     build:
       context: .
-      dockerfile: docker/client/Dockerfile
+      dockerfile: docker/server/proxy/Dockerfile
+    ports:
+      - 8080:80
+    depends_on:
+      - server-app
+    environment:
+      APP_HOST: server-app
+    networks:
+      - hentai_salon
+
+  client-app:
+    container_name: hentai-salon-client-app
+    build:
+      context: .
+      dockerfile: docker/client/app/Dockerfile
       target: dev
     restart: always
     tty: true
     init: true
-    depends_on:
-      - server
     volumes:
-      - ./packages/client:/client
+      - ./packages/client:/app
+    networks:
+      - hentai_salon
+      
+  client-proxy:
+    container_name: hentai-salon-client-proxy
+    build:
+      context: .
+      dockerfile: docker/client/proxy/Dockerfile
+    ports:
+      - 3000:80
+    depends_on:
+      - client-app
+    environment:
+      APP_HOST: client-app
     networks:
       - hentai_salon
 
@@ -77,30 +104,6 @@ services:
     networks:
       - hentai_salon
 
-  nginx-client:
-    container_name: hentai-salon-nginx-client
-    build:
-      context: .
-      dockerfile: docker/nginx/client/Dockerfile
-    ports:
-      - 3000:80
-    depends_on:
-      - client
-    networks:
-      - hentai_salon
-
-  nginx-server:
-    container_name: hentai-salon-nginx-server
-    build:
-      context: .
-      dockerfile: docker/nginx/server/Dockerfile
-    ports:
-      - 8080:80
-    depends_on:
-      - server
-    networks:
-      - hentai_salon
-
   mailpit:
     image: axllent/mailpit
     container_name: hentai-salon-mailpit
@@ -110,21 +113,21 @@ services:
     networks:
       - hentai_salon
 
-  infra:
-    container_name: infra
-    platform: linux/x86_64
-    build:
-      context: .
-      dockerfile: docker/infra/Dockerfile
-    ports:
-      - 22:22
-    volumes:
-      - ./:/infra
-      - ~/.aws:/root/.aws:ro
-      - /var/run/docker.sock:/var/run/docker.sock
-    tty: true
-    networks:
-      - hentai_salon
+  # infra:
+  #   container_name: infra
+  #   platform: linux/x86_64
+  #   build:
+  #     context: .
+  #     dockerfile: docker/infra/Dockerfile
+  #   ports:
+  #     - 22:22
+  #   volumes:
+  #     - ./:/infra
+  #     - ~/.aws:/root/.aws:ro
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #   tty: true
+  #   networks:
+  #     - hentai_salon
 
 networks:
   hentai_salon:

@@ -1,8 +1,8 @@
 {
-  "name": "hentai-salon-server",
+  "name": "hentai-salon-server-app",
   "dockerComposeFile": ["../../compose.yaml"],
-  "service": "server",
-  "workspaceFolder": "/server",
+  "service": "server-app",
+  "workspaceFolder": "/app",
   "shutdownAction": "stopCompose",
   "remoteUser": "root",
   "target": "dev",

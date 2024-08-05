@@ -27,9 +27,6 @@ resource "aws_ecs_service" "server" {
     container_name   = "server"
     container_port   = 80
   }
-  service_registries {
-    registry_arn = aws_service_discovery_service.this.arn
-  }
 }
 
 resource "aws_ecs_service" "client" {

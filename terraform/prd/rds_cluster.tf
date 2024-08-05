@@ -14,7 +14,7 @@ resource "aws_rds_cluster" "this" {
     aws_security_group.rds.id,
   ]
   engine                    = "aurora-mysql"
-  engine_version            = "8.0.mysql_aurora.3.02.2"
+  engine_version            = "8.0.mysql_aurora.3.07.1"
   port                      = "3306"
   database_name             = aws_ssm_parameter.db_name.value
   master_username           = aws_ssm_parameter.db_user.value

@@ -1,0 +1,173 @@
+name: 本番環境デプロイ
+
+on:
+  push:
+    paths-ignore:
+      - '**/*.md'
+    branches: ['prd']
+
+secrets:
+  TZ: 'Asia/Tokyo'
+  
+jobs:
+  deploy-server-app:
+    name: Server-Appデプロイ
+    runs-on: ubuntu-latest
+    if: github.event.head_commit.message != 'skip ci' && (contains(github.event.commits.*.modified, 'packages/server') || contains(github.event.commits.*.added, 'packages/server') || contains(github.event.commits.*.removed, 'packages/server'))
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+
+      - name: AWS認証
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: ECRログイン
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: コンテナビルド
+        run: |
+          docker-compose -f ${{ secrets.COMPOSE_FILE }} build --no-cache --build-arg BUILDKIT_INLINE_CACHE=1 hentai-salon-server-app
+
+      - name: ECRにプッシュ
+        run: |
+          docker tag hentai-salon-server-app:latest ${{ secrets.AWS_ECR_SERVER_REPO_NAME }}:latest
+          docker push ${{ secrets.AWS_ECR_SERVER_REPO_NAME }}:latest
+
+      - name: タスク定義デプロイ
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ secrets.AWS_ESC_SERVER_TASK_DEFINITION_NAME }}
+          service: ${{ secrets.AWS_ECS_SERVER_SERVICE_NAME }}
+          cluster: ${{ secrets.AWS_ECS_CLUSTER_NAME }}
+          wait-for-service-stability: true
+
+      - name: タスクID取得
+        id: get-ecs-task
+        run: |
+          ECS_TASK_ID=$(aws ecs list-tasks --cluster ${{ secrets.AWS_ECS_CLUSTER_NAME }} --service-name ${{ secrets.AWS_ECS_SERVER_SERVICE_NAME }} --query 'taskArns[0]' --output text)
+          echo "task_id=$ECS_TASK_ID" >> $GITHUB_secrets
+
+      - name: マイグレーション実行
+        run: |
+          aws ecs execute-command --task "${{ secrets.task_id }}" \
+            --cluster ${{ secrets.AWS_ECS_CLUSTER_NAME }} \
+            --container server-app \
+            --interactive \
+            --command "atlas migrate apply --dir \"file://./infrastructure/ent/migrate/migrations\" --url \"${{ secrets.DB_CONNECTION_URL }}\""
+
+  deploy-client-app:
+    name: Client-Appデプロイ
+    runs-on: ubuntu-latest
+    if: github.event.head_commit.message != 'skip ci' && (contains(github.event.commits.*.modified, 'packages/client') || contains(github.event.commits.*.added, 'packages/client') || contains(github.event.commits.*.removed, 'packages/client'))
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+
+      - name: AWS認証
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: ECRログイン
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: コンテナビルド
+        run: |
+          docker-compose -f ${{ secrets.COMPOSE_FILE }} build --no-cache --build-arg BUILDKIT_INLINE_CACHE=1 hentai-salon-client-app
+
+      - name: ECRにプッシュ
+        run: |
+          docker tag hentai-salon-client-app:latest ${{ secrets.AWS_ECR_CLIENT_REPO_NAME }}:latest
+          docker push ${{ secrets.AWS_ECR_CLIENT_REPO_NAME }}:latest
+
+      - name: タスク定義デプロイ
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ secrets.AWS_ESC_CLIENT_TASK_DEFINITION_NAME }}
+          service: ${{ secrets.AWS_ECS_CLIENT_SERVICE_NAME }}
+          cluster: ${{ secrets.AWS_ECS_CLUSTER_NAME }}
+          wait-for-service-stability: true
+
+  deploy-server-proxy:
+    name: Server-Proxyデプロイ
+    runs-on: ubuntu-latest
+    if: github.event.head_commit.message != 'skip ci' && (contains(github.event.commits.*.modified, 'docker/proxy/server') || contains(github.event.commits.*.added, 'docker/proxy/server') || contains(github.event.commits.*.removed, 'docker/proxy/server'))
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+
+      - name: AWS認証
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: ECRログイン
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: コンテナビルド
+        run: |
+          docker-compose -f ${{ secrets.COMPOSE_FILE }} build --no-cache --build-arg BUILDKIT_INLINE_CACHE=1 hentai-salon-server-proxy
+
+      - name: ECRにプッシュ
+        run: |
+          docker tag hentai-salon-server-proxy:latest ${{ secrets.AWS_ECR_SERVER_PROXY_REPO_NAME }}:latest
+          docker push ${{ secrets.AWS_ECR_SERVER_PROXY_REPO_NAME }}:latest
+
+      - name: タスク定義デプロイ
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ secrets.AWS_ESC_SERVER_PROXY_TASK_DEFINITION_NAME }}
+          service: ${{ secrets.AWS_ECS_SERVER_PROXY_SERVICE_NAME }}
+          cluster: ${{ secrets.AWS_ECS_CLUSTER_NAME }}
+          wait-for-service-stability: true
+
+  deploy-client-proxy:
+    name: Client-Proxyデプロイ
+    runs-on: ubuntu-latest
+    if: github.event.head_commit.message != 'skip ci' && (contains(github.event.commits.*.modified, 'docker/proxy/client') || contains(github.event.commits.*.added, 'docker/proxy/client') || contains(github.event.commits.*.removed, 'docker/proxy/client'))
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+
+      - name: AWS認証
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: ECRログイン
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: コンテナビルド
+        run: |
+          docker-compose -f ${{ secrets.COMPOSE_FILE }} build --no-cache --build-arg BUILDKIT_INLINE_CACHE=1 hentai-salon-client-proxy
+
+      - name: ECRにプッシュ
+        run: |
+          docker tag hentai-salon-client-proxy:latest ${{ secrets.AWS_ECR_CLIENT_PROXY_REPO_NAME }}:latest
+          docker push ${{ secrets.AWS_ECR_CLIENT_PROXY_REPO_NAME }}:latest
+
+      - name: タスク定義デプロイ
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ secrets.AWS_ESC_CLIENT_PROXY_TASK_DEFINITION_NAME }}
+          service: ${{ secrets.AWS_ECS_CLIENT_PROXY_SERVICE_NAME }}
+          cluster: ${{ secrets.AWS_ECS_CLUSTER_NAME }}
+          wait-for-service-stability: true

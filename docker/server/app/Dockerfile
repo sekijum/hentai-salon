@@ -4,7 +4,7 @@ ENV LANG C.UTF-8
 ENV TZ Asia/Tokyo
 ENV GOPATH=/go
 
-WORKDIR /server
+WORKDIR /app
 
 COPY packages/server $ROOTPATH
 
