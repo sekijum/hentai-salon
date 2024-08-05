@@ -160,6 +160,53 @@ func (svc *UserApplicationService) Signin(params UserApplicationServiceSigninPar
 		return "", errors.New("秘密鍵が設定されていません")
 	}
 
+	// 管理者の場合、メール認証を送信する
+	if user.EntUser.Role == int(model.UserRoleAdmin) {
+		verificationToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+			"userID": user.EntUser.ID,
+			"role":   user.EntUser.Role,
+			"exp":    time.Now().Add(15 * time.Minute).Unix(), // 有効期限15分
+		})
+
+		tokenString, err := verificationToken.SignedString([]byte(jwtSecretKey))
+		if err != nil {
+			return "", errors.New("認証トークンの生成に失敗しました")
+		}
+
+		verificationURL := fmt.Sprintf("%s/verify-email?token=%s", os.Getenv("CLIENT_URL"), url.QueryEscape(tokenString))
+		emailSubject := "【重要】管理者アカウントのメールアドレス確認"
+		emailBody := fmt.Sprintf(`
+		%sさん
+		
+		変態サロンをご利用いただきありがとうございます。
+		以下のリンクをクリックして、管理者アカウントのメールアドレスを確認してください。
+		
+		メールアドレスの確認
+		%s
+		
+		このリンクの有効期限は15分ですので、お早めに手続きを完了してください。
+		
+		Webページを開く
+		%s
+		
+		※このメールは返信しても届きません。`,
+			user.EntUser.Name, verificationURL, os.Getenv("CLIENT_URL"))
+
+		if os.Getenv("ENV") == "production" {
+			err = svc.sesClient.SendEmail(params.Email, emailSubject, emailBody)
+			if err != nil {
+				return "", fmt.Errorf("メールの送信に失敗しました: %v", err)
+			}
+		} else {
+			err = svc.mailpitClient.SendEmail(params.Email, emailSubject, emailBody)
+			if err != nil {
+				return "", fmt.Errorf("メールの送信に失敗しました: %v", err)
+			}
+		}
+
+		return "", nil
+	}
+
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"userID": user.EntUser.ID,
 		"role":   user.EntUser.Role,
@@ -169,6 +216,60 @@ func (svc *UserApplicationService) Signin(params UserApplicationServiceSigninPar
 	tokenString, err := token.SignedString([]byte(jwtSecretKey))
 	if err != nil {
 		return "", errors.New("トークンの生成に失敗しました")
+	}
+
+	return tokenString, nil
+}
+
+type UserApplicationServiceVerifyEmailTokenParams struct {
+	Ctx  context.Context
+	Body request.UserVerifyEmailTokenRequest
+}
+
+func (svc *UserApplicationService) VerifyEmailToken(params UserApplicationServiceVerifyEmailTokenParams) (string, error) {
+	jwtSecretKey := os.Getenv("JWT_SECRET_KEY")
+	if jwtSecretKey == "" {
+		return "", errors.New("秘密鍵が設定されていません")
+	}
+
+	token, err := jwt.ParseWithClaims(params.Body.Token, &TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, errors.New("予期しない署名方法です")
+		}
+		return []byte(jwtSecretKey), nil
+	})
+
+	if err != nil {
+		return "", errors.New("トークンの解析に失敗しました")
+	}
+
+	var userID int
+	if claims, ok := token.Claims.(*TokenClaims); ok && token.Valid {
+		if claims.ExpiresAt < time.Now().Unix() {
+			return "", errors.New("トークンの有効期限が切れています")
+		}
+		userID = claims.UserID
+	} else {
+		return "", errors.New("トークンが無効です")
+	}
+
+	user, err := svc.userDatasource.FindByID(datasource.UserDatasourceFindByIDParams{
+		Ctx:    params.Ctx,
+		UserID: userID,
+	})
+	if err != nil {
+		return "", err
+	}
+
+	token = jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"userID": user.EntUser.ID,
+		"role":   user.EntUser.Role,
+		"exp":    time.Now().AddDate(0, 1, 0).Unix(),
+	})
+
+	tokenString, err := token.SignedString([]byte(jwtSecretKey))
+	if err != nil {
+		return "", errors.New("新しいトークンの生成に失敗しました")
 	}
 
 	return tokenString, nil
@@ -313,7 +414,7 @@ func (svc *UserApplicationService) ForgotPassword(params UserApplicationServiceF
 
 	resetToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"userID": user.EntUser.ID,
-		"exp":    time.Now().Add(24 * time.Hour).Unix(), // 有効期限24時間
+		"exp":    time.Now().Add(1 * time.Hour).Unix(), // 有効期限1時間
 	})
 
 	tokenString, err := resetToken.SignedString([]byte(jwtSecretKey))
@@ -330,7 +431,7 @@ func (svc *UserApplicationService) ForgotPassword(params UserApplicationServiceF
 
 変態サロンをご利用いただきありがとうございます。
 パスワードの再設定は以下のリンクからお願いします。
-このリンクの有効期限は24時間です。
+このリンクの有効期限は1時間です。
 
 パスワードの再設定
 %s
@@ -338,10 +439,10 @@ func (svc *UserApplicationService) ForgotPassword(params UserApplicationServiceF
 Webページを開く
 %s
 
-※このメールは返信しても届きません。`, user.EntUser.Name, resetURL, clientURL)
+※このメールは返信しても届きません。`,
+		user.EntUser.Name, resetURL, clientURL)
 
-	environment := os.Getenv("ENVIRONMENT")
-	if environment == "production" {
+	if os.Getenv("ENV") == "production" {
 		err = svc.sesClient.SendEmail(params.Body.Email, emailSubject, emailBody)
 		if err != nil {
 			return fmt.Errorf("メールの送信に失敗しました: %v", err)

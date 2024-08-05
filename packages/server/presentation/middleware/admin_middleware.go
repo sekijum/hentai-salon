@@ -11,7 +11,7 @@ func AdminMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		role, exists := c.Get("role")
 		if !exists {
-			c.JSON(http.StatusForbidden, gin.H{"error": "アクセスが拒否されました: ロール情報が見つかりません"})
+			c.JSON(http.StatusForbidden, gin.H{"error": "アクセスが拒否されました: 権限情報が見つかりません"})
 			c.Abort()
 			return
 		}

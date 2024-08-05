@@ -22,6 +22,7 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 
 	r.POST("/signup", controllers.UserController.Signup)
 	r.POST("/signin", controllers.UserController.Signin)
+	r.POST("/verify-email-token", controllers.UserController.VerifyEmailToken)
 
 	r.POST("/forgot-password", controllers.UserController.ForgotPassword)
 	r.POST("/verify-reset-password-token", controllers.UserController.VerifyResetPasswordToken)

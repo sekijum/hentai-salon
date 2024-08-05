@@ -50,7 +50,6 @@
           @click="navigate('/')"
           value="client-view"
         />
-        <v-list-item prepend-icon="mdi-database" title="adminer" @click="openAdminer" value="adminer" />
       </v-list>
     </v-navigation-drawer>
 
@@ -70,10 +69,6 @@ function navigate(to: string) {
 
 const nuxtApp = useNuxtApp();
 const { payload } = nuxtApp;
-
-function openAdminer() {
-  open(config.public.adminerUrl, '_blank');
-}
 </script>
 
 <style scoped></style>

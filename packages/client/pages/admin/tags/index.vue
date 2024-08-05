@@ -149,7 +149,6 @@ async function fetchTags(params: { page: number; itemsPerPage: number; sortBy: S
       keyword: params.search,
     },
   });
-  console.log(response);
   tags.value = response.data.data ? response.data.data : [];
   totalCount.value = response.data.totalCount;
 }

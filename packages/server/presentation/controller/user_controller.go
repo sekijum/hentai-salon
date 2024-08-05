@@ -85,6 +85,30 @@ func (ctrl *UserController) Signin(ctx *gin.Context) {
 		return
 	}
 
+	if token == "" {
+		ctx.JSON(http.StatusOK, gin.H{"message": "認証メールを送信しました。"})
+	} else {
+		ctx.Header("Authorization", "Bearer "+token)
+		ctx.JSON(http.StatusOK, gin.H{"message": "サインインが成功しました"})
+	}
+}
+
+func (ctrl *UserController) VerifyEmailToken(ctx *gin.Context) {
+	var body request.UserVerifyEmailTokenRequest
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	token, err := ctrl.userApplicationService.VerifyEmailToken(service.UserApplicationServiceVerifyEmailTokenParams{
+		Ctx:  context.Background(),
+		Body: body,
+	})
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	}
+
 	ctx.Header("Authorization", "Bearer "+token)
 	ctx.JSON(http.StatusOK, gin.H{"message": "サインインが成功しました"})
 }

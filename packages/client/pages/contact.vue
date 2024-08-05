@@ -76,7 +76,6 @@ async function submit(_: typeof form.value, { resetForm }: { resetForm: () => vo
     alert('送信しました。');
     resetForm();
   } catch (err) {
-    console.log(err);
     alert('通信中にエラーが発生しました');
   }
 }

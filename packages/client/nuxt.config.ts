@@ -9,7 +9,6 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL,
-      adminerUrl: process.env.NUXT_PUBLIC_ADMINER_URL,
       clientId: process.env.IMGUR_CLIENT_ID,
     },
   },

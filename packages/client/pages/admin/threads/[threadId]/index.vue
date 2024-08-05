@@ -256,7 +256,6 @@ const schema = yup.object({
 async function submit() {
   try {
     await $api.put(`/admin/threads/${thread?.value?.id}`, form.value);
-    console.log(form.value);
     alert('スレッド情報が更新されました。');
     await fetchThread({ page: 1, itemsPerPage: itemsPerPage.value, sortBy: sortBy.value, search: '' });
   } catch (err) {

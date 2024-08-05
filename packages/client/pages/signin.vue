@@ -76,8 +76,12 @@ async function submit() {
     const response = await $api.post('/signin', credentials);
 
     const authHeader = response.headers.authorization;
-    const token = authHeader.split(' ')[1];
-    $storage.setItem('access_token', token);
+    const accessToken = authHeader?.split(' ')[1];
+    if (!accessToken) {
+      alert('認証メールの送信しました。メールをご確認ください。');
+      return;
+    }
+    $storage.setItem('access_token', accessToken);
     alert('サインインしました。');
     router.push('/');
   } catch (err) {

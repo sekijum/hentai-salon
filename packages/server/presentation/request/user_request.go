@@ -37,6 +37,10 @@ type UserResetPasswordRequest struct {
 	Password string `json:"password" binding:"required,min=6"`
 }
 
+type UserVerifyEmailTokenRequest struct {
+	Token string `json:"token" binding:"required"`
+}
+
 type UserVerifyResetPasswordTokenRequest struct {
 	Token string `json:"token" binding:"required"`
 }
