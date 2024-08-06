@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"context"
 	"net/http"
 	"server/application/service"
 	"server/presentation/request"
@@ -42,7 +43,7 @@ func (ctrl *ThreadCommentController) FindById(ctx *gin.Context) {
 	}
 
 	dto, err := ctrl.threadCommentApplicationService.FindByID(service.ThreadCommentApplicationServiceFindByIDParams{
-		Ctx:       ctx.Request.Context(),
+		Ctx:       context.Background(),
 		CommentID: commentID,
 		UserID:    userIDPtr,
 		Qs:        qs,
@@ -76,7 +77,7 @@ func (ctrl *ThreadCommentController) Create(ctx *gin.Context) {
 	}
 
 	dto, err := ctrl.threadCommentApplicationService.Create(service.ThreadCommentApplicationServiceCreateParams{
-		Ctx:             ctx.Request.Context(),
+		Ctx:             context.Background(),
 		UserID:          userIDPtr,
 		ClientIP:        ctx.ClientIP(),
 		ThreadID:        threadID,
@@ -118,7 +119,7 @@ func (ctrl *ThreadCommentController) Reply(ctx *gin.Context) {
 	}
 
 	dto, err := ctrl.threadCommentApplicationService.Create(service.ThreadCommentApplicationServiceCreateParams{
-		Ctx:             ctx.Request.Context(),
+		Ctx:             context.Background(),
 		ThreadID:        threadID,
 		UserID:          userIDPtr,
 		ClientIP:        ctx.ClientIP(),
@@ -147,7 +148,7 @@ func (ctrl *ThreadCommentController) Like(ctx *gin.Context) {
 	}
 
 	err = ctrl.threadCommentApplicationService.Like(service.ThreadCommentApplicationServiceLikeParams{
-		Ctx:       ctx.Request.Context(),
+		Ctx:       context.Background(),
 		UserID:    userID.(int),
 		CommentID: commentID,
 	})
@@ -173,7 +174,7 @@ func (ctrl *ThreadCommentController) Unlike(ctx *gin.Context) {
 	}
 
 	err = ctrl.threadCommentApplicationService.Unlike(service.ThreadCommentApplicationServiceUnLikeParams{
-		Ctx:       ctx.Request.Context(),
+		Ctx:       context.Background(),
 		UserID:    userID.(int),
 		CommentID: commentID,
 	})

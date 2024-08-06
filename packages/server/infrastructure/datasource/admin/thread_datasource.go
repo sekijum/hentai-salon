@@ -216,24 +216,22 @@ type ThreadDatasourceUpdateParams struct {
 }
 
 func (ds *ThreadDatasource) Update(params ThreadDatasourceUpdateParams) (*model.Thread, error) {
-	update := ds.client.
-		Thread.
+	q := ds.client.Thread.
 		UpdateOneID(params.Thread.EntThread.ID)
 
-	update.
-		SetTitle(params.Thread.EntThread.Title).
+	q.SetTitle(params.Thread.EntThread.Title).
 		SetStatus(params.Thread.EntThread.Status).
 		SetUpdatedAt(time.Now())
 
 	if params.Thread.EntThread.Description != nil {
-		update.SetDescription(*params.Thread.EntThread.Description)
+		q.SetDescription(*params.Thread.EntThread.Description)
 	}
 
 	if params.Thread.EntThread.ThumbnailURL != nil {
-		update.SetThumbnailURL(*params.Thread.EntThread.ThumbnailURL)
+		q.SetThumbnailURL(*params.Thread.EntThread.ThumbnailURL)
 	}
 
-	entThread, err := update.Save(params.Ctx)
+	entThread, err := q.Save(params.Ctx)
 	if err != nil {
 		return nil, err
 	}

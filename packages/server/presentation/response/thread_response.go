@@ -11,6 +11,7 @@ type ThreadResponse struct {
 	ThumbnailURL *string                                       `json:"thumbnailUrl,omitempty"`
 	TagNameList  *[]string                                     `json:"tagNameList,omitempty"`
 	CommentCount *int                                          `json:"commentCount"`
+	UserID       int                                           `json:"userId"`
 	Comments     *Collection[*ThreadCommentResponse]           `json:"comments,omitempty"`
 	Board        *BoardResponse                                `json:"board,omitempty"`
 	Attachments  *Collection[*ThreadCommentAttachmentResponse] `json:"attachments,omitempty"`
@@ -103,6 +104,7 @@ func NewThreadResponse(params NewThreadResponseParams) *ThreadResponse {
 		ThumbnailURL: params.Thread.EntThread.ThumbnailURL,
 		TagNameList:  &tagNameList,
 		CommentCount: params.CommentCount,
+		UserID:       params.Thread.EntThread.UserID,
 		Comments:     commentCollection,
 		Attachments:  attachmentCollection,
 		IsLiked:      isLiked,

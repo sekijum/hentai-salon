@@ -127,7 +127,7 @@ func (ctrl *ThreadController) Like(ctx *gin.Context) {
 	}
 
 	err = ctrl.threadApplicationService.Like(service.ThreadApplicationServiceLikeParams{
-		Ctx:      ctx.Request.Context(),
+		Ctx:      context.Background(),
 		UserID:   userID.(int),
 		ThreadID: threadID,
 	})
@@ -153,7 +153,7 @@ func (ctrl *ThreadController) Unlike(ctx *gin.Context) {
 	}
 
 	err = ctrl.threadApplicationService.Unlike(service.ThreadApplicationServiceUnlikeParams{
-		Ctx:      ctx.Request.Context(),
+		Ctx:      context.Background(),
 		UserID:   userID.(int),
 		ThreadID: threadID,
 	})
@@ -163,4 +163,30 @@ func (ctrl *ThreadController) Unlike(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{"message": "スレッドのいいねを外しました"})
+}
+
+func (ctrl *ThreadController) Update(ctx *gin.Context) {
+	threadID, err := strconv.Atoi(ctx.Param("threadID"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	var body request.ThreadUpdateRequest
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	dto, err := ctrl.threadApplicationService.Update(service.ThreadApplicationServiceUpdateParams{
+		Ctx:      context.Background(),
+		ThreadID: threadID,
+		Body:     body,
+	})
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, dto)
 }

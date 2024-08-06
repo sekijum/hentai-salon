@@ -319,7 +319,7 @@ func (ctrl *UserController) FindThreads(ctx *gin.Context) {
 	qs.Offset = ctx.GetInt("offset")
 
 	dto, err := ctrl.userApplicationService.FindThreads(service.UserApplicationServiceFindUserThreadsParams{
-		Ctx:    ctx.Request.Context(),
+		Ctx:    context.Background(),
 		UserID: userID.(int),
 		Qs:     qs,
 	})
@@ -348,7 +348,7 @@ func (ctrl *UserController) FindComments(ctx *gin.Context) {
 	qs.Offset = ctx.GetInt("offset")
 
 	comments, err := ctrl.userApplicationService.FindUserComments(service.UserApplicationServiceFindUserCommentsParams{
-		Ctx:    ctx.Request.Context(),
+		Ctx:    context.Background(),
 		UserID: userID.(int),
 		Qs:     qs,
 	})

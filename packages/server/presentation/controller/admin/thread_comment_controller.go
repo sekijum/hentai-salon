@@ -1,6 +1,7 @@
 package controller_admin
 
 import (
+	"context"
 	"net/http"
 	service_admin "server/application/service/admin"
 	"strconv"
@@ -24,7 +25,7 @@ func (ctrl *ThreadCommentController) Delete(ctx *gin.Context) {
 	}
 
 	err = ctrl.threadCommentApplicationService.Delete(service_admin.ThreadCommentApplicationServiceFindByIDParams{
-		Ctx:       ctx.Request.Context(),
+		Ctx:       context.Background(),
 		CommentID: commentID,
 	})
 	if err != nil {

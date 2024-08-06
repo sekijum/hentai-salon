@@ -229,7 +229,7 @@ func (svc *ThreadApplicationService) Create(params ThreadApplicationServiceCreat
 	}
 	defer tx.Rollback()
 
-	tags, err := svc.tagDatasource.CreateManyTx(datasource.TagDatasourceCreateManyTxParams{
+	tagList, err := svc.tagDatasource.CreateManyTx(datasource.TagDatasourceCreateManyTxParams{
 		Ctx:         params.Ctx,
 		Tx:          tx,
 		TagNameList: params.Body.TagNameList,
@@ -239,7 +239,7 @@ func (svc *ThreadApplicationService) Create(params ThreadApplicationServiceCreat
 	}
 
 	var tagIDs []int
-	for _, tag_i := range tags {
+	for _, tag_i := range tagList {
 		tagIDs = append(tagIDs, tag_i.EntTag.ID)
 	}
 
@@ -258,6 +258,61 @@ func (svc *ThreadApplicationService) Create(params ThreadApplicationServiceCreat
 	})
 
 	thread, err = svc.threadDatasource.CreateTx(datasource.ThreadDatasourceCreateTxParams{
+		Ctx:    params.Ctx,
+		Tx:     tx,
+		Thread: thread,
+		TagIDs: tagIDs,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return nil, err
+	}
+
+	dto := response.NewThreadResponse(response.NewThreadResponseParams{Thread: thread})
+
+	return dto, nil
+}
+
+type ThreadApplicationServiceUpdateParams struct {
+	Ctx      context.Context
+	ThreadID int
+	Body     request.ThreadUpdateRequest
+}
+
+func (svc *ThreadApplicationService) Update(params ThreadApplicationServiceUpdateParams) (*response.ThreadResponse, error) {
+	tx, err := svc.client.Tx(params.Ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer tx.Rollback()
+
+	tagList, err := svc.tagDatasource.CreateManyTx(datasource.TagDatasourceCreateManyTxParams{
+		Ctx:         params.Ctx,
+		Tx:          tx,
+		TagNameList: params.Body.TagNameList,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var tagIDs []int
+	for _, tag_i := range tagList {
+		tagIDs = append(tagIDs, tag_i.EntTag.ID)
+	}
+
+	thread := model.NewThread(model.NewThreadParams{
+		EntThread: &ent.Thread{
+			ID:           params.ThreadID,
+			Description:  params.Body.Description,
+			ThumbnailURL: params.Body.ThumbnailURL,
+		},
+	})
+
+	thread, err = svc.threadDatasource.UpdateTx(datasource.ThreadDatasourceUpdateTxParams{
 		Ctx:    params.Ctx,
 		Tx:     tx,
 		Thread: thread,

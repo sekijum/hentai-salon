@@ -11,6 +11,7 @@ export interface IThread {
   thumbnailUrl: string;
   tagNameList: string[];
   commentCount: number;
+  userId: number;
   comments: ICollection<IThreadComment>;
   attachments: ICollection<IThreadCommentAttachmentForThread>;
   isLiked: boolean;

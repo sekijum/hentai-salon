@@ -262,7 +262,8 @@ func (ds *ThreadDatasource) CreateTx(params ThreadDatasourceCreateTxParams) (*mo
 		SetBoardID(params.Thread.EntThread.BoardID).
 		SetIPAddress(params.Thread.EntThread.IPAddress).
 		SetStatus(params.Thread.EntThread.Status).
-		AddTagIDs(params.TagIDs...)
+		AddTagIDs(params.TagIDs...).
+		AddTags()
 
 	if params.Thread.EntThread.Description != nil {
 		q.SetDescription(*params.Thread.EntThread.Description)
@@ -312,4 +313,38 @@ func (ds *ThreadDatasource) Unlike(params ThreadDatasourceUnlikeParams) (int, er
 			userthreadlike.ThreadIDEQ(params.ThreadID),
 		).
 		Exec(params.Ctx)
+}
+
+type ThreadDatasourceUpdateTxParams struct {
+	Ctx    context.Context
+	Tx     *ent.Tx
+	Thread *model.Thread
+	TagIDs []int
+}
+
+func (ds *ThreadDatasource) UpdateTx(params ThreadDatasourceUpdateTxParams) (*model.Thread, error) {
+	q := params.Tx.Thread.
+		UpdateOneID(params.Thread.EntThread.ID).
+		ClearTags().
+		AddTagIDs(params.TagIDs...).
+		SetUpdatedAt(time.Now())
+
+	if params.Thread.EntThread.Description != nil {
+		q.SetDescription(*params.Thread.EntThread.Description)
+	}
+
+	if params.Thread.EntThread.ThumbnailURL != nil {
+		q.SetThumbnailURL(*params.Thread.EntThread.ThumbnailURL)
+	}
+
+	entThread, err := q.Save(params.Ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	thread := model.NewThread(model.NewThreadParams{
+		EntThread: entThread,
+	})
+
+	return thread, nil
 }

@@ -55,7 +55,12 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 	authGroup := r.Group("/")
 	authGroup.Use(middleware.AuthMiddleware())
 	{
-		authGroup.POST("/threads", controllers.ThreadController.Create)
+
+		threadGroup := authGroup.Group("/threads")
+		{
+			threadGroup.POST("", controllers.ThreadController.Create)
+			threadGroup.PUT("/:threadID", controllers.ThreadController.Update)
+		}
 
 		userGroup := authGroup.Group("/users")
 		{

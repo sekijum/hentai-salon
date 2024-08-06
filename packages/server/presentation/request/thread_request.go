@@ -28,3 +28,9 @@ type ThreadCreateRequest struct {
 	ThumbnailURL *string  `json:"thumbnailUrl" binding:"omitempty,max=255"`
 	TagNameList  []string `json:"tagNameList" binding:"omitempty,dive,max=50"`
 }
+
+type ThreadUpdateRequest struct {
+	Description  *string  `json:"description" binding:"omitempty"`
+	ThumbnailURL *string  `json:"thumbnailUrl" binding:"omitempty,max=255"`
+	TagNameList  []string `json:"tagNameList" binding:"omitempty,dive,max=50"`
+}

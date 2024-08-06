@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"context"
 	"net/http"
 	"server/application/service"
 	"server/presentation/request"
@@ -24,7 +25,7 @@ func (ctrl *ContactController) Create(ctx *gin.Context) {
 	}
 
 	_, err := ctrl.contactApplicationService.Create(service.ContactApplicationServiceCreateParams{
-		Ctx:      ctx.Request.Context(),
+		Ctx:      context.Background(),
 		ClientIP: ctx.ClientIP(),
 		Body:     body,
 	})

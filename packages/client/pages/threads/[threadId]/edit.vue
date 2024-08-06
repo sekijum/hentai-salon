@@ -8,30 +8,7 @@
 
     <Form @submit="submit" :validation-schema="schema" v-slot="{ meta }">
       <div class="field">
-        <Field name="boardId" v-model="form.boardId" v-slot="{ errors }">
-          <v-select
-            v-model="form.boardId"
-            label="板"
-            item-value="id"
-            item-text="title"
-            :items="boardSuggestions"
-            variant="outlined"
-            density="compact"
-            :error-messages="errors"
-          />
-        </Field>
-      </div>
-
-      <div class="field">
-        <Field name="title" v-model="form.title" v-slot="{ errors }">
-          <v-text-field
-            v-model="form.title"
-            label="タイトル"
-            variant="outlined"
-            density="compact"
-            :error-messages="errors"
-          />
-        </Field>
+        <v-text-field v-model="thread.title" label="タイトル" variant="outlined" density="compact" readonly />
       </div>
 
       <div class="field">
@@ -102,9 +79,11 @@ const boardSuggestions = ref<{ id: number; title: string }[]>([]);
 
 const thumbnailFile = ref<File>();
 
-const form = ref({
-  boardId: route.query.board_id,
-  title: '',
+const form = ref<{
+  description: string;
+  thumbnailUrl: string | null;
+  tagNameList: string[];
+}>({
   description: '',
   thumbnailUrl: null as string | null,
   tagNameList: [],
@@ -112,26 +91,27 @@ const form = ref({
 
 onMounted(async () => {
   await fetchTagSuggestions();
-  await fetchBoardSuggestions();
+  await fetchThread();
 });
 
-const schema = yup.object({
-  title: yup.string().required('必須項目です'),
-  boardId: yup.string().required('必須項目です'),
+const thread = ref<IThread>({
+  id: 0,
+  title: '',
+  description: '',
+  thumbnailUrl: '',
+  tagNameList: [],
+  commentCount: 0,
+  userId: 0,
+  comments: { totalCount: 0, limit: 0, offset: 0, data: [] },
+  attachments: { totalCount: 0, limit: 0, offset: 0, data: [] },
+  isLiked: false,
 });
+
+const schema = yup.object({});
 
 async function fetchTagSuggestions() {
   const response = await $api.get<string[]>('/tags/name');
   tagSuggestions.value = response.data;
-}
-
-async function fetchBoardSuggestions() {
-  const response = await $api.get<IBoard[]>('/boards');
-
-  boardSuggestions.value = response.data.map(board => ({
-    id: board.id,
-    title: board.title,
-  }));
 }
 
 function handleThumbnailChange(event: Event) {
@@ -143,19 +123,29 @@ function handleThumbnailChange(event: Event) {
 
 async function submit() {
   try {
-    if (confirm('スレッドを作成しますか？')) {
+    if (confirm('スレッドを更新しますか？')) {
       if (thumbnailFile.value) {
         const presignedUrls = await fetchListPresignedUrl([thumbnailFile.value.name]);
         const thumbnailUrl = await uploadFilesToS3(presignedUrls[0], thumbnailFile.value);
         form.value.thumbnailUrl = thumbnailUrl;
       }
-      const response = await $api.post<IThread>('/threads', form.value);
-      alert('スレッドを作成しました。');
-      router.push(`/threads/${response.data.id}`);
+      const respons = await $api.put<IThread>(`/threads/${route.params.threadId}`, form.value);
     }
-  } catch (error) {
+  } catch (err) {
+    console.log(err);
     alert('通信中にエラーが発生しました');
   }
+}
+
+async function fetchThread() {
+  const threadId = route.params.threadId;
+  const response = await $api.get<IThread>(`/threads/${threadId}`);
+  thread.value = response.data;
+  form.value = {
+    description: thread.value.description,
+    thumbnailUrl: thread.value.thumbnailUrl,
+    tagNameList: thread.value.tagNameList,
+  };
 }
 
 useHead({

@@ -30,7 +30,6 @@ type StorageApplicationServiceGeneratePresignedURLs struct {
 }
 
 func (s *StorageApplicationService) GeneratePresignedURLs(params StorageApplicationServiceGeneratePresignedURLs) ([]string, error) {
-	env := os.Getenv("APP_ENV")
 	bucketName := os.Getenv("AWS_BUCKET_NAME")
 	urls := make([]string, len(params.Body.ObjectNameList))
 
@@ -41,16 +40,7 @@ func (s *StorageApplicationService) GeneratePresignedURLs(params StorageApplicat
 		var url string
 		var err error
 
-		if env == "development" {
-			if s.minioClient == nil {
-				return nil, errors.New("minio クライアントが初期化されていません")
-			}
-			url, err = s.minioClient.GeneratePresignedURL(minio.MinioClientGeneratePresignedURL{
-				Ctx:        params.Ctx,
-				BucketName: bucketName,
-				ObjectName: objectKey,
-			})
-		} else if env == "production" {
+		if os.Getenv("ENV") == "production" {
 			if s.s3Client == nil {
 				return nil, errors.New("S3 クライアントが初期化されていません")
 			}
@@ -59,7 +49,14 @@ func (s *StorageApplicationService) GeneratePresignedURLs(params StorageApplicat
 				ObjectName: objectKey,
 			})
 		} else {
-			return nil, errors.New("不明な環境設定です")
+			if s.minioClient == nil {
+				return nil, errors.New("minio クライアントが初期化されていません")
+			}
+			url, err = s.minioClient.GeneratePresignedURL(minio.MinioClientGeneratePresignedURL{
+				Ctx:        params.Ctx,
+				BucketName: bucketName,
+				ObjectName: objectKey,
+			})
 		}
 
 		if err != nil {
