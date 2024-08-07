@@ -254,24 +254,24 @@ const schema = yup.object({
 });
 
 async function submit() {
-  try {
-    await $api.put(`/admin/threads/${thread?.value?.id}`, form.value);
-    alert('スレッド情報が更新されました。');
-    await fetchThread({ page: 1, itemsPerPage: itemsPerPage.value, sortBy: sortBy.value, search: '' });
-  } catch (err) {
-    alert('通信中にエラーが発生しました');
+  if (confirm('スレッド情報が更新されました。')) {
+    try {
+      await $api.put(`/admin/threads/${thread?.value?.id}`, form.value);
+      await fetchThread({ page: 1, itemsPerPage: itemsPerPage.value, sortBy: sortBy.value, search: '' });
+    } catch (err) {
+      alert('通信中にエラーが発生しました');
+    }
   }
 }
 
 async function deleteComment(commentId: number) {
-  try {
-    if (confirm('本当に削除しますか？')) {
+  if (confirm('本当に削除しますか？')) {
+    try {
       await $api.delete(`/admin/threads/${thread?.value?.id}/comments/${commentId}`);
-      alert('コメントが削除されました。');
+      await fetchThread({ page: 1, itemsPerPage: itemsPerPage.value, sortBy: sortBy.value, search: '' });
+    } catch (err) {
+      alert('通信中にエラーが発生しました');
     }
-    await fetchThread({ page: 1, itemsPerPage: itemsPerPage.value, sortBy: sortBy.value, search: '' });
-  } catch (err) {
-    alert('通信中にエラーが発生しました');
   }
 }
 

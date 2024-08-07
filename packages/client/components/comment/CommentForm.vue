@@ -207,7 +207,6 @@ async function submit(_: typeof form.value, { resetForm }: { resetForm: () => vo
       if (!payload.isLoggedIn) {
         setLastCommentTime();
       }
-      alert('書き込みました。');
       resetForm();
       attachmentFiles.value = [];
       if (fileInput.value) {

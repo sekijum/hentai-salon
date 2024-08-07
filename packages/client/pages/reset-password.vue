@@ -63,12 +63,13 @@ const schema = yup.object({
 });
 
 async function submit() {
-  try {
-    await $api.patch('/reset-password', { password: form.value.password, token: token.value });
-    alert('パスワードを変更しました。');
-    router.push('/signin');
-  } catch (err) {
-    alert('通信中にエラーが発生しました');
+  if (confirm('パスワードを変更しますか？')) {
+    try {
+      await $api.patch('/reset-password', { password: form.value.password, token: token.value });
+      router.push('/signin');
+    } catch (err) {
+      alert('通信中にエラーが発生しました');
+    }
   }
 }
 

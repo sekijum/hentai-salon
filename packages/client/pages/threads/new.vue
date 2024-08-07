@@ -150,7 +150,6 @@ async function submit() {
         form.value.thumbnailUrl = thumbnailUrl;
       }
       const response = await $api.post<IThread>('/threads', form.value);
-      alert('スレッドを作成しました。');
       router.push(`/threads/${response.data.id}`);
     }
   } catch (error) {

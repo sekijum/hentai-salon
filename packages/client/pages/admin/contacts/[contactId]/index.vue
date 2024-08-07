@@ -123,7 +123,6 @@ const schema = yup.object({
 async function submit() {
   try {
     await $api.patch(`/admin/contacts/${contact?.value?.id}/status`, form.value);
-    alert('問い合わせ情報が更新されました。');
     await fetchContact();
   } catch (err) {
     alert('通信中にエラーが発生しました');

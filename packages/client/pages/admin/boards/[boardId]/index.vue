@@ -162,17 +162,18 @@ const schema = yup.object({
 });
 
 async function submit() {
-  try {
-    if (thumbnailFile.value) {
-      const presignedUrls = await fetchListPresignedUrl([thumbnailFile.value.name]);
-      const thumbnailUrl = await uploadFilesToS3(presignedUrls[0], thumbnailFile.value);
-      form.value.thumbnailUrl = thumbnailUrl;
+  if (confirm('板情報を更新しますか？')) {
+    try {
+      if (thumbnailFile.value) {
+        const presignedUrls = await fetchListPresignedUrl([thumbnailFile.value.name]);
+        const thumbnailUrl = await uploadFilesToS3(presignedUrls[0], thumbnailFile.value);
+        form.value.thumbnailUrl = thumbnailUrl;
+      }
+      await $api.put(`/admin/boards/${board?.value?.id}`, form.value);
+      await fetchBoards();
+    } catch (err) {
+      alert('通信中にエラーが発生しました');
     }
-    await $api.put(`/admin/boards/${board?.value?.id}`, form.value);
-    alert('板情報が更新されました。');
-    await fetchBoards();
-  } catch (err) {
-    alert('通信中にエラーが発生しました');
   }
 }
 

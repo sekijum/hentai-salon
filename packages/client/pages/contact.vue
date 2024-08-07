@@ -71,12 +71,13 @@ const schema = yup.object({
 });
 
 async function submit(_: typeof form.value, { resetForm }: { resetForm: () => void }) {
-  try {
-    await $api.post('/contact', form.value);
-    alert('送信しました。');
-    resetForm();
-  } catch (err) {
-    alert('通信中にエラーが発生しました');
+  if (confirm('送信しますか？')) {
+    try {
+      await $api.post('/contact', form.value);
+      resetForm();
+    } catch (err) {
+      alert('通信中にエラーが発生しました');
+    }
   }
 }
 

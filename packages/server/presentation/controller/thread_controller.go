@@ -172,6 +172,12 @@ func (ctrl *ThreadController) Update(ctx *gin.Context) {
 		return
 	}
 
+	userID, exists := ctx.Get("userID")
+	if !exists {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "ユーザーIDがコンテキストに存在しません"})
+		return
+	}
+
 	var body request.ThreadUpdateRequest
 	if err := ctx.ShouldBindJSON(&body); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -182,6 +188,7 @@ func (ctrl *ThreadController) Update(ctx *gin.Context) {
 		Ctx:      context.Background(),
 		ThreadID: threadID,
 		Body:     body,
+		UserID:   userID.(int),
 	})
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

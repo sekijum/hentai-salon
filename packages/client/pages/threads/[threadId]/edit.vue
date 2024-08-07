@@ -62,7 +62,6 @@
 import * as yup from 'yup';
 import { Form, Field } from 'vee-validate';
 import PageTitle from '~/components/PageTitle.vue';
-import type { IBoard } from '~/types/board';
 import type { IThread } from '~/types/thread';
 
 definePageMeta({ middleware: ['logged-in-access-only'] });
@@ -72,10 +71,9 @@ const route = useRoute();
 const nuxtApp = useNuxtApp();
 const { fetchListPresignedUrl, uploadFilesToS3 } = useActions();
 
-const { $api } = nuxtApp;
+const { $api, payload } = nuxtApp;
 
 const tagSuggestions = ref<string[]>([]);
-const boardSuggestions = ref<{ id: number; title: string }[]>([]);
 
 const thumbnailFile = ref<File>();
 
@@ -122,24 +120,24 @@ function handleThumbnailChange(event: Event) {
 }
 
 async function submit() {
-  try {
-    if (confirm('スレッドを更新しますか？')) {
+  if (confirm('スレッドを更新しますか？')) {
+    try {
       if (thumbnailFile.value) {
         const presignedUrls = await fetchListPresignedUrl([thumbnailFile.value.name]);
         const thumbnailUrl = await uploadFilesToS3(presignedUrls[0], thumbnailFile.value);
         form.value.thumbnailUrl = thumbnailUrl;
       }
-      const respons = await $api.put<IThread>(`/threads/${route.params.threadId}`, form.value);
+      await $api.put<IThread>(`/threads/${route.params.threadId}`, form.value);
+    } catch (err) {
+      alert('通信中にエラーが発生しました');
     }
-  } catch (err) {
-    console.log(err);
-    alert('通信中にエラーが発生しました');
   }
 }
 
 async function fetchThread() {
   const threadId = route.params.threadId;
   const response = await $api.get<IThread>(`/threads/${threadId}`);
+  if (response.data.userId !== payload?.user?.id) router.push('/');
   thread.value = response.data;
   form.value = {
     description: thread.value.description,
@@ -149,7 +147,7 @@ async function fetchThread() {
 }
 
 useHead({
-  title: '変態サロン | スレ作成',
+  title: '変態サロン | スレ更新',
 });
 </script>
 

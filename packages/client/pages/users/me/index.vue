@@ -161,7 +161,6 @@ async function update() {
         email: updateForm.value.email,
         profileLink: updateForm.value.profileLink,
       });
-      alert('ユーザー情報を更新しました。');
       fetchUser();
     } catch (err) {
       alert(err.response.data.error);
@@ -176,7 +175,6 @@ async function updatePassword(_, { resetForm }: { resetForm: () => void }) {
         oldPassword: updatePasswordForm.value.oldPassword,
         newPassword: updatePasswordForm.value.newPassword,
       });
-      alert('パスワードを更新しました。');
       fetchUser();
       resetForm();
     } catch (err) {

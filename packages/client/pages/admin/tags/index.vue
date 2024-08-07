@@ -154,14 +154,13 @@ async function fetchTags(params: { page: number; itemsPerPage: number; sortBy: S
 }
 
 async function deleteTag(tagId: number) {
-  try {
-    if (confirm('本当に削除しますか？')) {
+  if (confirm('本当に削除しますか？')) {
+    try {
       await $api.delete(`/admin/tags/${tagId}`);
-      alert('タグが削除されました。');
+      await fetchTags({ page: 1, itemsPerPage: itemsPerPage.value, sortBy: sortBy.value, search: '' });
+    } catch (err) {
+      alert('通信中にエラーが発生しました');
     }
-    await fetchTags({ page: 1, itemsPerPage: itemsPerPage.value, sortBy: sortBy.value, search: '' });
-  } catch (err) {
-    alert('通信中にエラーが発生しました');
   }
 }
 

@@ -281,9 +281,22 @@ type ThreadApplicationServiceUpdateParams struct {
 	Ctx      context.Context
 	ThreadID int
 	Body     request.ThreadUpdateRequest
+	UserID   int
 }
 
 func (svc *ThreadApplicationService) Update(params ThreadApplicationServiceUpdateParams) (*response.ThreadResponse, error) {
+	thread, err := svc.threadDatasource.FindById(datasource.ThreadDatasourceFindByIDParams{
+		Ctx:      params.Ctx,
+		ThreadID: params.ThreadID,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	if thread.EntThread.UserID != params.UserID {
+		return nil, errors.New("更新する権限がありません。")
+	}
+
 	tx, err := svc.client.Tx(params.Ctx)
 	if err != nil {
 		return nil, err
@@ -304,7 +317,7 @@ func (svc *ThreadApplicationService) Update(params ThreadApplicationServiceUpdat
 		tagIDs = append(tagIDs, tag_i.EntTag.ID)
 	}
 
-	thread := model.NewThread(model.NewThreadParams{
+	thread = model.NewThread(model.NewThreadParams{
 		EntThread: &ent.Thread{
 			ID:           params.ThreadID,
 			Description:  params.Body.Description,

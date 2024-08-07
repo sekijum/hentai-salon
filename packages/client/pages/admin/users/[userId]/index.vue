@@ -159,12 +159,13 @@ const schema = yup.object({
 });
 
 async function submit() {
-  try {
-    await $api.put(`/admin/users/${user?.value?.id}`, form.value);
-    alert('ユーザー情報が更新されました。');
-    await fetchUser();
-  } catch (err) {
-    alert('通信中にエラーが発生しました');
+  if (confirm('ユーザー情報が更新しますか？')) {
+    try {
+      await $api.put(`/admin/users/${user?.value?.id}`, form.value);
+      await fetchUser();
+    } catch (err) {
+      alert('通信中にエラーが発生しました');
+    }
   }
 }
 
