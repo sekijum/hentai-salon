@@ -31,7 +31,7 @@ resource "aws_ecs_task_definition" "server" {
       {
         name = "proxy"
         essential : true
-        image        = "${aws_ecr_repository.proxy_server_proxy.repository_url}:latest"
+        image        = "${aws_ecr_repository.server_proxy.repository_url}:latest"
         portMappings = [{ containerPort = 80 }]
         logConfiguration = {
           logDriver = "awslogs"

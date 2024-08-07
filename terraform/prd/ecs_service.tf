@@ -89,7 +89,4 @@ resource "aws_ecs_service" "adminer" {
     container_name   = "adminer"
     container_port   = 8080
   }
-  service_registries {
-    registry_arn = aws_service_discovery_service.this.arn
-  }
 }

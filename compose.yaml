@@ -113,21 +113,21 @@ services:
     networks:
       - hentai_salon
 
-  # infra:
-  #   container_name: infra
-  #   platform: linux/x86_64
-  #   build:
-  #     context: .
-  #     dockerfile: docker/infra/Dockerfile
-  #   ports:
-  #     - 22:22
-  #   volumes:
-  #     - ./:/infra
-  #     - ~/.aws:/root/.aws:ro
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #   tty: true
-  #   networks:
-  #     - hentai_salon
+  infra:
+    container_name: infra
+    platform: linux/x86_64
+    build:
+      context: .
+      dockerfile: docker/infra/Dockerfile
+    ports:
+      - 22:22
+    volumes:
+      - ./:/infra
+      - ~/.aws:/root/.aws:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    tty: true
+    networks:
+      - hentai_salon
 
 networks:
   hentai_salon:
