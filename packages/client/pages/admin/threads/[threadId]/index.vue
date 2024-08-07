@@ -254,7 +254,7 @@ const schema = yup.object({
 });
 
 async function submit() {
-  if (confirm('スレッド情報が更新されました。')) {
+  if (confirm('スレッド情報が編集しますか？')) {
     try {
       await $api.put(`/admin/threads/${thread?.value?.id}`, form.value);
       await fetchThread({ page: 1, itemsPerPage: itemsPerPage.value, sortBy: sortBy.value, search: '' });

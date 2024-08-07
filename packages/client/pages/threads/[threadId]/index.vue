@@ -30,15 +30,19 @@
       />
       <div id="media-bottom" />
 
-      <v-fab transition="slide-y-transition">
-        <v-btn icon large color="primary" @click="scrollToMediaTop" class="fab fab-top">
-          <v-icon>mdi-arrow-up</v-icon>
-        </v-btn>
+      <div class="fab-container">
+        <v-fab-transition>
+          <v-btn icon large color="primary" @click="scrollToMediaTop">
+            <v-icon>mdi-arrow-up</v-icon>
+          </v-btn>
+        </v-fab-transition>
 
-        <v-btn icon large color="primary" @click="scrollToMediaBottom" class="fab fab-bottom">
-          <v-icon>mdi-arrow-down</v-icon>
-        </v-btn>
-      </v-fab>
+        <v-fab-transition>
+          <v-btn icon large color="primary" @click="scrollToMediaBottom">
+            <v-icon>mdi-arrow-down</v-icon>
+          </v-btn>
+        </v-fab-transition>
+      </div>
     </template>
     <template v-else>
       <CommentForm @submit="fetchThread" :showReplyForm="true" :threadId="thread.id" />
@@ -56,32 +60,36 @@
 
       <CommentForm @submit="fetchThread" :showReplyForm="true" :threadId="thread.id" />
 
-      <v-fab transition="slide-y-transition">
-        <v-btn icon large color="primary" @click="scrollToCommentTop" class="fab fab-top">
-          <v-icon>mdi-arrow-up</v-icon>
-        </v-btn>
+      <div class="fab-container">
+        <v-fab-transition v-if="payload?.user?.id === thread.userId">
+          <v-btn icon large color="secondary" @click="editThread">
+            <v-icon>mdi-pencil</v-icon>
+          </v-btn>
+        </v-fab-transition>
 
-        <v-btn icon large color="primary" @click="scrollToCommentBottom" class="fab fab-bottom">
-          <v-icon>mdi-arrow-down</v-icon>
-        </v-btn>
-      </v-fab>
+        <v-fab-transition>
+          <v-btn icon large color="primary" @click="toggleLike">
+            <v-icon>{{ thread.isLiked ? 'mdi-thumb-up' : 'mdi-thumb-up-outline' }}</v-icon>
+          </v-btn>
+        </v-fab-transition>
+
+        <v-fab-transition>
+          <v-btn icon large color="primary" @click="scrollToCommentTop">
+            <v-icon>mdi-arrow-up</v-icon>
+          </v-btn>
+        </v-fab-transition>
+
+        <v-fab-transition>
+          <v-btn icon large color="primary" @click="scrollToCommentBottom">
+            <v-icon>mdi-arrow-down</v-icon>
+          </v-btn>
+        </v-fab-transition>
+      </div>
     </template>
 
     <v-divider />
 
     <Pagination :totalCount="thread.comments.totalCount" :limit="commentLimit" />
-
-    <v-fab transition="slide-y-transition">
-      <v-btn icon large color="primary" @click="toggleLike" class="fab fab-like">
-        <v-icon>{{ thread.isLiked ? 'mdi-thumb-up' : 'mdi-thumb-up-outline' }}</v-icon>
-      </v-btn>
-    </v-fab>
-
-    <v-fab transition="slide-y-transition" v-if="payload?.user?.id === thread.userId">
-      <v-btn icon large color="secondary" class="fab fab-edit" @click="editThread">
-        <v-icon>mdi-pencil</v-icon>
-      </v-btn>
-    </v-fab>
 
     <ThreadItem filter="related" title="関連" :isInfiniteScroll="true" />
   </div>
@@ -240,24 +248,13 @@ watch(
   font-size: 12px;
 }
 
-.fab {
+.fab-container {
   position: fixed;
-  right: 16px;
-}
-
-.fab-top {
-  bottom: 72px;
-}
-
-.fab-bottom {
   bottom: 16px;
-}
-
-.fab-like {
-  bottom: 130px;
-}
-
-.fab-edit {
-  bottom: 190px;
+  right: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 1000;
 }
 </style>

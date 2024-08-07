@@ -162,7 +162,7 @@ const schema = yup.object({
 });
 
 async function submit() {
-  if (confirm('板情報を更新しますか？')) {
+  if (confirm('板情報を編集しますか？')) {
     try {
       if (thumbnailFile.value) {
         const presignedUrls = await fetchListPresignedUrl([thumbnailFile.value.name]);

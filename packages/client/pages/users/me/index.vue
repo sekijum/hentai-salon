@@ -48,7 +48,7 @@
         </Field>
       </div>
 
-      <v-btn type="submit" color="primary" block :disabled="!meta.valid">更新</v-btn>
+      <v-btn type="submit" color="primary" block :disabled="!meta.valid">編集</v-btn>
     </Form>
 
     <v-divider class="border-opacity-100" />
@@ -82,7 +82,7 @@
         </Field>
       </div>
 
-      <v-btn type="submit" color="primary" block :disabled="!meta.valid">パスワード更新</v-btn>
+      <v-btn type="submit" color="primary" block :disabled="!meta.valid">パスワード編集</v-btn>
     </Form>
   </div>
 </template>
@@ -149,7 +149,7 @@ async function fetchUser() {
 }
 
 async function update() {
-  if (confirm('ユーザー情報を更新しますか？')) {
+  if (confirm('ユーザー情報を編集しますか？')) {
     try {
       // 空文字列をnullに変換
       if (updateForm.value.profileLink === '') {
@@ -169,7 +169,7 @@ async function update() {
 }
 
 async function updatePassword(_, { resetForm }: { resetForm: () => void }) {
-  if (confirm('パスワードを更新しますか？')) {
+  if (confirm('パスワードを編集しますか？')) {
     try {
       await $api.patch('/users/me/password', {
         oldPassword: updatePasswordForm.value.oldPassword,

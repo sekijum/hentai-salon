@@ -294,7 +294,7 @@ func (svc *ThreadApplicationService) Update(params ThreadApplicationServiceUpdat
 	}
 
 	if thread.EntThread.UserID != params.UserID {
-		return nil, errors.New("更新する権限がありません。")
+		return nil, errors.New("編集権限がありません。")
 	}
 
 	tx, err := svc.client.Tx(params.Ctx)

@@ -159,7 +159,7 @@ const schema = yup.object({
 });
 
 async function submit() {
-  if (confirm('ユーザー情報が更新しますか？')) {
+  if (confirm('ユーザー情報が編集しますか？')) {
     try {
       await $api.put(`/admin/users/${user?.value?.id}`, form.value);
       await fetchUser();

@@ -158,7 +158,7 @@ func (ctrl *UserController) Update(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, "ユーザー情報を更新しました")
+	ctx.JSON(http.StatusOK, "ユーザー情報を編集しました")
 }
 
 func (ctrl *UserController) UpdatePassword(ctx *gin.Context) {
@@ -184,7 +184,7 @@ func (ctrl *UserController) UpdatePassword(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, "パスワードを更新しました")
+	ctx.JSON(http.StatusOK, "パスワードを編集しました")
 }
 
 func (ctrl *UserController) ForgotPassword(ctx *gin.Context) {

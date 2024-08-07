@@ -1,6 +1,6 @@
 <template>
   <div class="mx-2">
-    <PageTitle title="スレ作成" />
+    <PageTitle title="スレ編集" />
 
     <v-divider />
 
@@ -120,7 +120,7 @@ function handleThumbnailChange(event: Event) {
 }
 
 async function submit() {
-  if (confirm('スレッドを更新しますか？')) {
+  if (confirm('スレッドを編集しますか？')) {
     try {
       if (thumbnailFile.value) {
         const presignedUrls = await fetchListPresignedUrl([thumbnailFile.value.name]);
@@ -147,7 +147,7 @@ async function fetchThread() {
 }
 
 useHead({
-  title: '変態サロン | スレ更新',
+  title: '変態サロン | スレ編集',
 });
 </script>
 
