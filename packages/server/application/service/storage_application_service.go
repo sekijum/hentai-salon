@@ -40,7 +40,7 @@ func (s *StorageApplicationService) GeneratePresignedURLs(params StorageApplicat
 		var url string
 		var err error
 
-		if os.Getenv("ENV") == "production" {
+		if os.Getenv("APP_ENV") == "production" {
 			if s.s3Client == nil {
 				return nil, errors.New("S3 クライアントが初期化されていません")
 			}

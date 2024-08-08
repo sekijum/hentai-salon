@@ -192,7 +192,7 @@ func (svc *UserApplicationService) Signin(params UserApplicationServiceSigninPar
 		※このメールは返信しても届きません。`,
 			user.EntUser.Name, verificationURL, os.Getenv("CLIENT_URL"))
 
-		if os.Getenv("ENV") == "production" {
+		if os.Getenv("APP_ENV") == "production" {
 			err = svc.sesClient.SendEmail(params.Email, emailSubject, emailBody)
 			if err != nil {
 				return "", fmt.Errorf("メールの送信に失敗しました: %v", err)
@@ -442,7 +442,7 @@ Webページを開く
 ※このメールは返信しても届きません。`,
 		user.EntUser.Name, resetURL, clientURL)
 
-	if os.Getenv("ENV") == "production" {
+	if os.Getenv("APP_ENV") == "production" {
 		err = svc.sesClient.SendEmail(params.Body.Email, emailSubject, emailBody)
 		if err != nil {
 			return fmt.Errorf("メールの送信に失敗しました: %v", err)
