@@ -22,19 +22,19 @@ dokcer compose stop
 ### generate
 
 ```
-docker compose exec server go generate ./infrastructure/ent
+docker compose exec server-app go generate ./infrastructure/ent
 ```
 
 ### マイグレーションフィアル生成
 
 ```
-docker compose exec server go run -mod=mod ./infrastructure/ent/migrate/main.go {{ マイグレーション名 }}
+docker compose exec server-app go run -mod=mod ./infrastructure/ent/migrate/main.go {{ マイグレーション名 }}
 ```
 
 ### マイグレーション
 
 ```
-docker compose exec server atlas migrate apply \
+docker compose exec server-app atlas migrate apply \
   --dir "file://./infrastructure/ent/migrate/migrations" \
   --url "mysql://hentai_salon:H3nt@1_Sa!0n_2024@mysql:3306/hentai_salon"
 ```
@@ -42,5 +42,5 @@ docker compose exec server atlas migrate apply \
 ### シード
 
 ```
-docker compose exec server go run ./infrastructure/ent/seed/main.go
+docker compose exec server-app go run ./infrastructure/ent/seed/main.go
 ```
