@@ -24,7 +24,7 @@ resource "aws_ecs_service" "server" {
   }
   load_balancer {
     target_group_arn = aws_lb_target_group.server.arn
-    container_name   = "server"
+    container_name   = "proxy"
     container_port   = 80
   }
 }
@@ -55,7 +55,7 @@ resource "aws_ecs_service" "client" {
   }
   load_balancer {
     target_group_arn = aws_lb_target_group.client.arn
-    container_name   = "client"
+    container_name   = "proxy"
     container_port   = 80
   }
 }

@@ -42,30 +42,19 @@ resource "aws_cloudfront_distribution" "static" {
     }
   }
   viewer_certificate {
-    cloudfront_default_certificate = false
+    # cloudfront_default_certificate = false
     # 今後ssl証明書がバージニアリージョンから取得できないので一旦ハードコード
     # たぶんこの辺り
     # `https://limitusus.hatenablog.com/entry/2017/07/12/110343`
     # `https://qiita.com/tos-miyake/items/f0e5f28f2a69e4d39422`
     # acm_certificate_arn            = var.data_aws_acm_certificate_this_arn
     # acm_certificate_arn      = "arn:aws:acm:us-east-1:728047905319:certificate/9fed689c-9c33-476a-8ec0-858b7305e438"
-    acm_certificate_arn      = aws_acm_certificate.host_domain.arn
+    acm_certificate_arn      = aws_acm_certificate.host_domain_us_east_1.arn
     minimum_protocol_version = "TLSv1.2_2019"
     ssl_support_method       = "sni-only"
   }
   retain_on_delete    = false
   wait_for_deployment = true
-}
-
-resource "aws_route53_record" "static_subdomain" {
-  name    = local.static_domain
-  type    = "A"
-  zone_id = aws_route53_zone.this.zone_id
-  alias {
-    evaluate_target_health = false
-    name                   = aws_cloudfront_distribution.static.domain_name
-    zone_id                = aws_cloudfront_distribution.static.hosted_zone_id
-  }
 }
 
 data "aws_cloudfront_cache_policy" "asset" {
