@@ -1,5 +1,11 @@
+resource "aws_route53_registered_domain" "this" {
+  domain_name = local.host_domain
+  auto_renew = true
+  privacy_protection = true
+}
+
 resource "aws_route53_zone" "this" {
-  name = local.host_domain
+  name = aws_route53_registered_domain.this.domain_name
 }
 
 resource "aws_route53_record" "server_subdomain" {

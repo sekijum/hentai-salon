@@ -1,3 +1,21 @@
-ssm_db_name = ""
+ssm_app_env = ""
+
+# server-app
+ssm_jwt_secret_key = ""
+ssm_client_url = ""
+
+ssm_aws_access_key_id = ""
+ssm_aws_secret_access_key = ""
+ssm_aws_default_region = ""
+
+ssm_aws_bucket_name = ""
+
+ssm_mail_from_address = ""
+
+ssm_db_port = ""
 ssm_db_user = ""
+ssm_db_name = ""
 ssm_db_pass = ""
+
+# client-app
+ssm_nuxt_public_api_base_url = ""

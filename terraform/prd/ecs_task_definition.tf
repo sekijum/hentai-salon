@@ -14,10 +14,17 @@ resource "aws_ecs_task_definition" "server" {
         image        = "${aws_ecr_repository.server_app.repository_url}:latest"
         portMappings = [{ containerPort = 8080 }]
         secrets = [
-          {
-            name : "APP_SECRET",
-            valueFrom : aws_ssm_parameter.db_name.value
-          },
+          {name : "APP_ENV", valueFrom : aws_ssm_parameter.app_env.arn},
+          {name : "JWT_SECRET_KEY", valueFrom : aws_ssm_parameter.jwt_secret_key.arn},
+          {name : "CLIENT_URL", valueFrom : aws_ssm_parameter.client_url.arn},
+          {name : "AWS_ACCESS_KEY_ID", valueFrom : aws_ssm_parameter.aws_access_key_id.arn},
+          {name : "AWS_SECRET_ACCESS_KEY", valueFrom : aws_ssm_parameter.aws_secret_access_key.arn},
+          {name : "AWS_DEFAULT_REGION", valueFrom : aws_ssm_parameter.aws_default_region.arn},
+          {name : "AWS_BUCKET_NAME", valueFrom : aws_ssm_parameter.aws_bucket_name.arn},
+          {name : "DB_PORT", valueFrom : aws_ssm_parameter.db_port.arn},
+          {name : "DB_USER", valueFrom : aws_ssm_parameter.db_user.arn},
+          {name : "DB_NAME", valueFrom : aws_ssm_parameter.db_name.arn},
+          {name : "DB_PASS", valueFrom : aws_ssm_parameter.db_pass.arn},
         ]
         logConfiguration = {
           logDriver = "awslogs"
@@ -62,10 +69,8 @@ resource "aws_ecs_task_definition" "client" {
         image        = "${aws_ecr_repository.client_app.repository_url}:latest"
         portMappings = [{ containerPort = 3000 }]
         secrets = [
-          {
-            name : "APP_SECRET",
-            valueFrom : aws_ssm_parameter.db_name.value
-          },
+          {name : "APP_ENV", valueFrom : aws_ssm_parameter.app_env.arn},
+          {name : "NUXT_PUBLIC_API_BASE_URL", valueFrom : aws_ssm_parameter.nuxt_public_api_base_url.arn},
         ]
         logConfiguration = {
           logDriver = "awslogs"
@@ -111,7 +116,7 @@ resource "aws_ecs_task_definition" "adminer" {
         portMappings = [{ containerPort = 8080 }]
         secrets = [
           {
-            name : "DB_HOST",
+            name : "ADMINER_DEFAULT_SERVER",
             valueFrom : aws_rds_cluster.this.endpoint
           },
         ]
