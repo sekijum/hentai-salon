@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"server/infrastructure/datasource"
+	"server/presentation/request"
 )
 
 type TagApplicationService struct {
@@ -15,10 +16,11 @@ func NewTagApplicationService(tagDatasource *datasource.TagDatasource) *TagAppli
 
 type TagApplicationServiceFindNameListParams struct {
 	Ctx context.Context
+	Qs  request.TagFindAllRequest
 }
 
 func (svc *TagApplicationService) FindNameList(params TagApplicationServiceFindNameListParams) ([]string, error) {
-	tagList, err := svc.tagDatasource.FindAll(datasource.TagDatasourceFindAllParams{Ctx: params.Ctx})
+	tagList, err := svc.tagDatasource.FindAll(datasource.TagDatasourceFindAllParams{Ctx: params.Ctx, Keyword: params.Qs.Keyword})
 	if err != nil {
 		return nil, err
 	}

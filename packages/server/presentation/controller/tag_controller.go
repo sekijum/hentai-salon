@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"server/application/service"
+	"server/presentation/request"
 
 	"github.com/gin-gonic/gin"
 )
@@ -17,8 +18,15 @@ func NewTagController(tagApplicationService *service.TagApplicationService) *Tag
 }
 
 func (ctrl *TagController) FindNameList(ctx *gin.Context) {
+	var qs request.TagFindAllRequest
+	if err := ctx.ShouldBindQuery(&qs); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	tagNameList, err := ctrl.tagApplicationService.FindNameList(service.TagApplicationServiceFindNameListParams{
 		Ctx: context.Background(),
+		Qs:  qs,
 	})
 
 	if err != nil {

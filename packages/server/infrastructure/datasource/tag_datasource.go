@@ -44,15 +44,23 @@ func (ds *TagDatasource) FindAllIDs(params TagDatasourceFindAllIDsParams) ([]int
 }
 
 type TagDatasourceFindAllParams struct {
-	Ctx context.Context
+	Ctx     context.Context
+	Keyword *string
 }
 
 func (ds *TagDatasource) FindAll(params TagDatasourceFindAllParams) ([]*model.Tag, error) {
-	entTagList, err := ds.client.
+	q := ds.client.
 		Tag.
 		Query().
-		WithThreads().
-		All(params.Ctx)
+		WithThreads()
+
+	q = q.Where(
+		tag.Or(
+			tag.NameContainsFold(*params.Keyword),
+		),
+	)
+
+	entTagList, err := q.All(params.Ctx)
 	if err != nil {
 		return nil, err
 	}

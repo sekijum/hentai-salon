@@ -57,6 +57,7 @@
           clearable
           multiple
           :items="tagSuggestions"
+          @input="fetchTagSuggestions"
         />
       </div>
 
@@ -111,7 +112,6 @@ const form = ref({
 });
 
 onMounted(async () => {
-  await fetchTagSuggestions();
   await fetchBoardSuggestions();
 });
 
@@ -120,9 +120,17 @@ const schema = yup.object({
   boardId: yup.string().required('必須項目です'),
 });
 
-async function fetchTagSuggestions() {
-  const response = await $api.get<string[]>('/tags/name');
-  tagSuggestions.value = response.data;
+async function fetchTagSuggestions(event) {
+  if (!event.target.value) {
+    tagSuggestions.value = [];
+    return;
+  }
+  const response = await $api.get<string[]>('/tags/name', {
+    params: {
+      keyword: event.target.value,
+    },
+  });
+  tagSuggestions.value = response.data ? response.data : [];
 }
 
 async function fetchBoardSuggestions() {
