@@ -29,7 +29,7 @@ resource "aws_lb_listener" "https" {
   load_balancer_arn = aws_lb.this.arn
   port              = 443
   protocol          = "HTTPS"
-  certificate_arn   = aws_acm_certificate.host_domain.arn
+  certificate_arn   = aws_acm_certificate.hentai_salon.arn
   default_action {
     type = "fixed-response"
     fixed_response {
@@ -60,7 +60,7 @@ resource "aws_lb_target_group" "client" {
   protocol             = "HTTP"
   deregistration_delay = 60
   health_check {
-    path = "/auth/signin/exhibitor/employee"
+    path = "/"
   }
 }
 
@@ -76,25 +76,9 @@ resource "aws_lb_target_group" "adminer" {
   }
 }
 
-resource "aws_lb_listener_rule" "forward_server" {
-  listener_arn = aws_lb_listener.https.arn
-  priority     = 10
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.server.arn
-  }
-  condition {
-    host_header {
-      values = [
-        local.server_domain
-      ]
-    }
-  }
-}
-
 resource "aws_lb_listener_rule" "forward_client" {
   listener_arn = aws_lb_listener.https.arn
-  priority     = 30
+  priority     = 10
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.client.arn
@@ -108,9 +92,25 @@ resource "aws_lb_listener_rule" "forward_client" {
   }
 }
 
-resource "aws_lb_listener_rule" "forward_adminer" {
+resource "aws_lb_listener_rule" "forward_server" {
   listener_arn = aws_lb_listener.https.arn
   priority     = 20
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.server.arn
+  }
+  condition {
+    host_header {
+      values = [
+        local.server_domain
+      ]
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "forward_adminer" {
+  listener_arn = aws_lb_listener.https.arn
+  priority     = 50
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.adminer.arn
@@ -126,13 +126,49 @@ resource "aws_lb_listener_rule" "forward_adminer" {
 
 resource "aws_lb_listener_rule" "maintenance" {
   listener_arn = aws_lb_listener.https.arn
-  priority     = 50
+  priority     = 80
   action {
     type = "fixed-response"
     fixed_response {
       content_type = "text/plain"
-      message_body = "503 Service Temporarily Unavailable"
+      message_body = "503 サービスは一時的に利用できません"
       status_code  = "503"
+    }
+  }
+  condition {
+    path_pattern {
+      values = ["*"]
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "not_found" {
+  listener_arn = aws_lb_listener.https.arn
+  priority     = 90
+  action {
+    type = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "404 ページが見つかりません"
+      status_code  = "404"
+    }
+  }
+  condition {
+    path_pattern {
+      values = ["*"]
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "server_error" {
+  listener_arn = aws_lb_listener.https.arn
+  priority     = 100
+  action {
+    type = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "500 サーバー内部エラーが発生しました"
+      status_code  = "500"
     }
   }
   condition {

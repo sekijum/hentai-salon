@@ -22,6 +22,7 @@ resource "aws_ecs_task_definition" "server" {
           { name : "AWS_DEFAULT_REGION", valueFrom : aws_ssm_parameter.server_aws_default_region.arn },
           { name : "AWS_BUCKET_NAME", valueFrom : aws_ssm_parameter.server_aws_bucket_name.arn },
           { name : "DB_PORT", valueFrom : aws_ssm_parameter.server_db_port.arn },
+          { name : "DB_HOST", valueFrom : aws_ssm_parameter.server_db_host.arn },
           { name : "DB_USER", valueFrom : aws_ssm_parameter.server_db_user.arn },
           { name : "DB_NAME", valueFrom : aws_ssm_parameter.server_db_name.arn },
           { name : "DB_PASS", valueFrom : aws_ssm_parameter.server_db_pass.arn },
@@ -40,6 +41,12 @@ resource "aws_ecs_task_definition" "server" {
         essential : true
         image        = "${aws_ecr_repository.server_proxy.repository_url}:latest"
         portMappings = [{ containerPort = 80 }]
+        dependsOn = [
+          {
+            containerName = "app"
+            condition     = "START"
+          },
+        ]
         logConfiguration = {
           logDriver = "awslogs"
           options = {
@@ -86,6 +93,12 @@ resource "aws_ecs_task_definition" "client" {
         essential : true
         image        = "${aws_ecr_repository.client_proxy.repository_url}:latest"
         portMappings = [{ containerPort = 80 }]
+        dependsOn = [
+          {
+            containerName = "app"
+            condition     = "START"
+          },
+        ]
         logConfiguration = {
           logDriver = "awslogs"
           options = {
@@ -117,7 +130,7 @@ resource "aws_ecs_task_definition" "adminer" {
         secrets = [
           {
             name : "ADMINER_DEFAULT_SERVER",
-            valueFrom : aws_rds_cluster.this.endpoint
+            valueFrom : aws_ssm_parameter.server_db_host.arn
           },
         ]
       },

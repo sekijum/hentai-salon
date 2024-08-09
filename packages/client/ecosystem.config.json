@@ -2,12 +2,12 @@
   "apps": [
     {
       "name": "prd",
-      "cwd": "/client",
+      "cwd": "/app",
       "port": "3000",
       "script": "./.output/server/index.mjs",
       "instances": "max",
       "exec_mode": "cluster",
-      "log_date_format": "YYYY-MM-DD HH:mm Z",
+      "log_date_format": "YYYY-MM-DD HH:mm Z"
     }
   ]
 }

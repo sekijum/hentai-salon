@@ -49,7 +49,7 @@ resource "aws_cloudfront_distribution" "static" {
     # `https://qiita.com/tos-miyake/items/f0e5f28f2a69e4d39422`
     # acm_certificate_arn            = var.data_aws_acm_certificate_this_arn
     # acm_certificate_arn      = "arn:aws:acm:us-east-1:728047905319:certificate/9fed689c-9c33-476a-8ec0-858b7305e438"
-    acm_certificate_arn      = aws_acm_certificate.host_domain_us_east_1.arn
+    acm_certificate_arn      = aws_acm_certificate.hentai_salon_us_east_1.arn
     minimum_protocol_version = "TLSv1.2_2019"
     ssl_support_method       = "sni-only"
   }

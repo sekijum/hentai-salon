@@ -13,7 +13,7 @@ resource "aws_route53_record" "server_subdomain" {
   }
 }
 
-resource "aws_route53_record" "client_subdomain" {
+resource "aws_route53_record" "client_domain" {
   name    = local.client_domain
   type    = "A"
   zone_id = data.aws_route53_zone.this.zone_id

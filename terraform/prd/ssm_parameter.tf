@@ -45,6 +45,11 @@ resource "aws_ssm_parameter" "server_db_port" {
   type  = "String"
   value = var.ssm_db_port
 }
+resource "aws_ssm_parameter" "server_db_host" {
+  name  = "${local.ssm_parameter_store}/server/db_host"
+  type  = "String"
+  value = aws_rds_cluster.this.endpoint
+}
 resource "aws_ssm_parameter" "server_db_user" {
   name  = "${local.ssm_parameter_store}/server/db_user"
   type  = "String"

@@ -20,6 +20,7 @@ RUN go install github.com/air-verse/air@v1.52.2 \
 ENTRYPOINT ["air"]
 
 FROM base AS prd
-RUN go install ariga.io/atlas/cmd/atlas@latest
+RUN go install ariga.io/atlas/cmd/atlas@latest \
+    && go clean -modcache
 RUN go build -o ./build/main
 ENTRYPOINT ["./build/main"]

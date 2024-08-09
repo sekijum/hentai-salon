@@ -10,18 +10,15 @@ resource "aws_ses_domain_identity" "this" {
 #   depends_on = [aws_route53_record.txt_this]
 # }
 
-## For DKIM
 resource "aws_ses_domain_dkim" "this" {
   domain = data.aws_route53_zone.this.name
 }
 
-## For SPF
 resource "aws_ses_domain_mail_from" "this" {
   domain           = data.aws_route53_zone.this.name
   mail_from_domain = "mail.${data.aws_route53_zone.this.name}"
 }
 
-## For SES
 resource "aws_route53_record" "txt_this" {
   zone_id = data.aws_route53_zone.this.zone_id
   name    = "_amazonses.${data.aws_route53_zone.this.name}"
@@ -30,7 +27,6 @@ resource "aws_route53_record" "txt_this" {
   records = [aws_ses_domain_identity.this.verification_token]
 }
 
-## For DKIM
 resource "aws_route53_record" "cname_dkim_this" {
   count   = 3
   zone_id = data.aws_route53_zone.this.zone_id
@@ -40,7 +36,6 @@ resource "aws_route53_record" "cname_dkim_this" {
   records = ["${element(aws_ses_domain_dkim.this.dkim_tokens, count.index)}.dkim.amazonses.com"]
 }
 
-## For SPF
 resource "aws_route53_record" "mx_mail_this" {
   zone_id = data.aws_route53_zone.this.zone_id
   name    = aws_ses_domain_mail_from.this.mail_from_domain
@@ -57,7 +52,6 @@ resource "aws_route53_record" "txt_mail_this" {
   records = ["v=spf1 include:amazonses.com ~all"]
 }
 
-## For DMARC
 resource "aws_route53_record" "txt_dmarc_this" {
   zone_id = data.aws_route53_zone.this.zone_id
   name    = "_dmarc.example.com"

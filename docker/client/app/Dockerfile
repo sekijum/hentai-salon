@@ -12,7 +12,8 @@ WORKDIR $ROOTPATH
 COPY packages/client $ROOTPATH
 
 RUN npm ci \
-    && npm cache clean --force
+    && npm cache clean --force \
+    && npm run build
 
 EXPOSE 3000
 

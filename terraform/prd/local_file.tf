@@ -95,7 +95,7 @@ DOC
 }
 
 resource "local_file" "server_exec" {
-  filename = "../../../cmd/${local.env}/server_exec.sh"
+  filename = "../../cmd/${local.env}/server_exec.sh"
   content  = <<DOC
 #!/bin/bash
 

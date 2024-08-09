@@ -5,7 +5,8 @@ services:
     platform: linux/x86_64
     build:
       context: .
-      dockerfile: docker/server/Dockerfile
+      dockerfile: docker/server/app/Dockerfile
+      target: prd
 
   server-proxy:
     container_name: hentai-salon-server-proxy
@@ -13,7 +14,7 @@ services:
     platform: linux/x86_64
     build:
       context: .
-      dockerfile: docker/nginx/client/Dockerfile
+      dockerfile: docker/server/proxy/Dockerfile
 
   client-app:
     container_name: hentai-salon-client-app
@@ -21,12 +22,13 @@ services:
     platform: linux/x86_64
     build:
       context: .
-      dockerfile: docker/client/Dockerfile
+      dockerfile: docker/client/app/Dockerfile
+      target: prd
 
   client-proxy:
-    container_name: hentai-salon-server-proxy
+    container_name: hentai-salon-client-proxy
     image: ${ECR_CLIENT_PROXY_URI}
     platform: linux/x86_64
     build:
       context: .
-      dockerfile: docker/nginx/server/Dockerfile
+      dockerfile: docker/client/proxy/Dockerfile

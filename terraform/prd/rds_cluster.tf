@@ -11,7 +11,7 @@ resource "aws_rds_cluster" "this" {
   cluster_identifier   = "${local.app_name}-database-cluster"
   db_subnet_group_name = aws_db_subnet_group.this.name
   vpc_security_group_ids = [
-    aws_security_group.rds.id,
+    aws_security_group.db.id,
   ]
   engine                    = "aurora-mysql"
   engine_version            = "8.0.mysql_aurora.3.07.1"
@@ -21,7 +21,7 @@ resource "aws_rds_cluster" "this" {
   master_password           = aws_ssm_parameter.server_db_pass.value
   backup_retention_period   = 7
   preferred_backup_window   = "04:00-05:00"
-  deletion_protection       = true
+  deletion_protection       = false
   skip_final_snapshot       = true
   final_snapshot_identifier = "${local.app_name}-final-snapshot"
   apply_immediately         = true

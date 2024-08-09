@@ -130,9 +130,9 @@ resource "aws_security_group_rule" "client_from_alb" {
   source_security_group_id = aws_security_group.alb.id
 }
 
-# rds
-resource "aws_security_group" "rds" {
-  name   = "${local.app_name}-rds"
+# db
+resource "aws_security_group" "db" {
+  name   = "${local.app_name}-db"
   vpc_id = aws_vpc.this.id
   egress {
     from_port   = 0
@@ -141,19 +141,19 @@ resource "aws_security_group" "rds" {
     cidr_blocks = ["0.0.0.0/0"]
   }
   tags = {
-    Name = "${local.app_name}-rds"
+    Name = "${local.app_name}-db"
   }
 }
-resource "aws_security_group_rule" "rds_from_server" {
-  security_group_id        = aws_security_group.rds.id
+resource "aws_security_group_rule" "db_from_server" {
+  security_group_id        = aws_security_group.db.id
   type                     = "ingress"
   from_port                = 3306
   to_port                  = 3306
   protocol                 = "tcp"
   source_security_group_id = aws_security_group.server.id
 }
-resource "aws_security_group_rule" "rds_from_adminer" {
-  security_group_id        = aws_security_group.rds.id
+resource "aws_security_group_rule" "db_from_adminer" {
+  security_group_id        = aws_security_group.db.id
   type                     = "ingress"
   from_port                = 3306
   to_port                  = 3306
