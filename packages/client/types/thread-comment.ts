@@ -15,4 +15,5 @@ export interface IThreadComment {
   parentComment: IThreadComment;
   replies: ICollection<IThreadComment>;
   replyCount: number;
+  isLiked: boolean;
 }
