@@ -136,6 +136,9 @@ async function fetchTagSuggestions(event) {
 async function fetchBoardSuggestions() {
   const response = await $api.get<IBoard[]>('/boards');
 
+  if (!response.data) {
+    return;
+  }
   boardSuggestions.value = response.data.map(board => ({
     id: board.id,
     title: board.title,

@@ -1,7 +1,7 @@
 resource "aws_acm_certificate" "hentai_salon" {
   domain_name               = local.host_domain
   subject_alternative_names = ["*.hentai-salon.com"]
-  validation_method = "DNS"
+  validation_method         = "DNS"
 
   lifecycle {
     create_before_destroy = true
@@ -17,11 +17,12 @@ resource "aws_route53_record" "acm_certificate_validation" {
     }
   }
 
-  name    = each.value.name
-  type    = each.value.type
-  zone_id = data.aws_route53_zone.this.zone_id
-  records = [each.value.record]
-  ttl     = 300
+  name            = each.value.name
+  type            = each.value.type
+  zone_id         = data.aws_route53_zone.this.zone_id
+  records         = [each.value.record]
+  ttl             = 300
+  allow_overwrite = true
 }
 
 resource "aws_acm_certificate_validation" "hentai_salon" {
@@ -31,9 +32,10 @@ resource "aws_acm_certificate_validation" "hentai_salon" {
 
 # us-east-1
 resource "aws_acm_certificate" "hentai_salon_us_east_1" {
+  provider                  = aws.us_east_1
   domain_name               = local.host_domain
   subject_alternative_names = ["*.hentai-salon.com"]
-  validation_method = "DNS"
+  validation_method         = "DNS"
 
   lifecycle {
     create_before_destroy = true

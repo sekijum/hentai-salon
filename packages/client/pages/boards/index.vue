@@ -7,7 +7,7 @@
     <br />
 
     <v-row class="">
-      <v-col v-for="(board, index) in filteredBoards" :key="index" cols="4" class="board-item">
+      <v-col v-for="(board, index) in boards" :key="index" cols="4" class="board-item">
         <v-card @click="() => router.push(`/threads?filter=board&boardId=${board.id}`)" class="board-card">
           <v-img :src="getImageSrc(board.thumbnailUrl)" aspect-ratio="1" class="board-image" :alt="board.title">
             <template v-slot:placeholder>
@@ -33,11 +33,6 @@ const nuxtApp = useNuxtApp();
 const { $api } = nuxtApp;
 
 const boards = ref<IBoard[]>([]);
-const search = ref('');
-
-const filteredBoards = computed(() => {
-  return boards.value.filter(board => board.title.includes(search.value));
-});
 
 onMounted(async () => {
   await fetchBoards();

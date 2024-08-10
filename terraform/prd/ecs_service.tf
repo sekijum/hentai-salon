@@ -9,6 +9,7 @@ resource "aws_ecs_service" "server" {
   propagate_tags                     = "SERVICE"
   launch_type                        = "FARGATE"
   health_check_grace_period_seconds  = 60
+  enable_execute_command             = true
   deployment_circuit_breaker {
     enable   = true
     rollback = true
@@ -40,6 +41,7 @@ resource "aws_ecs_service" "client" {
   propagate_tags                     = "SERVICE"
   launch_type                        = "FARGATE"
   health_check_grace_period_seconds  = 60
+  enable_execute_command             = true
   deployment_circuit_breaker {
     enable   = true
     rollback = true
@@ -71,6 +73,7 @@ resource "aws_ecs_service" "adminer" {
   propagate_tags                     = "SERVICE"
   launch_type                        = "FARGATE"
   health_check_grace_period_seconds  = 60
+  enable_execute_command             = true
   deployment_circuit_breaker {
     enable   = true
     rollback = true

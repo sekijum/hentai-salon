@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="items.length">
     <h2 v-if="title" class="font-weight-regular">{{ title }}</h2>
 
     <div class="thread-section">

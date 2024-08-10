@@ -65,10 +65,3 @@ resource "aws_ssm_parameter" "server_db_pass" {
   type  = "SecureString"
   value = var.ssm_db_pass
 }
-
-# client-app
-resource "aws_ssm_parameter" "client_nuxt_public_api_base_url" {
-  name  = "${local.ssm_parameter_store}/client/nuxt_public_api_base_url"
-  type  = "SecureString"
-  value = var.ssm_nuxt_public_api_base_url
-}

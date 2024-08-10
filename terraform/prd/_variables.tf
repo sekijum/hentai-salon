@@ -37,7 +37,8 @@ variable "ssm_db_pass" {
   type = string
 }
 
-# client-app
-variable "ssm_nuxt_public_api_base_url" {
-  type = string
+variable "adminer_allowed_cidr" {
+  description = "CIDR block allowed to access adminer"
+  type        = string
+  default     = "0.0.0.0/0"
 }

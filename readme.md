@@ -6,6 +6,12 @@
 docker network create hentai_salon
 ```
 
+### 初期設定
+
+```
+cmd/dev/init.sh
+```
+
 ### 起動
 
 ```
@@ -36,7 +42,7 @@ docker compose exec server-app go run -mod=mod ./infrastructure/ent/migrate/main
 ```
 docker compose exec server-app atlas migrate apply \
   --dir "file://./infrastructure/ent/migrate/migrations" \
-  --url "mysql://hentai_salon:H3nt@1_Sa!0n_2024@mysql:3306/hentai_salon"
+  --url "mysql://hentai_salon:password@mysql:3306/hentai_salon"
 ```
 
 ### シード

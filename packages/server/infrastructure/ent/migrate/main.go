@@ -25,7 +25,7 @@ func main() {
 
 	ctx := context.Background()
 	// Create a local migration directory able to understand Atlas migration file format for replay.
-	dir, err := atlas.NewLocalDir("/server/infrastructure/ent/migrate/migrations")
+	dir, err := atlas.NewLocalDir("/app/infrastructure/ent/migrate/migrations")
 	if err != nil {
 		log.Fatalf("failed creating atlas migration directory: %v", err)
 	}
@@ -47,7 +47,7 @@ func main() {
 	dbName := os.Getenv("DB_NAME")
 
 	// Construct DB_URL using environment variables
-	dbURL := fmt.Sprintf("mysql://%s:%s@tcp(%s:%s)/%s", dbUser, dbPass, dbHost, dbPort, dbName)
+	dbURL := fmt.Sprintf("mysql://%s:%s@%s:%s/%s", dbUser, dbPass, dbHost, dbPort, dbName)
 
 	// Generate migrations using Atlas support for MySQL (note the Ent dialect option passed above).
 	err = migrate.NamedDiff(ctx, dbURL, os.Args[1], opts...)
