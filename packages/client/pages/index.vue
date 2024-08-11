@@ -42,7 +42,6 @@ const guestMenuItems = computed(() => {
     { title: 'スレ一覧', clicked: () => router.push('/threads'), icon: 'mdi-format-list-bulleted' },
     { title: '板一覧', clicked: () => router.push('/boards'), icon: 'mdi-view-list' },
     { title: '設定', clicked: () => router.push('/setting'), icon: 'mdi-cog' },
-    { title: 'メニュー', clicked: () => (isMenuModal.value = true), icon: 'mdi-menu' },
   ];
 
   if (!payload.isLoggedIn) {
@@ -55,7 +54,7 @@ const guestMenuItems = computed(() => {
   if (payload.isMember || payload.isAdmin) {
     items = items.concat([
       { title: 'スレ作成', clicked: () => router.push('/threads/new'), icon: 'mdi-pencil' },
-      { title: 'マイページ', clicked: () => router.push('/users/me'), icon: 'mdi-account' },
+      { title: 'マイページ', clicked: () => router.push('/mypage'), icon: 'mdi-account' },
     ]);
   }
 

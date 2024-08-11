@@ -70,11 +70,6 @@ func Description(v string) predicate.Board {
 	return predicate.Board(sql.FieldEQ(FieldDescription, v))
 }
 
-// ThumbnailURL applies equality check predicate on the "thumbnail_url" field. It's identical to ThumbnailURLEQ.
-func ThumbnailURL(v string) predicate.Board {
-	return predicate.Board(sql.FieldEQ(FieldThumbnailURL, v))
-}
-
 // Status applies equality check predicate on the "status" field. It's identical to StatusEQ.
 func Status(v int) predicate.Board {
 	return predicate.Board(sql.FieldEQ(FieldStatus, v))
@@ -248,81 +243,6 @@ func DescriptionEqualFold(v string) predicate.Board {
 // DescriptionContainsFold applies the ContainsFold predicate on the "description" field.
 func DescriptionContainsFold(v string) predicate.Board {
 	return predicate.Board(sql.FieldContainsFold(FieldDescription, v))
-}
-
-// ThumbnailURLEQ applies the EQ predicate on the "thumbnail_url" field.
-func ThumbnailURLEQ(v string) predicate.Board {
-	return predicate.Board(sql.FieldEQ(FieldThumbnailURL, v))
-}
-
-// ThumbnailURLNEQ applies the NEQ predicate on the "thumbnail_url" field.
-func ThumbnailURLNEQ(v string) predicate.Board {
-	return predicate.Board(sql.FieldNEQ(FieldThumbnailURL, v))
-}
-
-// ThumbnailURLIn applies the In predicate on the "thumbnail_url" field.
-func ThumbnailURLIn(vs ...string) predicate.Board {
-	return predicate.Board(sql.FieldIn(FieldThumbnailURL, vs...))
-}
-
-// ThumbnailURLNotIn applies the NotIn predicate on the "thumbnail_url" field.
-func ThumbnailURLNotIn(vs ...string) predicate.Board {
-	return predicate.Board(sql.FieldNotIn(FieldThumbnailURL, vs...))
-}
-
-// ThumbnailURLGT applies the GT predicate on the "thumbnail_url" field.
-func ThumbnailURLGT(v string) predicate.Board {
-	return predicate.Board(sql.FieldGT(FieldThumbnailURL, v))
-}
-
-// ThumbnailURLGTE applies the GTE predicate on the "thumbnail_url" field.
-func ThumbnailURLGTE(v string) predicate.Board {
-	return predicate.Board(sql.FieldGTE(FieldThumbnailURL, v))
-}
-
-// ThumbnailURLLT applies the LT predicate on the "thumbnail_url" field.
-func ThumbnailURLLT(v string) predicate.Board {
-	return predicate.Board(sql.FieldLT(FieldThumbnailURL, v))
-}
-
-// ThumbnailURLLTE applies the LTE predicate on the "thumbnail_url" field.
-func ThumbnailURLLTE(v string) predicate.Board {
-	return predicate.Board(sql.FieldLTE(FieldThumbnailURL, v))
-}
-
-// ThumbnailURLContains applies the Contains predicate on the "thumbnail_url" field.
-func ThumbnailURLContains(v string) predicate.Board {
-	return predicate.Board(sql.FieldContains(FieldThumbnailURL, v))
-}
-
-// ThumbnailURLHasPrefix applies the HasPrefix predicate on the "thumbnail_url" field.
-func ThumbnailURLHasPrefix(v string) predicate.Board {
-	return predicate.Board(sql.FieldHasPrefix(FieldThumbnailURL, v))
-}
-
-// ThumbnailURLHasSuffix applies the HasSuffix predicate on the "thumbnail_url" field.
-func ThumbnailURLHasSuffix(v string) predicate.Board {
-	return predicate.Board(sql.FieldHasSuffix(FieldThumbnailURL, v))
-}
-
-// ThumbnailURLIsNil applies the IsNil predicate on the "thumbnail_url" field.
-func ThumbnailURLIsNil() predicate.Board {
-	return predicate.Board(sql.FieldIsNull(FieldThumbnailURL))
-}
-
-// ThumbnailURLNotNil applies the NotNil predicate on the "thumbnail_url" field.
-func ThumbnailURLNotNil() predicate.Board {
-	return predicate.Board(sql.FieldNotNull(FieldThumbnailURL))
-}
-
-// ThumbnailURLEqualFold applies the EqualFold predicate on the "thumbnail_url" field.
-func ThumbnailURLEqualFold(v string) predicate.Board {
-	return predicate.Board(sql.FieldEqualFold(FieldThumbnailURL, v))
-}
-
-// ThumbnailURLContainsFold applies the ContainsFold predicate on the "thumbnail_url" field.
-func ThumbnailURLContainsFold(v string) predicate.Board {
-	return predicate.Board(sql.FieldContainsFold(FieldThumbnailURL, v))
 }
 
 // StatusEQ applies the EQ predicate on the "status" field.

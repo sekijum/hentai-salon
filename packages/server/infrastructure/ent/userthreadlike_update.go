@@ -128,10 +128,10 @@ func (utlu *UserThreadLikeUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (utlu *UserThreadLikeUpdate) check() error {
-	if _, ok := utlu.mutation.UserID(); utlu.mutation.UserCleared() && !ok {
+	if utlu.mutation.UserCleared() && len(utlu.mutation.UserIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "UserThreadLike.user"`)
 	}
-	if _, ok := utlu.mutation.ThreadID(); utlu.mutation.ThreadCleared() && !ok {
+	if utlu.mutation.ThreadCleared() && len(utlu.mutation.ThreadIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "UserThreadLike.thread"`)
 	}
 	return nil
@@ -341,10 +341,10 @@ func (utluo *UserThreadLikeUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (utluo *UserThreadLikeUpdateOne) check() error {
-	if _, ok := utluo.mutation.UserID(); utluo.mutation.UserCleared() && !ok {
+	if utluo.mutation.UserCleared() && len(utluo.mutation.UserIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "UserThreadLike.user"`)
 	}
-	if _, ok := utluo.mutation.ThreadID(); utluo.mutation.ThreadCleared() && !ok {
+	if utluo.mutation.ThreadCleared() && len(utluo.mutation.ThreadIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "UserThreadLike.thread"`)
 	}
 	return nil

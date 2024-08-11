@@ -128,10 +128,10 @@ func (uclu *UserCommentLikeUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (uclu *UserCommentLikeUpdate) check() error {
-	if _, ok := uclu.mutation.UserID(); uclu.mutation.UserCleared() && !ok {
+	if uclu.mutation.UserCleared() && len(uclu.mutation.UserIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "UserCommentLike.user"`)
 	}
-	if _, ok := uclu.mutation.CommentID(); uclu.mutation.CommentCleared() && !ok {
+	if uclu.mutation.CommentCleared() && len(uclu.mutation.CommentIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "UserCommentLike.comment"`)
 	}
 	return nil
@@ -341,10 +341,10 @@ func (ucluo *UserCommentLikeUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (ucluo *UserCommentLikeUpdateOne) check() error {
-	if _, ok := ucluo.mutation.UserID(); ucluo.mutation.UserCleared() && !ok {
+	if ucluo.mutation.UserCleared() && len(ucluo.mutation.UserIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "UserCommentLike.user"`)
 	}
-	if _, ok := ucluo.mutation.CommentID(); ucluo.mutation.CommentCleared() && !ok {
+	if ucluo.mutation.CommentCleared() && len(ucluo.mutation.CommentIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "UserCommentLike.comment"`)
 	}
 	return nil

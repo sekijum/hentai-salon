@@ -7,15 +7,8 @@
     <br />
 
     <v-row class="">
-      <v-col v-for="(board, index) in boards" :key="index" cols="4" class="board-item">
+      <v-col v-for="(board, index) in boards" :key="index" cols="6" class="board-item">
         <v-card @click="() => router.push(`/threads?filter=board&boardId=${board.id}`)" class="board-card">
-          <v-img :src="getImageSrc(board.thumbnailUrl)" aspect-ratio="1" class="board-image" :alt="board.title">
-            <template v-slot:placeholder>
-              <v-row align="center" class="fill-height ma-0" justify="center">
-                <v-progress-circular color="grey-lighten-5" indeterminate></v-progress-circular>
-              </v-row>
-            </template>
-          </v-img>
           <v-card-title class="board-title">{{ board.title }}</v-card-title>
         </v-card>
       </v-col>
@@ -41,10 +34,6 @@ onMounted(async () => {
 async function fetchBoards() {
   const response = await $api.get<IBoard[]>('/boards');
   boards.value = response.data;
-}
-
-function getImageSrc(thumbnailUrl: string) {
-  return thumbnailUrl ? thumbnailUrl : '/no-image.jpg';
 }
 
 useHead({

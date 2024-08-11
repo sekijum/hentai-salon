@@ -358,10 +358,10 @@ func (tu *ThreadUpdate) check() error {
 			return &ValidationError{Name: "ip_address", err: fmt.Errorf(`ent: validator failed for field "Thread.ip_address": %w`, err)}
 		}
 	}
-	if _, ok := tu.mutation.BoardID(); tu.mutation.BoardCleared() && !ok {
+	if tu.mutation.BoardCleared() && len(tu.mutation.BoardIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Thread.board"`)
 	}
-	if _, ok := tu.mutation.OwnerID(); tu.mutation.OwnerCleared() && !ok {
+	if tu.mutation.OwnerCleared() && len(tu.mutation.OwnerIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Thread.owner"`)
 	}
 	return nil
@@ -973,10 +973,10 @@ func (tuo *ThreadUpdateOne) check() error {
 			return &ValidationError{Name: "ip_address", err: fmt.Errorf(`ent: validator failed for field "Thread.ip_address": %w`, err)}
 		}
 	}
-	if _, ok := tuo.mutation.BoardID(); tuo.mutation.BoardCleared() && !ok {
+	if tuo.mutation.BoardCleared() && len(tuo.mutation.BoardIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Thread.board"`)
 	}
-	if _, ok := tuo.mutation.OwnerID(); tuo.mutation.OwnerCleared() && !ok {
+	if tuo.mutation.OwnerCleared() && len(tuo.mutation.OwnerIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Thread.owner"`)
 	}
 	return nil

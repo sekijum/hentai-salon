@@ -5,10 +5,9 @@ import (
 )
 
 type BoardResponse struct {
-	Id           int     `json:"id"`
-	Title        string  `json:"title"`
-	Description  *string `json:"description,omitempty"`
-	ThumbnailURL *string `json:"thumbnailUrl,omitempty"`
+	Id          int     `json:"id"`
+	Title       string  `json:"title"`
+	Description *string `json:"description,omitempty"`
 }
 
 type NewBoardResponseParams struct {
@@ -17,9 +16,8 @@ type NewBoardResponseParams struct {
 
 func NewBoardResponse(params NewBoardResponseParams) *BoardResponse {
 	return &BoardResponse{
-		Id:           params.Board.EntBoard.ID,
-		Title:        params.Board.EntBoard.Title,
-		Description:  params.Board.EntBoard.Description,
-		ThumbnailURL: params.Board.EntBoard.ThumbnailURL,
+		Id:          params.Board.EntBoard.ID,
+		Title:       params.Board.EntBoard.Title,
+		Description: params.Board.EntBoard.Description,
 	}
 }

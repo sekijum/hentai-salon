@@ -113,7 +113,7 @@ const schema = yup.object({
     .string()
     .oneOf([yup.ref('password')], 'パスワードが一致しません')
     .required('必須項目です'),
-  profileLink: yup.string().url('有効なURLを入力してください').optional(),
+  profileLink: yup.string().url('有効なURLを入力してください').optional().nullable(),
 });
 
 async function submit() {

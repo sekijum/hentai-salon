@@ -78,26 +78,6 @@ func (bu *BoardUpdate) ClearDescription() *BoardUpdate {
 	return bu
 }
 
-// SetThumbnailURL sets the "thumbnail_url" field.
-func (bu *BoardUpdate) SetThumbnailURL(s string) *BoardUpdate {
-	bu.mutation.SetThumbnailURL(s)
-	return bu
-}
-
-// SetNillableThumbnailURL sets the "thumbnail_url" field if the given value is not nil.
-func (bu *BoardUpdate) SetNillableThumbnailURL(s *string) *BoardUpdate {
-	if s != nil {
-		bu.SetThumbnailURL(*s)
-	}
-	return bu
-}
-
-// ClearThumbnailURL clears the value of the "thumbnail_url" field.
-func (bu *BoardUpdate) ClearThumbnailURL() *BoardUpdate {
-	bu.mutation.ClearThumbnailURL()
-	return bu
-}
-
 // SetStatus sets the "status" field.
 func (bu *BoardUpdate) SetStatus(i int) *BoardUpdate {
 	bu.mutation.ResetStatus()
@@ -240,7 +220,7 @@ func (bu *BoardUpdate) check() error {
 			return &ValidationError{Name: "title", err: fmt.Errorf(`ent: validator failed for field "Board.title": %w`, err)}
 		}
 	}
-	if _, ok := bu.mutation.OwnerID(); bu.mutation.OwnerCleared() && !ok {
+	if bu.mutation.OwnerCleared() && len(bu.mutation.OwnerIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Board.owner"`)
 	}
 	return nil
@@ -266,12 +246,6 @@ func (bu *BoardUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if bu.mutation.DescriptionCleared() {
 		_spec.ClearField(board.FieldDescription, field.TypeString)
-	}
-	if value, ok := bu.mutation.ThumbnailURL(); ok {
-		_spec.SetField(board.FieldThumbnailURL, field.TypeString, value)
-	}
-	if bu.mutation.ThumbnailURLCleared() {
-		_spec.ClearField(board.FieldThumbnailURL, field.TypeString)
 	}
 	if value, ok := bu.mutation.Status(); ok {
 		_spec.SetField(board.FieldStatus, field.TypeInt, value)
@@ -424,26 +398,6 @@ func (buo *BoardUpdateOne) SetNillableDescription(s *string) *BoardUpdateOne {
 // ClearDescription clears the value of the "description" field.
 func (buo *BoardUpdateOne) ClearDescription() *BoardUpdateOne {
 	buo.mutation.ClearDescription()
-	return buo
-}
-
-// SetThumbnailURL sets the "thumbnail_url" field.
-func (buo *BoardUpdateOne) SetThumbnailURL(s string) *BoardUpdateOne {
-	buo.mutation.SetThumbnailURL(s)
-	return buo
-}
-
-// SetNillableThumbnailURL sets the "thumbnail_url" field if the given value is not nil.
-func (buo *BoardUpdateOne) SetNillableThumbnailURL(s *string) *BoardUpdateOne {
-	if s != nil {
-		buo.SetThumbnailURL(*s)
-	}
-	return buo
-}
-
-// ClearThumbnailURL clears the value of the "thumbnail_url" field.
-func (buo *BoardUpdateOne) ClearThumbnailURL() *BoardUpdateOne {
-	buo.mutation.ClearThumbnailURL()
 	return buo
 }
 
@@ -602,7 +556,7 @@ func (buo *BoardUpdateOne) check() error {
 			return &ValidationError{Name: "title", err: fmt.Errorf(`ent: validator failed for field "Board.title": %w`, err)}
 		}
 	}
-	if _, ok := buo.mutation.OwnerID(); buo.mutation.OwnerCleared() && !ok {
+	if buo.mutation.OwnerCleared() && len(buo.mutation.OwnerIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Board.owner"`)
 	}
 	return nil
@@ -645,12 +599,6 @@ func (buo *BoardUpdateOne) sqlSave(ctx context.Context) (_node *Board, err error
 	}
 	if buo.mutation.DescriptionCleared() {
 		_spec.ClearField(board.FieldDescription, field.TypeString)
-	}
-	if value, ok := buo.mutation.ThumbnailURL(); ok {
-		_spec.SetField(board.FieldThumbnailURL, field.TypeString, value)
-	}
-	if buo.mutation.ThumbnailURLCleared() {
-		_spec.ClearField(board.FieldThumbnailURL, field.TypeString)
 	}
 	if value, ok := buo.mutation.Status(); ok {
 		_spec.SetField(board.FieldStatus, field.TypeInt, value)

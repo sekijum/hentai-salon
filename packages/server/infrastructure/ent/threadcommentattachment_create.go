@@ -152,7 +152,7 @@ func (tcac *ThreadCommentAttachmentCreate) check() error {
 	if _, ok := tcac.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "ThreadCommentAttachment.created_at"`)}
 	}
-	if _, ok := tcac.mutation.CommentID(); !ok {
+	if len(tcac.mutation.CommentIDs()) == 0 {
 		return &ValidationError{Name: "comment", err: errors.New(`ent: missing required edge "ThreadCommentAttachment.comment"`)}
 	}
 	return nil

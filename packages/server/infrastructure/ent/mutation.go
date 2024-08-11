@@ -53,7 +53,6 @@ type BoardMutation struct {
 	id             *int
 	title          *string
 	description    *string
-	thumbnail_url  *string
 	status         *int
 	addstatus      *int
 	created_at     *time.Time
@@ -292,55 +291,6 @@ func (m *BoardMutation) DescriptionCleared() bool {
 func (m *BoardMutation) ResetDescription() {
 	m.description = nil
 	delete(m.clearedFields, board.FieldDescription)
-}
-
-// SetThumbnailURL sets the "thumbnail_url" field.
-func (m *BoardMutation) SetThumbnailURL(s string) {
-	m.thumbnail_url = &s
-}
-
-// ThumbnailURL returns the value of the "thumbnail_url" field in the mutation.
-func (m *BoardMutation) ThumbnailURL() (r string, exists bool) {
-	v := m.thumbnail_url
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldThumbnailURL returns the old "thumbnail_url" field's value of the Board entity.
-// If the Board object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *BoardMutation) OldThumbnailURL(ctx context.Context) (v *string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldThumbnailURL is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldThumbnailURL requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldThumbnailURL: %w", err)
-	}
-	return oldValue.ThumbnailURL, nil
-}
-
-// ClearThumbnailURL clears the value of the "thumbnail_url" field.
-func (m *BoardMutation) ClearThumbnailURL() {
-	m.thumbnail_url = nil
-	m.clearedFields[board.FieldThumbnailURL] = struct{}{}
-}
-
-// ThumbnailURLCleared returns if the "thumbnail_url" field was cleared in this mutation.
-func (m *BoardMutation) ThumbnailURLCleared() bool {
-	_, ok := m.clearedFields[board.FieldThumbnailURL]
-	return ok
-}
-
-// ResetThumbnailURL resets all changes to the "thumbnail_url" field.
-func (m *BoardMutation) ResetThumbnailURL() {
-	m.thumbnail_url = nil
-	delete(m.clearedFields, board.FieldThumbnailURL)
 }
 
 // SetStatus sets the "status" field.
@@ -599,7 +549,7 @@ func (m *BoardMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *BoardMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 6)
 	if m.owner != nil {
 		fields = append(fields, board.FieldUserID)
 	}
@@ -608,9 +558,6 @@ func (m *BoardMutation) Fields() []string {
 	}
 	if m.description != nil {
 		fields = append(fields, board.FieldDescription)
-	}
-	if m.thumbnail_url != nil {
-		fields = append(fields, board.FieldThumbnailURL)
 	}
 	if m.status != nil {
 		fields = append(fields, board.FieldStatus)
@@ -635,8 +582,6 @@ func (m *BoardMutation) Field(name string) (ent.Value, bool) {
 		return m.Title()
 	case board.FieldDescription:
 		return m.Description()
-	case board.FieldThumbnailURL:
-		return m.ThumbnailURL()
 	case board.FieldStatus:
 		return m.Status()
 	case board.FieldCreatedAt:
@@ -658,8 +603,6 @@ func (m *BoardMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldTitle(ctx)
 	case board.FieldDescription:
 		return m.OldDescription(ctx)
-	case board.FieldThumbnailURL:
-		return m.OldThumbnailURL(ctx)
 	case board.FieldStatus:
 		return m.OldStatus(ctx)
 	case board.FieldCreatedAt:
@@ -695,13 +638,6 @@ func (m *BoardMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetDescription(v)
-		return nil
-	case board.FieldThumbnailURL:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetThumbnailURL(v)
 		return nil
 	case board.FieldStatus:
 		v, ok := value.(int)
@@ -772,9 +708,6 @@ func (m *BoardMutation) ClearedFields() []string {
 	if m.FieldCleared(board.FieldDescription) {
 		fields = append(fields, board.FieldDescription)
 	}
-	if m.FieldCleared(board.FieldThumbnailURL) {
-		fields = append(fields, board.FieldThumbnailURL)
-	}
 	return fields
 }
 
@@ -792,9 +725,6 @@ func (m *BoardMutation) ClearField(name string) error {
 	case board.FieldDescription:
 		m.ClearDescription()
 		return nil
-	case board.FieldThumbnailURL:
-		m.ClearThumbnailURL()
-		return nil
 	}
 	return fmt.Errorf("unknown Board nullable field %s", name)
 }
@@ -811,9 +741,6 @@ func (m *BoardMutation) ResetField(name string) error {
 		return nil
 	case board.FieldDescription:
 		m.ResetDescription()
-		return nil
-	case board.FieldThumbnailURL:
-		m.ResetThumbnailURL()
 		return nil
 	case board.FieldStatus:
 		m.ResetStatus()

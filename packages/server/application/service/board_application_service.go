@@ -60,10 +60,9 @@ func (svc *BoardApplicationService) Create(params BoardApplicationServiceCreateP
 
 	board := model.NewBoard(model.NewBoardParams{
 		EntBoard: &ent.Board{
-			Title:        params.Body.Title,
-			UserID:       params.UserID,
-			Description:  params.Body.Description,
-			ThumbnailURL: params.Body.ThumbnailURL,
+			Title:       params.Body.Title,
+			UserID:      params.UserID,
+			Description: params.Body.Description,
 		},
 		OptionList: []func(*model.Board){
 			model.WithBoardStatus(model.BoardStatusPublic),

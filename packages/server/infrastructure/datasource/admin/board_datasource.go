@@ -145,10 +145,6 @@ func (ds *BoardDatasource) Update(params BoardDatasourceUpdateParams) (*model.Bo
 		SetStatus(params.Board.EntBoard.Status).
 		SetUpdatedAt(time.Now())
 
-	if params.Board.EntBoard.ThumbnailURL != nil {
-		q.SetThumbnailURL(*params.Board.EntBoard.ThumbnailURL)
-	}
-
 	entBoard, err := q.Save(params.Ctx)
 	if err != nil {
 		return nil, err

@@ -361,7 +361,7 @@ func (tcu *ThreadCommentUpdate) check() error {
 			return &ValidationError{Name: "ip_address", err: fmt.Errorf(`ent: validator failed for field "ThreadComment.ip_address": %w`, err)}
 		}
 	}
-	if _, ok := tcu.mutation.ThreadID(); tcu.mutation.ThreadCleared() && !ok {
+	if tcu.mutation.ThreadCleared() && len(tcu.mutation.ThreadIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "ThreadComment.thread"`)
 	}
 	return nil
@@ -994,7 +994,7 @@ func (tcuo *ThreadCommentUpdateOne) check() error {
 			return &ValidationError{Name: "ip_address", err: fmt.Errorf(`ent: validator failed for field "ThreadComment.ip_address": %w`, err)}
 		}
 	}
-	if _, ok := tcuo.mutation.ThreadID(); tcuo.mutation.ThreadCleared() && !ok {
+	if tcuo.mutation.ThreadCleared() && len(tcuo.mutation.ThreadIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "ThreadComment.thread"`)
 	}
 	return nil

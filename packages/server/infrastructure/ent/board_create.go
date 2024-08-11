@@ -48,20 +48,6 @@ func (bc *BoardCreate) SetNillableDescription(s *string) *BoardCreate {
 	return bc
 }
 
-// SetThumbnailURL sets the "thumbnail_url" field.
-func (bc *BoardCreate) SetThumbnailURL(s string) *BoardCreate {
-	bc.mutation.SetThumbnailURL(s)
-	return bc
-}
-
-// SetNillableThumbnailURL sets the "thumbnail_url" field if the given value is not nil.
-func (bc *BoardCreate) SetNillableThumbnailURL(s *string) *BoardCreate {
-	if s != nil {
-		bc.SetThumbnailURL(*s)
-	}
-	return bc
-}
-
 // SetStatus sets the "status" field.
 func (bc *BoardCreate) SetStatus(i int) *BoardCreate {
 	bc.mutation.SetStatus(i)
@@ -207,7 +193,7 @@ func (bc *BoardCreate) check() error {
 	if _, ok := bc.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Board.updated_at"`)}
 	}
-	if _, ok := bc.mutation.OwnerID(); !ok {
+	if len(bc.mutation.OwnerIDs()) == 0 {
 		return &ValidationError{Name: "owner", err: errors.New(`ent: missing required edge "Board.owner"`)}
 	}
 	return nil
@@ -249,10 +235,6 @@ func (bc *BoardCreate) createSpec() (*Board, *sqlgraph.CreateSpec) {
 	if value, ok := bc.mutation.Description(); ok {
 		_spec.SetField(board.FieldDescription, field.TypeString, value)
 		_node.Description = &value
-	}
-	if value, ok := bc.mutation.ThumbnailURL(); ok {
-		_spec.SetField(board.FieldThumbnailURL, field.TypeString, value)
-		_node.ThumbnailURL = &value
 	}
 	if value, ok := bc.mutation.Status(); ok {
 		_spec.SetField(board.FieldStatus, field.TypeInt, value)

@@ -92,10 +92,9 @@ type BoardApplicationServiceUpdateParams struct {
 func (svc *BoardApplicationService) Update(params BoardApplicationServiceUpdateParams) (*response_admin.BoardResponse, error) {
 	board := model.NewBoard(model.NewBoardParams{
 		EntBoard: &ent.Board{
-			ID:           params.BoardID,
-			Title:        params.Body.Title,
-			Description:  params.Body.Description,
-			ThumbnailURL: params.Body.ThumbnailURL,
+			ID:          params.BoardID,
+			Title:       params.Body.Title,
+			Description: params.Body.Description,
 		},
 		OptionList: []func(*model.Board){
 			model.WithBoardStatus(model.BoardStatus(params.Body.Status)),

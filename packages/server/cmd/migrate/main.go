@@ -24,17 +24,17 @@ func main() {
 	}
 
 	ctx := context.Background()
-	// Create a local migration directory able to understand Atlas migration file format for replay.
 	dir, err := atlas.NewLocalDir("/app/infrastructure/ent/migrate/migrations")
 	if err != nil {
 		log.Fatalf("failed creating atlas migration directory: %v", err)
 	}
-	// Migrate diff options.
 	opts := []schema.MigrateOption{
-		schema.WithDir(dir),                         // provide migration directory
-		schema.WithMigrationMode(schema.ModeReplay), // provide migration mode
-		schema.WithDialect(dialect.MySQL),           // Ent dialect to use
+		schema.WithDir(dir),
+		schema.WithMigrationMode(schema.ModeInspect),
+		schema.WithDialect(dialect.MySQL),
 		schema.WithFormatter(atlas.DefaultFormatter),
+		schema.WithDropIndex(true),
+		schema.WithDropColumn(true),
 	}
 	if len(os.Args) != 2 {
 		log.Fatalln("migration name is required. Use: 'go run -mod=mod ent/migrate/main.go <name>'")
@@ -46,12 +46,12 @@ func main() {
 	dbPort := os.Getenv("DB_PORT")
 	dbName := os.Getenv("DB_NAME")
 
-	// Construct DB_URL using environment variables
 	dbURL := fmt.Sprintf("mysql://%s:%s@%s:%s/%s", dbUser, dbPass, dbHost, dbPort, dbName)
 
-	// Generate migrations using Atlas support for MySQL (note the Ent dialect option passed above).
 	err = migrate.NamedDiff(ctx, dbURL, os.Args[1], opts...)
 	if err != nil {
 		log.Fatalf("failed generating migration file: %v", err)
 	}
+
+	log.Println("Migration file generated successfully")
 }

@@ -64,7 +64,6 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 
 		userGroup := authGroup.Group("/users")
 		{
-			userGroup.GET("/:userID", controllers.UserController.FindByID)
 			userGroup.GET("/me", controllers.UserController.FindAuthenticatedUser)
 			userGroup.GET("/me/comments", controllers.UserController.FindComments)
 			userGroup.GET("/me/threads", controllers.UserController.FindThreads)

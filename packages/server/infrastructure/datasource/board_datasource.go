@@ -77,9 +77,6 @@ func (ds *BoardDatasource) Create(params BoardDatasourceCreateParams) (*model.Bo
 	if params.Board.EntBoard.Description != nil {
 		q.SetDescription(*params.Board.EntBoard.Description)
 	}
-	if params.Board.EntBoard.ThumbnailURL != nil {
-		q.SetThumbnailURL(*params.Board.EntBoard.ThumbnailURL)
-	}
 
 	entBoard, err := q.Save(params.Ctx)
 	if err != nil {

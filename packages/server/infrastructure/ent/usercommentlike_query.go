@@ -11,6 +11,7 @@ import (
 	"server/infrastructure/ent/user"
 	"server/infrastructure/ent/usercommentlike"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 )
@@ -107,7 +108,7 @@ func (uclq *UserCommentLikeQuery) QueryComment() *ThreadCommentQuery {
 // First returns the first UserCommentLike entity from the query.
 // Returns a *NotFoundError when no UserCommentLike was found.
 func (uclq *UserCommentLikeQuery) First(ctx context.Context) (*UserCommentLike, error) {
-	nodes, err := uclq.Limit(1).All(setContextOp(ctx, uclq.ctx, "First"))
+	nodes, err := uclq.Limit(1).All(setContextOp(ctx, uclq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -130,7 +131,7 @@ func (uclq *UserCommentLikeQuery) FirstX(ctx context.Context) *UserCommentLike {
 // Returns a *NotSingularError when more than one UserCommentLike entity is found.
 // Returns a *NotFoundError when no UserCommentLike entities are found.
 func (uclq *UserCommentLikeQuery) Only(ctx context.Context) (*UserCommentLike, error) {
-	nodes, err := uclq.Limit(2).All(setContextOp(ctx, uclq.ctx, "Only"))
+	nodes, err := uclq.Limit(2).All(setContextOp(ctx, uclq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -155,7 +156,7 @@ func (uclq *UserCommentLikeQuery) OnlyX(ctx context.Context) *UserCommentLike {
 
 // All executes the query and returns a list of UserCommentLikes.
 func (uclq *UserCommentLikeQuery) All(ctx context.Context) ([]*UserCommentLike, error) {
-	ctx = setContextOp(ctx, uclq.ctx, "All")
+	ctx = setContextOp(ctx, uclq.ctx, ent.OpQueryAll)
 	if err := uclq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -174,7 +175,7 @@ func (uclq *UserCommentLikeQuery) AllX(ctx context.Context) []*UserCommentLike {
 
 // Count returns the count of the given query.
 func (uclq *UserCommentLikeQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, uclq.ctx, "Count")
+	ctx = setContextOp(ctx, uclq.ctx, ent.OpQueryCount)
 	if err := uclq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -192,7 +193,7 @@ func (uclq *UserCommentLikeQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (uclq *UserCommentLikeQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, uclq.ctx, "Exist")
+	ctx = setContextOp(ctx, uclq.ctx, ent.OpQueryExist)
 	switch _, err := uclq.First(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -525,7 +526,7 @@ func (uclgb *UserCommentLikeGroupBy) Aggregate(fns ...AggregateFunc) *UserCommen
 
 // Scan applies the selector query and scans the result into the given value.
 func (uclgb *UserCommentLikeGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, uclgb.build.ctx, "GroupBy")
+	ctx = setContextOp(ctx, uclgb.build.ctx, ent.OpQueryGroupBy)
 	if err := uclgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -573,7 +574,7 @@ func (ucls *UserCommentLikeSelect) Aggregate(fns ...AggregateFunc) *UserCommentL
 
 // Scan applies the selector query and scans the result into the given value.
 func (ucls *UserCommentLikeSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, ucls.ctx, "Select")
+	ctx = setContextOp(ctx, ucls.ctx, ent.OpQuerySelect)
 	if err := ucls.prepareQuery(ctx); err != nil {
 		return err
 	}

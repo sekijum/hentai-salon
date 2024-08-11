@@ -27,15 +27,15 @@ func init() {
 	// board.TitleValidator is a validator for the "title" field. It is called by the builders before save.
 	board.TitleValidator = boardDescTitle.Validators[0].(func(string) error)
 	// boardDescStatus is the schema descriptor for status field.
-	boardDescStatus := boardFields[5].Descriptor()
+	boardDescStatus := boardFields[4].Descriptor()
 	// board.DefaultStatus holds the default value on creation for the status field.
 	board.DefaultStatus = boardDescStatus.Default.(int)
 	// boardDescCreatedAt is the schema descriptor for created_at field.
-	boardDescCreatedAt := boardFields[6].Descriptor()
+	boardDescCreatedAt := boardFields[5].Descriptor()
 	// board.DefaultCreatedAt holds the default value on creation for the created_at field.
 	board.DefaultCreatedAt = boardDescCreatedAt.Default.(func() time.Time)
 	// boardDescUpdatedAt is the schema descriptor for updated_at field.
-	boardDescUpdatedAt := boardFields[7].Descriptor()
+	boardDescUpdatedAt := boardFields[6].Descriptor()
 	// board.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	board.DefaultUpdatedAt = boardDescUpdatedAt.Default.(func() time.Time)
 	// board.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

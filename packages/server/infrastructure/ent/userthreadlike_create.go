@@ -110,10 +110,10 @@ func (utlc *UserThreadLikeCreate) check() error {
 	if _, ok := utlc.mutation.LikedAt(); !ok {
 		return &ValidationError{Name: "liked_at", err: errors.New(`ent: missing required field "UserThreadLike.liked_at"`)}
 	}
-	if _, ok := utlc.mutation.UserID(); !ok {
+	if len(utlc.mutation.UserIDs()) == 0 {
 		return &ValidationError{Name: "user", err: errors.New(`ent: missing required edge "UserThreadLike.user"`)}
 	}
-	if _, ok := utlc.mutation.ThreadID(); !ok {
+	if len(utlc.mutation.ThreadIDs()) == 0 {
 		return &ValidationError{Name: "thread", err: errors.New(`ent: missing required edge "UserThreadLike.thread"`)}
 	}
 	return nil

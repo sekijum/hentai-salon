@@ -94,16 +94,12 @@ func seed(ctx context.Context, client *ent.Client) error {
 	// Create Boards
 	boards := make([]*ent.Board, 100)
 	for i := 0; i < 100; i++ {
-		thumbnailURL := randomImageURL(i)
 		createBoard := tx.Board.Create().
 			SetTitle("掲示板" + uuid.New().String()[:8]).
 			SetDescription("掲示板の説明" + uuid.New().String()[:8]).
 			SetUserID(users[rand.Intn(100)].ID).
 			SetCreatedAt(time.Now()).
 			SetUpdatedAt(time.Now())
-		if rand.Intn(1000) >= 100 { // 1000件ほどnullにする
-			createBoard.SetThumbnailURL(thumbnailURL)
-		}
 		boards[i] = createBoard.SaveX(ctx)
 	}
 

@@ -3,7 +3,7 @@ resource "aws_ecs_service" "server" {
   cluster                            = aws_ecs_cluster.this.id
   platform_version                   = "LATEST"
   task_definition                    = aws_ecs_task_definition.server.arn
-  desired_count                      = 1
+  desired_count                      = 0
   deployment_minimum_healthy_percent = 50
   deployment_maximum_percent         = 200
   propagate_tags                     = "SERVICE"
@@ -35,7 +35,7 @@ resource "aws_ecs_service" "client" {
   cluster                            = aws_ecs_cluster.this.id
   platform_version                   = "LATEST"
   task_definition                    = aws_ecs_task_definition.client.arn
-  desired_count                      = 1
+  desired_count                      = 0
   deployment_minimum_healthy_percent = 50
   deployment_maximum_percent         = 200
   propagate_tags                     = "SERVICE"

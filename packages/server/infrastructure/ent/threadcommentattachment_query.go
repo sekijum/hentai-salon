@@ -10,6 +10,7 @@ import (
 	"server/infrastructure/ent/threadcomment"
 	"server/infrastructure/ent/threadcommentattachment"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -84,7 +85,7 @@ func (tcaq *ThreadCommentAttachmentQuery) QueryComment() *ThreadCommentQuery {
 // First returns the first ThreadCommentAttachment entity from the query.
 // Returns a *NotFoundError when no ThreadCommentAttachment was found.
 func (tcaq *ThreadCommentAttachmentQuery) First(ctx context.Context) (*ThreadCommentAttachment, error) {
-	nodes, err := tcaq.Limit(1).All(setContextOp(ctx, tcaq.ctx, "First"))
+	nodes, err := tcaq.Limit(1).All(setContextOp(ctx, tcaq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +108,7 @@ func (tcaq *ThreadCommentAttachmentQuery) FirstX(ctx context.Context) *ThreadCom
 // Returns a *NotFoundError when no ThreadCommentAttachment ID was found.
 func (tcaq *ThreadCommentAttachmentQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = tcaq.Limit(1).IDs(setContextOp(ctx, tcaq.ctx, "FirstID")); err != nil {
+	if ids, err = tcaq.Limit(1).IDs(setContextOp(ctx, tcaq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -130,7 +131,7 @@ func (tcaq *ThreadCommentAttachmentQuery) FirstIDX(ctx context.Context) int {
 // Returns a *NotSingularError when more than one ThreadCommentAttachment entity is found.
 // Returns a *NotFoundError when no ThreadCommentAttachment entities are found.
 func (tcaq *ThreadCommentAttachmentQuery) Only(ctx context.Context) (*ThreadCommentAttachment, error) {
-	nodes, err := tcaq.Limit(2).All(setContextOp(ctx, tcaq.ctx, "Only"))
+	nodes, err := tcaq.Limit(2).All(setContextOp(ctx, tcaq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -158,7 +159,7 @@ func (tcaq *ThreadCommentAttachmentQuery) OnlyX(ctx context.Context) *ThreadComm
 // Returns a *NotFoundError when no entities are found.
 func (tcaq *ThreadCommentAttachmentQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = tcaq.Limit(2).IDs(setContextOp(ctx, tcaq.ctx, "OnlyID")); err != nil {
+	if ids, err = tcaq.Limit(2).IDs(setContextOp(ctx, tcaq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -183,7 +184,7 @@ func (tcaq *ThreadCommentAttachmentQuery) OnlyIDX(ctx context.Context) int {
 
 // All executes the query and returns a list of ThreadCommentAttachments.
 func (tcaq *ThreadCommentAttachmentQuery) All(ctx context.Context) ([]*ThreadCommentAttachment, error) {
-	ctx = setContextOp(ctx, tcaq.ctx, "All")
+	ctx = setContextOp(ctx, tcaq.ctx, ent.OpQueryAll)
 	if err := tcaq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -205,7 +206,7 @@ func (tcaq *ThreadCommentAttachmentQuery) IDs(ctx context.Context) (ids []int, e
 	if tcaq.ctx.Unique == nil && tcaq.path != nil {
 		tcaq.Unique(true)
 	}
-	ctx = setContextOp(ctx, tcaq.ctx, "IDs")
+	ctx = setContextOp(ctx, tcaq.ctx, ent.OpQueryIDs)
 	if err = tcaq.Select(threadcommentattachment.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -223,7 +224,7 @@ func (tcaq *ThreadCommentAttachmentQuery) IDsX(ctx context.Context) []int {
 
 // Count returns the count of the given query.
 func (tcaq *ThreadCommentAttachmentQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, tcaq.ctx, "Count")
+	ctx = setContextOp(ctx, tcaq.ctx, ent.OpQueryCount)
 	if err := tcaq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -241,7 +242,7 @@ func (tcaq *ThreadCommentAttachmentQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (tcaq *ThreadCommentAttachmentQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, tcaq.ctx, "Exist")
+	ctx = setContextOp(ctx, tcaq.ctx, ent.OpQueryExist)
 	switch _, err := tcaq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -528,7 +529,7 @@ func (tcagb *ThreadCommentAttachmentGroupBy) Aggregate(fns ...AggregateFunc) *Th
 
 // Scan applies the selector query and scans the result into the given value.
 func (tcagb *ThreadCommentAttachmentGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, tcagb.build.ctx, "GroupBy")
+	ctx = setContextOp(ctx, tcagb.build.ctx, ent.OpQueryGroupBy)
 	if err := tcagb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -576,7 +577,7 @@ func (tcas *ThreadCommentAttachmentSelect) Aggregate(fns ...AggregateFunc) *Thre
 
 // Scan applies the selector query and scans the result into the given value.
 func (tcas *ThreadCommentAttachmentSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, tcas.ctx, "Select")
+	ctx = setContextOp(ctx, tcas.ctx, ent.OpQuerySelect)
 	if err := tcas.prepareQuery(ctx); err != nil {
 		return err
 	}

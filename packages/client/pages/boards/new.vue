@@ -29,22 +29,7 @@
         </Field>
       </div>
 
-      <div class="field">
-        <v-file-input
-          label="サムネイルを選択"
-          show-size
-          truncate-length="25"
-          prepend-icon=""
-          variant="outlined"
-          dense
-          hide-details
-          accept="image/*"
-          density="compact"
-          @change="handleThumbnailChange"
-        />
-      </div>
-
-      <v-btn type="submit" color="primary" block :disabled="!meta?.valid" class="mt-5">作成</v-btn>
+      <v-btn type="submit" color="primary" block :disabled="!meta?.valid">作成</v-btn>
       <p class="note">＊反映には時間が掛かる場合があります＊</p>
     </Form>
   </div>
@@ -59,37 +44,21 @@ definePageMeta({ middleware: ['admin-access-only'] });
 
 const router = useRouter();
 const nuxtApp = useNuxtApp();
-const { fetchListPresignedUrl, uploadFilesToS3 } = useActions();
 
 const { $api } = nuxtApp;
-
-const thumbnailFile = ref<File | null>(null);
 
 const form = ref({
   title: '',
   description: '',
-  thumbnailUrl: null as null | string,
 });
 
 const schema = yup.object({
   title: yup.string().required('必須項目です'),
 });
 
-function handleThumbnailChange(event: Event) {
-  const input = event.target as HTMLInputElement;
-  if (input.files && input.files[0]) {
-    thumbnailFile.value = input.files[0];
-  }
-}
-
 async function submit() {
   try {
     if (confirm('板を作成しますか？')) {
-      if (thumbnailFile.value) {
-        const presignedUrls = await fetchListPresignedUrl([thumbnailFile.value.name]);
-        const thumbnailUrl = await uploadFilesToS3(presignedUrls[0], thumbnailFile.value);
-        form.value.thumbnailUrl = thumbnailUrl;
-      }
       await $api.post('/admin/boards', form.value);
       router.push('/');
     }

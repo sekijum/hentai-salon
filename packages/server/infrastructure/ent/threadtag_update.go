@@ -113,10 +113,10 @@ func (ttu *ThreadTagUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (ttu *ThreadTagUpdate) check() error {
-	if _, ok := ttu.mutation.ThreadID(); ttu.mutation.ThreadCleared() && !ok {
+	if ttu.mutation.ThreadCleared() && len(ttu.mutation.ThreadIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "ThreadTag.thread"`)
 	}
-	if _, ok := ttu.mutation.TagID(); ttu.mutation.TagCleared() && !ok {
+	if ttu.mutation.TagCleared() && len(ttu.mutation.TagIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "ThreadTag.tag"`)
 	}
 	return nil
@@ -309,10 +309,10 @@ func (ttuo *ThreadTagUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (ttuo *ThreadTagUpdateOne) check() error {
-	if _, ok := ttuo.mutation.ThreadID(); ttuo.mutation.ThreadCleared() && !ok {
+	if ttuo.mutation.ThreadCleared() && len(ttuo.mutation.ThreadIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "ThreadTag.thread"`)
 	}
-	if _, ok := ttuo.mutation.TagID(); ttuo.mutation.TagCleared() && !ok {
+	if ttuo.mutation.TagCleared() && len(ttuo.mutation.TagIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "ThreadTag.tag"`)
 	}
 	return nil

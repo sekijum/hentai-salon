@@ -1,5 +1,5 @@
 <template>
-  <div class="text-center">
+  <div v-if="totalCount" class="text-center">
     <v-pagination
       v-model="page"
       :length="totalPages"

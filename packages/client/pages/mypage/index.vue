@@ -96,15 +96,15 @@ import type { IUser } from '~/types/user';
 definePageMeta({ middleware: ['logged-in-access-only'] });
 
 const menuItems = [
-  { title: 'マイスレ', clicked: () => router.push('/users/me/threads'), icon: 'mdi-file-document-multiple-outline' },
-  { title: 'ユーザー情報', clicked: () => router.push('/users/me'), icon: 'mdi-account-cog-outline' },
-  { title: 'マイレス', clicked: () => router.push('/users/me/comments'), icon: 'mdi-message-text-outline' },
+  { title: 'マイスレ', clicked: () => router.push('/mypage/threads'), icon: 'mdi-file-document-multiple-outline' },
+  { title: 'ユーザー情報', clicked: () => router.push('/mypage'), icon: 'mdi-account-cog-outline' },
+  { title: 'マイレス', clicked: () => router.push('/mypage/comments'), icon: 'mdi-message-text-outline' },
   {
     title: 'お気に入りスレ',
-    clicked: () => router.push('/users/me/liked-threads'),
+    clicked: () => router.push('/mypage/liked-threads'),
     icon: 'mdi-star-box-multiple-outline',
   },
-  { title: 'お気に入りレス', clicked: () => router.push('/users/me/liked-comments'), icon: 'mdi-message-star-outline' },
+  { title: 'お気に入りレス', clicked: () => router.push('/mypage/liked-comments'), icon: 'mdi-message-star-outline' },
 ];
 
 const schema = yup.object({
@@ -141,7 +141,7 @@ onMounted(async () => {
 });
 
 async function fetchUser() {
-  const { data } = await $api.get<IUser>(`/users/${payload?.user?.id}`, {});
+  const { data } = await $api.get<IUser>(`/users/me`, {});
   user.value = data;
   updateForm.value.name = data.name;
   updateForm.value.email = data.email;

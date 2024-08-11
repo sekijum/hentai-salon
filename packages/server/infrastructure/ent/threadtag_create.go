@@ -83,10 +83,10 @@ func (ttc *ThreadTagCreate) check() error {
 	if _, ok := ttc.mutation.TagID(); !ok {
 		return &ValidationError{Name: "tag_id", err: errors.New(`ent: missing required field "ThreadTag.tag_id"`)}
 	}
-	if _, ok := ttc.mutation.ThreadID(); !ok {
+	if len(ttc.mutation.ThreadIDs()) == 0 {
 		return &ValidationError{Name: "thread", err: errors.New(`ent: missing required edge "ThreadTag.thread"`)}
 	}
-	if _, ok := ttc.mutation.TagID(); !ok {
+	if len(ttc.mutation.TagIDs()) == 0 {
 		return &ValidationError{Name: "tag", err: errors.New(`ent: missing required edge "ThreadTag.tag"`)}
 	}
 	return nil

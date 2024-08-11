@@ -263,7 +263,7 @@ func (tcc *ThreadCommentCreate) check() error {
 	if _, ok := tcc.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "ThreadComment.updated_at"`)}
 	}
-	if _, ok := tcc.mutation.ThreadID(); !ok {
+	if len(tcc.mutation.ThreadIDs()) == 0 {
 		return &ValidationError{Name: "thread", err: errors.New(`ent: missing required edge "ThreadComment.thread"`)}
 	}
 	return nil

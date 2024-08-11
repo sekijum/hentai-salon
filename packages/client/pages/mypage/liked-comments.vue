@@ -1,10 +1,10 @@
 <template>
   <div v-if="comment">
-    <PageTitle title="マイレス" />
+    <PageTitle title="お気に入りレス" />
 
     <Menu :items="menuItems" />
 
-    <Pagination :totalCount="comment?.totalCount" :limit="commentLimit" />
+    <Pagination v-if="comment.totalCount" :totalCount="comment?.totalCount" :limit="commentLimit" />
 
     <template v-for="comment in comment?.data" :key="comment.id">
       <CommentItem
@@ -35,15 +35,15 @@ const { $api } = nuxtApp;
 const { getCommentLimit } = useStorage();
 
 const menuItems = [
-  { title: 'マイスレ', clicked: () => router.push('/users/me/threads'), icon: 'mdi-file-document-multiple-outline' },
-  { title: 'ユーザー情報', clicked: () => router.push('/users/me'), icon: 'mdi-account-cog-outline' },
-  { title: 'マイレス', clicked: () => router.push('/users/me/comments'), icon: 'mdi-message-text-outline' },
+  { title: 'マイスレ', clicked: () => router.push('/mypage/threads'), icon: 'mdi-file-document-multiple-outline' },
+  { title: 'ユーザー情報', clicked: () => router.push('/mypage'), icon: 'mdi-account-cog-outline' },
+  { title: 'マイレス', clicked: () => router.push('/mypage/comments'), icon: 'mdi-message-text-outline' },
   {
     title: 'お気に入りスレ',
-    clicked: () => router.push('/users/me/liked-threads'),
+    clicked: () => router.push('/mypage/liked-threads'),
     icon: 'mdi-star-box-multiple-outline',
   },
-  { title: 'お気に入りレス', clicked: () => router.push('/users/me/liked-comments'), icon: 'mdi-message-star-outline' },
+  { title: 'お気に入りレス', clicked: () => router.push('/mypage/liked-comments'), icon: 'mdi-message-star-outline' },
 ];
 
 const comment = ref<ICollection<IThreadComment>>();
@@ -54,7 +54,7 @@ onMounted(async () => {
 });
 
 async function fetchComments() {
-  const response = await $api.get<ICollection<IThreadComment>>('/users/me/comments', {
+  const response = await $api.get<ICollection<IThreadComment>>('/users/me/liked-comments', {
     params: { offset: route.query.offset, limit: commentLimit },
   });
 

@@ -158,7 +158,7 @@ func (tcau *ThreadCommentAttachmentUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (tcau *ThreadCommentAttachmentUpdate) check() error {
-	if _, ok := tcau.mutation.CommentID(); tcau.mutation.CommentCleared() && !ok {
+	if tcau.mutation.CommentCleared() && len(tcau.mutation.CommentIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "ThreadCommentAttachment.comment"`)
 	}
 	return nil
@@ -385,7 +385,7 @@ func (tcauo *ThreadCommentAttachmentUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (tcauo *ThreadCommentAttachmentUpdateOne) check() error {
-	if _, ok := tcauo.mutation.CommentID(); tcauo.mutation.CommentCleared() && !ok {
+	if tcauo.mutation.CommentCleared() && len(tcauo.mutation.CommentIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "ThreadCommentAttachment.comment"`)
 	}
 	return nil

@@ -19,7 +19,6 @@ func (Board) Fields() []ent.Field {
 		field.Int("user_id"),
 		field.String("title").Unique().MaxLen(255).Comment("板名"),
 		field.Text("description").Optional().Nillable(),
-		field.String("thumbnail_url").Optional().Nillable(),
 		field.Int("status").Default(0).Comment("0: Public, 1: Private, 3: Pending, 3: Archived"),
 		field.Time("created_at").Default(time.Now),
 		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),

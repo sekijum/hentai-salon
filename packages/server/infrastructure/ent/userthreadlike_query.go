@@ -11,6 +11,7 @@ import (
 	"server/infrastructure/ent/user"
 	"server/infrastructure/ent/userthreadlike"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 )
@@ -107,7 +108,7 @@ func (utlq *UserThreadLikeQuery) QueryThread() *ThreadQuery {
 // First returns the first UserThreadLike entity from the query.
 // Returns a *NotFoundError when no UserThreadLike was found.
 func (utlq *UserThreadLikeQuery) First(ctx context.Context) (*UserThreadLike, error) {
-	nodes, err := utlq.Limit(1).All(setContextOp(ctx, utlq.ctx, "First"))
+	nodes, err := utlq.Limit(1).All(setContextOp(ctx, utlq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -130,7 +131,7 @@ func (utlq *UserThreadLikeQuery) FirstX(ctx context.Context) *UserThreadLike {
 // Returns a *NotSingularError when more than one UserThreadLike entity is found.
 // Returns a *NotFoundError when no UserThreadLike entities are found.
 func (utlq *UserThreadLikeQuery) Only(ctx context.Context) (*UserThreadLike, error) {
-	nodes, err := utlq.Limit(2).All(setContextOp(ctx, utlq.ctx, "Only"))
+	nodes, err := utlq.Limit(2).All(setContextOp(ctx, utlq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -155,7 +156,7 @@ func (utlq *UserThreadLikeQuery) OnlyX(ctx context.Context) *UserThreadLike {
 
 // All executes the query and returns a list of UserThreadLikes.
 func (utlq *UserThreadLikeQuery) All(ctx context.Context) ([]*UserThreadLike, error) {
-	ctx = setContextOp(ctx, utlq.ctx, "All")
+	ctx = setContextOp(ctx, utlq.ctx, ent.OpQueryAll)
 	if err := utlq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -174,7 +175,7 @@ func (utlq *UserThreadLikeQuery) AllX(ctx context.Context) []*UserThreadLike {
 
 // Count returns the count of the given query.
 func (utlq *UserThreadLikeQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, utlq.ctx, "Count")
+	ctx = setContextOp(ctx, utlq.ctx, ent.OpQueryCount)
 	if err := utlq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -192,7 +193,7 @@ func (utlq *UserThreadLikeQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (utlq *UserThreadLikeQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, utlq.ctx, "Exist")
+	ctx = setContextOp(ctx, utlq.ctx, ent.OpQueryExist)
 	switch _, err := utlq.First(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -525,7 +526,7 @@ func (utlgb *UserThreadLikeGroupBy) Aggregate(fns ...AggregateFunc) *UserThreadL
 
 // Scan applies the selector query and scans the result into the given value.
 func (utlgb *UserThreadLikeGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, utlgb.build.ctx, "GroupBy")
+	ctx = setContextOp(ctx, utlgb.build.ctx, ent.OpQueryGroupBy)
 	if err := utlgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -573,7 +574,7 @@ func (utls *UserThreadLikeSelect) Aggregate(fns ...AggregateFunc) *UserThreadLik
 
 // Scan applies the selector query and scans the result into the given value.
 func (utls *UserThreadLikeSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, utls.ctx, "Select")
+	ctx = setContextOp(ctx, utls.ctx, ent.OpQuerySelect)
 	if err := utls.prepareQuery(ctx); err != nil {
 		return err
 	}

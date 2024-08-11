@@ -267,10 +267,10 @@ func (tc *ThreadCreate) check() error {
 	if _, ok := tc.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Thread.updated_at"`)}
 	}
-	if _, ok := tc.mutation.BoardID(); !ok {
+	if len(tc.mutation.BoardIDs()) == 0 {
 		return &ValidationError{Name: "board", err: errors.New(`ent: missing required edge "Thread.board"`)}
 	}
-	if _, ok := tc.mutation.OwnerID(); !ok {
+	if len(tc.mutation.OwnerIDs()) == 0 {
 		return &ValidationError{Name: "owner", err: errors.New(`ent: missing required edge "Thread.owner"`)}
 	}
 	return nil

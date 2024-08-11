@@ -11,6 +11,7 @@ import (
 	"server/infrastructure/ent/thread"
 	"server/infrastructure/ent/threadtag"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 )
@@ -107,7 +108,7 @@ func (ttq *ThreadTagQuery) QueryTag() *TagQuery {
 // First returns the first ThreadTag entity from the query.
 // Returns a *NotFoundError when no ThreadTag was found.
 func (ttq *ThreadTagQuery) First(ctx context.Context) (*ThreadTag, error) {
-	nodes, err := ttq.Limit(1).All(setContextOp(ctx, ttq.ctx, "First"))
+	nodes, err := ttq.Limit(1).All(setContextOp(ctx, ttq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -130,7 +131,7 @@ func (ttq *ThreadTagQuery) FirstX(ctx context.Context) *ThreadTag {
 // Returns a *NotSingularError when more than one ThreadTag entity is found.
 // Returns a *NotFoundError when no ThreadTag entities are found.
 func (ttq *ThreadTagQuery) Only(ctx context.Context) (*ThreadTag, error) {
-	nodes, err := ttq.Limit(2).All(setContextOp(ctx, ttq.ctx, "Only"))
+	nodes, err := ttq.Limit(2).All(setContextOp(ctx, ttq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -155,7 +156,7 @@ func (ttq *ThreadTagQuery) OnlyX(ctx context.Context) *ThreadTag {
 
 // All executes the query and returns a list of ThreadTags.
 func (ttq *ThreadTagQuery) All(ctx context.Context) ([]*ThreadTag, error) {
-	ctx = setContextOp(ctx, ttq.ctx, "All")
+	ctx = setContextOp(ctx, ttq.ctx, ent.OpQueryAll)
 	if err := ttq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -174,7 +175,7 @@ func (ttq *ThreadTagQuery) AllX(ctx context.Context) []*ThreadTag {
 
 // Count returns the count of the given query.
 func (ttq *ThreadTagQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, ttq.ctx, "Count")
+	ctx = setContextOp(ctx, ttq.ctx, ent.OpQueryCount)
 	if err := ttq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -192,7 +193,7 @@ func (ttq *ThreadTagQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (ttq *ThreadTagQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, ttq.ctx, "Exist")
+	ctx = setContextOp(ctx, ttq.ctx, ent.OpQueryExist)
 	switch _, err := ttq.First(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -525,7 +526,7 @@ func (ttgb *ThreadTagGroupBy) Aggregate(fns ...AggregateFunc) *ThreadTagGroupBy 
 
 // Scan applies the selector query and scans the result into the given value.
 func (ttgb *ThreadTagGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, ttgb.build.ctx, "GroupBy")
+	ctx = setContextOp(ctx, ttgb.build.ctx, ent.OpQueryGroupBy)
 	if err := ttgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -573,7 +574,7 @@ func (tts *ThreadTagSelect) Aggregate(fns ...AggregateFunc) *ThreadTagSelect {
 
 // Scan applies the selector query and scans the result into the given value.
 func (tts *ThreadTagSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, tts.ctx, "Select")
+	ctx = setContextOp(ctx, tts.ctx, ent.OpQuerySelect)
 	if err := tts.prepareQuery(ctx); err != nil {
 		return err
 	}

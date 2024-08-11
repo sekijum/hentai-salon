@@ -20,8 +20,6 @@ const (
 	FieldTitle = "title"
 	// FieldDescription holds the string denoting the description field in the database.
 	FieldDescription = "description"
-	// FieldThumbnailURL holds the string denoting the thumbnail_url field in the database.
-	FieldThumbnailURL = "thumbnail_url"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
@@ -56,7 +54,6 @@ var Columns = []string{
 	FieldUserID,
 	FieldTitle,
 	FieldDescription,
-	FieldThumbnailURL,
 	FieldStatus,
 	FieldCreatedAt,
 	FieldUpdatedAt,
@@ -106,11 +103,6 @@ func ByTitle(opts ...sql.OrderTermOption) OrderOption {
 // ByDescription orders the results by the description field.
 func ByDescription(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDescription, opts...).ToFunc()
-}
-
-// ByThumbnailURL orders the results by the thumbnail_url field.
-func ByThumbnailURL(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldThumbnailURL, opts...).ToFunc()
 }
 
 // ByStatus orders the results by the status field.

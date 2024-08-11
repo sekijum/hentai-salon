@@ -110,10 +110,10 @@ func (uclc *UserCommentLikeCreate) check() error {
 	if _, ok := uclc.mutation.LikedAt(); !ok {
 		return &ValidationError{Name: "liked_at", err: errors.New(`ent: missing required field "UserCommentLike.liked_at"`)}
 	}
-	if _, ok := uclc.mutation.UserID(); !ok {
+	if len(uclc.mutation.UserIDs()) == 0 {
 		return &ValidationError{Name: "user", err: errors.New(`ent: missing required edge "UserCommentLike.user"`)}
 	}
-	if _, ok := uclc.mutation.CommentID(); !ok {
+	if len(uclc.mutation.CommentIDs()) == 0 {
 		return &ValidationError{Name: "comment", err: errors.New(`ent: missing required edge "UserCommentLike.comment"`)}
 	}
 	return nil
