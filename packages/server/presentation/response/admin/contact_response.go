@@ -6,14 +6,14 @@ import (
 )
 
 type ContactResponse struct {
-	ID          int    `json:"id"`
-	Email       string `json:"email"`
-	Subject     string `json:"subject"`
-	Message     string `json:"message"`
-	Status      int    `json:"status"`
-	StatusLabel string `json:"statusLabel"`
-	CreatedAt   string `json:"createdAt"`
-	UpdatedAt   string `json:"updatedAt"`
+	ID          int     `json:"id"`
+	Email       *string `json:"email,omitempty"`
+	Subject     string  `json:"subject"`
+	Message     string  `json:"message"`
+	Status      int     `json:"status"`
+	StatusLabel string  `json:"statusLabel"`
+	CreatedAt   string  `json:"createdAt"`
+	UpdatedAt   string  `json:"updatedAt"`
 }
 
 type NewContactResponseParams struct {

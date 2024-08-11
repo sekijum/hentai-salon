@@ -15,7 +15,7 @@ func NewThreadCommentDatasource(client *ent.Client) *ThreadCommentDatasource {
 
 type ThreadCommentDatasourceDeleteParams struct {
 	Ctx       context.Context
-	CommentID int
+	CommentID uint64
 }
 
 func (ds *ThreadCommentDatasource) Delete(params ThreadCommentDatasourceDeleteParams) error {

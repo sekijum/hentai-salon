@@ -26,7 +26,7 @@ type ContactApplicationServiceCreateParams struct {
 func (svc *ContactApplicationService) Create(params ContactApplicationServiceCreateParams) (*response.ContactResponse, error) {
 	contact := model.NewContact(model.NewContactParams{
 		EntContact: &ent.Contact{
-			Email:     params.Body.Email,
+			Email:     &params.Body.Email,
 			Subject:   params.Body.Subject,
 			Message:   params.Body.Message,
 			IPAddress: params.ClientIP,

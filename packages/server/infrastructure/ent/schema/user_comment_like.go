@@ -22,7 +22,7 @@ func (UserCommentLike) Annotations() []schema.Annotation {
 func (UserCommentLike) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("user_id"),
-		field.Int("comment_id"),
+		field.Uint64("comment_id"),
 		field.Time("liked_at").Default(time.Now),
 	}
 }

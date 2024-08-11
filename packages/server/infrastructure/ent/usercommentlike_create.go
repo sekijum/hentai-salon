@@ -29,8 +29,8 @@ func (uclc *UserCommentLikeCreate) SetUserID(i int) *UserCommentLikeCreate {
 }
 
 // SetCommentID sets the "comment_id" field.
-func (uclc *UserCommentLikeCreate) SetCommentID(i int) *UserCommentLikeCreate {
-	uclc.mutation.SetCommentID(i)
+func (uclc *UserCommentLikeCreate) SetCommentID(u uint64) *UserCommentLikeCreate {
+	uclc.mutation.SetCommentID(u)
 	return uclc
 }
 
@@ -167,7 +167,7 @@ func (uclc *UserCommentLikeCreate) createSpec() (*UserCommentLike, *sqlgraph.Cre
 			Columns: []string{usercommentlike.CommentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {

@@ -998,7 +998,7 @@ func (m *ContactMutation) Email() (r string, exists bool) {
 // OldEmail returns the old "email" field's value of the Contact entity.
 // If the Contact object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ContactMutation) OldEmail(ctx context.Context) (v string, err error) {
+func (m *ContactMutation) OldEmail(ctx context.Context) (v *string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldEmail is only allowed on UpdateOne operations")
 	}
@@ -1012,9 +1012,22 @@ func (m *ContactMutation) OldEmail(ctx context.Context) (v string, err error) {
 	return oldValue.Email, nil
 }
 
+// ClearEmail clears the value of the "email" field.
+func (m *ContactMutation) ClearEmail() {
+	m.email = nil
+	m.clearedFields[contact.FieldEmail] = struct{}{}
+}
+
+// EmailCleared returns if the "email" field was cleared in this mutation.
+func (m *ContactMutation) EmailCleared() bool {
+	_, ok := m.clearedFields[contact.FieldEmail]
+	return ok
+}
+
 // ResetEmail resets all changes to the "email" field.
 func (m *ContactMutation) ResetEmail() {
 	m.email = nil
+	delete(m.clearedFields, contact.FieldEmail)
 }
 
 // SetSubject sets the "subject" field.
@@ -1456,7 +1469,11 @@ func (m *ContactMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *ContactMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(contact.FieldEmail) {
+		fields = append(fields, contact.FieldEmail)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -1469,6 +1486,11 @@ func (m *ContactMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *ContactMutation) ClearField(name string) error {
+	switch name {
+	case contact.FieldEmail:
+		m.ClearEmail()
+		return nil
+	}
 	return fmt.Errorf("unknown Contact nullable field %s", name)
 }
 
@@ -2047,8 +2069,8 @@ type ThreadMutation struct {
 	clearedboard       bool
 	owner              *int
 	clearedowner       bool
-	comments           map[int]struct{}
-	removedcomments    map[int]struct{}
+	comments           map[uint64]struct{}
+	removedcomments    map[uint64]struct{}
 	clearedcomments    bool
 	tags               map[int]struct{}
 	removedtags        map[int]struct{}
@@ -2603,9 +2625,9 @@ func (m *ThreadMutation) ResetOwner() {
 }
 
 // AddCommentIDs adds the "comments" edge to the ThreadComment entity by ids.
-func (m *ThreadMutation) AddCommentIDs(ids ...int) {
+func (m *ThreadMutation) AddCommentIDs(ids ...uint64) {
 	if m.comments == nil {
-		m.comments = make(map[int]struct{})
+		m.comments = make(map[uint64]struct{})
 	}
 	for i := range ids {
 		m.comments[ids[i]] = struct{}{}
@@ -2623,9 +2645,9 @@ func (m *ThreadMutation) CommentsCleared() bool {
 }
 
 // RemoveCommentIDs removes the "comments" edge to the ThreadComment entity by IDs.
-func (m *ThreadMutation) RemoveCommentIDs(ids ...int) {
+func (m *ThreadMutation) RemoveCommentIDs(ids ...uint64) {
 	if m.removedcomments == nil {
-		m.removedcomments = make(map[int]struct{})
+		m.removedcomments = make(map[uint64]struct{})
 	}
 	for i := range ids {
 		delete(m.comments, ids[i])
@@ -2634,7 +2656,7 @@ func (m *ThreadMutation) RemoveCommentIDs(ids ...int) {
 }
 
 // RemovedComments returns the removed IDs of the "comments" edge to the ThreadComment entity.
-func (m *ThreadMutation) RemovedCommentsIDs() (ids []int) {
+func (m *ThreadMutation) RemovedCommentsIDs() (ids []uint64) {
 	for id := range m.removedcomments {
 		ids = append(ids, id)
 	}
@@ -2642,7 +2664,7 @@ func (m *ThreadMutation) RemovedCommentsIDs() (ids []int) {
 }
 
 // CommentsIDs returns the "comments" edge IDs in the mutation.
-func (m *ThreadMutation) CommentsIDs() (ids []int) {
+func (m *ThreadMutation) CommentsIDs() (ids []uint64) {
 	for id := range m.comments {
 		ids = append(ids, id)
 	}
@@ -3238,7 +3260,7 @@ type ThreadCommentMutation struct {
 	config
 	op                    Op
 	typ                   string
-	id                    *int
+	id                    *uint64
 	guest_name            *string
 	content               *string
 	ip_address            *string
@@ -3249,10 +3271,10 @@ type ThreadCommentMutation struct {
 	clearedthread         bool
 	author                *int
 	clearedauthor         bool
-	parent_comment        *int
+	parent_comment        *uint64
 	clearedparent_comment bool
-	replies               map[int]struct{}
-	removedreplies        map[int]struct{}
+	replies               map[uint64]struct{}
+	removedreplies        map[uint64]struct{}
 	clearedreplies        bool
 	attachments           map[int]struct{}
 	removedattachments    map[int]struct{}
@@ -3285,7 +3307,7 @@ func newThreadCommentMutation(c config, op Op, opts ...threadcommentOption) *Thr
 }
 
 // withThreadCommentID sets the ID field of the mutation.
-func withThreadCommentID(id int) threadcommentOption {
+func withThreadCommentID(id uint64) threadcommentOption {
 	return func(m *ThreadCommentMutation) {
 		var (
 			err   error
@@ -3337,13 +3359,13 @@ func (m ThreadCommentMutation) Tx() (*Tx, error) {
 
 // SetID sets the value of the id field. Note that this
 // operation is only accepted on creation of ThreadComment entities.
-func (m *ThreadCommentMutation) SetID(id int) {
+func (m *ThreadCommentMutation) SetID(id uint64) {
 	m.id = &id
 }
 
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *ThreadCommentMutation) ID() (id int, exists bool) {
+func (m *ThreadCommentMutation) ID() (id uint64, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -3354,12 +3376,12 @@ func (m *ThreadCommentMutation) ID() (id int, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *ThreadCommentMutation) IDs(ctx context.Context) ([]int, error) {
+func (m *ThreadCommentMutation) IDs(ctx context.Context) ([]uint64, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
 		if exists {
-			return []int{id}, nil
+			return []uint64{id}, nil
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
@@ -3406,12 +3428,12 @@ func (m *ThreadCommentMutation) ResetThreadID() {
 }
 
 // SetParentCommentID sets the "parent_comment_id" field.
-func (m *ThreadCommentMutation) SetParentCommentID(i int) {
-	m.parent_comment = &i
+func (m *ThreadCommentMutation) SetParentCommentID(u uint64) {
+	m.parent_comment = &u
 }
 
 // ParentCommentID returns the value of the "parent_comment_id" field in the mutation.
-func (m *ThreadCommentMutation) ParentCommentID() (r int, exists bool) {
+func (m *ThreadCommentMutation) ParentCommentID() (r uint64, exists bool) {
 	v := m.parent_comment
 	if v == nil {
 		return
@@ -3422,7 +3444,7 @@ func (m *ThreadCommentMutation) ParentCommentID() (r int, exists bool) {
 // OldParentCommentID returns the old "parent_comment_id" field's value of the ThreadComment entity.
 // If the ThreadComment object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ThreadCommentMutation) OldParentCommentID(ctx context.Context) (v *int, err error) {
+func (m *ThreadCommentMutation) OldParentCommentID(ctx context.Context) (v *uint64, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldParentCommentID is only allowed on UpdateOne operations")
 	}
@@ -3777,7 +3799,7 @@ func (m *ThreadCommentMutation) ParentCommentCleared() bool {
 // ParentCommentIDs returns the "parent_comment" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // ParentCommentID instead. It exists only for internal usage by the builders.
-func (m *ThreadCommentMutation) ParentCommentIDs() (ids []int) {
+func (m *ThreadCommentMutation) ParentCommentIDs() (ids []uint64) {
 	if id := m.parent_comment; id != nil {
 		ids = append(ids, *id)
 	}
@@ -3791,9 +3813,9 @@ func (m *ThreadCommentMutation) ResetParentComment() {
 }
 
 // AddReplyIDs adds the "replies" edge to the ThreadComment entity by ids.
-func (m *ThreadCommentMutation) AddReplyIDs(ids ...int) {
+func (m *ThreadCommentMutation) AddReplyIDs(ids ...uint64) {
 	if m.replies == nil {
-		m.replies = make(map[int]struct{})
+		m.replies = make(map[uint64]struct{})
 	}
 	for i := range ids {
 		m.replies[ids[i]] = struct{}{}
@@ -3811,9 +3833,9 @@ func (m *ThreadCommentMutation) RepliesCleared() bool {
 }
 
 // RemoveReplyIDs removes the "replies" edge to the ThreadComment entity by IDs.
-func (m *ThreadCommentMutation) RemoveReplyIDs(ids ...int) {
+func (m *ThreadCommentMutation) RemoveReplyIDs(ids ...uint64) {
 	if m.removedreplies == nil {
-		m.removedreplies = make(map[int]struct{})
+		m.removedreplies = make(map[uint64]struct{})
 	}
 	for i := range ids {
 		delete(m.replies, ids[i])
@@ -3822,7 +3844,7 @@ func (m *ThreadCommentMutation) RemoveReplyIDs(ids ...int) {
 }
 
 // RemovedReplies returns the removed IDs of the "replies" edge to the ThreadComment entity.
-func (m *ThreadCommentMutation) RemovedRepliesIDs() (ids []int) {
+func (m *ThreadCommentMutation) RemovedRepliesIDs() (ids []uint64) {
 	for id := range m.removedreplies {
 		ids = append(ids, id)
 	}
@@ -3830,7 +3852,7 @@ func (m *ThreadCommentMutation) RemovedRepliesIDs() (ids []int) {
 }
 
 // RepliesIDs returns the "replies" edge IDs in the mutation.
-func (m *ThreadCommentMutation) RepliesIDs() (ids []int) {
+func (m *ThreadCommentMutation) RepliesIDs() (ids []uint64) {
 	for id := range m.replies {
 		ids = append(ids, id)
 	}
@@ -4077,7 +4099,7 @@ func (m *ThreadCommentMutation) SetField(name string, value ent.Value) error {
 		m.SetThreadID(v)
 		return nil
 	case threadcomment.FieldParentCommentID:
-		v, ok := value.(int)
+		v, ok := value.(uint64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -4429,7 +4451,7 @@ type ThreadCommentAttachmentMutation struct {
 	add_type         *int
 	created_at       *time.Time
 	clearedFields    map[string]struct{}
-	comment          *int
+	comment          *uint64
 	clearedcomment   bool
 	done             bool
 	oldValue         func(context.Context) (*ThreadCommentAttachment, error)
@@ -4541,12 +4563,12 @@ func (m *ThreadCommentAttachmentMutation) IDs(ctx context.Context) ([]int, error
 }
 
 // SetCommentID sets the "comment_id" field.
-func (m *ThreadCommentAttachmentMutation) SetCommentID(i int) {
-	m.comment = &i
+func (m *ThreadCommentAttachmentMutation) SetCommentID(u uint64) {
+	m.comment = &u
 }
 
 // CommentID returns the value of the "comment_id" field in the mutation.
-func (m *ThreadCommentAttachmentMutation) CommentID() (r int, exists bool) {
+func (m *ThreadCommentAttachmentMutation) CommentID() (r uint64, exists bool) {
 	v := m.comment
 	if v == nil {
 		return
@@ -4557,7 +4579,7 @@ func (m *ThreadCommentAttachmentMutation) CommentID() (r int, exists bool) {
 // OldCommentID returns the old "comment_id" field's value of the ThreadCommentAttachment entity.
 // If the ThreadCommentAttachment object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ThreadCommentAttachmentMutation) OldCommentID(ctx context.Context) (v int, err error) {
+func (m *ThreadCommentAttachmentMutation) OldCommentID(ctx context.Context) (v uint64, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldCommentID is only allowed on UpdateOne operations")
 	}
@@ -4774,7 +4796,7 @@ func (m *ThreadCommentAttachmentMutation) CommentCleared() bool {
 // CommentIDs returns the "comment" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // CommentID instead. It exists only for internal usage by the builders.
-func (m *ThreadCommentAttachmentMutation) CommentIDs() (ids []int) {
+func (m *ThreadCommentAttachmentMutation) CommentIDs() (ids []uint64) {
 	if id := m.comment; id != nil {
 		ids = append(ids, *id)
 	}
@@ -4884,7 +4906,7 @@ func (m *ThreadCommentAttachmentMutation) OldField(ctx context.Context, name str
 func (m *ThreadCommentAttachmentMutation) SetField(name string, value ent.Value) error {
 	switch name {
 	case threadcommentattachment.FieldCommentID:
-		v, ok := value.(int)
+		v, ok := value.(uint64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -5492,14 +5514,14 @@ type UserMutation struct {
 	threads               map[int]struct{}
 	removedthreads        map[int]struct{}
 	clearedthreads        bool
-	comments              map[int]struct{}
-	removedcomments       map[int]struct{}
+	comments              map[uint64]struct{}
+	removedcomments       map[uint64]struct{}
 	clearedcomments       bool
 	liked_threads         map[int]struct{}
 	removedliked_threads  map[int]struct{}
 	clearedliked_threads  bool
-	liked_comments        map[int]struct{}
-	removedliked_comments map[int]struct{}
+	liked_comments        map[uint64]struct{}
+	removedliked_comments map[uint64]struct{}
 	clearedliked_comments bool
 	done                  bool
 	oldValue              func(context.Context) (*User, error)
@@ -6060,9 +6082,9 @@ func (m *UserMutation) ResetThreads() {
 }
 
 // AddCommentIDs adds the "comments" edge to the ThreadComment entity by ids.
-func (m *UserMutation) AddCommentIDs(ids ...int) {
+func (m *UserMutation) AddCommentIDs(ids ...uint64) {
 	if m.comments == nil {
-		m.comments = make(map[int]struct{})
+		m.comments = make(map[uint64]struct{})
 	}
 	for i := range ids {
 		m.comments[ids[i]] = struct{}{}
@@ -6080,9 +6102,9 @@ func (m *UserMutation) CommentsCleared() bool {
 }
 
 // RemoveCommentIDs removes the "comments" edge to the ThreadComment entity by IDs.
-func (m *UserMutation) RemoveCommentIDs(ids ...int) {
+func (m *UserMutation) RemoveCommentIDs(ids ...uint64) {
 	if m.removedcomments == nil {
-		m.removedcomments = make(map[int]struct{})
+		m.removedcomments = make(map[uint64]struct{})
 	}
 	for i := range ids {
 		delete(m.comments, ids[i])
@@ -6091,7 +6113,7 @@ func (m *UserMutation) RemoveCommentIDs(ids ...int) {
 }
 
 // RemovedComments returns the removed IDs of the "comments" edge to the ThreadComment entity.
-func (m *UserMutation) RemovedCommentsIDs() (ids []int) {
+func (m *UserMutation) RemovedCommentsIDs() (ids []uint64) {
 	for id := range m.removedcomments {
 		ids = append(ids, id)
 	}
@@ -6099,7 +6121,7 @@ func (m *UserMutation) RemovedCommentsIDs() (ids []int) {
 }
 
 // CommentsIDs returns the "comments" edge IDs in the mutation.
-func (m *UserMutation) CommentsIDs() (ids []int) {
+func (m *UserMutation) CommentsIDs() (ids []uint64) {
 	for id := range m.comments {
 		ids = append(ids, id)
 	}
@@ -6168,9 +6190,9 @@ func (m *UserMutation) ResetLikedThreads() {
 }
 
 // AddLikedCommentIDs adds the "liked_comments" edge to the ThreadComment entity by ids.
-func (m *UserMutation) AddLikedCommentIDs(ids ...int) {
+func (m *UserMutation) AddLikedCommentIDs(ids ...uint64) {
 	if m.liked_comments == nil {
-		m.liked_comments = make(map[int]struct{})
+		m.liked_comments = make(map[uint64]struct{})
 	}
 	for i := range ids {
 		m.liked_comments[ids[i]] = struct{}{}
@@ -6188,9 +6210,9 @@ func (m *UserMutation) LikedCommentsCleared() bool {
 }
 
 // RemoveLikedCommentIDs removes the "liked_comments" edge to the ThreadComment entity by IDs.
-func (m *UserMutation) RemoveLikedCommentIDs(ids ...int) {
+func (m *UserMutation) RemoveLikedCommentIDs(ids ...uint64) {
 	if m.removedliked_comments == nil {
-		m.removedliked_comments = make(map[int]struct{})
+		m.removedliked_comments = make(map[uint64]struct{})
 	}
 	for i := range ids {
 		delete(m.liked_comments, ids[i])
@@ -6199,7 +6221,7 @@ func (m *UserMutation) RemoveLikedCommentIDs(ids ...int) {
 }
 
 // RemovedLikedComments returns the removed IDs of the "liked_comments" edge to the ThreadComment entity.
-func (m *UserMutation) RemovedLikedCommentsIDs() (ids []int) {
+func (m *UserMutation) RemovedLikedCommentsIDs() (ids []uint64) {
 	for id := range m.removedliked_comments {
 		ids = append(ids, id)
 	}
@@ -6207,7 +6229,7 @@ func (m *UserMutation) RemovedLikedCommentsIDs() (ids []int) {
 }
 
 // LikedCommentsIDs returns the "liked_comments" edge IDs in the mutation.
-func (m *UserMutation) LikedCommentsIDs() (ids []int) {
+func (m *UserMutation) LikedCommentsIDs() (ids []uint64) {
 	for id := range m.liked_comments {
 		ids = append(ids, id)
 	}
@@ -6704,7 +6726,7 @@ type UserCommentLikeMutation struct {
 	clearedFields  map[string]struct{}
 	user           *int
 	cleareduser    bool
-	comment        *int
+	comment        *uint64
 	clearedcomment bool
 	done           bool
 	oldValue       func(context.Context) (*UserCommentLike, error)
@@ -6769,12 +6791,12 @@ func (m *UserCommentLikeMutation) ResetUserID() {
 }
 
 // SetCommentID sets the "comment_id" field.
-func (m *UserCommentLikeMutation) SetCommentID(i int) {
-	m.comment = &i
+func (m *UserCommentLikeMutation) SetCommentID(u uint64) {
+	m.comment = &u
 }
 
 // CommentID returns the value of the "comment_id" field in the mutation.
-func (m *UserCommentLikeMutation) CommentID() (r int, exists bool) {
+func (m *UserCommentLikeMutation) CommentID() (r uint64, exists bool) {
 	v := m.comment
 	if v == nil {
 		return
@@ -6847,7 +6869,7 @@ func (m *UserCommentLikeMutation) CommentCleared() bool {
 // CommentIDs returns the "comment" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // CommentID instead. It exists only for internal usage by the builders.
-func (m *UserCommentLikeMutation) CommentIDs() (ids []int) {
+func (m *UserCommentLikeMutation) CommentIDs() (ids []uint64) {
 	if id := m.comment; id != nil {
 		ids = append(ids, *id)
 	}
@@ -6942,7 +6964,7 @@ func (m *UserCommentLikeMutation) SetField(name string, value ent.Value) error {
 		m.SetUserID(v)
 		return nil
 	case usercommentlike.FieldCommentID:
-		v, ok := value.(int)
+		v, ok := value.(uint64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}

@@ -141,14 +141,14 @@ func (tc *ThreadCreate) SetOwner(u *User) *ThreadCreate {
 }
 
 // AddCommentIDs adds the "comments" edge to the ThreadComment entity by IDs.
-func (tc *ThreadCreate) AddCommentIDs(ids ...int) *ThreadCreate {
+func (tc *ThreadCreate) AddCommentIDs(ids ...uint64) *ThreadCreate {
 	tc.mutation.AddCommentIDs(ids...)
 	return tc
 }
 
 // AddComments adds the "comments" edges to the ThreadComment entity.
 func (tc *ThreadCreate) AddComments(t ...*ThreadComment) *ThreadCreate {
-	ids := make([]int, len(t))
+	ids := make([]uint64, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
 	}
@@ -375,7 +375,7 @@ func (tc *ThreadCreate) createSpec() (*Thread, *sqlgraph.CreateSpec) {
 			Columns: []string{thread.CommentsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {

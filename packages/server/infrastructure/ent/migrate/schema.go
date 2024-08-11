@@ -42,7 +42,7 @@ var (
 	// ContactsColumns holds the columns for the "contacts" table.
 	ContactsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "email", Type: field.TypeString, Size: 255},
+		{Name: "email", Type: field.TypeString, Nullable: true, Size: 255},
 		{Name: "subject", Type: field.TypeString, Size: 255},
 		{Name: "message", Type: field.TypeString, Size: 2147483647},
 		{Name: "ip_address", Type: field.TypeString, Size: 64},
@@ -117,14 +117,14 @@ var (
 	}
 	// ThreadCommentsColumns holds the columns for the "thread_comments" table.
 	ThreadCommentsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "id", Type: field.TypeUint64, Increment: true},
 		{Name: "guest_name", Type: field.TypeString, Nullable: true, Size: 20},
 		{Name: "content", Type: field.TypeString, Size: 2147483647},
 		{Name: "ip_address", Type: field.TypeString, Size: 64},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "thread_id", Type: field.TypeInt},
-		{Name: "parent_comment_id", Type: field.TypeInt, Nullable: true},
+		{Name: "parent_comment_id", Type: field.TypeUint64, Nullable: true},
 		{Name: "user_id", Type: field.TypeInt, Nullable: true},
 	}
 	// ThreadCommentsTable holds the schema information for the "thread_comments" table.
@@ -160,7 +160,7 @@ var (
 		{Name: "display_order", Type: field.TypeInt, Default: 0},
 		{Name: "type", Type: field.TypeInt, Default: 0},
 		{Name: "created_at", Type: field.TypeTime},
-		{Name: "comment_id", Type: field.TypeInt},
+		{Name: "comment_id", Type: field.TypeUint64},
 	}
 	// ThreadCommentAttachmentsTable holds the schema information for the "thread_comment_attachments" table.
 	ThreadCommentAttachmentsTable = &schema.Table{
@@ -223,7 +223,7 @@ var (
 	UserCommentLikesColumns = []*schema.Column{
 		{Name: "liked_at", Type: field.TypeTime},
 		{Name: "user_id", Type: field.TypeInt},
-		{Name: "comment_id", Type: field.TypeInt},
+		{Name: "comment_id", Type: field.TypeUint64},
 	}
 	// UserCommentLikesTable holds the schema information for the "user_comment_likes" table.
 	UserCommentLikesTable = &schema.Table{

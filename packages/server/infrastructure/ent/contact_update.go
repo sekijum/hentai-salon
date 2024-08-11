@@ -42,6 +42,12 @@ func (cu *ContactUpdate) SetNillableEmail(s *string) *ContactUpdate {
 	return cu
 }
 
+// ClearEmail clears the value of the "email" field.
+func (cu *ContactUpdate) ClearEmail() *ContactUpdate {
+	cu.mutation.ClearEmail()
+	return cu
+}
+
 // SetSubject sets the "subject" field.
 func (cu *ContactUpdate) SetSubject(s string) *ContactUpdate {
 	cu.mutation.SetSubject(s)
@@ -201,6 +207,9 @@ func (cu *ContactUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := cu.mutation.Email(); ok {
 		_spec.SetField(contact.FieldEmail, field.TypeString, value)
 	}
+	if cu.mutation.EmailCleared() {
+		_spec.ClearField(contact.FieldEmail, field.TypeString)
+	}
 	if value, ok := cu.mutation.Subject(); ok {
 		_spec.SetField(contact.FieldSubject, field.TypeString, value)
 	}
@@ -253,6 +262,12 @@ func (cuo *ContactUpdateOne) SetNillableEmail(s *string) *ContactUpdateOne {
 	if s != nil {
 		cuo.SetEmail(*s)
 	}
+	return cuo
+}
+
+// ClearEmail clears the value of the "email" field.
+func (cuo *ContactUpdateOne) ClearEmail() *ContactUpdateOne {
+	cuo.mutation.ClearEmail()
 	return cuo
 }
 
@@ -444,6 +459,9 @@ func (cuo *ContactUpdateOne) sqlSave(ctx context.Context) (_node *Contact, err e
 	}
 	if value, ok := cuo.mutation.Email(); ok {
 		_spec.SetField(contact.FieldEmail, field.TypeString, value)
+	}
+	if cuo.mutation.EmailCleared() {
+		_spec.ClearField(contact.FieldEmail, field.TypeString)
 	}
 	if value, ok := cuo.mutation.Subject(); ok {
 		_spec.SetField(contact.FieldSubject, field.TypeString, value)

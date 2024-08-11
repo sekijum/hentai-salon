@@ -6,7 +6,7 @@ import (
 )
 
 type ThreadCommentResponse struct {
-	ID        int    `json:"id"`
+	ID        uint64 `json:"id"`
 	ThreadID  int    `json:"threadId"`
 	UserID    *int   `json:"userId"`
 	Content   string `json:"content"`

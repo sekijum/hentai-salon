@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"time"
 
+	"server/domain/lib/util"
 	"server/infrastructure/datasource"
 	"server/infrastructure/ent"
 
@@ -125,7 +126,7 @@ func seed(ctx context.Context, client *ent.Client) error {
 	comments := make([]*ent.ThreadComment, 0, 100000)
 	for i := 0; i < 100000; i++ {
 		thread := threads[rand.Intn(100)]
-		var parentID *int
+		var parentID *uint64
 		if i >= 1000 {
 			// threadに紐づくコメントからランダムに選択
 			threadComments := make([]*ent.ThreadComment, 0)
@@ -139,7 +140,17 @@ func seed(ctx context.Context, client *ent.Client) error {
 				parentID = &pID
 			}
 		}
+		idGenerator := util.NewSonyflakeIDGenerator()
+		id, err := idGenerator.GenerateID()
+		if err != nil {
+			return err
+		}
+
+		// index (i) を id に加える
+		id += uint64(i)
+
 		createComment := tx.ThreadComment.Create().
+			SetID(id).
 			SetContent("コメント内容" + uuid.New().String()[:8]).
 			SetIPAddress("127.0.0.1").
 			SetThreadID(thread.ID).
@@ -201,7 +212,8 @@ func seed(ctx context.Context, client *ent.Client) error {
 	// Create User Comment Likes
 	userCommentLikes := make(map[string]struct{})
 	for i := 0; i < 100; i++ {
-		var userID, commentID int
+		var userID int
+		var commentID uint64
 		var key string
 		for {
 			userID = users[rand.Intn(100)].ID

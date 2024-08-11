@@ -8,7 +8,7 @@ type ThreadCommentAttachmentResponse struct {
 	URL          string `json:"url"`
 	DisplayOrder int    `json:"displayOrder"`
 	Type         string `json:"type"`
-	CommentID    int    `json:"commentId"`
+	CommentID    uint64 `json:"commentId"`
 }
 
 type NewThreadCommentAttachmentResponseParams struct {

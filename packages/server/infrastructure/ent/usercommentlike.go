@@ -20,7 +20,7 @@ type UserCommentLike struct {
 	// UserID holds the value of the "user_id" field.
 	UserID int `json:"user_id,omitempty"`
 	// CommentID holds the value of the "comment_id" field.
-	CommentID int `json:"comment_id,omitempty"`
+	CommentID uint64 `json:"comment_id,omitempty"`
 	// LikedAt holds the value of the "liked_at" field.
 	LikedAt time.Time `json:"liked_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -96,7 +96,7 @@ func (ucl *UserCommentLike) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field comment_id", values[i])
 			} else if value.Valid {
-				ucl.CommentID = int(value.Int64)
+				ucl.CommentID = uint64(value.Int64)
 			}
 		case usercommentlike.FieldLikedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {

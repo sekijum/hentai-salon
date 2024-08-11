@@ -22,8 +22,8 @@ type ThreadCommentAttachmentCreate struct {
 }
 
 // SetCommentID sets the "comment_id" field.
-func (tcac *ThreadCommentAttachmentCreate) SetCommentID(i int) *ThreadCommentAttachmentCreate {
-	tcac.mutation.SetCommentID(i)
+func (tcac *ThreadCommentAttachmentCreate) SetCommentID(u uint64) *ThreadCommentAttachmentCreate {
+	tcac.mutation.SetCommentID(u)
 	return tcac
 }
 
@@ -211,7 +211,7 @@ func (tcac *ThreadCommentAttachmentCreate) createSpec() (*ThreadCommentAttachmen
 			Columns: []string{threadcommentattachment.CommentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {

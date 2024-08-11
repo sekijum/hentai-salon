@@ -7,11 +7,11 @@ import (
 )
 
 type ThreadCommentResponse struct {
-	ID              int                                 `json:"id"`
+	ID              uint64                              `json:"id"`
 	GuestName       *string                             `json:"guestName,omitempty"`
 	Content         string                              `json:"content"`
 	CreatedAt       string                              `json:"createdAt"`
-	ParentCommentID *int                                `json:"parentCommentId,omitempty"`
+	ParentCommentID *uint64                             `json:"parentCommentId,omitempty"`
 	ReplyCount      *int                                `json:"replyCount"`
 	User            *UserResponse                       `json:"user,omitempty"`
 	Thread          *ThreadResponse                     `json:"thread,omitempty"`

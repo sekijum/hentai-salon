@@ -56,7 +56,7 @@ func IDLTE(id int) predicate.ThreadCommentAttachment {
 }
 
 // CommentID applies equality check predicate on the "comment_id" field. It's identical to CommentIDEQ.
-func CommentID(v int) predicate.ThreadCommentAttachment {
+func CommentID(v uint64) predicate.ThreadCommentAttachment {
 	return predicate.ThreadCommentAttachment(sql.FieldEQ(FieldCommentID, v))
 }
 
@@ -81,22 +81,22 @@ func CreatedAt(v time.Time) predicate.ThreadCommentAttachment {
 }
 
 // CommentIDEQ applies the EQ predicate on the "comment_id" field.
-func CommentIDEQ(v int) predicate.ThreadCommentAttachment {
+func CommentIDEQ(v uint64) predicate.ThreadCommentAttachment {
 	return predicate.ThreadCommentAttachment(sql.FieldEQ(FieldCommentID, v))
 }
 
 // CommentIDNEQ applies the NEQ predicate on the "comment_id" field.
-func CommentIDNEQ(v int) predicate.ThreadCommentAttachment {
+func CommentIDNEQ(v uint64) predicate.ThreadCommentAttachment {
 	return predicate.ThreadCommentAttachment(sql.FieldNEQ(FieldCommentID, v))
 }
 
 // CommentIDIn applies the In predicate on the "comment_id" field.
-func CommentIDIn(vs ...int) predicate.ThreadCommentAttachment {
+func CommentIDIn(vs ...uint64) predicate.ThreadCommentAttachment {
 	return predicate.ThreadCommentAttachment(sql.FieldIn(FieldCommentID, vs...))
 }
 
 // CommentIDNotIn applies the NotIn predicate on the "comment_id" field.
-func CommentIDNotIn(vs ...int) predicate.ThreadCommentAttachment {
+func CommentIDNotIn(vs ...uint64) predicate.ThreadCommentAttachment {
 	return predicate.ThreadCommentAttachment(sql.FieldNotIn(FieldCommentID, vs...))
 }
 

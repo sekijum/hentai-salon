@@ -14,7 +14,7 @@ type Contact struct {
 func (Contact) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("id").Unique().Immutable(),
-		field.String("email").MaxLen(255),
+		field.String("email").Optional().Nillable().MaxLen(255),
 		field.String("subject").MaxLen(255),
 		field.Text("message"),
 		field.String("ip_address").MaxLen(64),

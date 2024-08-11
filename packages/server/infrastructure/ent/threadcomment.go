@@ -18,11 +18,11 @@ import (
 type ThreadComment struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	ID uint64 `json:"id,omitempty"`
 	// ThreadID holds the value of the "thread_id" field.
 	ThreadID int `json:"thread_id,omitempty"`
 	// 親コメントID（リプライの場合）
-	ParentCommentID *int `json:"parent_comment_id,omitempty"`
+	ParentCommentID *uint64 `json:"parent_comment_id,omitempty"`
 	// ログインユーザーの場合
 	UserID *int `json:"user_id,omitempty"`
 	// ゲストユーザーの場合
@@ -162,7 +162,7 @@ func (tc *ThreadComment) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			tc.ID = int(value.Int64)
+			tc.ID = uint64(value.Int64)
 		case threadcomment.FieldThreadID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field thread_id", values[i])
@@ -173,8 +173,8 @@ func (tc *ThreadComment) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field parent_comment_id", values[i])
 			} else if value.Valid {
-				tc.ParentCommentID = new(int)
-				*tc.ParentCommentID = int(value.Int64)
+				tc.ParentCommentID = new(uint64)
+				*tc.ParentCommentID = uint64(value.Int64)
 			}
 		case threadcomment.FieldUserID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {

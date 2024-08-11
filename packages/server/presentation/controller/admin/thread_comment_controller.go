@@ -18,7 +18,7 @@ func NewThreadCommentController(threadCommentApplicationService *service_admin.T
 }
 
 func (ctrl *ThreadCommentController) Delete(ctx *gin.Context) {
-	commentID, err := strconv.Atoi(ctx.Param("commentID"))
+	commentID, err := strconv.ParseUint(ctx.Param("commentID"), 10, 64)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

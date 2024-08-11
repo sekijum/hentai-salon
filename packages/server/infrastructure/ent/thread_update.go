@@ -186,14 +186,14 @@ func (tu *ThreadUpdate) SetOwner(u *User) *ThreadUpdate {
 }
 
 // AddCommentIDs adds the "comments" edge to the ThreadComment entity by IDs.
-func (tu *ThreadUpdate) AddCommentIDs(ids ...int) *ThreadUpdate {
+func (tu *ThreadUpdate) AddCommentIDs(ids ...uint64) *ThreadUpdate {
 	tu.mutation.AddCommentIDs(ids...)
 	return tu
 }
 
 // AddComments adds the "comments" edges to the ThreadComment entity.
 func (tu *ThreadUpdate) AddComments(t ...*ThreadComment) *ThreadUpdate {
-	ids := make([]int, len(t))
+	ids := make([]uint64, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
 	}
@@ -254,14 +254,14 @@ func (tu *ThreadUpdate) ClearComments() *ThreadUpdate {
 }
 
 // RemoveCommentIDs removes the "comments" edge to ThreadComment entities by IDs.
-func (tu *ThreadUpdate) RemoveCommentIDs(ids ...int) *ThreadUpdate {
+func (tu *ThreadUpdate) RemoveCommentIDs(ids ...uint64) *ThreadUpdate {
 	tu.mutation.RemoveCommentIDs(ids...)
 	return tu
 }
 
 // RemoveComments removes "comments" edges to ThreadComment entities.
 func (tu *ThreadUpdate) RemoveComments(t ...*ThreadComment) *ThreadUpdate {
-	ids := make([]int, len(t))
+	ids := make([]uint64, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
 	}
@@ -475,7 +475,7 @@ func (tu *ThreadUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{thread.CommentsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeUint64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -488,7 +488,7 @@ func (tu *ThreadUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{thread.CommentsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -504,7 +504,7 @@ func (tu *ThreadUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{thread.CommentsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -788,14 +788,14 @@ func (tuo *ThreadUpdateOne) SetOwner(u *User) *ThreadUpdateOne {
 }
 
 // AddCommentIDs adds the "comments" edge to the ThreadComment entity by IDs.
-func (tuo *ThreadUpdateOne) AddCommentIDs(ids ...int) *ThreadUpdateOne {
+func (tuo *ThreadUpdateOne) AddCommentIDs(ids ...uint64) *ThreadUpdateOne {
 	tuo.mutation.AddCommentIDs(ids...)
 	return tuo
 }
 
 // AddComments adds the "comments" edges to the ThreadComment entity.
 func (tuo *ThreadUpdateOne) AddComments(t ...*ThreadComment) *ThreadUpdateOne {
-	ids := make([]int, len(t))
+	ids := make([]uint64, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
 	}
@@ -856,14 +856,14 @@ func (tuo *ThreadUpdateOne) ClearComments() *ThreadUpdateOne {
 }
 
 // RemoveCommentIDs removes the "comments" edge to ThreadComment entities by IDs.
-func (tuo *ThreadUpdateOne) RemoveCommentIDs(ids ...int) *ThreadUpdateOne {
+func (tuo *ThreadUpdateOne) RemoveCommentIDs(ids ...uint64) *ThreadUpdateOne {
 	tuo.mutation.RemoveCommentIDs(ids...)
 	return tuo
 }
 
 // RemoveComments removes "comments" edges to ThreadComment entities.
 func (tuo *ThreadUpdateOne) RemoveComments(t ...*ThreadComment) *ThreadUpdateOne {
-	ids := make([]int, len(t))
+	ids := make([]uint64, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
 	}
@@ -1107,7 +1107,7 @@ func (tuo *ThreadUpdateOne) sqlSave(ctx context.Context) (_node *Thread, err err
 			Columns: []string{thread.CommentsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeUint64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -1120,7 +1120,7 @@ func (tuo *ThreadUpdateOne) sqlSave(ctx context.Context) (_node *Thread, err err
 			Columns: []string{thread.CommentsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -1136,7 +1136,7 @@ func (tuo *ThreadUpdateOne) sqlSave(ctx context.Context) (_node *Thread, err err
 			Columns: []string{thread.CommentsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {

@@ -7,7 +7,7 @@ import (
 
 type ContactResponse struct {
 	ID        int       `json:"id"`
-	Email     string    `json:"email"`
+	Email     *string   `json:"email,omitempty"`
 	Subject   string    `json:"subject"`
 	Message   string    `json:"message"`
 	IPAddress string    `json:"ip_address"`

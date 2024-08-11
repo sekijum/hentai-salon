@@ -133,7 +133,7 @@ func (ds *ThreadDatasource) GetThreadCommentCount(params ThreadDatasourceGetThre
 	if params.Keyword != nil && *params.Keyword != "" {
 		switch {
 		case len(*params.Keyword) > 3 && (*params.Keyword)[:3] == "id:":
-			if id, err := strconv.Atoi((*params.Keyword)[3:]); err == nil {
+			if id, err := strconv.ParseUint((*params.Keyword)[3:], 10, 64); err == nil {
 				q = q.Where(threadcomment.IDEQ(id))
 			}
 		default:
@@ -184,7 +184,7 @@ func (ds *ThreadDatasource) FindByID(params ThreadDatasourceFindByIDParams) (*mo
 			if params.Keyword != nil && *params.Keyword != "" {
 				switch {
 				case len(*params.Keyword) > 3 && (*params.Keyword)[:3] == "id:":
-					if id, err := strconv.Atoi((*params.Keyword)[3:]); err == nil {
+					if id, err := strconv.ParseUint((*params.Keyword)[3:], 10, 64); err == nil {
 						q = q.Where(threadcomment.IDEQ(id))
 					}
 				default:

@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"server/domain/lib/util"
 	"server/domain/model"
 	"server/infrastructure/datasource"
 	"server/infrastructure/ent"
@@ -19,7 +20,7 @@ func NewThreadCommentApplicationService(threadCommentDatasource *datasource.Thre
 
 type ThreadCommentApplicationServiceFindByIDParams struct {
 	Ctx       context.Context
-	CommentID int
+	CommentID uint64
 	UserID    *int
 	Qs        request.ThreadCommentFindByIDRequest
 }
@@ -57,14 +58,20 @@ type ThreadCommentApplicationServiceCreateParams struct {
 	UserID          *int
 	ThreadID        int
 	ClientIP        string
-	ParentCommentID *int
+	ParentCommentID *uint64
 	Body            request.ThreadCommentCreateRequest
 }
 
 func (svc *ThreadCommentApplicationService) Create(params ThreadCommentApplicationServiceCreateParams) (*response.ThreadCommentResponse, error) {
+	idGenerator := util.NewSonyflakeIDGenerator()
+	id, err := idGenerator.GenerateID()
+	if err != nil {
+		return nil, err
+	}
 
 	comment := model.NewThreadComment(model.NewThreadCommentParams{
 		EntThreadComment: &ent.ThreadComment{
+			ID:              id,
 			ThreadID:        params.ThreadID,
 			Content:         params.Body.Content,
 			IPAddress:       params.ClientIP,
@@ -95,7 +102,7 @@ func (svc *ThreadCommentApplicationService) Create(params ThreadCommentApplicati
 
 	comment.EntThreadComment.Edges.Attachments = attachments
 
-	_, err := svc.threadCommentDatasource.Create(datasource.ThreadCommentDatasourceCreateParams{
+	_, err = svc.threadCommentDatasource.Create(datasource.ThreadCommentDatasourceCreateParams{
 		Ctx:           params.Ctx,
 		ThreadComment: comment,
 	})
@@ -113,7 +120,7 @@ func (svc *ThreadCommentApplicationService) Create(params ThreadCommentApplicati
 type ThreadCommentApplicationServiceLikeParams struct {
 	Ctx       context.Context
 	UserID    int
-	CommentID int
+	CommentID uint64
 }
 
 func (svc *ThreadCommentApplicationService) Like(params ThreadCommentApplicationServiceLikeParams) error {
@@ -132,7 +139,7 @@ func (svc *ThreadCommentApplicationService) Like(params ThreadCommentApplication
 type ThreadCommentApplicationServiceUnLikeParams struct {
 	Ctx       context.Context
 	UserID    int
-	CommentID int
+	CommentID uint64
 }
 
 func (svc *ThreadCommentApplicationService) Unlike(params ThreadCommentApplicationServiceUnLikeParams) error {

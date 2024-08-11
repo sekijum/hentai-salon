@@ -45,9 +45,10 @@ func (ds *ThreadCommentDatasource) GetCommentCount(params ThreadDatasourceGetCom
 }
 
 type ThreadCommentDatasourceFindByIDParams struct {
-	Ctx                      context.Context
-	UserID                   *int
-	CommentID, Limit, Offset int
+	Ctx           context.Context
+	UserID        *int
+	CommentID     uint64
+	Limit, Offset int
 }
 
 func (ds *ThreadCommentDatasource) FindByID(params ThreadCommentDatasourceFindByIDParams) (*model.ThreadComment, error) {
@@ -143,7 +144,7 @@ func (ds *ThreadCommentDatasource) Create(params ThreadCommentDatasourceCreatePa
 type ThreadCommentDatasourceLikeParams struct {
 	Ctx       context.Context
 	UserID    int
-	CommentID int
+	CommentID uint64
 }
 
 func (ds *ThreadCommentDatasource) Like(params ThreadCommentDatasourceLikeParams) error {
@@ -160,7 +161,7 @@ func (ds *ThreadCommentDatasource) Like(params ThreadCommentDatasourceLikeParams
 type ThreadCommentDatasourceUnLikeParams struct {
 	Ctx       context.Context
 	UserID    int
-	CommentID int
+	CommentID uint64
 }
 
 func (ds *ThreadCommentDatasource) Unlike(params ThreadCommentDatasourceUnLikeParams) (int, error) {

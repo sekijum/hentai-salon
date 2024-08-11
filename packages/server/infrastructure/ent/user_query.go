@@ -822,7 +822,7 @@ func (uq *UserQuery) loadLikedThreads(ctx context.Context, query *ThreadQuery, n
 func (uq *UserQuery) loadLikedComments(ctx context.Context, query *ThreadCommentQuery, nodes []*User, init func(*User), assign func(*User, *ThreadComment)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
 	byID := make(map[int]*User)
-	nids := make(map[int]map[*User]struct{})
+	nids := make(map[uint64]map[*User]struct{})
 	for i, node := range nodes {
 		edgeIDs[i] = node.ID
 		byID[node.ID] = node
@@ -855,7 +855,7 @@ func (uq *UserQuery) loadLikedComments(ctx context.Context, query *ThreadComment
 			}
 			spec.Assign = func(columns []string, values []any) error {
 				outValue := int(values[0].(*sql.NullInt64).Int64)
-				inValue := int(values[1].(*sql.NullInt64).Int64)
+				inValue := uint64(values[1].(*sql.NullInt64).Int64)
 				if nids[inValue] == nil {
 					nids[inValue] = map[*User]struct{}{byID[outValue]: {}}
 					return assign(columns[1:], values[1:])

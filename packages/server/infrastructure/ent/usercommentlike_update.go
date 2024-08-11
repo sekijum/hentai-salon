@@ -45,15 +45,15 @@ func (uclu *UserCommentLikeUpdate) SetNillableUserID(i *int) *UserCommentLikeUpd
 }
 
 // SetCommentID sets the "comment_id" field.
-func (uclu *UserCommentLikeUpdate) SetCommentID(i int) *UserCommentLikeUpdate {
-	uclu.mutation.SetCommentID(i)
+func (uclu *UserCommentLikeUpdate) SetCommentID(u uint64) *UserCommentLikeUpdate {
+	uclu.mutation.SetCommentID(u)
 	return uclu
 }
 
 // SetNillableCommentID sets the "comment_id" field if the given value is not nil.
-func (uclu *UserCommentLikeUpdate) SetNillableCommentID(i *int) *UserCommentLikeUpdate {
-	if i != nil {
-		uclu.SetCommentID(*i)
+func (uclu *UserCommentLikeUpdate) SetNillableCommentID(u *uint64) *UserCommentLikeUpdate {
+	if u != nil {
+		uclu.SetCommentID(*u)
 	}
 	return uclu
 }
@@ -141,7 +141,7 @@ func (uclu *UserCommentLikeUpdate) sqlSave(ctx context.Context) (n int, err erro
 	if err := uclu.check(); err != nil {
 		return n, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(usercommentlike.Table, usercommentlike.Columns, sqlgraph.NewFieldSpec(usercommentlike.FieldUserID, field.TypeInt), sqlgraph.NewFieldSpec(usercommentlike.FieldCommentID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(usercommentlike.Table, usercommentlike.Columns, sqlgraph.NewFieldSpec(usercommentlike.FieldUserID, field.TypeInt), sqlgraph.NewFieldSpec(usercommentlike.FieldCommentID, field.TypeUint64))
 	if ps := uclu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -189,7 +189,7 @@ func (uclu *UserCommentLikeUpdate) sqlSave(ctx context.Context) (n int, err erro
 			Columns: []string{usercommentlike.CommentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeUint64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -202,7 +202,7 @@ func (uclu *UserCommentLikeUpdate) sqlSave(ctx context.Context) (n int, err erro
 			Columns: []string{usercommentlike.CommentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -245,15 +245,15 @@ func (ucluo *UserCommentLikeUpdateOne) SetNillableUserID(i *int) *UserCommentLik
 }
 
 // SetCommentID sets the "comment_id" field.
-func (ucluo *UserCommentLikeUpdateOne) SetCommentID(i int) *UserCommentLikeUpdateOne {
-	ucluo.mutation.SetCommentID(i)
+func (ucluo *UserCommentLikeUpdateOne) SetCommentID(u uint64) *UserCommentLikeUpdateOne {
+	ucluo.mutation.SetCommentID(u)
 	return ucluo
 }
 
 // SetNillableCommentID sets the "comment_id" field if the given value is not nil.
-func (ucluo *UserCommentLikeUpdateOne) SetNillableCommentID(i *int) *UserCommentLikeUpdateOne {
-	if i != nil {
-		ucluo.SetCommentID(*i)
+func (ucluo *UserCommentLikeUpdateOne) SetNillableCommentID(u *uint64) *UserCommentLikeUpdateOne {
+	if u != nil {
+		ucluo.SetCommentID(*u)
 	}
 	return ucluo
 }
@@ -354,7 +354,7 @@ func (ucluo *UserCommentLikeUpdateOne) sqlSave(ctx context.Context) (_node *User
 	if err := ucluo.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(usercommentlike.Table, usercommentlike.Columns, sqlgraph.NewFieldSpec(usercommentlike.FieldUserID, field.TypeInt), sqlgraph.NewFieldSpec(usercommentlike.FieldCommentID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(usercommentlike.Table, usercommentlike.Columns, sqlgraph.NewFieldSpec(usercommentlike.FieldUserID, field.TypeInt), sqlgraph.NewFieldSpec(usercommentlike.FieldCommentID, field.TypeUint64))
 	if id, ok := ucluo.mutation.UserID(); !ok {
 		return nil, &ValidationError{Name: "user_id", err: errors.New(`ent: missing "UserCommentLike.user_id" for update`)}
 	} else {
@@ -421,7 +421,7 @@ func (ucluo *UserCommentLikeUpdateOne) sqlSave(ctx context.Context) (_node *User
 			Columns: []string{usercommentlike.CommentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeUint64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -434,7 +434,7 @@ func (ucluo *UserCommentLikeUpdateOne) sqlSave(ctx context.Context) (_node *User
 			Columns: []string{usercommentlike.CommentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {

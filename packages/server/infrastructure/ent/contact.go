@@ -18,7 +18,7 @@ type Contact struct {
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// Email holds the value of the "email" field.
-	Email string `json:"email,omitempty"`
+	Email *string `json:"email,omitempty"`
 	// Subject holds the value of the "subject" field.
 	Subject string `json:"subject,omitempty"`
 	// Message holds the value of the "message" field.
@@ -70,7 +70,8 @@ func (c *Contact) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field email", values[i])
 			} else if value.Valid {
-				c.Email = value.String
+				c.Email = new(string)
+				*c.Email = value.String
 			}
 		case contact.FieldSubject:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -144,8 +145,10 @@ func (c *Contact) String() string {
 	var builder strings.Builder
 	builder.WriteString("Contact(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", c.ID))
-	builder.WriteString("email=")
-	builder.WriteString(c.Email)
+	if v := c.Email; v != nil {
+		builder.WriteString("email=")
+		builder.WriteString(*v)
+	}
 	builder.WriteString(", ")
 	builder.WriteString("subject=")
 	builder.WriteString(c.Subject)

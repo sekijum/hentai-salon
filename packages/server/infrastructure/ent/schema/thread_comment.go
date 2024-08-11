@@ -15,9 +15,9 @@ type ThreadComment struct {
 
 func (ThreadComment) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("id").Unique().Immutable(),
+		field.Uint64("id").Unique().Immutable(),
 		field.Int("thread_id"),
-		field.Int("parent_comment_id").Optional().Nillable().Comment("親コメントID（リプライの場合）"),
+		field.Uint64("parent_comment_id").Optional().Nillable().Comment("親コメントID（リプライの場合）"),
 		field.Int("user_id").Optional().Nillable().Comment("ログインユーザーの場合"),
 		field.String("guest_name").Optional().Nillable().MaxLen(20).Comment("ゲストユーザーの場合"),
 		field.Text("content"),

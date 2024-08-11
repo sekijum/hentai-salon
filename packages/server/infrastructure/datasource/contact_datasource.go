@@ -24,13 +24,15 @@ func (ds *ContactDatasource) Create(params ContactDatasourceCreateParams) (*mode
 	q := ds.client.
 		Contact.
 		Create().
-		SetEmail(params.Contact.EntContact.Email).
 		SetSubject(params.Contact.EntContact.Subject).
 		SetMessage(params.Contact.EntContact.Message).
 		SetIPAddress(params.Contact.EntContact.IPAddress).
 		SetStatus(params.Contact.EntContact.Status).
 		SetCreatedAt(time.Now()).
 		SetUpdatedAt(time.Now())
+	if params.Contact.EntContact.Email != nil {
+		q.SetEmail(*params.Contact.EntContact.Email)
+	}
 
 	entContact, err := q.Save(params.Ctx)
 	if err != nil {

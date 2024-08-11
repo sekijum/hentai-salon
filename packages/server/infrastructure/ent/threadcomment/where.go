@@ -11,47 +11,47 @@ import (
 )
 
 // ID filters vertices based on their ID field.
-func ID(id int) predicate.ThreadComment {
+func ID(id uint64) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldEQ(FieldID, id))
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id int) predicate.ThreadComment {
+func IDEQ(id uint64) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldEQ(FieldID, id))
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id int) predicate.ThreadComment {
+func IDNEQ(id uint64) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldNEQ(FieldID, id))
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...int) predicate.ThreadComment {
+func IDIn(ids ...uint64) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldIn(FieldID, ids...))
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...int) predicate.ThreadComment {
+func IDNotIn(ids ...uint64) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldNotIn(FieldID, ids...))
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id int) predicate.ThreadComment {
+func IDGT(id uint64) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldGT(FieldID, id))
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id int) predicate.ThreadComment {
+func IDGTE(id uint64) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldGTE(FieldID, id))
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id int) predicate.ThreadComment {
+func IDLT(id uint64) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldLT(FieldID, id))
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id int) predicate.ThreadComment {
+func IDLTE(id uint64) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldLTE(FieldID, id))
 }
 
@@ -61,7 +61,7 @@ func ThreadID(v int) predicate.ThreadComment {
 }
 
 // ParentCommentID applies equality check predicate on the "parent_comment_id" field. It's identical to ParentCommentIDEQ.
-func ParentCommentID(v int) predicate.ThreadComment {
+func ParentCommentID(v uint64) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldEQ(FieldParentCommentID, v))
 }
 
@@ -116,22 +116,22 @@ func ThreadIDNotIn(vs ...int) predicate.ThreadComment {
 }
 
 // ParentCommentIDEQ applies the EQ predicate on the "parent_comment_id" field.
-func ParentCommentIDEQ(v int) predicate.ThreadComment {
+func ParentCommentIDEQ(v uint64) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldEQ(FieldParentCommentID, v))
 }
 
 // ParentCommentIDNEQ applies the NEQ predicate on the "parent_comment_id" field.
-func ParentCommentIDNEQ(v int) predicate.ThreadComment {
+func ParentCommentIDNEQ(v uint64) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldNEQ(FieldParentCommentID, v))
 }
 
 // ParentCommentIDIn applies the In predicate on the "parent_comment_id" field.
-func ParentCommentIDIn(vs ...int) predicate.ThreadComment {
+func ParentCommentIDIn(vs ...uint64) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldIn(FieldParentCommentID, vs...))
 }
 
 // ParentCommentIDNotIn applies the NotIn predicate on the "parent_comment_id" field.
-func ParentCommentIDNotIn(vs ...int) predicate.ThreadComment {
+func ParentCommentIDNotIn(vs ...uint64) predicate.ThreadComment {
 	return predicate.ThreadComment(sql.FieldNotIn(FieldParentCommentID, vs...))
 }
 

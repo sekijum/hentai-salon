@@ -15,7 +15,7 @@ type ThreadCommentAttachment struct {
 func (ThreadCommentAttachment) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("id").Unique().Immutable(),
-		field.Int("comment_id"),
+		field.Uint64("comment_id"),
 		field.String("url"),
 		field.Int("display_order").Default(0),
 		field.Int("type").Default(0).Comment("0: image, 1: video"),

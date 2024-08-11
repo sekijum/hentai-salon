@@ -148,14 +148,14 @@ func (uc *UserCreate) AddThreads(t ...*Thread) *UserCreate {
 }
 
 // AddCommentIDs adds the "comments" edge to the ThreadComment entity by IDs.
-func (uc *UserCreate) AddCommentIDs(ids ...int) *UserCreate {
+func (uc *UserCreate) AddCommentIDs(ids ...uint64) *UserCreate {
 	uc.mutation.AddCommentIDs(ids...)
 	return uc
 }
 
 // AddComments adds the "comments" edges to the ThreadComment entity.
 func (uc *UserCreate) AddComments(t ...*ThreadComment) *UserCreate {
-	ids := make([]int, len(t))
+	ids := make([]uint64, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
 	}
@@ -178,14 +178,14 @@ func (uc *UserCreate) AddLikedThreads(t ...*Thread) *UserCreate {
 }
 
 // AddLikedCommentIDs adds the "liked_comments" edge to the ThreadComment entity by IDs.
-func (uc *UserCreate) AddLikedCommentIDs(ids ...int) *UserCreate {
+func (uc *UserCreate) AddLikedCommentIDs(ids ...uint64) *UserCreate {
 	uc.mutation.AddLikedCommentIDs(ids...)
 	return uc
 }
 
 // AddLikedComments adds the "liked_comments" edges to the ThreadComment entity.
 func (uc *UserCreate) AddLikedComments(t ...*ThreadComment) *UserCreate {
-	ids := make([]int, len(t))
+	ids := make([]uint64, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
 	}
@@ -382,7 +382,7 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Columns: []string{user.CommentsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -418,7 +418,7 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Columns: user.LikedCommentsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {

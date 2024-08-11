@@ -15,7 +15,7 @@ func NewThreadCommentApplicationService(threadCommentDatasource *datasource_admi
 
 type ThreadCommentApplicationServiceFindByIDParams struct {
 	Ctx       context.Context
-	CommentID int
+	CommentID uint64
 }
 
 func (svc *ThreadCommentApplicationService) Delete(params ThreadCommentApplicationServiceFindByIDParams) error {

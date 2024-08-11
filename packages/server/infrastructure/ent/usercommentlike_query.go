@@ -401,8 +401,8 @@ func (uclq *UserCommentLikeQuery) loadUser(ctx context.Context, query *UserQuery
 	return nil
 }
 func (uclq *UserCommentLikeQuery) loadComment(ctx context.Context, query *ThreadCommentQuery, nodes []*UserCommentLike, init func(*UserCommentLike), assign func(*UserCommentLike, *ThreadComment)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*UserCommentLike)
+	ids := make([]uint64, 0, len(nodes))
+	nodeids := make(map[uint64][]*UserCommentLike)
 	for i := range nodes {
 		fk := nodes[i].CommentID
 		if _, ok := nodeids[fk]; !ok {

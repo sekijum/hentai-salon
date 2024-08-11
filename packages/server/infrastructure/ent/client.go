@@ -1049,7 +1049,7 @@ func (c *ThreadCommentClient) UpdateOne(tc *ThreadComment) *ThreadCommentUpdateO
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *ThreadCommentClient) UpdateOneID(id int) *ThreadCommentUpdateOne {
+func (c *ThreadCommentClient) UpdateOneID(id uint64) *ThreadCommentUpdateOne {
 	mutation := newThreadCommentMutation(c.config, OpUpdateOne, withThreadCommentID(id))
 	return &ThreadCommentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -1066,7 +1066,7 @@ func (c *ThreadCommentClient) DeleteOne(tc *ThreadComment) *ThreadCommentDeleteO
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *ThreadCommentClient) DeleteOneID(id int) *ThreadCommentDeleteOne {
+func (c *ThreadCommentClient) DeleteOneID(id uint64) *ThreadCommentDeleteOne {
 	builder := c.Delete().Where(threadcomment.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -1083,12 +1083,12 @@ func (c *ThreadCommentClient) Query() *ThreadCommentQuery {
 }
 
 // Get returns a ThreadComment entity by its id.
-func (c *ThreadCommentClient) Get(ctx context.Context, id int) (*ThreadComment, error) {
+func (c *ThreadCommentClient) Get(ctx context.Context, id uint64) (*ThreadComment, error) {
 	return c.Query().Where(threadcomment.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *ThreadCommentClient) GetX(ctx context.Context, id int) *ThreadComment {
+func (c *ThreadCommentClient) GetX(ctx context.Context, id uint64) *ThreadComment {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)

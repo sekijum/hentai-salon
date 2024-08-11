@@ -26,6 +26,14 @@ func (cc *ContactCreate) SetEmail(s string) *ContactCreate {
 	return cc
 }
 
+// SetNillableEmail sets the "email" field if the given value is not nil.
+func (cc *ContactCreate) SetNillableEmail(s *string) *ContactCreate {
+	if s != nil {
+		cc.SetEmail(*s)
+	}
+	return cc
+}
+
 // SetSubject sets the "subject" field.
 func (cc *ContactCreate) SetSubject(s string) *ContactCreate {
 	cc.mutation.SetSubject(s)
@@ -143,9 +151,6 @@ func (cc *ContactCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (cc *ContactCreate) check() error {
-	if _, ok := cc.mutation.Email(); !ok {
-		return &ValidationError{Name: "email", err: errors.New(`ent: missing required field "Contact.email"`)}
-	}
 	if v, ok := cc.mutation.Email(); ok {
 		if err := contact.EmailValidator(v); err != nil {
 			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "Contact.email": %w`, err)}
@@ -213,7 +218,7 @@ func (cc *ContactCreate) createSpec() (*Contact, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := cc.mutation.Email(); ok {
 		_spec.SetField(contact.FieldEmail, field.TypeString, value)
-		_node.Email = value
+		_node.Email = &value
 	}
 	if value, ok := cc.mutation.Subject(); ok {
 		_spec.SetField(contact.FieldSubject, field.TypeString, value)

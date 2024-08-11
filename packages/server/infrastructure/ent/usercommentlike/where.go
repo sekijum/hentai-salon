@@ -16,7 +16,7 @@ func UserID(v int) predicate.UserCommentLike {
 }
 
 // CommentID applies equality check predicate on the "comment_id" field. It's identical to CommentIDEQ.
-func CommentID(v int) predicate.UserCommentLike {
+func CommentID(v uint64) predicate.UserCommentLike {
 	return predicate.UserCommentLike(sql.FieldEQ(FieldCommentID, v))
 }
 
@@ -46,22 +46,22 @@ func UserIDNotIn(vs ...int) predicate.UserCommentLike {
 }
 
 // CommentIDEQ applies the EQ predicate on the "comment_id" field.
-func CommentIDEQ(v int) predicate.UserCommentLike {
+func CommentIDEQ(v uint64) predicate.UserCommentLike {
 	return predicate.UserCommentLike(sql.FieldEQ(FieldCommentID, v))
 }
 
 // CommentIDNEQ applies the NEQ predicate on the "comment_id" field.
-func CommentIDNEQ(v int) predicate.UserCommentLike {
+func CommentIDNEQ(v uint64) predicate.UserCommentLike {
 	return predicate.UserCommentLike(sql.FieldNEQ(FieldCommentID, v))
 }
 
 // CommentIDIn applies the In predicate on the "comment_id" field.
-func CommentIDIn(vs ...int) predicate.UserCommentLike {
+func CommentIDIn(vs ...uint64) predicate.UserCommentLike {
 	return predicate.UserCommentLike(sql.FieldIn(FieldCommentID, vs...))
 }
 
 // CommentIDNotIn applies the NotIn predicate on the "comment_id" field.
-func CommentIDNotIn(vs ...int) predicate.UserCommentLike {
+func CommentIDNotIn(vs ...uint64) predicate.UserCommentLike {
 	return predicate.UserCommentLike(sql.FieldNotIn(FieldCommentID, vs...))
 }
 

@@ -30,15 +30,15 @@ func (tcau *ThreadCommentAttachmentUpdate) Where(ps ...predicate.ThreadCommentAt
 }
 
 // SetCommentID sets the "comment_id" field.
-func (tcau *ThreadCommentAttachmentUpdate) SetCommentID(i int) *ThreadCommentAttachmentUpdate {
-	tcau.mutation.SetCommentID(i)
+func (tcau *ThreadCommentAttachmentUpdate) SetCommentID(u uint64) *ThreadCommentAttachmentUpdate {
+	tcau.mutation.SetCommentID(u)
 	return tcau
 }
 
 // SetNillableCommentID sets the "comment_id" field if the given value is not nil.
-func (tcau *ThreadCommentAttachmentUpdate) SetNillableCommentID(i *int) *ThreadCommentAttachmentUpdate {
-	if i != nil {
-		tcau.SetCommentID(*i)
+func (tcau *ThreadCommentAttachmentUpdate) SetNillableCommentID(u *uint64) *ThreadCommentAttachmentUpdate {
+	if u != nil {
+		tcau.SetCommentID(*u)
 	}
 	return tcau
 }
@@ -202,7 +202,7 @@ func (tcau *ThreadCommentAttachmentUpdate) sqlSave(ctx context.Context) (n int, 
 			Columns: []string{threadcommentattachment.CommentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeUint64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -215,7 +215,7 @@ func (tcau *ThreadCommentAttachmentUpdate) sqlSave(ctx context.Context) (n int, 
 			Columns: []string{threadcommentattachment.CommentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -244,15 +244,15 @@ type ThreadCommentAttachmentUpdateOne struct {
 }
 
 // SetCommentID sets the "comment_id" field.
-func (tcauo *ThreadCommentAttachmentUpdateOne) SetCommentID(i int) *ThreadCommentAttachmentUpdateOne {
-	tcauo.mutation.SetCommentID(i)
+func (tcauo *ThreadCommentAttachmentUpdateOne) SetCommentID(u uint64) *ThreadCommentAttachmentUpdateOne {
+	tcauo.mutation.SetCommentID(u)
 	return tcauo
 }
 
 // SetNillableCommentID sets the "comment_id" field if the given value is not nil.
-func (tcauo *ThreadCommentAttachmentUpdateOne) SetNillableCommentID(i *int) *ThreadCommentAttachmentUpdateOne {
-	if i != nil {
-		tcauo.SetCommentID(*i)
+func (tcauo *ThreadCommentAttachmentUpdateOne) SetNillableCommentID(u *uint64) *ThreadCommentAttachmentUpdateOne {
+	if u != nil {
+		tcauo.SetCommentID(*u)
 	}
 	return tcauo
 }
@@ -446,7 +446,7 @@ func (tcauo *ThreadCommentAttachmentUpdateOne) sqlSave(ctx context.Context) (_no
 			Columns: []string{threadcommentattachment.CommentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeUint64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -459,7 +459,7 @@ func (tcauo *ThreadCommentAttachmentUpdateOne) sqlSave(ctx context.Context) (_no
 			Columns: []string{threadcommentattachment.CommentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {

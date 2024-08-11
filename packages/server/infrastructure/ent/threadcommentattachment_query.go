@@ -298,7 +298,7 @@ func (tcaq *ThreadCommentAttachmentQuery) WithComment(opts ...func(*ThreadCommen
 // Example:
 //
 //	var v []struct {
-//		CommentID int `json:"comment_id,omitempty"`
+//		CommentID uint64 `json:"comment_id,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -321,7 +321,7 @@ func (tcaq *ThreadCommentAttachmentQuery) GroupBy(field string, fields ...string
 // Example:
 //
 //	var v []struct {
-//		CommentID int `json:"comment_id,omitempty"`
+//		CommentID uint64 `json:"comment_id,omitempty"`
 //	}
 //
 //	client.ThreadCommentAttachment.Query().
@@ -402,8 +402,8 @@ func (tcaq *ThreadCommentAttachmentQuery) sqlAll(ctx context.Context, hooks ...q
 }
 
 func (tcaq *ThreadCommentAttachmentQuery) loadComment(ctx context.Context, query *ThreadCommentQuery, nodes []*ThreadCommentAttachment, init func(*ThreadCommentAttachment), assign func(*ThreadCommentAttachment, *ThreadComment)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*ThreadCommentAttachment)
+	ids := make([]uint64, 0, len(nodes))
+	nodeids := make(map[uint64][]*ThreadCommentAttachment)
 	for i := range nodes {
 		fk := nodes[i].CommentID
 		if _, ok := nodeids[fk]; !ok {

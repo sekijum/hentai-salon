@@ -248,8 +248,8 @@ func (tcq *ThreadCommentQuery) FirstX(ctx context.Context) *ThreadComment {
 
 // FirstID returns the first ThreadComment ID from the query.
 // Returns a *NotFoundError when no ThreadComment ID was found.
-func (tcq *ThreadCommentQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (tcq *ThreadCommentQuery) FirstID(ctx context.Context) (id uint64, err error) {
+	var ids []uint64
 	if ids, err = tcq.Limit(1).IDs(setContextOp(ctx, tcq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
@@ -261,7 +261,7 @@ func (tcq *ThreadCommentQuery) FirstID(ctx context.Context) (id int, err error) 
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (tcq *ThreadCommentQuery) FirstIDX(ctx context.Context) int {
+func (tcq *ThreadCommentQuery) FirstIDX(ctx context.Context) uint64 {
 	id, err := tcq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -299,8 +299,8 @@ func (tcq *ThreadCommentQuery) OnlyX(ctx context.Context) *ThreadComment {
 // OnlyID is like Only, but returns the only ThreadComment ID in the query.
 // Returns a *NotSingularError when more than one ThreadComment ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (tcq *ThreadCommentQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (tcq *ThreadCommentQuery) OnlyID(ctx context.Context) (id uint64, err error) {
+	var ids []uint64
 	if ids, err = tcq.Limit(2).IDs(setContextOp(ctx, tcq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
@@ -316,7 +316,7 @@ func (tcq *ThreadCommentQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (tcq *ThreadCommentQuery) OnlyIDX(ctx context.Context) int {
+func (tcq *ThreadCommentQuery) OnlyIDX(ctx context.Context) uint64 {
 	id, err := tcq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -344,7 +344,7 @@ func (tcq *ThreadCommentQuery) AllX(ctx context.Context) []*ThreadComment {
 }
 
 // IDs executes the query and returns a list of ThreadComment IDs.
-func (tcq *ThreadCommentQuery) IDs(ctx context.Context) (ids []int, err error) {
+func (tcq *ThreadCommentQuery) IDs(ctx context.Context) (ids []uint64, err error) {
 	if tcq.ctx.Unique == nil && tcq.path != nil {
 		tcq.Unique(true)
 	}
@@ -356,7 +356,7 @@ func (tcq *ThreadCommentQuery) IDs(ctx context.Context) (ids []int, err error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (tcq *ThreadCommentQuery) IDsX(ctx context.Context) []int {
+func (tcq *ThreadCommentQuery) IDsX(ctx context.Context) []uint64 {
 	ids, err := tcq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -727,8 +727,8 @@ func (tcq *ThreadCommentQuery) loadAuthor(ctx context.Context, query *UserQuery,
 	return nil
 }
 func (tcq *ThreadCommentQuery) loadParentComment(ctx context.Context, query *ThreadCommentQuery, nodes []*ThreadComment, init func(*ThreadComment), assign func(*ThreadComment, *ThreadComment)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*ThreadComment)
+	ids := make([]uint64, 0, len(nodes))
+	nodeids := make(map[uint64][]*ThreadComment)
 	for i := range nodes {
 		if nodes[i].ParentCommentID == nil {
 			continue
@@ -760,7 +760,7 @@ func (tcq *ThreadCommentQuery) loadParentComment(ctx context.Context, query *Thr
 }
 func (tcq *ThreadCommentQuery) loadReplies(ctx context.Context, query *ThreadCommentQuery, nodes []*ThreadComment, init func(*ThreadComment), assign func(*ThreadComment, *ThreadComment)) error {
 	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*ThreadComment)
+	nodeids := make(map[uint64]*ThreadComment)
 	for i := range nodes {
 		fks = append(fks, nodes[i].ID)
 		nodeids[nodes[i].ID] = nodes[i]
@@ -793,7 +793,7 @@ func (tcq *ThreadCommentQuery) loadReplies(ctx context.Context, query *ThreadCom
 }
 func (tcq *ThreadCommentQuery) loadAttachments(ctx context.Context, query *ThreadCommentAttachmentQuery, nodes []*ThreadComment, init func(*ThreadComment), assign func(*ThreadComment, *ThreadCommentAttachment)) error {
 	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*ThreadComment)
+	nodeids := make(map[uint64]*ThreadComment)
 	for i := range nodes {
 		fks = append(fks, nodes[i].ID)
 		nodeids[nodes[i].ID] = nodes[i]
@@ -823,7 +823,7 @@ func (tcq *ThreadCommentQuery) loadAttachments(ctx context.Context, query *Threa
 }
 func (tcq *ThreadCommentQuery) loadLikedUsers(ctx context.Context, query *UserQuery, nodes []*ThreadComment, init func(*ThreadComment), assign func(*ThreadComment, *User)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
-	byID := make(map[int]*ThreadComment)
+	byID := make(map[uint64]*ThreadComment)
 	nids := make(map[int]map[*ThreadComment]struct{})
 	for i, node := range nodes {
 		edgeIDs[i] = node.ID
@@ -856,7 +856,7 @@ func (tcq *ThreadCommentQuery) loadLikedUsers(ctx context.Context, query *UserQu
 				return append([]any{new(sql.NullInt64)}, values...), nil
 			}
 			spec.Assign = func(columns []string, values []any) error {
-				outValue := int(values[0].(*sql.NullInt64).Int64)
+				outValue := uint64(values[0].(*sql.NullInt64).Int64)
 				inValue := int(values[1].(*sql.NullInt64).Int64)
 				if nids[inValue] == nil {
 					nids[inValue] = map[*ThreadComment]struct{}{byID[outValue]: {}}
@@ -884,7 +884,7 @@ func (tcq *ThreadCommentQuery) loadLikedUsers(ctx context.Context, query *UserQu
 }
 func (tcq *ThreadCommentQuery) loadUserCommentLike(ctx context.Context, query *UserCommentLikeQuery, nodes []*ThreadComment, init func(*ThreadComment), assign func(*ThreadComment, *UserCommentLike)) error {
 	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*ThreadComment)
+	nodeids := make(map[uint64]*ThreadComment)
 	for i := range nodes {
 		fks = append(fks, nodes[i].ID)
 		nodeids[nodes[i].ID] = nodes[i]
@@ -923,7 +923,7 @@ func (tcq *ThreadCommentQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (tcq *ThreadCommentQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(threadcomment.Table, threadcomment.Columns, sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewQuerySpec(threadcomment.Table, threadcomment.Columns, sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeUint64))
 	_spec.From = tcq.sql
 	if unique := tcq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique

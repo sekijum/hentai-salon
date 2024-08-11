@@ -19,7 +19,7 @@ func NewThreadCommentController(threadCommentApplicationService *service.ThreadC
 }
 
 func (ctrl *ThreadCommentController) FindById(ctx *gin.Context) {
-	commentID, err := strconv.Atoi(ctx.Param("commentID"))
+	commentID, err := strconv.ParseUint(ctx.Param("commentID"), 10, 64)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -99,7 +99,7 @@ func (ctrl *ThreadCommentController) Reply(ctx *gin.Context) {
 		return
 	}
 
-	parentCommentID, err := strconv.Atoi(ctx.Param("commentID"))
+	parentCommentID, err := strconv.ParseUint(ctx.Param("commentID"), 10, 64)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -141,7 +141,7 @@ func (ctrl *ThreadCommentController) Like(ctx *gin.Context) {
 		return
 	}
 
-	commentID, err := strconv.Atoi(ctx.Param("commentID"))
+	commentID, err := strconv.ParseUint(ctx.Param("commentID"), 10, 64)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -167,7 +167,7 @@ func (ctrl *ThreadCommentController) Unlike(ctx *gin.Context) {
 		return
 	}
 
-	commentID, err := strconv.Atoi(ctx.Param("commentID"))
+	commentID, err := strconv.ParseUint(ctx.Param("commentID"), 10, 64)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

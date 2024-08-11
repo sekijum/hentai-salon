@@ -19,7 +19,7 @@ type ThreadCommentAttachment struct {
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// CommentID holds the value of the "comment_id" field.
-	CommentID int `json:"comment_id,omitempty"`
+	CommentID uint64 `json:"comment_id,omitempty"`
 	// URL holds the value of the "url" field.
 	URL string `json:"url,omitempty"`
 	// DisplayOrder holds the value of the "display_order" field.
@@ -90,7 +90,7 @@ func (tca *ThreadCommentAttachment) assignValues(columns []string, values []any)
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field comment_id", values[i])
 			} else if value.Valid {
-				tca.CommentID = int(value.Int64)
+				tca.CommentID = uint64(value.Int64)
 			}
 		case threadcommentattachment.FieldURL:
 			if value, ok := values[i].(*sql.NullString); !ok {

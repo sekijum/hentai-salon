@@ -46,15 +46,15 @@ func (tcu *ThreadCommentUpdate) SetNillableThreadID(i *int) *ThreadCommentUpdate
 }
 
 // SetParentCommentID sets the "parent_comment_id" field.
-func (tcu *ThreadCommentUpdate) SetParentCommentID(i int) *ThreadCommentUpdate {
-	tcu.mutation.SetParentCommentID(i)
+func (tcu *ThreadCommentUpdate) SetParentCommentID(u uint64) *ThreadCommentUpdate {
+	tcu.mutation.SetParentCommentID(u)
 	return tcu
 }
 
 // SetNillableParentCommentID sets the "parent_comment_id" field if the given value is not nil.
-func (tcu *ThreadCommentUpdate) SetNillableParentCommentID(i *int) *ThreadCommentUpdate {
-	if i != nil {
-		tcu.SetParentCommentID(*i)
+func (tcu *ThreadCommentUpdate) SetNillableParentCommentID(u *uint64) *ThreadCommentUpdate {
+	if u != nil {
+		tcu.SetParentCommentID(*u)
 	}
 	return tcu
 }
@@ -183,14 +183,14 @@ func (tcu *ThreadCommentUpdate) SetParentComment(t *ThreadComment) *ThreadCommen
 }
 
 // AddReplyIDs adds the "replies" edge to the ThreadComment entity by IDs.
-func (tcu *ThreadCommentUpdate) AddReplyIDs(ids ...int) *ThreadCommentUpdate {
+func (tcu *ThreadCommentUpdate) AddReplyIDs(ids ...uint64) *ThreadCommentUpdate {
 	tcu.mutation.AddReplyIDs(ids...)
 	return tcu
 }
 
 // AddReplies adds the "replies" edges to the ThreadComment entity.
 func (tcu *ThreadCommentUpdate) AddReplies(t ...*ThreadComment) *ThreadCommentUpdate {
-	ids := make([]int, len(t))
+	ids := make([]uint64, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
 	}
@@ -257,14 +257,14 @@ func (tcu *ThreadCommentUpdate) ClearReplies() *ThreadCommentUpdate {
 }
 
 // RemoveReplyIDs removes the "replies" edge to ThreadComment entities by IDs.
-func (tcu *ThreadCommentUpdate) RemoveReplyIDs(ids ...int) *ThreadCommentUpdate {
+func (tcu *ThreadCommentUpdate) RemoveReplyIDs(ids ...uint64) *ThreadCommentUpdate {
 	tcu.mutation.RemoveReplyIDs(ids...)
 	return tcu
 }
 
 // RemoveReplies removes "replies" edges to ThreadComment entities.
 func (tcu *ThreadCommentUpdate) RemoveReplies(t ...*ThreadComment) *ThreadCommentUpdate {
-	ids := make([]int, len(t))
+	ids := make([]uint64, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
 	}
@@ -371,7 +371,7 @@ func (tcu *ThreadCommentUpdate) sqlSave(ctx context.Context) (n int, err error) 
 	if err := tcu.check(); err != nil {
 		return n, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(threadcomment.Table, threadcomment.Columns, sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(threadcomment.Table, threadcomment.Columns, sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeUint64))
 	if ps := tcu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -463,7 +463,7 @@ func (tcu *ThreadCommentUpdate) sqlSave(ctx context.Context) (n int, err error) 
 			Columns: []string{threadcomment.ParentCommentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeUint64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -476,7 +476,7 @@ func (tcu *ThreadCommentUpdate) sqlSave(ctx context.Context) (n int, err error) 
 			Columns: []string{threadcomment.ParentCommentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -492,7 +492,7 @@ func (tcu *ThreadCommentUpdate) sqlSave(ctx context.Context) (n int, err error) 
 			Columns: []string{threadcomment.RepliesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeUint64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -505,7 +505,7 @@ func (tcu *ThreadCommentUpdate) sqlSave(ctx context.Context) (n int, err error) 
 			Columns: []string{threadcomment.RepliesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -521,7 +521,7 @@ func (tcu *ThreadCommentUpdate) sqlSave(ctx context.Context) (n int, err error) 
 			Columns: []string{threadcomment.RepliesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -666,15 +666,15 @@ func (tcuo *ThreadCommentUpdateOne) SetNillableThreadID(i *int) *ThreadCommentUp
 }
 
 // SetParentCommentID sets the "parent_comment_id" field.
-func (tcuo *ThreadCommentUpdateOne) SetParentCommentID(i int) *ThreadCommentUpdateOne {
-	tcuo.mutation.SetParentCommentID(i)
+func (tcuo *ThreadCommentUpdateOne) SetParentCommentID(u uint64) *ThreadCommentUpdateOne {
+	tcuo.mutation.SetParentCommentID(u)
 	return tcuo
 }
 
 // SetNillableParentCommentID sets the "parent_comment_id" field if the given value is not nil.
-func (tcuo *ThreadCommentUpdateOne) SetNillableParentCommentID(i *int) *ThreadCommentUpdateOne {
-	if i != nil {
-		tcuo.SetParentCommentID(*i)
+func (tcuo *ThreadCommentUpdateOne) SetNillableParentCommentID(u *uint64) *ThreadCommentUpdateOne {
+	if u != nil {
+		tcuo.SetParentCommentID(*u)
 	}
 	return tcuo
 }
@@ -803,14 +803,14 @@ func (tcuo *ThreadCommentUpdateOne) SetParentComment(t *ThreadComment) *ThreadCo
 }
 
 // AddReplyIDs adds the "replies" edge to the ThreadComment entity by IDs.
-func (tcuo *ThreadCommentUpdateOne) AddReplyIDs(ids ...int) *ThreadCommentUpdateOne {
+func (tcuo *ThreadCommentUpdateOne) AddReplyIDs(ids ...uint64) *ThreadCommentUpdateOne {
 	tcuo.mutation.AddReplyIDs(ids...)
 	return tcuo
 }
 
 // AddReplies adds the "replies" edges to the ThreadComment entity.
 func (tcuo *ThreadCommentUpdateOne) AddReplies(t ...*ThreadComment) *ThreadCommentUpdateOne {
-	ids := make([]int, len(t))
+	ids := make([]uint64, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
 	}
@@ -877,14 +877,14 @@ func (tcuo *ThreadCommentUpdateOne) ClearReplies() *ThreadCommentUpdateOne {
 }
 
 // RemoveReplyIDs removes the "replies" edge to ThreadComment entities by IDs.
-func (tcuo *ThreadCommentUpdateOne) RemoveReplyIDs(ids ...int) *ThreadCommentUpdateOne {
+func (tcuo *ThreadCommentUpdateOne) RemoveReplyIDs(ids ...uint64) *ThreadCommentUpdateOne {
 	tcuo.mutation.RemoveReplyIDs(ids...)
 	return tcuo
 }
 
 // RemoveReplies removes "replies" edges to ThreadComment entities.
 func (tcuo *ThreadCommentUpdateOne) RemoveReplies(t ...*ThreadComment) *ThreadCommentUpdateOne {
-	ids := make([]int, len(t))
+	ids := make([]uint64, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
 	}
@@ -1004,7 +1004,7 @@ func (tcuo *ThreadCommentUpdateOne) sqlSave(ctx context.Context) (_node *ThreadC
 	if err := tcuo.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(threadcomment.Table, threadcomment.Columns, sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(threadcomment.Table, threadcomment.Columns, sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeUint64))
 	id, ok := tcuo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "ThreadComment.id" for update`)}
@@ -1113,7 +1113,7 @@ func (tcuo *ThreadCommentUpdateOne) sqlSave(ctx context.Context) (_node *ThreadC
 			Columns: []string{threadcomment.ParentCommentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeUint64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -1126,7 +1126,7 @@ func (tcuo *ThreadCommentUpdateOne) sqlSave(ctx context.Context) (_node *ThreadC
 			Columns: []string{threadcomment.ParentCommentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -1142,7 +1142,7 @@ func (tcuo *ThreadCommentUpdateOne) sqlSave(ctx context.Context) (_node *ThreadC
 			Columns: []string{threadcomment.RepliesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeUint64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -1155,7 +1155,7 @@ func (tcuo *ThreadCommentUpdateOne) sqlSave(ctx context.Context) (_node *ThreadC
 			Columns: []string{threadcomment.RepliesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -1171,7 +1171,7 @@ func (tcuo *ThreadCommentUpdateOne) sqlSave(ctx context.Context) (_node *ThreadC
 			Columns: []string{threadcomment.RepliesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(threadcomment.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
