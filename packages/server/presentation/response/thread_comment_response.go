@@ -59,10 +59,22 @@ func NewThreadCommentResponse(params NewThreadCommentResponseParams) *ThreadComm
 	var attachmentResponseList []*ThreadCommentAttachmentResponse
 	if params.IncludeAttachments {
 		for _, attachment_i := range params.ThreadComment.EntThreadComment.Edges.Attachments {
+			var commentAuthorName *string
+			if params.ThreadComment.EntThreadComment.Edges.Author != nil {
+				commentAuthorName = &params.ThreadComment.EntThreadComment.Edges.Author.Name
+			} else if params.ThreadComment.EntThreadComment.GuestName != nil {
+				commentAuthorName = params.ThreadComment.EntThreadComment.GuestName
+			}
+
+			createdAt := params.ThreadComment.EntThreadComment.CreatedAt.Format(time.RFC3339)
+
 			attachmentResponseList = append(attachmentResponseList, NewThreadCommentAttachmentResponse(NewThreadCommentAttachmentResponseParams{
 				ThreadCommentAttachment: model.NewThreadCommentAttachment(model.NewThreadCommentAttachmentParams{
 					EntAttachment: attachment_i,
 				}),
+				CommentAuthorName: commentAuthorName,
+				CommentContent:    &params.ThreadComment.EntThreadComment.Content,
+				CreatedAt:         &createdAt,
 			}))
 		}
 	}

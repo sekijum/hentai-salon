@@ -87,7 +87,7 @@ import { Form, Field } from 'vee-validate';
 interface Attachment {
   url: string;
   displayOrder: number;
-  type: 'Video' | 'Image';
+  type: 'video' | 'image';
 }
 
 interface FormState {
@@ -188,7 +188,7 @@ async function submit(_: typeof form.value, { resetForm }: { resetForm: () => vo
             return uploadFilesToS3(url, attachmentFiles.value[idx]).then(uploadedUrl => ({
               url: uploadedUrl,
               displayOrder: idx,
-              type: attachmentFiles.value[idx].type.startsWith('video') ? 'Video' : ('Image' as 'Video' | 'Image'),
+              type: attachmentFiles.value[idx].type.startsWith('video') ? 'video' : ('image' as 'video' | 'image'),
             }));
           }),
         );

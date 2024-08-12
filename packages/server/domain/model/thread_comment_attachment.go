@@ -45,9 +45,9 @@ func WithAttachmentTypeFromString(s string) func(*ThreadCommentAttachment) {
 func (m ThreadCommentAttachment) TypeToString() string {
 	switch AttachmentType(m.EntAttachment.Type) {
 	case AttachmentTypeImage:
-		return "Image"
+		return "image"
 	case AttachmentTypeVideo:
-		return "Video"
+		return "video"
 	default:
 		return "Unknown"
 	}
@@ -55,9 +55,9 @@ func (m ThreadCommentAttachment) TypeToString() string {
 
 func AttachmentTypeFromString(s string) (AttachmentType, error) {
 	switch s {
-	case "Image":
+	case "image":
 		return AttachmentTypeImage, nil
-	case "Video":
+	case "video":
 		return AttachmentTypeVideo, nil
 	default:
 		return -1, errors.New("invalid attachment type")

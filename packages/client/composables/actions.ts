@@ -30,10 +30,10 @@ export const useActions = () => {
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       const formData = new FormData();
-      const type = file.type.startsWith('video') ? 'Video' : 'Image';
+      const type = file.type.startsWith('video') ? 'video' : 'image';
 
       let uploadUrl = 'https://api.imgur.com/3/image';
-      if (type === 'Video') {
+      if (type === 'video') {
         formData.append('video', file);
         uploadUrl = 'https://api.imgur.com/3/upload';
       } else {

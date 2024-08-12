@@ -13,7 +13,7 @@ export default defineNuxtConfig({
     },
   },
 
-  css: ['vuetify/styles', '@mdi/font/css/materialdesignicons.css'],
+  css: ['vuetify/styles', '@mdi/font/css/materialdesignicons.css', 'glightbox/dist/css/glightbox.css'],
 
   modules: [
     (_options, nuxt) => {

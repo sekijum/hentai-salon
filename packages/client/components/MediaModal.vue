@@ -11,7 +11,7 @@
         </v-btn>
       </v-toolbar>
       <div class="media-container">
-        <template v-if="type === 'Video'">
+        <template v-if="type === 'video'">
           <VideoPlayer :src="url" />
         </template>
         <template v-else>
@@ -25,7 +25,7 @@
 <script setup lang="ts">
 import VideoPlayer from '~/components/VideoPlayer.vue';
 
-defineProps<{ type: 'Video' | 'Image'; url: string; to?: string }>();
+defineProps<{ type: 'video' | 'image'; url: string; to?: string }>();
 
 const emit = defineEmits(['close']);
 

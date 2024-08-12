@@ -2,6 +2,7 @@ package response
 
 import (
 	"server/domain/model"
+	"time"
 )
 
 type ThreadResponse struct {
@@ -59,10 +60,22 @@ func NewThreadResponse(params NewThreadResponseParams) *ThreadResponse {
 
 			if params.IncludeAttachments {
 				for _, attachment_i := range comment_i.Edges.Attachments {
+					var commentAuthorName *string
+					if comment_i.Edges.Author != nil {
+						commentAuthorName = &comment_i.Edges.Author.Name
+					} else if comment_i.GuestName != nil {
+						commentAuthorName = comment_i.GuestName
+					}
+
+					createdAt := comment_i.CreatedAt.Format(time.RFC3339)
+
 					attachmentResponseList = append(attachmentResponseList, NewThreadCommentAttachmentResponse(NewThreadCommentAttachmentResponseParams{
 						ThreadCommentAttachment: model.NewThreadCommentAttachment(model.NewThreadCommentAttachmentParams{
 							EntAttachment: attachment_i,
 						}),
+						CommentAuthorName: commentAuthorName,
+						CommentContent:    &comment_i.Content,
+						CreatedAt:         &createdAt,
 					}))
 				}
 			}
