@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="attachments.length">
     <v-row class="pa-0 ma-0">
       <v-col v-for="(item, index) in attachments" :key="index" class="d-flex child-flex pa-0 ma-0" cols="6">
         <nuxt-link
@@ -38,11 +38,19 @@ const props = defineProps<{
 
 const route = useRoute();
 
+onMounted(() => {
+  nextTick(() => {
+    GLightbox({
+      touchNavigation: true,
+      loop: true,
+    });
+  });
+});
 watch(
-  () => props.attachments,
+  () => props.attachments || route.fullPath,
   () => {
     nextTick(() => {
-      const lightbox = GLightbox({
+      GLightbox({
         touchNavigation: true,
         loop: true,
       });

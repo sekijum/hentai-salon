@@ -29,20 +29,6 @@
         :threadId="thread.id"
       />
       <div id="media-bottom" />
-
-      <div class="fab-container">
-        <v-fab-transition>
-          <v-btn icon large color="primary" @click="scrollToMediaTop">
-            <v-icon>mdi-arrow-up</v-icon>
-          </v-btn>
-        </v-fab-transition>
-
-        <v-fab-transition>
-          <v-btn icon large color="primary" @click="scrollToMediaBottom">
-            <v-icon>mdi-arrow-down</v-icon>
-          </v-btn>
-        </v-fab-transition>
-      </div>
     </template>
     <template v-else>
       <CommentForm @submit="fetchThread" :showReplyForm="true" :threadId="thread.id" />
@@ -59,33 +45,33 @@
       <div id="comment-bottom" />
 
       <CommentForm @submit="fetchThread" :showReplyForm="true" :threadId="thread.id" />
-
-      <div class="fab-container">
-        <v-fab-transition v-if="payload?.user?.id === thread.userId">
-          <v-btn icon large color="secondary" @click="editThread">
-            <v-icon>mdi-pencil</v-icon>
-          </v-btn>
-        </v-fab-transition>
-
-        <v-fab-transition>
-          <v-btn icon large color="primary" @click="toggleLike">
-            <v-icon>{{ thread.isLiked ? 'mdi-thumb-up' : 'mdi-thumb-up-outline' }}</v-icon>
-          </v-btn>
-        </v-fab-transition>
-
-        <v-fab-transition>
-          <v-btn icon large color="primary" @click="scrollToCommentTop">
-            <v-icon>mdi-arrow-up</v-icon>
-          </v-btn>
-        </v-fab-transition>
-
-        <v-fab-transition>
-          <v-btn icon large color="primary" @click="scrollToCommentBottom">
-            <v-icon>mdi-arrow-down</v-icon>
-          </v-btn>
-        </v-fab-transition>
-      </div>
     </template>
+
+    <div class="fab-container">
+      <v-fab-transition v-if="payload?.user?.id === thread.userId">
+        <v-btn icon large color="secondary" @click="editThread">
+          <v-icon>mdi-pencil</v-icon>
+        </v-btn>
+      </v-fab-transition>
+
+      <v-fab-transition>
+        <v-btn icon large color="primary" @click="toggleLike">
+          <v-icon>{{ thread.isLiked ? 'mdi-thumb-up' : 'mdi-thumb-up-outline' }}</v-icon>
+        </v-btn>
+      </v-fab-transition>
+
+      <v-fab-transition>
+        <v-btn icon large color="primary" @click="scrollToCommentTop">
+          <v-icon>mdi-arrow-up</v-icon>
+        </v-btn>
+      </v-fab-transition>
+
+      <v-fab-transition>
+        <v-btn icon large color="primary" @click="scrollToCommentBottom">
+          <v-icon>mdi-arrow-down</v-icon>
+        </v-btn>
+      </v-fab-transition>
+    </div>
 
     <v-divider />
 

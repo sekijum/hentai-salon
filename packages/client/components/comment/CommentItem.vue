@@ -43,10 +43,10 @@
         <v-row dense>
           <v-col
             cols="3"
-            v-for="(attachment, index) in comment.attachments"
-            :key="index"
+            v-for="(attachment, idx) in comment.attachments"
+            :key="idx"
             class="media-col"
-            @click="openModalMedia(attachment)"
+            @click="openLightbox(idx)"
           >
             <div class="media-item-wrapper">
               <v-img
@@ -113,12 +113,29 @@
     </v-list-item>
     <v-divider />
 
-    <MediaModal
-      v-if="selectedAttachment"
-      :type="selectedAttachment.type"
-      :url="selectedAttachment.url"
-      @close="closeModalMedia"
-    />
+    <nuxt-link
+      v-for="(item, index) in comment.attachments"
+      :key="index"
+      :href="item.url"
+      :class="`glightbox-${comment.id}`"
+      :data-title="`${comment.user?.name ? comment.user?.name : comment.guestName ? comment.guestName : '匿名'} ${
+        comment?.createdAt
+      }`"
+      :data-description="comment.content"
+      :data-type="item.type"
+      data-effect="fade"
+      data-zoomable="true"
+      data-draggable="true"
+      style="display: none"
+    >
+      <v-img :lazy-href="item.url" :src="item.url" alt="Image" aspect-ratio="1" class="bg-grey-lighten-2" cover>
+        <template v-slot:placeholder>
+          <v-row align="center" class="fill-height ma-0" justify="center">
+            <v-progress-circular color="grey-lighten-5" indeterminate></v-progress-circular>
+          </v-row>
+        </template>
+      </v-img>
+    </nuxt-link>
   </div>
 </template>
 
@@ -128,6 +145,7 @@ import MediaModal from '~/components/MediaModal.vue';
 import CommentForm from '~/components/comment/CommentForm.vue';
 import OEmbedContent from '~/components/OEmbedContent.vue';
 import type { IThreadComment } from '~/types/thread-comment';
+import GLightbox from 'glightbox';
 import type { IThreadCommentAttachment } from '~/types/thread-comment-attachment';
 
 const props = defineProps<{ comment: IThreadComment; commentLimit: number; threadId: number }>();
@@ -136,7 +154,6 @@ const route = useRoute();
 
 const { $formatDate, $api, payload } = nuxtApp;
 
-const selectedAttachment = ref<IThreadCommentAttachment | null>();
 const showReplyForm = ref(false);
 const emit = defineEmits(['replied']);
 const isLiked = ref(props.comment.isLiked);
@@ -145,12 +162,14 @@ function toggleReplyForm() {
   showReplyForm.value = !showReplyForm.value;
 }
 
-function openModalMedia(attachment: IThreadCommentAttachment) {
-  selectedAttachment.value = attachment;
-}
+function openLightbox(idx = 0) {
+  const lightbox = GLightbox({
+    selector: `.glightbox-${props.comment.id}`,
+    touchNavigation: true,
+    loop: true,
+  });
 
-function closeModalMedia() {
-  selectedAttachment.value = null;
+  lightbox.openAt(idx);
 }
 
 function username() {
