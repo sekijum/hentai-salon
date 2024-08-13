@@ -60,6 +60,7 @@
           label="タグ"
           variant="outlined"
           density="compact"
+          no-data-text="一致する結果が見つかりませんでした"
           clearable
           multiple
           dense

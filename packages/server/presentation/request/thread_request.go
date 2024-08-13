@@ -13,12 +13,13 @@ type ThreadFindByIdRequest struct {
 }
 
 type ThreadFindAllRequest struct {
-	Limit     int    `form:"limit"`
-	Offset    int    `form:"offset"`
-	Filter    string `form:"filter"`
-	ThreadIDs []int  `form:"threadIds[]" binding:"omitempty,dive,min=1"`
-	Keyword   string `form:"keyword" binding:"omitempty,max=50"`
-	BoardID   int    `form:"boardId" binding:"omitempty"`
+	Limit       int      `form:"limit"`
+	Offset      int      `form:"offset"`
+	Filter      string   `form:"filter"`
+	ThreadIDs   []int    `form:"threadIds[]" binding:"omitempty,dive,min=1"`
+	TagNameList []string `form:"tagNameList[],omitempty"`
+	Keyword     string   `form:"keyword" binding:"omitempty,max=50"`
+	BoardID     int      `form:"boardId" binding:"omitempty"`
 }
 
 type ThreadCreateRequest struct {

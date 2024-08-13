@@ -10,7 +10,14 @@
 
     <v-chip-group v-if="thread.tagNameList" active-class="primary--text" column>
       <v-chip size="x-small" v-for="(tagName, index) in thread.tagNameList" :key="`tag-${index}`">
-        {{ tagName }}
+        <nuxt-link
+          :to="`/threads?filter=tags&tagNameList=${tagName}`"
+          class="text-decoration-none bg-transparent"
+          target="_blank"
+          rel="noopener"
+        >
+          {{ tagName }}
+        </nuxt-link>
       </v-chip>
     </v-chip-group>
 

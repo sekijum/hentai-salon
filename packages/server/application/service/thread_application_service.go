@@ -51,6 +51,19 @@ func (svc *ThreadApplicationService) FindAll(params ThreadApplicationServiceFind
 		if err != nil {
 			return nil, err
 		}
+	case "tags":
+		if params.Qs.TagNameList != nil && len(params.Qs.TagNameList) > 0 {
+
+			threadList, err = svc.threadDatasource.FindAll(datasource.ThreadDatasourceFindAllParams{
+				Ctx:         params.Ctx,
+				Limit:       params.Qs.Limit,
+				Offset:      params.Qs.Offset,
+				TagNameList: params.Qs.TagNameList,
+			})
+			if err != nil {
+				return nil, err
+			}
+		}
 	case "related":
 		if len(params.Qs.ThreadIDs) == 0 {
 			return nil, nil

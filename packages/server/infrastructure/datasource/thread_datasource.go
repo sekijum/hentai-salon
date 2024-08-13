@@ -4,6 +4,7 @@ import (
 	"context"
 	"server/domain/model"
 	"server/infrastructure/ent"
+	"server/infrastructure/ent/predicate"
 	"server/infrastructure/ent/tag"
 	"server/infrastructure/ent/thread"
 	"server/infrastructure/ent/threadcomment"
@@ -45,14 +46,15 @@ func (ds *ThreadDatasource) GetThreadCount(params ThreadDatasourceGetCommentCoun
 }
 
 type ThreadDatasourceFindAllParams struct {
-	Ctx       context.Context
-	UserID    int
-	BoardID   int
-	Keyword   string
-	ThreadIDs []int
-	Order     string
-	Limit     int
-	Offset    int
+	Ctx         context.Context
+	UserID      int
+	BoardID     int
+	Keyword     string
+	ThreadIDs   []int
+	Order       string
+	Limit       int
+	Offset      int
+	TagNameList []string
 }
 
 func (ds *ThreadDatasource) FindAll(params ThreadDatasourceFindAllParams) ([]*model.Thread, error) {
@@ -71,6 +73,18 @@ func (ds *ThreadDatasource) FindAll(params ThreadDatasourceFindAllParams) ([]*mo
 			thread.Or(
 				thread.TitleContainsFold(params.Keyword),
 				thread.DescriptionContainsFold(params.Keyword),
+			),
+		)
+	}
+	if params.TagNameList != nil && len(params.TagNameList) > 0 {
+		var tagConditions []predicate.Tag
+		for _, tagName := range params.TagNameList {
+			tagConditions = append(tagConditions, tag.NameContainsFold(tagName))
+		}
+
+		q = q.Where(
+			thread.HasTagsWith(
+				tag.Or(tagConditions...),
 			),
 		)
 	}

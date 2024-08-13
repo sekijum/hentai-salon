@@ -28,6 +28,7 @@
       <div class="field">
         <v-combobox
           v-model="form.tagNameList"
+          no-data-text="一致する結果が見つかりませんでした"
           chips
           small-chips
           label="タグ"

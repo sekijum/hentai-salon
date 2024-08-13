@@ -71,11 +71,13 @@ async function fetchThreads(offset: number = 0) {
     });
     threads = response.data;
   } else {
+    console.log(route.query);
     const response = await $api.get<IThread[]>('/threads', {
       params: {
         filter: props.filter,
         threadIds: getThreadViewHistory(),
         keyword: route.query.keyword,
+        tagNameList: Array.isArray(route.query.tagNameList) ? route.query.tagNameList : [route.query.tagNameList],
         boardId: route.query.boardId,
         limit: threadLimit,
         offset: offset,
@@ -97,8 +99,12 @@ async function fetchThreads(offset: number = 0) {
   return { canNextLoad: true };
 }
 
+watchEffect(() => {
+  console.log(route.query);
+});
+
 watch(
-  () => route.query.keyword || route.query.filter || route.query.keyword,
+  () => route.query.tagNameList?.length || route.query.keyword || route.query.filter,
   () => {
     offset.value = 0;
     items.value = [];
