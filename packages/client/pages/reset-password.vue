@@ -15,6 +15,8 @@
             type="password"
             variant="outlined"
             density="compact"
+            dense
+            single-line
             :error-messages="errors"
           />
         </Field>
@@ -28,6 +30,8 @@
             type="password"
             variant="outlined"
             density="compact"
+            dense
+            single-line
             :error-messages="errors"
           />
         </Field>

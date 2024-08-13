@@ -141,7 +141,6 @@
 
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
-import MediaModal from '~/components/MediaModal.vue';
 import CommentForm from '~/components/comment/CommentForm.vue';
 import OEmbedContent from '~/components/OEmbedContent.vue';
 import type { IThreadComment } from '~/types/thread-comment';

@@ -9,7 +9,7 @@
     <br />
 
     <Form @submit="submit" :validation-schema="schema" class="mx-2 mb-2" v-slot="{ meta, errors }">
-      <div class="field mb-2">
+      <div class="field">
         <Field name="email" v-model="form.email" v-slot="{ errors }">
           <v-text-field
             v-model="form.email"
@@ -17,12 +17,14 @@
             type="email"
             variant="outlined"
             density="compact"
+            dense
+            single-line
             :error-messages="errors"
           />
         </Field>
       </div>
 
-      <div class="field mb-2">
+      <div class="field">
         <Field name="password" v-model="form.password" v-slot="{ errors }">
           <v-text-field
             v-model="form.password"
@@ -30,6 +32,8 @@
             type="password"
             variant="outlined"
             density="compact"
+            dense
+            single-line
             :error-messages="errors"
           />
         </Field>

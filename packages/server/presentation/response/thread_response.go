@@ -56,6 +56,7 @@ func NewThreadResponse(params NewThreadResponseParams) *ThreadResponse {
 				ReplyCount:         &replyCount,
 				UserID:             params.UserID,
 				IncludeAttachments: true,
+				IncludeUser:        true,
 			}))
 
 			if params.IncludeAttachments {

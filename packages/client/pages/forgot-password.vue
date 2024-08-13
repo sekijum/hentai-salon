@@ -17,6 +17,8 @@
             type="email"
             variant="outlined"
             density="compact"
+            dense
+            single-line
             :error-messages="errors"
           />
         </Field>

@@ -13,8 +13,11 @@ type SonyflakeIDGenerator struct {
 }
 
 func NewSonyflakeIDGenerator() *SonyflakeIDGenerator {
+	// StartTimeを2024年5月1日に設定
+	startTime := time.Date(2024, 5, 1, 0, 0, 0, 0, time.UTC)
+
 	flake := sonyflake.NewSonyflake(sonyflake.Settings{
-		StartTime: time.Now(), // Snowflake IDの生成を開始する時間を設定
+		StartTime: startTime, // Snowflake IDの生成を開始する時間を設定
 	})
 	if flake == nil {
 		panic("Failed to initialize Sonyflake ID generator")

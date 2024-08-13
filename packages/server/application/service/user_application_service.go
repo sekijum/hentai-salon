@@ -161,51 +161,51 @@ func (svc *UserApplicationService) Signin(params UserApplicationServiceSigninPar
 	}
 
 	// 管理者の場合、メール認証を送信する
-	// if user.EntUser.Role == int(model.UserRoleAdmin) {
-	// 	verificationToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-	// 		"userID": user.EntUser.ID,
-	// 		"role":   user.EntUser.Role,
-	// 		"exp":    time.Now().Add(15 * time.Minute).Unix(), // 有効期限15分
-	// 	})
+	if user.EntUser.Role == int(model.UserRoleAdmin) {
+		verificationToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+			"userID": user.EntUser.ID,
+			"role":   user.EntUser.Role,
+			"exp":    time.Now().Add(15 * time.Minute).Unix(), // 有効期限15分
+		})
 
-	// 	tokenString, err := verificationToken.SignedString([]byte(jwtSecretKey))
-	// 	if err != nil {
-	// 		return "", errors.New("認証トークンの生成に失敗しました")
-	// 	}
+		tokenString, err := verificationToken.SignedString([]byte(jwtSecretKey))
+		if err != nil {
+			return "", errors.New("認証トークンの生成に失敗しました")
+		}
 
-	// 	verificationURL := fmt.Sprintf("%s/verify-email?token=%s", os.Getenv("CLIENT_URL"), url.QueryEscape(tokenString))
-	// 	emailSubject := "【重要】管理者アカウントのメールアドレス確認"
-	// 	emailBody := fmt.Sprintf(`
-	// 	%sさん
+		verificationURL := fmt.Sprintf("%s/verify-email?token=%s", os.Getenv("CLIENT_URL"), url.QueryEscape(tokenString))
+		emailSubject := "【重要】管理者アカウントのメールアドレス確認"
+		emailBody := fmt.Sprintf(`
+		%sさん
 
-	// 	変態サロンをご利用いただきありがとうございます。
-	// 	以下のリンクをクリックして、管理者アカウントのメールアドレスを確認してください。
+		変態サロンをご利用いただきありがとうございます。
+		以下のリンクをクリックして、管理者アカウントのメールアドレスを確認してください。
 
-	// 	メールアドレスの確認
-	// 	%s
+		メールアドレスの確認
+		%s
 
-	// 	このリンクの有効期限は15分ですので、お早めに手続きを完了してください。
+		このリンクの有効期限は15分ですので、お早めに手続きを完了してください。
 
-	// 	Webページを開く
-	// 	%s
+		Webページを開く
+		%s
 
-	// 	※このメールは返信しても届きません。`,
-	// 		user.EntUser.Name, verificationURL, os.Getenv("CLIENT_URL"))
+		※このメールは返信しても届きません。`,
+			user.EntUser.Name, verificationURL, os.Getenv("CLIENT_URL"))
 
-	// 	if os.Getenv("APP_ENV") == "production" {
-	// 		err = svc.sesClient.SendEmail(params.Email, emailSubject, emailBody)
-	// 		if err != nil {
-	// 			return "", fmt.Errorf("メールの送信に失敗しました: %v", err)
-	// 		}
-	// 	} else {
-	// 		err = svc.mailpitClient.SendEmail(params.Email, emailSubject, emailBody)
-	// 		if err != nil {
-	// 			return "", fmt.Errorf("メールの送信に失敗しました: %v", err)
-	// 		}
-	// 	}
+		if os.Getenv("APP_ENV") == "production" {
+			err = svc.sesClient.SendEmail(params.Email, emailSubject, emailBody)
+			if err != nil {
+				return "", fmt.Errorf("メールの送信に失敗しました: %v", err)
+			}
+		} else {
+			err = svc.mailpitClient.SendEmail(params.Email, emailSubject, emailBody)
+			if err != nil {
+				return "", fmt.Errorf("メールの送信に失敗しました: %v", err)
+			}
+		}
 
-	// 	return "", nil
-	// }
+		return "", nil
+	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"userID": user.EntUser.ID,

@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"os"
 	"time"
@@ -41,17 +40,11 @@ func (s *StorageApplicationService) GeneratePresignedURLs(params StorageApplicat
 		var err error
 
 		if os.Getenv("APP_ENV") == "production" {
-			if s.s3Client == nil {
-				return nil, errors.New("S3 クライアントが初期化されていません")
-			}
 			url, err = s.s3Client.GeneratePresignedURL(aws.S3ClientGeneratePresignedURL{
 				BucketName: bucketName,
 				ObjectName: objectKey,
 			})
 		} else {
-			if s.minioClient == nil {
-				return nil, errors.New("minio クライアントが初期化されていません")
-			}
 			url, err = s.minioClient.GeneratePresignedURL(minio.MinioClientGeneratePresignedURL{
 				Ctx:        params.Ctx,
 				BucketName: bucketName,

@@ -10,6 +10,7 @@
       "log_date_format": "YYYY-MM-DD HH:mm Z",
       "env": {
         "APP_ENV": "production",
+        "STATIC_URL": "https://static.hentai-salon.com",
         "NUXT_PUBLIC_API_BASE_URL": "https://server.hentai-salon.com"
       }
     }

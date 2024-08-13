@@ -3,6 +3,7 @@ import type { IThreadCommentAttachment } from '~/types/thread-comment-attachment
 
 export const useActions = () => {
   const { $api } = useNuxtApp();
+  const config = useRuntimeConfig();
 
   async function fetchListPresignedUrl(objectNameList: string[]): Promise<string[]> {
     const response = await $api.post<{ urls: string[] }>('/files/urls-for-upload', { objectNameList });
@@ -18,7 +19,12 @@ export const useActions = () => {
     if (response.status !== 200) {
       throw new Error('Failed to upload file to S3');
     }
-    return presignedUrl.split('?')[0];
+
+    if (config.public.apiBaseUrl === 'production') {
+      return presignedUrl.replace(/^https?:\/\/[^\/]+/, config.public.staticUrl).split('?')[0];
+    } else {
+      return presignedUrl.split('?')[0];
+    }
   }
 
   async function uploadFilesToImgur(files: File[]): Promise<IThreadCommentAttachment[]> {

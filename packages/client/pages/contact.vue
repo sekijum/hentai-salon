@@ -7,7 +7,7 @@
     <br />
 
     <Form @submit="submit" :validation-schema="schema" class="mx-2 mb-2" v-slot="{ meta, errors }">
-      <div class="field mb-2">
+      <div class="field">
         <Field name="email" v-model="form.email" v-slot="{ errors }">
           <v-text-field
             v-model="form.email"
@@ -15,30 +15,36 @@
             type="email"
             variant="outlined"
             density="compact"
+            dense
+            single-line
             :error-messages="errors"
           />
         </Field>
       </div>
 
-      <div class="field mb-2">
+      <div class="field">
         <Field name="subject" v-model="form.subject" v-slot="{ errors }">
           <v-text-field
             v-model="form.subject"
             label="件名"
             variant="outlined"
             density="compact"
+            dense
+            single-line
             :error-messages="errors"
           />
         </Field>
       </div>
 
-      <div class="field mb-2">
+      <div class="field">
         <Field name="message" v-model="form.message" v-slot="{ errors }">
           <v-textarea
             v-model="form.message"
             label="内容"
             variant="outlined"
             density="compact"
+            dense
+            single-line
             :error-messages="errors"
           />
         </Field>
@@ -65,7 +71,7 @@ const form = ref({
 });
 
 const schema = yup.object({
-  email: yup.string().email('有効なメールアドレスを入力してください').required('必須項目です'),
+  email: yup.string().email('有効なメールアドレスを入力してください').nullable(),
   subject: yup.string().required('必須項目です'),
   message: yup.string().required('必須項目です'),
 });

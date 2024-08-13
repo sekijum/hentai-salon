@@ -31,6 +31,7 @@ const props = defineProps<{
   clicked?: () => void;
   isInfiniteScroll?: boolean;
   filter: string;
+  limit?: number;
 }>();
 
 const router = useRouter();
@@ -80,7 +81,11 @@ async function fetchThreads(offset: number = 0) {
         offset: offset,
       },
     });
-    threads = response.data;
+    if (props.limit) {
+      threads = response.data.slice(0, props.limit);
+    } else {
+      threads = response.data;
+    }
   }
 
   if (threads) {

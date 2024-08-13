@@ -6,13 +6,15 @@
 
     <br />
 
-    <v-row class="">
-      <v-col v-for="(board, index) in boards" :key="index" cols="6" class="board-item">
-        <v-card @click="() => router.push(`/threads?filter=board&boardId=${board.id}`)" class="board-card">
+    <v-row>
+      <v-col v-for="(board, index) in boards" :key="index" cols="6">
+        <v-card @click="() => router.push(`/threads?filter=board&boardId=${board.id}`)">
           <v-card-title class="board-title">{{ board.title }}</v-card-title>
         </v-card>
       </v-col>
     </v-row>
+
+    <br />
   </div>
 </template>
 
@@ -42,10 +44,6 @@ useHead({
 </script>
 
 <style scoped>
-.board-image {
-  width: 100%;
-}
-
 .board-title {
   font-size: 0.75rem;
   text-align: center;

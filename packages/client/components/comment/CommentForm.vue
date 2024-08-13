@@ -184,7 +184,7 @@ async function submit(_: typeof form.value, { resetForm }: { resetForm: () => vo
       if (attachmentFiles.value && attachmentFiles.value.length > 0) {
         const presignedUrls = await fetchListPresignedUrl(attachmentFiles.value.map(file => file.name));
         const uploadedAttachments = await Promise.all(
-          presignedUrls.map((url: string, idx: number) => {
+          presignedUrls.map(async (url: string, idx: number) => {
             return uploadFilesToS3(url, attachmentFiles.value[idx]).then(uploadedUrl => ({
               url: uploadedUrl,
               displayOrder: idx,

@@ -18,6 +18,8 @@
             label="説明"
             variant="outlined"
             density="compact"
+            dense
+            single-line
             :error-messages="errors"
           />
         </Field>
@@ -33,6 +35,8 @@
           density="compact"
           clearable
           multiple
+          dense
+          single-line
           :items="tagSuggestions"
         />
       </div>
@@ -48,6 +52,7 @@
           hide-details
           accept="image/*"
           density="compact"
+          single-line
           @change="handleThumbnailChange"
         />
       </div>

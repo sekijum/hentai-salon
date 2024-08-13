@@ -14,6 +14,7 @@
       title="スレッド閲覧履歴"
       :clicked="() => router.push({ path: '/threads', query: { filter: 'history' } })"
       :isInfiniteScroll="false"
+      :limit="5"
     />
     <ThreadItem
       filter="popularity"

@@ -24,20 +24,19 @@ func NewSESClient() (*SESClient, error) {
 
 func (s *SESClient) SendEmail(to, subject, body string) error {
 	input := &ses.SendEmailInput{
-		Source: aws.String(os.Getenv("MAIL_FROM_ADDRESS")),
+		Source: aws.String("変態サロン <" + os.Getenv("MAIL_FROM_ADDRESS") + ">"),
 		Destination: &types.Destination{
 			ToAddresses: []string{to},
 		},
 		Message: &types.Message{
 			Subject: &types.Content{
-				Data: aws.String(subject),
+				Charset: aws.String("UTF-8"),
+				Data:    aws.String(subject),
 			},
 			Body: &types.Body{
 				Text: &types.Content{
-					Data: aws.String(body),
-				},
-				Html: &types.Content{
-					Data: aws.String(body),
+					Charset: aws.String("UTF-8"),
+					Data:    aws.String(body),
 				},
 			},
 		},

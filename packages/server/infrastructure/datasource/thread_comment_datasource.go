@@ -99,6 +99,7 @@ func (ds *ThreadCommentDatasource) Create(params ThreadCommentDatasourceCreatePa
 	}
 
 	q := tx.ThreadComment.Create().
+		SetID(params.ThreadComment.EntThreadComment.ID).
 		SetThreadID(params.ThreadComment.EntThreadComment.ThreadID).
 		SetContent(params.ThreadComment.EntThreadComment.Content).
 		SetIPAddress(params.ThreadComment.EntThreadComment.IPAddress)

@@ -10,6 +10,7 @@ export default defineNuxtConfig({
     public: {
       apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL,
       appEnv: process.env.APP_ENV,
+      staticUrl: process.env.STATIC_URL,
     },
   },
 
