@@ -71,7 +71,6 @@ async function fetchThreads(offset: number = 0) {
     });
     threads = response.data;
   } else {
-    console.log(route.query);
     const response = await $api.get<IThread[]>('/threads', {
       params: {
         filter: props.filter,
@@ -98,10 +97,6 @@ async function fetchThreads(offset: number = 0) {
   }
   return { canNextLoad: true };
 }
-
-watchEffect(() => {
-  console.log(route.query);
-});
 
 watch(
   () => route.query.tagNameList?.length || route.query.keyword || route.query.filter,

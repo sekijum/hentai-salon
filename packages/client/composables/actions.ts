@@ -20,7 +20,7 @@ export const useActions = () => {
       throw new Error('Failed to upload file to S3');
     }
 
-    if (config.public.apiBaseUrl === 'production') {
+    if (config.public.appEnv === 'production') {
       return presignedUrl.replace(/^https?:\/\/[^\/]+/, config.public.staticUrl).split('?')[0];
     } else {
       return presignedUrl.split('?')[0];

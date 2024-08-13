@@ -1,6 +1,6 @@
 <template>
-  <div class="comment-item">
-    <v-sheet class="d-flex">
+  <div class="comment-item mx-2">
+    <v-sheet class="d-flex bg-transparent">
       <v-sheet class="me-auto">
         <template v-if="comment?.user?.id && comment?.user?.profileLink">
           <nuxt-link :to="comment.user.profileLink" target="_blank" rel="noopener">
@@ -14,9 +14,7 @@
       <v-sheet>{{ $formatDate(comment.createdAt) }}</v-sheet>
     </v-sheet>
 
-    <v-divider class="border-opacity-0"></v-divider>
-
-    <v-sheet class="d-flex">
+    <v-sheet class="d-flex bg-transparent">
       <v-sheet class="me-auto">
         <template v-if="comment.parentCommentId">
           <nuxt-link
@@ -41,11 +39,7 @@
       </v-sheet>
     </v-sheet>
 
-    <v-divider class="border-opacity-0"></v-divider>
-
     <OEmbedContent :text="comment.content" />
-
-    <v-divider class="border-opacity-0"></v-divider>
 
     <template v-if="comment.attachments && comment.attachments.length">
       <v-row dense>
@@ -70,11 +64,9 @@
       </v-row>
     </template>
 
-    <v-divider class="border-opacity-0"></v-divider>
-
-    <v-sheet class="d-flex">
+    <v-sheet class="d-flex bg-transparent">
       <v-sheet class="me-auto">
-        <v-icon @click="toggleReplyForm">{{ showReplyForm ? 'mdi-close' : 'mdi-reply' }}</v-icon>
+        <v-icon size="large" @click="toggleReplyForm">{{ showReplyForm ? 'mdi-close' : 'mdi-reply' }}</v-icon>
       </v-sheet>
       <v-sheet>
         <nuxt-link
@@ -83,11 +75,11 @@
           target="_blank"
           rel="noopener"
         >
-          <v-icon>mdi-comment</v-icon> {{ comment.replyCount }}
+          <v-icon size="large">mdi-comment</v-icon> {{ comment.replyCount }}
         </nuxt-link>
       </v-sheet>
       <v-sheet>
-        <v-icon class="text-decoration-none ml-2" @click="toggleLike">
+        <v-icon size="large" class="text-decoration-none ml-2" @click="toggleLike">
           {{ isLiked ? 'mdi-thumb-up' : 'mdi-thumb-up-outline' }}
         </v-icon>
       </v-sheet>
@@ -131,9 +123,8 @@
         </template>
       </v-img>
     </nuxt-link>
-
-    <v-divider></v-divider>
   </div>
+  <v-divider class="border-opacity-75"></v-divider>
 </template>
 
 <script setup lang="ts">

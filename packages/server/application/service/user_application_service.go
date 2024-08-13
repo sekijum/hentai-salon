@@ -176,21 +176,21 @@ func (svc *UserApplicationService) Signin(params UserApplicationServiceSigninPar
 		verificationURL := fmt.Sprintf("%s/verify-email?token=%s", os.Getenv("CLIENT_URL"), url.QueryEscape(tokenString))
 		emailSubject := "【重要】管理者アカウントのメールアドレス確認"
 		emailBody := fmt.Sprintf(`
-		%sさん
+%sさん
 
-		変態サロンをご利用いただきありがとうございます。
-		以下のリンクをクリックして、管理者アカウントのメールアドレスを確認してください。
+変態サロンをご利用いただきありがとうございます。
+以下のリンクをクリックして、管理者アカウントのメールアドレスを確認してください。
 
-		メールアドレスの確認
-		%s
+メールアドレスの確認
+%s
 
-		このリンクの有効期限は15分ですので、お早めに手続きを完了してください。
+このリンクの有効期限は15分ですので、お早めに手続きを完了してください。
 
-		Webページを開く
-		%s
+Webページを開く
+%s
 
-		※このメールは返信しても届きません。`,
-			user.EntUser.Name, verificationURL, os.Getenv("CLIENT_URL"))
+※このメールは返信しても届きません。
+`, user.EntUser.Name, verificationURL, os.Getenv("CLIENT_URL"))
 
 		if os.Getenv("APP_ENV") == "production" {
 			err = svc.sesClient.SendEmail(params.Email, emailSubject, emailBody)
@@ -439,8 +439,8 @@ func (svc *UserApplicationService) ForgotPassword(params UserApplicationServiceF
 Webページを開く
 %s
 
-※このメールは返信しても届きません。`,
-		user.EntUser.Name, resetURL, clientURL)
+※このメールは返信しても届きません。
+`, user.EntUser.Name, resetURL, clientURL)
 
 	if os.Getenv("APP_ENV") == "production" {
 		err = svc.sesClient.SendEmail(params.Body.Email, emailSubject, emailBody)

@@ -208,6 +208,8 @@ async function submit(_: typeof form.value, { resetForm }: { resetForm: () => vo
         setLastCommentTime();
       }
       resetForm();
+      form.value.content = '';
+      form.value.attachments = [];
       attachmentFiles.value = [];
       if (fileInput.value) {
         fileInput.value.reset();
