@@ -42,24 +42,26 @@
     <OEmbedContent :text="comment.content" />
 
     <template v-if="comment.attachments && comment.attachments.length">
-      <v-row dense>
-        <v-col cols="3" v-for="(attachment, idx) in comment.attachments" :key="idx" @click="openLightbox(idx)">
-          <div class="media-item-wrapper">
-            <v-img
-              :src="`${attachment.url}?w=5`"
-              :srcset="`${attachment.url}?w=5 5w, ${attachment.url}?w=5 5w`"
-              class="media-item"
-              contain
-              referrerpolicy="no-referrer"
-              :alt="comment.content"
-            >
+      <v-row :id="`gallery-${comment.id}`" class="pa-0 ma-0">
+        <v-col v-for="(attachment, key) in comment.attachments" :key="key" class="d-flex child-flex pa-0 ma-0" cols="3">
+          <nuxt-link
+            :class="`gallery-item-${comment.id}`"
+            :href="attachment.url"
+            data-pswp-width="1080"
+            data-pswp-height="1080"
+            style="height: 100%; width: 100%"
+          >
+            <v-img :lazy-href="attachment.url" :src="attachment.url" aspect-ratio="1" class="bg-grey-lighten-2" cover>
               <template v-slot:placeholder>
                 <v-row align="center" class="fill-height ma-0" justify="center">
                   <v-progress-circular color="grey-lighten-5" indeterminate></v-progress-circular>
                 </v-row>
               </template>
             </v-img>
-          </div>
+            <span class="hidden-caption-content" style="display: none">
+              <p>{{ comment.content }}</p>
+            </span>
+          </nuxt-link>
         </v-col>
       </v-row>
     </template>
@@ -99,30 +101,6 @@
         :showReplyForm="showReplyForm"
       />
     </template>
-
-    <nuxt-link
-      v-for="(item, index) in comment.attachments"
-      :key="index"
-      :href="item.url"
-      :class="`glightbox-${comment.id}`"
-      :data-title="`${comment.user?.name ? comment.user?.name : comment.guestName ? comment.guestName : '匿名'} ${
-        comment?.createdAt
-      }`"
-      :data-description="comment.content"
-      :data-type="item.type"
-      data-effect="fade"
-      data-zoomable="true"
-      data-draggable="true"
-      style="display: none"
-    >
-      <v-img :lazy-href="item.url" :src="item.url" alt="Image" aspect-ratio="1" class="bg-grey-lighten-2" cover>
-        <template v-slot:placeholder>
-          <v-row align="center" class="fill-height ma-0" justify="center">
-            <v-progress-circular color="grey-lighten-5" indeterminate></v-progress-circular>
-          </v-row>
-        </template>
-      </v-img>
-    </nuxt-link>
   </div>
   <v-divider class="border-opacity-75"></v-divider>
 </template>
@@ -132,11 +110,13 @@ import { useRoute } from 'vue-router';
 import CommentForm from '~/components/comment/CommentForm.vue';
 import OEmbedContent from '~/components/OEmbedContent.vue';
 import type { IThreadComment } from '~/types/thread-comment';
-import GLightbox from 'glightbox';
+import PhotoSwipeLightbox from 'photoswipe/lightbox';
+import 'photoswipe/style.css';
 
 const props = defineProps<{ comment: IThreadComment; commentLimit: number; threadId: number }>();
 const nuxtApp = useNuxtApp();
 const route = useRoute();
+const lightbox = ref<PhotoSwipeLightbox | null>();
 
 const { $formatDate, $api, payload } = nuxtApp;
 
@@ -148,15 +128,47 @@ function toggleReplyForm() {
   showReplyForm.value = !showReplyForm.value;
 }
 
-function openLightbox(idx = 0) {
-  const lightbox = GLightbox({
-    selector: `.glightbox-${props.comment.id}`,
-    touchNavigation: true,
-    loop: true,
+onMounted(() => {
+  lightbox.value = new PhotoSwipeLightbox({
+    gallery: `#gallery-${props.comment.id}`,
+    children: `.gallery-item-${props.comment.id}`,
+    pswpModule: () => import('photoswipe'),
+    bgOpacity: 1,
+    showHideAnimationType: 'zoom',
+    spacing: 0.5,
   });
 
-  lightbox.openAt(idx);
-}
+  lightbox.value.on('uiRegister', function () {
+    lightbox.value!.pswp!.ui!.registerElement({
+      name: 'custom-caption',
+      order: 9,
+      isButton: false,
+      appendTo: 'root',
+      html: 'Caption text',
+      onInit: (el, pswp) => {
+        lightbox.value!.pswp!.on('change', () => {
+          const currSlideElement = lightbox.value!.pswp!.currSlide!.data.element;
+          let captionHTML = '';
+          if (currSlideElement) {
+            const hiddenCaption = currSlideElement.querySelector('.hidden-caption-content');
+            if (hiddenCaption) {
+              captionHTML = hiddenCaption.innerHTML;
+            }
+          }
+          el.innerHTML = captionHTML || '';
+        });
+      },
+    });
+  });
+  lightbox.value.init();
+});
+
+onUnmounted(() => {
+  if (lightbox.value) {
+    lightbox.value.destroy();
+    lightbox.value = null;
+  }
+});
 
 function username() {
   const name = props.comment?.user?.name || props.comment?.guestName || '匿名';
@@ -178,24 +190,34 @@ async function toggleLike() {
 }
 </script>
 
-<style scoped>
+<style>
 .comment-item {
   font-size: 12px;
 }
 
-.media-item-wrapper {
-  position: relative;
-  width: 100%;
-  padding-bottom: 100%;
-  background-color: black;
+.v-col {
+  padding: 1px !important;
+  cursor: pointer;
 }
 
-.media-item {
+.pswp__custom-caption {
+  background: rgba(75, 150, 75, 0.75);
+  font-size: 16px;
+  color: #fff;
+  width: calc(100% - 32px);
+  max-width: 400px;
+  padding: 2px 8px;
+  border-radius: 4px;
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+}
+.pswp__custom-caption a {
+  color: #fff;
+  text-decoration: underline;
+}
+.hidden-caption-content {
+  display: none;
 }
 </style>

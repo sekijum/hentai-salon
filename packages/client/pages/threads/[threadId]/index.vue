@@ -30,7 +30,7 @@
     <template v-if="route.query.tab === 'media'">
       <div id="media-top" />
       <MediaGallery
-        v-if="thread.comments.data"
+        v-if="thread.comments.data.length"
         :attachments="thread.attachments.data"
         :commentLimit="commentLimit"
         :threadId="thread.id"

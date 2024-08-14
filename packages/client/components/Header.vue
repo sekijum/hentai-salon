@@ -1,16 +1,16 @@
 <template>
-  <div>
+  <div class="mt-2">
     <v-row>
-      <v-col cols="3" class="d-flex justify-start align-center">
+      <v-col cols="3" class="d-flex justify-start align-center ml-3">
         <v-sheet class="menu-item" @click="router.back()">
           <v-icon class="menu-icon">mdi-arrow-left</v-icon>
           <span class="menu-title">戻る</span>
         </v-sheet>
       </v-col>
-      <v-col cols="6" class="d-flex justify-center align-center">
+      <v-col class="d-flex justify-center align-center">
         <h1 class="font-weight-regular header-title" @click="router.push('/')">変態サロン</h1>
       </v-col>
-      <v-col cols="3" class="d-flex justify-end align-center">
+      <v-col cols="3" class="d-flex justify-end align-center mr-3">
         <v-sheet class="menu-item" @click="openMenuModal">
           <v-icon class="menu-icon">mdi-cog</v-icon>
           <span class="menu-title">メニュー</span>
@@ -48,6 +48,6 @@ function openMenuModal() {
 }
 
 .subtitle {
-  font-size: 10px;
+  font-size: 12px;
 }
 </style>
