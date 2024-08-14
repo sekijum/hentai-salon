@@ -23,11 +23,11 @@ export const useStorage = () => {
     $storage.setItem(COMMENT_LIMIT, limit);
   };
 
-  const getCommentSortOrder = (): 'asc' | 'desc' => {
+  const getCommentOrder = (): 'asc' | 'desc' => {
     return $storage.getItem<'asc' | 'desc'>(COMMENT_SORT_ORDER) || 'desc';
   };
 
-  const setCommentSortOrder = (order: 'asc' | 'desc'): void => {
+  const setCommentOrder = (order: 'asc' | 'desc'): void => {
     $storage.setItem(COMMENT_SORT_ORDER, order);
   };
 
@@ -88,8 +88,8 @@ export const useStorage = () => {
     getThreadViewHistory,
     setThreadViewHistory,
     clearThreadViewHistory,
-    getCommentSortOrder,
-    setCommentSortOrder,
+    getCommentOrder,
+    setCommentOrder,
     getCommentLimit,
     setCommentLimit,
     getTheme,

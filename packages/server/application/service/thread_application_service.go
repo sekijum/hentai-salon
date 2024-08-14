@@ -64,13 +64,35 @@ func (svc *ThreadApplicationService) FindAll(params ThreadApplicationServiceFind
 				return nil, err
 			}
 		}
-	case "related":
+	case "related-by-history":
 		if len(params.Qs.ThreadIDs) == 0 {
 			return nil, nil
 		}
 		var tagIDs, err = svc.tagDatasource.FindAllIDs(datasource.TagDatasourceFindAllIDsParams{
 			Ctx:       params.Ctx,
 			ThreadIDs: params.Qs.ThreadIDs,
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		threadList, err = svc.threadDatasource.FindByRelatedTag(datasource.ThreadDatasourceFindByRelatedTagParams{
+			Ctx:       params.Ctx,
+			ThreadIDs: params.Qs.ThreadIDs,
+			Limit:     params.Qs.Limit,
+			Offset:    params.Qs.Offset,
+			TagIDs:    tagIDs,
+		})
+		if err != nil {
+			return nil, err
+		}
+	case "related-by-thread":
+		if params.Qs.ThreadID == 0 {
+			return nil, nil
+		}
+		var tagIDs, err = svc.tagDatasource.FindAllIDs(datasource.TagDatasourceFindAllIDsParams{
+			Ctx:       params.Ctx,
+			ThreadIDs: []int{params.Qs.ThreadID},
 		})
 		if err != nil {
 			return nil, err

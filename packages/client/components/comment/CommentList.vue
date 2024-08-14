@@ -15,7 +15,11 @@ import CommentItem from '~/components/comment/CommentItem.vue';
 
 const emit = defineEmits(['replied']);
 
-defineProps<{ comments: IThreadComment[]; commentLimit: number; threadId: number }>();
+const props = defineProps<{
+  comments: IThreadComment[];
+  commentLimit: number;
+  threadId: number;
+}>();
 </script>
 
 <style scoped></style>

@@ -44,11 +44,10 @@
           ref="fileInput"
           label="ファイルを選択"
           show-size
-          truncate-length="25"
           prepend-icon=""
           variant="outlined"
+          single-line
           dense
-          hide-details
           multiple
           accept="image/jpeg,image/png,image/gif"
           density="compact"
@@ -57,7 +56,7 @@
         />
       </div>
 
-      <v-row class="no-gutters">
+      <v-row class="dense">
         <v-col cols="6">
           <v-btn class="clear-button" block @click="() => fileInput!.reset()" type="reset">クリア</v-btn>
         </v-col>
@@ -75,7 +74,7 @@
         </v-col>
       </v-row>
 
-      <p class="note">＊書き込み反映には時間が掛かる場合があります＊</p>
+      <p class="text-center text-subtitle-2 mt-4">＊書き込み反映には時間が掛かる場合があります＊</p>
     </Form>
   </div>
 </template>
@@ -96,7 +95,12 @@ interface FormState {
   attachments: Attachment[];
 }
 
-const props = defineProps<{ title?: string; parentCommentId?: number; showReplyForm?: boolean; threadId: number }>();
+const props = defineProps<{
+  title?: string;
+  parentCommentId?: string;
+  showReplyForm?: boolean;
+  threadId: number;
+}>();
 
 const nuxtApp = useNuxtApp();
 const router = useRouter();
@@ -227,44 +231,4 @@ onMounted(() => {
 });
 </script>
 
-<style scoped>
-.form-title {
-  font-size: 1.2em;
-}
-
-.v-text-field,
-.v-textarea,
-.v-file-input {
-  margin-bottom: 0px !important;
-}
-
-.v-text-field input,
-.v-textarea textarea {
-  font-size: 12px;
-}
-
-.v-row.no-gutters {
-  margin-right: 0;
-  margin-left: 0;
-}
-
-.v-row.no-gutters > .v-col {
-  padding-right: 0;
-  padding-left: 0;
-}
-
-.clear-button,
-.submit-button {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-bottom: 0px;
-}
-
-.note {
-  font-size: 12px;
-  text-align: center;
-  margin-top: 8px;
-}
-</style>
+<style scoped></style>

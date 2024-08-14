@@ -75,6 +75,7 @@ async function fetchThreads(offset: number = 0) {
       params: {
         filter: props.filter,
         threadIds: getThreadViewHistory(),
+        threadId: route.params.threadId,
         keyword: route.query.keyword,
         tagNameList: Array.isArray(route.query.tagNameList) ? route.query.tagNameList : [route.query.tagNameList],
         boardId: route.query.boardId,

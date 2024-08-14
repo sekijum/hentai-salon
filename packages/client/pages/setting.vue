@@ -18,16 +18,17 @@
                 small
                 class="spaced-button"
                 @click="clearThreadViewHistory"
+                block
               >
                 削除
               </v-btn>
               <v-switch
                 v-else-if="item.key === 'comment-sort-order'"
-                v-model="commentSortOrder"
+                v-model="commentOrder"
                 flat
                 small
                 class="centered-switch"
-                @change="setCommentSortOrder(commentSortOrder ? 'desc' : 'asc')"
+                @change="setCommentOrder(commentOrder ? 'desc' : 'asc')"
               />
               <v-switch
                 v-else-if="item.key === 'display-first-100-comments'"
@@ -65,15 +66,15 @@ const router = useRouter();
 const {
   getCommentLimit,
   getTheme,
-  getCommentSortOrder,
+  getCommentOrder,
   setCommentLimit,
   setTheme,
-  setCommentSortOrder,
+  setCommentOrder,
   clearThreadViewHistory,
 } = useStorage();
 
 const theme = ref(getTheme() === 'dark' ? true : false);
-const commentSortOrder = ref(getCommentSortOrder() === 'desc' ? true : false);
+const commentOrder = ref(getCommentOrder() === 'desc' ? true : false);
 const displayFirst100Comments = ref(getCommentLimit() === 100 ? true : false);
 
 const menuItems = [

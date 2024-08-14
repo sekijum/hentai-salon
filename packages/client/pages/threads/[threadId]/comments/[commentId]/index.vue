@@ -37,7 +37,7 @@
 
     <v-divider />
 
-    <ThreadItem filter="related" title="関連" :isInfiniteScroll="true" />
+    <ThreadItem filter="related-by-history" title="関連" :isInfiniteScroll="true" />
   </div>
 </template>
 

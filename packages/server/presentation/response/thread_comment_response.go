@@ -3,15 +3,16 @@ package response
 import (
 	"server/domain/model"
 	"server/infrastructure/ent"
+	"strconv"
 	"time"
 )
 
 type ThreadCommentResponse struct {
-	ID              uint64                              `json:"id"`
+	ID              string                              `json:"id"`
 	GuestName       *string                             `json:"guestName,omitempty"`
 	Content         string                              `json:"content"`
 	CreatedAt       string                              `json:"createdAt"`
-	ParentCommentID *uint64                             `json:"parentCommentId,omitempty"`
+	ParentCommentID *string                             `json:"parentCommentId,omitempty"`
 	ReplyCount      *int                                `json:"replyCount"`
 	User            *UserResponse                       `json:"user,omitempty"`
 	Thread          *ThreadResponse                     `json:"thread,omitempty"`
@@ -130,13 +131,19 @@ func NewThreadCommentResponse(params NewThreadCommentResponseParams) *ThreadComm
 		isLiked = &liked
 	}
 
+	var parentCommentID *string
+	if params.ThreadComment.EntThreadComment.ParentCommentID != nil {
+		idStr := strconv.FormatUint(*params.ThreadComment.EntThreadComment.ParentCommentID, 10)
+		parentCommentID = &idStr
+	}
+
 	return &ThreadCommentResponse{
-		ID:              params.ThreadComment.EntThreadComment.ID,
+		ID:              strconv.FormatUint(params.ThreadComment.EntThreadComment.ID, 10),
 		User:            userResponse,
 		GuestName:       params.ThreadComment.EntThreadComment.GuestName,
 		Content:         params.ThreadComment.EntThreadComment.Content,
 		CreatedAt:       params.ThreadComment.EntThreadComment.CreatedAt.Format(time.RFC3339),
-		ParentCommentID: params.ThreadComment.EntThreadComment.ParentCommentID,
+		ParentCommentID: parentCommentID,
 		ParentComment:   parentComment,
 		Thread:          threadResponse,
 		Attachments:     attachmentResponseList,

@@ -136,10 +136,7 @@ func (ds *ThreadDatasource) FindByRelatedTag(params ThreadDatasourceFindByRelate
 		Thread.
 		Query().
 		Where(
-			thread.And(
-				thread.HasTagsWith(tag.IDIn(params.TagIDs...)),
-				thread.Not(thread.IDIn(params.ThreadIDs...)),
-			),
+			thread.HasTagsWith(tag.IDIn(params.TagIDs...)),
 		).
 		Where(thread.StatusEQ(0)).
 		Limit(params.Limit).

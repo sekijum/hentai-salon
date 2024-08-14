@@ -13,8 +13,6 @@
             v-model="updateForm.name"
             label="名前(コメントの表示名になります)"
             variant="outlined"
-            counter
-            single-line
             dense
             density="compact"
             :error-messages="errors"

@@ -52,7 +52,12 @@
     <ThreadItem v-if="route.query.filter === 'history'" filter="history" title="閲覧履歴" :isInfiniteScroll="false" />
     <ThreadItem v-if="route.query.filter === 'newest'" filter="newest" title="新着" :isInfiniteScroll="true" />
     <ThreadItem v-if="route.query.filter === 'keyword'" filter="keyword" title="全板検索" :isInfiniteScroll="true" />
-    <ThreadItem v-if="route.query.filter === 'related'" filter="related" title="関連" :isInfiniteScroll="true" />
+    <ThreadItem
+      v-if="route.query.filter === 'related-by-history'"
+      filter="related-by-history"
+      title="関連"
+      :isInfiniteScroll="true"
+    />
     <ThreadItem v-if="route.query.filter === 'board'" filter="board" title="板" :isInfiniteScroll="true" />
     <ThreadItem v-if="route.query.filter === 'tags'" filter="tags" title="タグ" :isInfiniteScroll="true" />
   </div>
@@ -80,7 +85,7 @@ const menuItems = [
   },
   {
     title: '関連',
-    clicked: () => router.push({ query: { filter: 'related' } }),
+    clicked: () => router.push({ query: { filter: 'related-by-history' } }),
     icon: 'mdi-link-variant',
   },
   {
@@ -89,7 +94,7 @@ const menuItems = [
     icon: 'mdi-fire',
   },
   {
-    title: '関連履歴',
+    title: '履歴',
     clicked: () => router.push({ query: { filter: 'history' } }),
     icon: 'mdi-history',
   },
