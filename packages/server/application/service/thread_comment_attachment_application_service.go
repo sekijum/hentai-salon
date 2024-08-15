@@ -38,6 +38,7 @@ func (svc *ThreadCommentAttachmentApplicationService) FindAll(params ThreadComme
 		if len(params.Qs.ThreadIDs) == 0 {
 			return nil, nil
 		}
+
 		var tagIDs, err = svc.tagDatasource.FindAllIDs(datasource.TagDatasourceFindAllIDsParams{
 			Ctx:       params.Ctx,
 			ThreadIDs: params.Qs.ThreadIDs,
@@ -60,11 +61,17 @@ func (svc *ThreadCommentAttachmentApplicationService) FindAll(params ThreadComme
 	var dto []*response.ThreadCommentAttachmentResponse
 	for _, attachment_i := range attachmentList {
 		createdAt := attachment_i.EntAttachment.Edges.Comment.CreatedAt.Format(time.RFC3339)
+		var commentAuthorName *string
+		if attachment_i.EntAttachment.Edges.Comment.Edges.Author != nil {
+			commentAuthorName = &attachment_i.EntAttachment.Edges.Comment.Edges.Author.Name
+		} else if attachment_i.EntAttachment.Edges.Comment.GuestName != nil {
+			commentAuthorName = attachment_i.EntAttachment.Edges.Comment.GuestName
+		}
 
 		response := response.NewThreadCommentAttachmentResponse(response.NewThreadCommentAttachmentResponseParams{
 			ThreadCommentAttachment: attachment_i,
 			ThreadID:                &attachment_i.EntAttachment.Edges.Comment.Edges.Thread.ID,
-			CommentAuthorName:       &attachment_i.EntAttachment.Edges.Comment.Edges.Author.Name,
+			CommentAuthorName:       commentAuthorName,
 			CommentContent:          &attachment_i.EntAttachment.Edges.Comment.Content,
 			CreatedAt:               &createdAt,
 		})

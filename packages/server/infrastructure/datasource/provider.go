@@ -79,7 +79,7 @@ func CreateAdminUser(client *ent.Client) error {
 	}
 
 	_, err = client.User.Create().
-		SetName("関口純平").
+		SetName("管理人").
 		SetEmail(email).
 		SetPassword(hashedPassword).
 		SetRole(1).

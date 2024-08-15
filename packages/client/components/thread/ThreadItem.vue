@@ -17,6 +17,7 @@
         </div>
       </template>
     </div>
+    <v-divider class="border-opacity-100" />
   </div>
 </template>
 

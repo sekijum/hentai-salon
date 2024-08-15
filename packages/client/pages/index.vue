@@ -14,13 +14,14 @@
         id="gallery"
         :slidesPerView="2"
         :spaceBetween="10"
-        :grid="{ rows: 3 }"
+        :grid="getGridConfig(commentAttachments.length)"
         :modules="modules"
         :autoplay="{
           delay: 2500,
           disableOnInteraction: false,
         }"
         class="swiper"
+        :style="{ height: swiperHeight }"
       >
         <swiper-slide class="swiper-slide" v-for="(attachment, idx) in commentAttachments">
           <nuxt-link
@@ -130,6 +131,10 @@ const guestMenuItems = computed(() => {
   return items;
 });
 
+function getGridConfig(length: number) {
+  return { rows: Math.min(length, 3) };
+}
+
 function getWidthFromUrl(url: string): number {
   const parts = url.split('/');
   const width = parseInt(parts[parts.length - 2], 10);
@@ -153,6 +158,16 @@ async function fetchRelatedByHistoryComments() {
 }
 
 const lightbox = ref<PhotoSwipeLightbox | null>();
+
+function calculateSwiperHeight(rows: number): string {
+  const rowHeight = 200;
+  return `${rows * rowHeight}px`;
+}
+
+const swiperHeight = computed(() => {
+  const rows = Math.min(commentAttachments.value.length, 3);
+  return calculateSwiperHeight(rows);
+});
 
 onMounted(async () => {
   await fetchRelatedByHistoryComments();
@@ -218,14 +233,6 @@ useHead({
 <style scoped>
 .small-text {
   font-size: 0.75rem;
-}
-
-.swiper {
-  height: 100vw;
-}
-
-.swiper-slide {
-  height: 50%;
 }
 
 .pswp__custom-caption {

@@ -176,6 +176,7 @@ func (svc *ThreadApplicationService) FindAll(params ThreadApplicationServiceFind
 			Ctx:    params.Ctx,
 			Limit:  params.Qs.Limit,
 			Offset: params.Qs.Offset,
+			Order:  "desc",
 		})
 		if err != nil {
 			return nil, err
