@@ -2,6 +2,10 @@
   <div v-if="comment">
     <PageTitle title="コメント詳細" />
 
+    <v-btn block @click="() => router.push(`/threads/${comment?.thread.id}`)">
+      <v-icon class="menu-icon">mdi-arrow-left</v-icon>{{ comment.thread.title }}へ移動
+    </v-btn>
+
     <v-divider />
 
     <CommentList
@@ -49,6 +53,7 @@ import ThreadItem from '~/components/thread/ThreadItem.vue';
 import type { IThreadComment } from '~/types/thread-comment';
 
 const route = useRoute();
+const router = useRouter();
 const nuxtApp = useNuxtApp();
 const { getCommentLimit } = useStorage();
 

@@ -11,4 +11,5 @@ export interface IThreadCommentAttachmentForThread extends IThreadCommentAttachm
   commentAuthorName?: string;
   commentContent?: string;
   createdAt?: string;
+  threadId?: number;
 }

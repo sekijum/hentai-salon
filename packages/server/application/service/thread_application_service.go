@@ -52,7 +52,7 @@ func (svc *ThreadApplicationService) FindAll(params ThreadApplicationServiceFind
 			return nil, err
 		}
 	case "tags":
-		if params.Qs.TagNameList != nil && len(params.Qs.TagNameList) > 0 {
+		if len(params.Qs.TagNameList) > 0 {
 
 			threadList, err = svc.threadDatasource.FindAll(datasource.ThreadDatasourceFindAllParams{
 				Ctx:         params.Ctx,
@@ -187,12 +187,12 @@ func (svc *ThreadApplicationService) FindAll(params ThreadApplicationServiceFind
 	var dto []*response.ThreadResponse
 	for _, thread_i := range threadList {
 		commentCount := len(thread_i.EntThread.Edges.Comments)
-		Response := response.NewThreadResponse(response.NewThreadResponseParams{
+		response := response.NewThreadResponse(response.NewThreadResponseParams{
 			Thread:       thread_i,
 			CommentCount: &commentCount,
 			IncludeBoard: true,
 		})
-		dto = append(dto, Response)
+		dto = append(dto, response)
 	}
 
 	return dto, nil

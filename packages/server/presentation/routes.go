@@ -32,6 +32,8 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 
 	r.GET("/boards", controllers.BoardController.FindAll)
 
+	r.GET("/attachments", controllers.ThreadCommentAttachmentController.FindAll)
+
 	r.POST("/files/urls-for-upload", controllers.StorageController.GeneratePresignedURLs)
 
 	threadGroup := r.Group("/threads")

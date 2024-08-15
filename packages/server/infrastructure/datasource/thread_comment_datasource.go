@@ -18,12 +18,6 @@ func NewThreadCommentDatasource(client *ent.Client) *ThreadCommentDatasource {
 	return &ThreadCommentDatasource{client: client}
 }
 
-type ThreadDatasourceGetCommentCountParams struct {
-	Ctx      context.Context
-	UserID   *int
-	ThreadID *int
-}
-
 func (ds *ThreadCommentDatasource) GetCommentCount(params ThreadDatasourceGetCommentCountParams) (int, error) {
 	q := ds.client.
 		ThreadComment.

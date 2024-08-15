@@ -23,7 +23,7 @@ func NewThreadDatasource(client *ent.Client) *ThreadDatasource {
 	return &ThreadDatasource{client: client}
 }
 
-type ThreadDatasourceGetThreadCountParams struct {
+type ThreadDatasourceGetCommentCountParams struct {
 	Ctx      context.Context
 	UserID   *int
 	ThreadID *int
@@ -76,7 +76,7 @@ func (ds *ThreadDatasource) FindAll(params ThreadDatasourceFindAllParams) ([]*mo
 			),
 		)
 	}
-	if params.TagNameList != nil && len(params.TagNameList) > 0 {
+	if len(params.TagNameList) > 0 {
 		var tagConditions []predicate.Tag
 		for _, tagName := range params.TagNameList {
 			tagConditions = append(tagConditions, tag.NameContainsFold(tagName))
@@ -238,8 +238,8 @@ func (ds *ThreadDatasource) FindById(params ThreadDatasourceFindByIDParams) (*mo
 				Limit(params.Limit).
 				Offset(params.Offset).
 				WithAuthor().
-				WithAttachments(func(aq *ent.ThreadCommentAttachmentQuery) {
-					aq.Order(ent.Asc(threadcommentattachment.FieldDisplayOrder))
+				WithAttachments(func(q *ent.ThreadCommentAttachmentQuery) {
+					q.Order(ent.Asc(threadcommentattachment.FieldDisplayOrder))
 				}).
 				WithReplies(func(rq *ent.ThreadCommentQuery) {
 					rq.Select(thread.FieldID)

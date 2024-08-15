@@ -32,10 +32,12 @@ var controllerSet = wire.NewSet(
 	controller.NewThreadCommentController,
 	controller.NewTagController,
 	controller.NewStorageController,
+	controller.NewContactController,
+	controller.NewThreadCommentAttachmentController,
+
 	controller_admin.NewUserController,
 	controller_admin.NewBoardController,
 	controller_admin.NewThreadController,
-	controller.NewContactController,
 	controller_admin.NewContactController,
 	controller_admin.NewThreadCommentController,
 	controller_admin.NewTagController,
@@ -48,10 +50,12 @@ var serviceSet = wire.NewSet(
 	service.NewThreadCommentApplicationService,
 	service.NewTagApplicationService,
 	service.NewStorageApplicationService,
+	service.NewContactApplicationService,
+	service.NewThreadCommentAttachmentApplicationService,
+
 	service_admin.NewUserApplicationService,
 	service_admin.NewBoardApplicationService,
 	service_admin.NewThreadApplicationService,
-	service.NewContactApplicationService,
 	service_admin.NewContactApplicationService,
 	service_admin.NewThreadCommentApplicationService,
 	service_admin.NewTagApplicationService,
@@ -63,26 +67,30 @@ var datasourceSet = wire.NewSet(
 	datasource.NewThreadDatasource,
 	datasource.NewThreadCommentDatasource,
 	datasource.NewTagDatasource,
+	datasource.NewContactDatasource,
+	datasource.NewThreadCommentAttachmentDatasource,
+
 	datasource_admin.NewUserDatasource,
 	datasource_admin.NewBoardDatasource,
 	datasource_admin.NewThreadDatasource,
-	datasource.NewContactDatasource,
 	datasource_admin.NewContactDatasource,
 	datasource_admin.NewThreadCommentDatasource,
 	datasource_admin.NewTagDatasource,
 )
 
 type ControllersSet struct {
-	BoardController              *controller.BoardController
-	UserController               *controller.UserController
-	ThreadController             *controller.ThreadController
-	ThreadCommentController      *controller.ThreadCommentController
-	TagController                *controller.TagController
-	StorageController            *controller.StorageController
+	BoardController                   *controller.BoardController
+	UserController                    *controller.UserController
+	ThreadController                  *controller.ThreadController
+	ThreadCommentController           *controller.ThreadCommentController
+	TagController                     *controller.TagController
+	StorageController                 *controller.StorageController
+	ContactController                 *controller.ContactController
+	ThreadCommentAttachmentController *controller.ThreadCommentAttachmentController
+
 	UserAdminController          *controller_admin.UserController
 	BoardAdminController         *controller_admin.BoardController
 	ThreadAdminController        *controller_admin.ThreadController
-	ContactController            *controller.ContactController
 	ContactAdminController       *controller_admin.ContactController
 	ThreadCommentAdminController *controller_admin.ThreadCommentController
 	TagAdminController           *controller_admin.TagController
