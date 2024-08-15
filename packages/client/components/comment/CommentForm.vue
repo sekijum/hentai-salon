@@ -140,46 +140,67 @@ const schema = yup.object({
   content: yup.string().required('コメントは必須項目です'),
 });
 
-function handleAttachmentsChange(event: Event): void {
+function getImageDimensions(file: File): Promise<{ width: number; height: number }> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve({ width: img.width, height: img.height });
+    img.onerror = reject;
+    const reader = new FileReader();
+    reader.onload = event => {
+      img.src = event.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+async function handleAttachmentsChange(event: Event): Promise<void> {
   const input = event.target as HTMLInputElement;
-  if (input.files) {
-    const files = Array.from(input.files);
-    const invalidFiles = files.filter(
-      file => !['image/jpeg', 'image/png', 'image/gif'].includes(file.type) || file.size > 1 * 1024 * 1024,
-    );
+  if (!input.files) return;
 
-    if (invalidFiles.length > 0) {
-      const messages: string[] = [];
-      invalidFiles.forEach(file => {
-        if (!['image/jpeg', 'image/png', 'image/gif'].includes(file.type)) {
-          messages.push(
-            `${file.name}は無効なファイルタイプです。許可されているタイプはimage/jpeg, image/png, image/gifです。`,
-          );
-        }
-        if (file.size > 1 * 1024 * 1024) {
-          messages.push(`${file.name}は1MBを超えています。ファイルサイズの最大は1MBです。`);
-        }
-      });
+  const files = Array.from(input.files);
+  const invalidFiles = files.filter(
+    file => !['image/jpeg', 'image/png', 'image/gif'].includes(file.type) || file.size > 1 * 1024 * 1024,
+  );
 
-      alert(messages.join('\n'));
-      attachmentFiles.value = [];
-      if (fileInput.value) {
-        fileInput.value.reset();
+  if (invalidFiles.length > 0) {
+    const messages: string[] = [];
+    invalidFiles.forEach(file => {
+      if (!['image/jpeg', 'image/png', 'image/gif'].includes(file.type)) {
+        messages.push(
+          `${file.name}は無効なファイルタイプです。許可されているタイプはimage/jpeg, image/png, image/gifです。`,
+        );
       }
-      return;
-    }
-
-    if (files.length > 4) {
-      alert('ファイルの最大枚数は4枚です');
-      attachmentFiles.value = [];
-      if (fileInput.value) {
-        fileInput.value.reset();
+      if (file.size > 1 * 1024 * 1024) {
+        messages.push(`${file.name}は1MBを超えています。ファイルサイズの最大は1MBです。`);
       }
-      return;
-    }
+    });
 
-    attachmentFiles.value = files;
+    alert(messages.join('\n'));
+    attachmentFiles.value = [];
+    if (fileInput.value) {
+      fileInput.value.reset();
+    }
+    return;
   }
+
+  if (files.length > 4) {
+    alert('ファイルの最大枚数は4枚です');
+    attachmentFiles.value = [];
+    if (fileInput.value) {
+      fileInput.value.reset();
+    }
+    return;
+  }
+
+  attachmentFiles.value = await Promise.all(
+    files.map(async file => {
+      const dimensions = await getImageDimensions(file);
+      const updatedFileName = `${file.name.split('.').slice(0, -1).join('.')}/${dimensions.width}/${
+        dimensions.height
+      }.${file.name.split('.').pop()}`;
+      return new File([file], updatedFileName, { type: file.type });
+    }),
+  );
 }
 
 async function submit(_: typeof form.value, { resetForm }: { resetForm: () => void }): Promise<void> {

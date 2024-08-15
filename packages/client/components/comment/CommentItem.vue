@@ -47,8 +47,8 @@
           <nuxt-link
             :class="`gallery-item-${comment.id}`"
             :href="attachment.url"
-            data-pswp-width="1080"
-            data-pswp-height="1080"
+            :data-pswp-width="getWidthFromUrl(attachment.url)"
+            :data-pswp-height="getHeightFromUrl(attachment.url)"
             style="height: 100%; width: 100%"
           >
             <v-img :lazy-href="attachment.url" :src="attachment.url" aspect-ratio="1" class="bg-grey-lighten-2" cover>
@@ -126,6 +126,18 @@ const isLiked = ref(props.comment.isLiked);
 
 function toggleReplyForm() {
   showReplyForm.value = !showReplyForm.value;
+}
+
+function getWidthFromUrl(url: string): number {
+  const parts = url.split('/');
+  const width = parseInt(parts[parts.length - 2], 10);
+  return isNaN(width) ? 1080 : width;
+}
+
+function getHeightFromUrl(url: string): number {
+  const parts = url.split('/');
+  const height = parseInt(parts[parts.length - 1], 10);
+  return isNaN(height) ? 1080 : height;
 }
 
 onMounted(() => {
