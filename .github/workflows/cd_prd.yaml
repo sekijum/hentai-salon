@@ -11,78 +11,78 @@ env:
   COMPOSE_FILE: 'compose.prd.yaml'
   
 jobs:
-  # deploy-server-app:
-  #   name: Server-Appデプロイ
-  #   runs-on: ubuntu-latest
-  #   if: github.event.head_commit.message != 'skip ci' &&
-  #       (
-  #         contains(github.event.commits.*.modified, 'docker/server/app') ||
-  #         contains(github.event.commits.*.added, 'docker/server/app') ||
-  #         contains(github.event.commits.*.removed, 'docker/server/app') ||
-  #         contains(github.event.commits.*.modified, 'packages/server') ||
-  #         contains(github.event.commits.*.added, 'packages/server') ||
-  #         contains(github.event.commits.*.removed, 'packages/server')
-  #       )
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v3
-  #       with:
-  #         fetch-depth: 2
+  deploy-server-app:
+    name: Server-Appデプロイ
+    runs-on: ubuntu-latest
+    if: github.event.head_commit.message != 'skip ci' &&
+        (
+          contains(github.event.commits.*.modified, 'docker/server/app') ||
+          contains(github.event.commits.*.added, 'docker/server/app') ||
+          contains(github.event.commits.*.removed, 'docker/server/app') ||
+          contains(github.event.commits.*.modified, 'packages/server') ||
+          contains(github.event.commits.*.added, 'packages/server') ||
+          contains(github.event.commits.*.removed, 'packages/server')
+        )
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
 
-  #     - name: AWS認証
-  #       uses: aws-actions/configure-aws-credentials@v1-node16
-  #       with:
-  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #         aws-region: ap-northeast-1
+      - name: AWS認証
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-1
 
-  #     - name: ECRログイン
-  #       uses: aws-actions/amazon-ecr-login@v1
+      - name: ECRログイン
+        uses: aws-actions/amazon-ecr-login@v1
 
-  #     - name: コンテナビルド
-  #       run: |
-  #         docker compose -f ${{ env.COMPOSE_FILE }} build --no-cache --build-arg BUILDKIT_INLINE_CACHE=1 server-app
+      - name: コンテナビルド
+        run: |
+          docker compose -f ${{ env.COMPOSE_FILE }} build --no-cache --build-arg BUILDKIT_INLINE_CACHE=1 server-app
 
-  #     - name: ECRにプッシュ
-  #       run: |
-  #         docker tag hentai-salon-server-app:latest ${{ secrets.ECR_SERVER_APP_URI }}:latest
-  #         docker push ${{ secrets.ECR_SERVER_APP_URI }}
+      - name: ECRにプッシュ
+        run: |
+          docker tag hentai-salon-server-app:latest ${{ secrets.ECR_SERVER_APP_URI }}:latest
+          docker push ${{ secrets.ECR_SERVER_APP_URI }}
 
-  #     - name: タスク定義取得
-  #       run: |
-  #         aws ecs describe-task-definition --task-definition hentai-salon-prd-server --query taskDefinition > task-definition.json
+      - name: タスク定義取得
+        run: |
+          aws ecs describe-task-definition --task-definition hentai-salon-prd-server --query taskDefinition > task-definition.json
 
-  #     - name: タスク定義デプロイ
-  #       uses: aws-actions/amazon-ecs-deploy-task-definition@v2
-  #       with:
-  #         task-definition: task-definition.json
-  #         service: server
-  #         cluster: hentai-salon-prd
-  #         wait-for-service-stability: true
+      - name: タスク定義デプロイ
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: task-definition.json
+          service: server
+          cluster: hentai-salon-prd
+          wait-for-service-stability: true
 
-  #     - name: タスクID取得
-  #       id: get-ecs-task
-  #       run: |
-  #         ECS_TASK_ID=$(aws ecs list-tasks --cluster hentai-salon-prd --service-name server --query 'taskArns[0]' --output text)
-  #         echo "task_id=$ECS_TASK_ID" >> $GITHUB_ENV
+      - name: タスクID取得
+        id: get-ecs-task
+        run: |
+          ECS_TASK_ID=$(aws ecs list-tasks --cluster hentai-salon-prd --service-name server --query 'taskArns[0]' --output text)
+          echo "task_id=$ECS_TASK_ID" >> $GITHUB_ENV
 
-  #     - name: マイグレーション実行
-  #       run: |
-  #         aws ecs execute-command --task "${{ env.task_id }}" \
-  #           --cluster hentai-salon-prd \
-  #           --container app \
-  #           --interactive \
-  #           --command "atlas migrate apply --dir 'file://./infrastructure/ent/migrate/migrations' --url 'mysql://${{ secrets.DB_USER }}:${{ secrets.DB_PASS }}@${{ secrets.DB_HOST }}:${{ secrets.DB_PORT }}/${{ secrets.DB_NAME }}'"
+      - name: マイグレーション実行
+        run: |
+          aws ecs execute-command --task "${{ env.task_id }}" \
+            --cluster hentai-salon-prd \
+            --container app \
+            --interactive \
+            --command "atlas migrate apply --dir 'file://./infrastructure/ent/migrate/migrations' --url 'mysql://${{ secrets.DB_USER }}:${{ secrets.DB_PASS }}@${{ secrets.DB_HOST }}:${{ secrets.DB_PORT }}/${{ secrets.DB_NAME }}'"
 
   deploy-server-proxy:
     name: Server-Proxyデプロイ
     runs-on: ubuntu-latest
-    # if: github.event.head_commit.message != 'skip ci' &&
-    #     (
-    #       contains(github.event.commits.*.modified, 'docker/server/proxy') ||
-    #       contains(github.event.commits.*.added, 'docker/server/proxy') ||
-    #       contains(github.event.commits.*.removed, 'docker/server/proxy')
-    #     )
+    if: github.event.head_commit.message != 'skip ci' &&
+        (
+          contains(github.event.commits.*.modified, 'docker/server/proxy') ||
+          contains(github.event.commits.*.added, 'docker/server/proxy') ||
+          contains(github.event.commits.*.removed, 'docker/server/proxy')
+        )
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -123,15 +123,15 @@ jobs:
   deploy-client-app:
     name: Client-Appデプロイ
     runs-on: ubuntu-latest
-    # if: github.event.head_commit.message != 'skip ci' &&
-    #     (
-    #       contains(github.event.commits.*.modified, 'docker/client/app') ||
-    #       contains(github.event.commits.*.added, 'docker/client/app') ||
-    #       contains(github.event.commits.*.removed, 'docker/client/app') ||
-    #       contains(github.event.commits.*.modified, 'packages/client') ||
-    #       contains(github.event.commits.*.added, 'packages/client') ||
-    #       contains(github.event.commits.*.removed, 'packages/client')
-    #     )
+    if: github.event.head_commit.message != 'skip ci' &&
+        (
+          contains(github.event.commits.*.modified, 'docker/client/app') ||
+          contains(github.event.commits.*.added, 'docker/client/app') ||
+          contains(github.event.commits.*.removed, 'docker/client/app') ||
+          contains(github.event.commits.*.modified, 'packages/client') ||
+          contains(github.event.commits.*.added, 'packages/client') ||
+          contains(github.event.commits.*.removed, 'packages/client')
+        )
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -172,12 +172,12 @@ jobs:
   deploy-client-proxy:
     name: Client-Proxyデプロイ
     runs-on: ubuntu-latest
-    # if: github.event.head_commit.message != 'skip ci' &&
-    #     (
-    #       contains(github.event.commits.*.modified, 'docker/client/proxy') ||
-    #       contains(github.event.commits.*.added, 'docker/client/proxy') ||
-    #       contains(github.event.commits.*.removed, 'docker/client/proxy')
-    #     )
+    if: github.event.head_commit.message != 'skip ci' &&
+        (
+          contains(github.event.commits.*.modified, 'docker/client/proxy') ||
+          contains(github.event.commits.*.added, 'docker/client/proxy') ||
+          contains(github.event.commits.*.removed, 'docker/client/proxy')
+        )
     steps:
       - name: Checkout
         uses: actions/checkout@v3
