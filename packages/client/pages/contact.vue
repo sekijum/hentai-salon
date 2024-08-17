@@ -24,29 +24,13 @@
 
       <div class="field">
         <Field name="subject" v-model="form.subject" v-slot="{ errors }">
-          <v-text-field
-            v-model="form.subject"
-            label="件名"
-            variant="outlined"
-            density="compact"
-            dense
-            single-line
-            :error-messages="errors"
-          />
+          <v-text-field v-model="form.subject" label="件名" variant="outlined" density="compact" dense single-line :error-messages="errors" />
         </Field>
       </div>
 
       <div class="field">
         <Field name="message" v-model="form.message" v-slot="{ errors }">
-          <v-textarea
-            v-model="form.message"
-            label="内容"
-            variant="outlined"
-            density="compact"
-            dense
-            single-line
-            :error-messages="errors"
-          />
+          <v-textarea v-model="form.message" label="内容" variant="outlined" density="compact" dense single-line :error-messages="errors" />
         </Field>
       </div>
 
@@ -61,7 +45,6 @@ import PageTitle from '~/components/PageTitle.vue';
 import * as yup from 'yup';
 
 const nuxtApp = useNuxtApp();
-
 const { $api } = nuxtApp;
 
 const form = ref({
@@ -81,6 +64,7 @@ async function submit(_: typeof form.value, { resetForm }: { resetForm: () => vo
     try {
       await $api.post('/contact', form.value);
       resetForm();
+      alert('お問い合わせいただき、ありがとうございます。');
     } catch (err) {
       alert('通信中にエラーが発生しました');
     }

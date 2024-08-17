@@ -26,29 +26,13 @@
 
       <div class="field">
         <Field name="title" v-model="form.title" v-slot="{ errors }">
-          <v-text-field
-            v-model="form.title"
-            label="タイトル"
-            variant="outlined"
-            density="compact"
-            dense
-            single-line
-            :error-messages="errors"
-          />
+          <v-text-field v-model="form.title" label="タイトル" variant="outlined" density="compact" dense single-line :error-messages="errors" />
         </Field>
       </div>
 
       <div class="field">
         <Field name="description" v-model="form.description" v-slot="{ errors }">
-          <v-textarea
-            v-model="form.description"
-            label="説明"
-            variant="outlined"
-            density="compact"
-            dense
-            single-line
-            :error-messages="errors"
-          />
+          <v-textarea v-model="form.description" label="説明" variant="outlined" density="compact" dense single-line :error-messages="errors" />
         </Field>
       </div>
 

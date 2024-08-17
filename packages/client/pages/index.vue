@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-alert
-      v-if="payload.isLoggedIn"
+      v-if="payload?.user?.name"
       :text="`${payload?.user?.name}さん、あなたのアカウントにログインしています。`"
       prominent
       class="small-text text-center"
@@ -18,12 +18,7 @@
       :isInfiniteScroll="false"
       :limit="5"
     />
-    <ThreadItem
-      filter="popularity"
-      title="人気"
-      :clicked="() => router.push({ path: '/threads' })"
-      :isInfiniteScroll="false"
-    />
+    <ThreadItem filter="popularity" title="人気" :clicked="() => router.push({ path: '/threads' })" :isInfiniteScroll="false" />
     <ThreadItem filter="newest" title="新着" :isInfiniteScroll="true" />
   </div>
 </template>
@@ -39,7 +34,6 @@ const nuxtApp = useNuxtApp();
 const { $api } = nuxtApp;
 const { getThreadViewHistory } = useStorage();
 const commentAttachments = ref<IThreadCommentAttachmentForThread[]>([]);
-
 const { payload } = nuxtApp;
 
 const guestMenuItems = computed(() => {

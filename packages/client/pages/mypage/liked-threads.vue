@@ -15,8 +15,6 @@ import ThreadItem from '~/components/thread/ThreadItem.vue';
 definePageMeta({ middleware: ['logged-in-access-only'] });
 
 const router = useRouter();
-const route = useRoute();
-const nuxtApp = useNuxtApp();
 
 const menuItems = [
   { title: 'マイスレ', clicked: () => router.push('/mypage/threads'), icon: 'mdi-file-document-multiple-outline' },

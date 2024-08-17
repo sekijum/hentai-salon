@@ -17,7 +17,6 @@ import type { ICollection } from '~/types/collection';
 definePageMeta({ middleware: ['logged-in-access-only'] });
 
 const router = useRouter();
-const route = useRoute();
 const nuxtApp = useNuxtApp();
 const { $api } = nuxtApp;
 const { getThreadViewHistory } = useStorage();

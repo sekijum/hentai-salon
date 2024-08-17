@@ -6,21 +6,14 @@
 
     <br />
 
-    <Form @submit="submit" :validation-schema="schema" v-slot="{ meta }">
+    <Form v-if="thread?.id" @submit="submit" :validation-schema="schema" v-slot="{ meta }">
       <div class="field">
         <v-text-field v-model="thread.title" label="タイトル" variant="outlined" density="compact" readonly />
       </div>
 
       <div class="field">
         <Field name="description" v-model="form.description" v-slot="{ errors }">
-          <v-textarea
-            v-model="form.description"
-            label="説明"
-            variant="outlined"
-            density="compact"
-            dense
-            :error-messages="errors"
-          />
+          <v-textarea v-model="form.description" label="説明" variant="outlined" density="compact" dense :error-messages="errors" />
         </Field>
       </div>
 
@@ -106,18 +99,7 @@ onMounted(async () => {
   await fetchThread();
 });
 
-const thread = ref<IThread>({
-  id: 0,
-  title: '',
-  description: '',
-  thumbnailUrl: '',
-  tagNameList: [],
-  commentCount: 0,
-  userId: 0,
-  comments: { totalCount: 0, limit: 0, offset: 0, data: [] },
-  attachments: { totalCount: 0, limit: 0, offset: 0, data: [] },
-  isLiked: false,
-});
+const thread = ref<IThread>();
 
 const schema = yup.object({});
 
