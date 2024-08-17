@@ -20,15 +20,15 @@ services:
     container_name: hentai-salon-client-app
     image: ${ECR_CLIENT_APP_URI}
     platform: linux/x86_64
-    environment:
-      APP_ENV: production
-      NUXT_PUBLIC_API_BASE_URL: server.hentai-salon.com
-      STATIC_URL: https://static.hentai-salon.com
-      GA_MEASUREMENT_ID: ${GA_MEASUREMENT_ID}
     build:
       context: .
       dockerfile: docker/client/app/Dockerfile
       target: prd
+      args:
+        APP_ENV: production
+        NUXT_PUBLIC_API_BASE_URL: server.hentai-salon.com
+        STATIC_URL: https://static.hentai-salon.com
+        GA_MEASUREMENT_ID: ${GA_MEASUREMENT_ID}
 
   client-proxy:
     container_name: hentai-salon-client-proxy
