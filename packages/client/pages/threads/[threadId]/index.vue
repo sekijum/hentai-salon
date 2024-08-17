@@ -149,7 +149,9 @@
 
     <Pagination :totalCount="thread.comments.totalCount" :limit="commentLimit" />
 
-    <ThreadItem filter="related-by-thread" title="関連" :isInfiniteScroll="true" />
+    <SwiperGrid v-if="commentAttachments?.length" :commentAttachments="commentAttachments" />
+
+    <ThreadItem filter="related-by-thread" title="関連スレ" :isInfiniteScroll="true" />
   </div>
 </template>
 
@@ -162,11 +164,13 @@ import PageTitle from '~/components/PageTitle.vue';
 import Pagination from '~/components/Pagination.vue';
 import MediaGallery from '~/components/MediaGallery.vue';
 import type { IThread } from '~/types/thread';
+import type { IThreadCommentAttachmentForThread } from '~/types/thread-comment-attachment';
 
 const router = useRouter();
 const route = useRoute();
 const nuxtApp = useNuxtApp();
-const { setThreadViewHistory, getThreadViewHistory, getCommentLimit, getCommentOrder } = useStorage();
+const { setThreadViewHistory, getThreadViewHistory, getCommentLimit } = useStorage();
+const commentAttachments = ref<IThreadCommentAttachmentForThread[]>([]);
 
 const { $api, payload } = nuxtApp;
 
@@ -233,6 +237,16 @@ function scrollToCommentBottom() {
   }
 }
 
+async function fetchRelatedByHistoryComments() {
+  const response = await $api.get<IThreadCommentAttachmentForThread[]>('/attachments', {
+    params: {
+      filter: 'related-by-history',
+      threadIds: getThreadViewHistory(),
+    },
+  });
+  commentAttachments.value = response.data;
+}
+
 onMounted(async () => {
   await fetchThread();
   setThreadViewHistory(parseInt(route.params.threadId.toString(), 10));
@@ -245,6 +259,7 @@ onMounted(async () => {
       { property: 'og:url', content: location.href },
     ],
   });
+  await fetchRelatedByHistoryComments();
 });
 
 async function fetchThread() {
@@ -253,7 +268,6 @@ async function fetchThread() {
     params: {
       limit: commentLimit,
       offset: route.query.offset,
-      order: getCommentOrder(),
     },
   });
   thread.value = response.data;

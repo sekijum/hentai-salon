@@ -4,7 +4,7 @@
 
     <div class="thread-section">
       <template v-if="isInfiniteScroll">
-        <v-infinite-scroll :onLoad="load" height="600px">
+        <v-infinite-scroll :onLoad="load" height="700px">
           <ThreadItemRow :items="items" />
           <template v-slot:empty />
         </v-infinite-scroll>

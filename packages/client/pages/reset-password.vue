@@ -52,9 +52,7 @@ definePageMeta({ middleware: ['unauthentication-only'] });
 const nuxtApp = useNuxtApp();
 const router = useRouter();
 const route = useRoute();
-
 const { $api } = nuxtApp;
-
 const form = ref({ password: '', confirmPassword: '' });
 const token = ref(route.query.token);
 
@@ -76,10 +74,6 @@ async function submit() {
     }
   }
 }
-
-useHead({
-  title: '変態サロン | 新しいパスワードの設定',
-});
 
 onMounted(async () => {
   try {

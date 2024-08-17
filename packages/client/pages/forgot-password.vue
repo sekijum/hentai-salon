@@ -37,9 +37,7 @@ import * as yup from 'yup';
 definePageMeta({ middleware: ['unauthentication-only'] });
 
 const nuxtApp = useNuxtApp();
-
 const { $api } = nuxtApp;
-
 const form = ref({ email: '' });
 
 const schema = yup.object({

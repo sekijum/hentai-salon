@@ -22,27 +22,13 @@
 
       <div class="field mb-2">
         <Field name="email" v-model="updateForm.email" v-slot="{ errors }">
-          <v-text-field
-            v-model="updateForm.email"
-            label="メールアドレス"
-            type="email"
-            variant="outlined"
-            density="compact"
-            :error-messages="errors"
-          />
+          <v-text-field v-model="updateForm.email" label="メールアドレス" type="email" variant="outlined" density="compact" :error-messages="errors" />
         </Field>
       </div>
 
       <div class="field mb-2">
         <Field name="profileLink" v-model="updateForm.profileLink" v-slot="{ errors }">
-          <v-text-field
-            v-model="updateForm.profileLink"
-            label="プロフィールリンク"
-            type="url"
-            variant="outlined"
-            density="compact"
-            :error-messages="errors"
-          />
+          <v-text-field v-model="updateForm.profileLink" label="プロフィールリンク" type="url" variant="outlined" density="compact" :error-messages="errors" />
         </Field>
       </div>
 
@@ -129,10 +115,8 @@ const passwordSchema = yup.object({
 });
 
 const router = useRouter();
-const route = useRoute();
 const nuxtApp = useNuxtApp();
-const { payload, $api } = nuxtApp;
-const { $storage } = useNuxtApp();
+const { $storage, $api } = useNuxtApp();
 
 const user = ref<IUser>();
 
@@ -163,7 +147,7 @@ async function update() {
   if (confirm('ユーザー情報を編集しますか？')) {
     try {
       // 空文字列をnullに変換
-      if (updateForm.value.profileLink === '') {
+      if (!updateForm.value.profileLink) {
         updateForm.value.profileLink = null;
       }
 

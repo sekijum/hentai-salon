@@ -6,7 +6,6 @@ definePageMeta({ middleware: ['unauthentication-only'] });
 const nuxtApp = useNuxtApp();
 const router = useRouter();
 const route = useRoute();
-
 const { $api, $storage } = nuxtApp;
 
 onMounted(async () => {

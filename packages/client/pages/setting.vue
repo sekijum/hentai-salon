@@ -13,14 +13,7 @@
           <v-col cols="6" class="d-flex justify-center align-center item-name">{{ item.name }}</v-col>
           <v-col cols="6" class="d-flex justify-center align-center">
             <div v-if="item.key" class="d-flex justify-center align-center">
-              <v-btn
-                v-if="item.key === 'thread-history-delete'"
-                class="spaced-button"
-                @click="clearThreadViewHistory"
-                block
-              >
-                削除
-              </v-btn>
+              <v-btn v-if="item.key === 'thread-history-delete'" class="spaced-button" @click="clearThreadViewHistory" block> 削除 </v-btn>
               <v-switch
                 v-else-if="item.key === 'comment-sort-order'"
                 v-model="commentOrder"
@@ -61,20 +54,7 @@
 import PageTitle from '~/components/PageTitle.vue';
 
 const router = useRouter();
-
-const {
-  getCommentLimit,
-  getTheme,
-  getCommentOrder,
-  setCommentLimit,
-  setTheme,
-  setCommentOrder,
-  clearThreadViewHistory,
-} = useStorage();
-
-const theme = ref(getTheme() === 'dark' ? true : false);
-const commentOrder = ref(getCommentOrder() === 'desc' ? true : false);
-const displayFirst100Comments = ref(getCommentLimit() === 100 ? true : false);
+const { getCommentLimit, getTheme, getCommentOrder, setCommentLimit, setTheme, setCommentOrder, clearThreadViewHistory } = useStorage();
 
 const menuItems = [
   { name: '表示', type: 'header' },
@@ -85,6 +65,10 @@ const menuItems = [
   { name: 'コメント', type: 'header' },
   { name: '昇順/降順', key: 'comment-sort-order' },
 ];
+
+const theme = ref(getTheme() === 'dark' ? true : false);
+const commentOrder = ref(getCommentOrder() === 'desc' ? true : false);
+const displayFirst100Comments = ref(getCommentLimit() === 100 ? true : false);
 
 useHead({
   title: '変態サロン | 設定',
@@ -109,9 +93,7 @@ useHead({
   margin-top: 8px;
   margin-bottom: 8px;
 }
-.text-center {
-  text-align: center;
-}
+
 .item-name {
   display: flex;
   align-items: center;

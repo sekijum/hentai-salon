@@ -8,12 +8,7 @@
 
     <v-divider />
 
-    <CommentList
-      :comments="[comment]"
-      :commentLimit="commentLimit"
-      :threadId="comment.thread.id"
-      @replied="fetchComment"
-    />
+    <CommentList :comments="[comment]" :commentLimit="commentLimit" :threadId="comment.thread.id" @replied="fetchComment" />
 
     <v-divider />
     <Pagination :totalCount="comment.replies.totalCount" :limit="commentLimit" />

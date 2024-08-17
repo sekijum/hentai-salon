@@ -90,16 +90,15 @@
 </template>
 
 <script setup lang="ts">
+import * as yup from 'yup';
 import { Form, Field } from 'vee-validate';
 import PageTitle from '~/components/PageTitle.vue';
 import Menu from '~/components/Menu.vue';
-import * as yup from 'yup';
 
 definePageMeta({ middleware: ['unauthentication-only'] });
 
 const nuxtApp = useNuxtApp();
 const router = useRouter();
-
 const { $storage, $api } = nuxtApp;
 
 const form = ref({
@@ -129,7 +128,7 @@ const schema = yup.object({
 async function submit() {
   try {
     // 空文字列をnullに変換
-    if (form.value.profileLink === '') {
+    if (!form.value.profileLink) {
       form.value.profileLink = null;
     }
 

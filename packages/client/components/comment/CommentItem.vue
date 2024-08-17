@@ -213,9 +213,7 @@ async function toggleLike() {
 }
 
 .pswp__custom-caption {
-  background: rgba(75, 150, 75, 0.75);
   font-size: 16px;
-  color: #fff;
   width: calc(100% - 32px);
   max-width: 400px;
   padding: 2px 8px;
@@ -225,10 +223,7 @@ async function toggleLike() {
   bottom: 16px;
   transform: translateX(-50%);
 }
-.pswp__custom-caption a {
-  color: #fff;
-  text-decoration: underline;
-}
+
 .hidden-caption-content {
   display: none;
 }

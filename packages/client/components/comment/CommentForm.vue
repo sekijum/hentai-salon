@@ -76,6 +76,12 @@
 
       <p class="text-center text-subtitle-2 mt-4">＊書き込み反映には時間が掛かる場合があります＊</p>
     </Form>
+
+    <div class="text-center">
+      <v-overlay :model-value="isLoading" class="align-center justify-center">
+        <v-progress-circular color="primary" size="64" indeterminate></v-progress-circular>
+      </v-overlay>
+    </div>
   </div>
 </template>
 
@@ -107,6 +113,7 @@ const router = useRouter();
 const route = useRoute();
 const { fetchListPresignedUrl, uploadFilesToS3 } = useActions();
 const { setLastCommentTime, canComment, timeUntilNextComment } = useStorage();
+const isLoading = ref(false);
 
 const { $api, payload } = nuxtApp;
 
@@ -206,6 +213,7 @@ async function handleAttachmentsChange(event: Event): Promise<void> {
 async function submit(_: typeof form.value, { resetForm }: { resetForm: () => void }): Promise<void> {
   if (confirm('本当に書き込みますか？')) {
     try {
+      isLoading.value = true;
       if (attachmentFiles.value && attachmentFiles.value.length > 0) {
         const presignedUrls = await fetchListPresignedUrl(attachmentFiles.value.map(file => file.name));
         const uploadedAttachments = await Promise.all(
@@ -240,9 +248,11 @@ async function submit(_: typeof form.value, { resetForm }: { resetForm: () => vo
         fileInput.value.reset();
       }
       emit('submit');
-    } catch (error) {
+    } catch (err) {
+      console.log(err);
       alert('書き込み中にエラーが発生しました。');
     }
+    isLoading.value = false;
   }
 }
 
