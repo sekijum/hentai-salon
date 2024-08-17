@@ -16,6 +16,3 @@ ssm_db_port = ""
 ssm_db_name = ""
 ssm_db_user = ""
 ssm_db_pass = ""
-
-# client-app
-ssm_nuxt_public_api_base_url = ""

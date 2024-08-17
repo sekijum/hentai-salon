@@ -24,6 +24,10 @@ services:
       context: .
       dockerfile: docker/client/app/Dockerfile
       target: prd
+      args:
+        APP_ENV: production
+        NUXT_PUBLIC_API_BASE_URL: https://server.hentai-salon.com
+        STATIC_URL: https://static.hentai-salon.com
 
   client-proxy:
     container_name: hentai-salon-client-proxy
