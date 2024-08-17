@@ -41,11 +41,10 @@ jobs:
 
       - name: コンテナビルド
         run: |
-          docker compose -f ${{ env.COMPOSE_FILE }} build --no-cache --build-arg BUILDKIT_INLINE_CACHE=1 hentai-salon-server-app
+          docker compose -f ${{ env.COMPOSE_FILE }} build --no-cache --build-arg BUILDKIT_INLINE_CACHE=1 server-app
 
       - name: ECRにプッシュ
         run: |
-          # docker tag hentai-salon-server-app:latest ${{ secrets.ECR_SERVER_APP_URI }}:latest
           docker push ${{ secrets.ECR_SERVER_APP_URI }}
 
       - name: タスク定義デプロイ
@@ -97,11 +96,10 @@ jobs:
 
       - name: コンテナビルド
         run: |
-          docker-compose -f ${{ env.COMPOSE_FILE }} build --no-cache --build-arg BUILDKIT_INLINE_CACHE=1 hentai-salon-server-proxy
+          docker-compose -f ${{ env.COMPOSE_FILE }} build --no-cache --build-arg BUILDKIT_INLINE_CACHE=1 server-proxy
 
       - name: ECRにプッシュ
         run: |
-          # docker tag hentai-salon-server-proxy:latest ${{ secrets.ECR_SERVER_PROXY_URI }}:latest
           docker push ${{ secrets.ECR_SERVER_PROXY_URI }}
 
       - name: タスク定義デプロイ
@@ -142,11 +140,10 @@ jobs:
 
       - name: コンテナビルド
         run: |
-          docker-compose -f ${{ env.COMPOSE_FILE }} build --no-cache --build-arg BUILDKIT_INLINE_CACHE=1 hentai-salon-client-app
+          docker-compose -f ${{ env.COMPOSE_FILE }} build --no-cache --build-arg BUILDKIT_INLINE_CACHE=1 client-app
 
       - name: ECRにプッシュ
         run: |
-          # docker tag hentai-salon-client-app:latest ${{ secrets.ECR_CLIENT_APP_URI }}:latest
           docker push ${{ secrets.ECR_CLIENT_APP_URI }}
 
       - name: タスク定義デプロイ
@@ -184,11 +181,10 @@ jobs:
 
       - name: コンテナビルド
         run: |
-          docker-compose -f ${{ env.COMPOSE_FILE }} build --no-cache --build-arg BUILDKIT_INLINE_CACHE=1 hentai-salon-client-proxy
+          docker-compose -f ${{ env.COMPOSE_FILE }} build --no-cache --build-arg BUILDKIT_INLINE_CACHE=1 client-proxy
 
       - name: ECRにプッシュ
         run: |
-          # docker tag hentai-salon-client-proxy:latest ${{ secrets.ECR_CLIENT_PROXY_URI }}:latest
           docker push ${{ secrets.ECR_CLIENT_PROXY_URI }}
 
       - name: タスク定義デプロイ
