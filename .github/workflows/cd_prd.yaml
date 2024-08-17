@@ -6,7 +6,7 @@ on:
       - '**/*.md'
     branches: ['prd']
 
-secrets:
+env:
   TZ: 'Asia/Tokyo'
   COMPOSE_FILE: 'compose.prd.yaml'
   
@@ -41,7 +41,7 @@ jobs:
 
       - name: コンテナビルド
         run: |
-          docker compose -f ${{ secrets.COMPOSE_FILE }} build --no-cache --build-arg BUILDKIT_INLINE_CACHE=1 hentai-salon-server-app
+          docker compose -f ${{ env.COMPOSE_FILE }} build --no-cache --build-arg BUILDKIT_INLINE_CACHE=1 hentai-salon-server-app
 
       - name: ECRにプッシュ
         run: |
@@ -97,7 +97,7 @@ jobs:
 
       - name: コンテナビルド
         run: |
-          docker-compose -f ${{ secrets.COMPOSE_FILE }} build --no-cache --build-arg BUILDKIT_INLINE_CACHE=1 hentai-salon-server-proxy
+          docker-compose -f ${{ env.COMPOSE_FILE }} build --no-cache --build-arg BUILDKIT_INLINE_CACHE=1 hentai-salon-server-proxy
 
       - name: ECRにプッシュ
         run: |
@@ -142,7 +142,7 @@ jobs:
 
       - name: コンテナビルド
         run: |
-          docker-compose -f ${{ secrets.COMPOSE_FILE }} build --no-cache --build-arg BUILDKIT_INLINE_CACHE=1 hentai-salon-client-app
+          docker-compose -f ${{ env.COMPOSE_FILE }} build --no-cache --build-arg BUILDKIT_INLINE_CACHE=1 hentai-salon-client-app
 
       - name: ECRにプッシュ
         run: |
@@ -184,7 +184,7 @@ jobs:
 
       - name: コンテナビルド
         run: |
-          docker-compose -f ${{ secrets.COMPOSE_FILE }} build --no-cache --build-arg BUILDKIT_INLINE_CACHE=1 hentai-salon-client-proxy
+          docker-compose -f ${{ env.COMPOSE_FILE }} build --no-cache --build-arg BUILDKIT_INLINE_CACHE=1 hentai-salon-client-proxy
 
       - name: ECRにプッシュ
         run: |
