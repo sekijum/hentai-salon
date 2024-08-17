@@ -15,6 +15,7 @@ jobs:
     name: Server-Appデプロイ
     runs-on: ubuntu-latest
 
+    if: steps.check_server_app_changes.outputs.hasChanges == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -29,7 +30,7 @@ jobs:
             const { execSync } = require('child_process');
             const output = execSync('git diff --name-only HEAD^ HEAD').toString();
             const hasChanges = output.split('\n').some(file => file.startsWith('docker/server/app') || file.startsWith('packages/server'));
-            return { hasChanges };
+            return { hasChanges: hasChanges.toString() };
           result-encoding: string
           
       - name: AWS認証
@@ -81,6 +82,7 @@ jobs:
     name: Server-Proxyデプロイ
     runs-on: ubuntu-latest
 
+    if: steps.check_server_proxy_changes.outputs.hasChanges == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -95,7 +97,7 @@ jobs:
             const { execSync } = require('child_process');
             const output = execSync('git diff --name-only HEAD^ HEAD').toString();
             const hasChanges = output.split('\n').some(file => file.startsWith('docker/server/proxy'));
-            return { hasChanges };
+            return { hasChanges: hasChanges.toString() };
           result-encoding: string
 
       - name: AWS認証
@@ -133,6 +135,7 @@ jobs:
     name: Client-Appデプロイ
     runs-on: ubuntu-latest
 
+    if: steps.check_client_app_changes.outputs.hasChanges == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -147,7 +150,7 @@ jobs:
             const { execSync } = require('child_process');
             const output = execSync('git diff --name-only HEAD^ HEAD').toString();
             const hasChanges = output.split('\n').some(file => file.startsWith('docker/client/app') || file.startsWith('packages/client'));
-            return { hasChanges };
+            return { hasChanges: hasChanges.toString() };
           result-encoding: string
 
       - name: AWS認証
@@ -189,6 +192,7 @@ jobs:
     name: Client-Proxyデプロイ
     runs-on: ubuntu-latest
 
+    if: steps.check_client_proxy_changes.outputs.hasChanges == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -198,12 +202,11 @@ jobs:
       - name: 差分チェック
         id: check_client_proxy_changes
         uses: actions/github-script@v6
-        with:
           script: |
-            const { execSync } = require('child_process');
-            const output = execSync('git diff --name-only HEAD^ HEAD').toString();
-            const hasChanges = output.split('\n').some(file => file.startsWith('docker/client/proxy'));
-            return { hasChanges };
+              const { execSync } = require('child_process');
+              const output = execSync('git diff --name-only HEAD^ HEAD').toString();
+              const hasChanges = output.split('\n').some(file => file.startsWith('docker/client/proxy'));
+              return { hasChanges: hasChanges.toString() };
           result-encoding: string
 
       - name: AWS認証
