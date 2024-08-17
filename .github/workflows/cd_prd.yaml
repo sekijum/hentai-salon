@@ -14,15 +14,15 @@ jobs:
   deploy-server-app:
     name: Server-Appデプロイ
     runs-on: ubuntu-latest
-    if: github.event.head_commit.message != 'skip ci' &&
-        (
-          contains(github.event.commits.*.modified, 'docker/server/app') ||
-          contains(github.event.commits.*.added, 'docker/server/app') ||
-          contains(github.event.commits.*.removed, 'docker/server/app') ||
-          contains(github.event.commits.*.modified, 'packages/server') ||
-          contains(github.event.commits.*.added, 'packages/server') ||
-          contains(github.event.commits.*.removed, 'packages/server')
-        )
+    # if: github.event.head_commit.message != 'skip ci' &&
+    #     (
+    #       contains(github.event.commits.*.modified, 'docker/server/app') ||
+    #       contains(github.event.commits.*.added, 'docker/server/app') ||
+    #       contains(github.event.commits.*.removed, 'docker/server/app') ||
+    #       contains(github.event.commits.*.modified, 'packages/server') ||
+    #       contains(github.event.commits.*.added, 'packages/server') ||
+    #       contains(github.event.commits.*.removed, 'packages/server')
+    #     )
     steps:
       - name: Checkout
         uses: actions/checkout@v3
