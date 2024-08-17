@@ -36,8 +36,3 @@ variable "ssm_db_name" {
 variable "ssm_db_pass" {
   type = string
 }
-
-# client app
-variable "ssm_ga_measurement_id" {
-  type = string
-}

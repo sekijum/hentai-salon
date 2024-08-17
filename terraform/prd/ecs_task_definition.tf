@@ -75,9 +75,6 @@ resource "aws_ecs_task_definition" "client" {
         essential : true
         image        = "${aws_ecr_repository.client_app.repository_url}:latest"
         portMappings = [{ containerPort = 3000 }]
-        secrets = [
-          { name : "GA_MEASUREMENT_ID", valueFrom : aws_ssm_parameter.client_ga_measurement_id.arn },
-        ],
         logConfiguration = {
           logDriver = "awslogs"
           options = {

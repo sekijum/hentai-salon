@@ -65,8 +65,3 @@ resource "aws_ssm_parameter" "server_db_pass" {
   type  = "SecureString"
   value = var.ssm_db_pass
 }
-resource "aws_ssm_parameter" "client_ga_measurement_id" {
-  name  = "${local.ssm_parameter_store}/client/ssm_ga_measurement_id"
-  type  = "String"
-  value = var.ssm_ga_measurement_id
-}

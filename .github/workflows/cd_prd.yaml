@@ -6,7 +6,7 @@ on:
       - '**/*.md'
     branches: ['prd']
 
-secrets:
+env:
   TZ: 'Asia/Tokyo'
   COMPOSE_FILE: 'compose.prd.yaml'
   
@@ -41,17 +41,21 @@ jobs:
 
       - name: コンテナビルド
         run: |
-          docker compose -f ${{ secrets.COMPOSE_FILE }} build --no-cache --build-arg BUILDKIT_INLINE_CACHE=1 hentai-salon-server-app
+          docker compose -f ${{ env.COMPOSE_FILE }} build --no-cache --build-arg BUILDKIT_INLINE_CACHE=1 server-app
 
       - name: ECRにプッシュ
         run: |
-          # docker tag hentai-salon-server-app:latest ${{ secrets.ECR_SERVER_APP_URI }}:latest
+          docker tag hentai-salon-server-app:latest ${{ secrets.ECR_SERVER_APP_URI }}:latest
           docker push ${{ secrets.ECR_SERVER_APP_URI }}
 
+      - name: タスク定義取得
+        run: |
+          aws ecs describe-task-definition --task-definition hentai-salon-prd-server --query taskDefinition > task-definition.json
+
       - name: タスク定義デプロイ
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
-          task-definition: hentai-salon-prd-server
+          task-definition: task-definition.json
           service: server
           cluster: hentai-salon-prd
           wait-for-service-stability: true
@@ -60,15 +64,15 @@ jobs:
         id: get-ecs-task
         run: |
           ECS_TASK_ID=$(aws ecs list-tasks --cluster hentai-salon-prd --service-name server --query 'taskArns[0]' --output text)
-          echo "task_id=$ECS_TASK_ID" >> $GITHUB_secrets
+          echo "task_id=$ECS_TASK_ID" >> $GITHUB_ENV
 
       - name: マイグレーション実行
         run: |
-          aws ecs execute-command --task "${{ secrets.task_id }}" \
+          aws ecs execute-command --task "${{ env.task_id }}" \
             --cluster hentai-salon-prd \
-            --container server-app \
+            --container app \
             --interactive \
-            --command "atlas migrate apply --dir "file://./infrastructure/ent/migrate/migrations" --url "mysql://${{ secrets.DB_USER }}:${{ secrets.DB_PASS }}@${{ secrets.DB_HOST }}:${{ secrets.DB_PORT }}/${{ secrets.DB_NAME }""
+            --command "atlas migrate apply --dir 'file://./infrastructure/ent/migrate/migrations' --url 'mysql://${{ secrets.DB_USER }}:${{ secrets.DB_PASS }}@${{ secrets.DB_HOST }}:${{ secrets.DB_PORT }}/${{ secrets.DB_NAME }}'"
 
   deploy-server-proxy:
     name: Server-Proxyデプロイ
@@ -97,17 +101,21 @@ jobs:
 
       - name: コンテナビルド
         run: |
-          docker-compose -f ${{ secrets.COMPOSE_FILE }} build --no-cache --build-arg BUILDKIT_INLINE_CACHE=1 hentai-salon-server-proxy
+          docker compose -f ${{ env.COMPOSE_FILE }} build --no-cache --build-arg BUILDKIT_INLINE_CACHE=1 server-proxy
 
       - name: ECRにプッシュ
         run: |
-          # docker tag hentai-salon-server-proxy:latest ${{ secrets.ECR_SERVER_PROXY_URI }}:latest
+          docker tag hentai-salon-server-proxy:latest ${{ secrets.ECR_SERVER_PROXY_URI }}:latest
           docker push ${{ secrets.ECR_SERVER_PROXY_URI }}
 
+      - name: タスク定義取得
+        run: |
+          aws ecs describe-task-definition --task-definition hentai-salon-prd-server --query taskDefinition > task-definition.json
+
       - name: タスク定義デプロイ
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
-          task-definition: hentai-salon-prd-server
+          task-definition: task-definition.json
           service: server
           cluster: hentai-salon-prd
           wait-for-service-stability: true
@@ -142,17 +150,21 @@ jobs:
 
       - name: コンテナビルド
         run: |
-          docker-compose -f ${{ secrets.COMPOSE_FILE }} build --no-cache --build-arg BUILDKIT_INLINE_CACHE=1 hentai-salon-client-app
+          docker compose -f ${{ env.COMPOSE_FILE }} build --no-cache --build-arg BUILDKIT_INLINE_CACHE=1 client-app
 
       - name: ECRにプッシュ
         run: |
-          # docker tag hentai-salon-client-app:latest ${{ secrets.ECR_CLIENT_APP_URI }}:latest
+          docker tag hentai-salon-client-app:latest ${{ secrets.ECR_CLIENT_APP_URI }}:latest
           docker push ${{ secrets.ECR_CLIENT_APP_URI }}
 
+      - name: タスク定義取得
+        run: |
+          aws ecs describe-task-definition --task-definition hentai-salon-prd-client --query taskDefinition > task-definition.json
+
       - name: タスク定義デプロイ
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
-          task-definition: hentai-salon-prd-client
+          task-definition: task-definition.json
           service: client
           cluster: hentai-salon-prd
           wait-for-service-stability: true
@@ -184,17 +196,21 @@ jobs:
 
       - name: コンテナビルド
         run: |
-          docker-compose -f ${{ secrets.COMPOSE_FILE }} build --no-cache --build-arg BUILDKIT_INLINE_CACHE=1 hentai-salon-client-proxy
+          docker compose -f ${{ env.COMPOSE_FILE }} build --no-cache --build-arg BUILDKIT_INLINE_CACHE=1 client-proxy
 
       - name: ECRにプッシュ
         run: |
-          # docker tag hentai-salon-client-proxy:latest ${{ secrets.ECR_CLIENT_PROXY_URI }}:latest
+          docker tag hentai-salon-client-proxy:latest ${{ secrets.ECR_CLIENT_PROXY_URI }}:latest
           docker push ${{ secrets.ECR_CLIENT_PROXY_URI }}
 
+      - name: タスク定義取得
+        run: |
+          aws ecs describe-task-definition --task-definition hentai-salon-prd-client --query taskDefinition > task-definition.json
+
       - name: タスク定義デプロイ
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
-          task-definition: hentai-salon-prd-client
+          task-definition: task-definition.json
           service: client
           cluster: hentai-salon-prd
           wait-for-service-stability: true
