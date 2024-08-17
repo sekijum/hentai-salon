@@ -54,11 +54,13 @@ func (ds *TagDatasource) FindAll(params TagDatasourceFindAllParams) ([]*model.Ta
 		Query().
 		WithThreads()
 
-	q = q.Where(
-		tag.Or(
-			tag.NameContainsFold(*params.Keyword),
-		),
-	)
+	if params.Keyword != nil {
+		q = q.Where(
+			tag.Or(
+				tag.NameContainsFold(*params.Keyword),
+			),
+		)
+	}
 
 	entTagList, err := q.All(params.Ctx)
 	if err != nil {

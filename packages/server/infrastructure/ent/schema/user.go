@@ -19,7 +19,7 @@ func (User) Fields() []ent.Field {
 		field.String("email").Unique().MaxLen(255),
 		field.String("password"),
 		field.String("profile_link").Optional().Nillable(),
-		field.Int("status").Default(0).Comment("0: Active, 1: Withdrawn, 2: Suspended, 2: Inactive"),
+		field.Int("status").Default(0).Comment("0: Active, 1: Withdrawn, 2: Suspended, 3: Inactive"),
 		field.Int("role").Default(0).Comment("0: Member, 1: Admin"),
 		field.Time("created_at").Default(time.Now),
 		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),

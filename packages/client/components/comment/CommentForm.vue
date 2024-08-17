@@ -58,7 +58,7 @@
 
       <v-row class="dense">
         <v-col cols="6">
-          <v-btn class="clear-button" block @click="() => fileInput!.reset()" type="reset">クリア</v-btn>
+          <v-btn class="clear-button" block @click="() => fileInput!.reset()" type="reset" variant="flat">クリア</v-btn>
         </v-col>
         <v-col cols="6">
           <template v-if="canCommentState || payload.isLoggedIn">
@@ -67,7 +67,7 @@
             </v-btn>
           </template>
           <template v-else>
-            <v-btn type="submit" class="submit-button" block disabled>
+            <v-btn type="submit" class="submit-button" block disabled variant="flat">
               {{ remainingTimeText }}後に書き込み可能です
             </v-btn>
           </template>

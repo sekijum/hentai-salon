@@ -124,3 +124,23 @@ func (ctrl *ThreadController) UpdateStatus(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, nil)
 }
+
+func (ctrl *ThreadController) Delete(ctx *gin.Context) {
+
+	threadID, err := strconv.Atoi(ctx.Param("threadID"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	err = ctrl.threadApplicationService.Delete(service_admin.ThreadApplicationServiceDeleteParams{
+		Ctx:      context.Background(),
+		ThreadID: threadID,
+	})
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, nil)
+}

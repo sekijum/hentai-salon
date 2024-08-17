@@ -418,3 +418,20 @@ func (svc *ThreadApplicationService) Unlike(params ThreadApplicationServiceUnlik
 
 	return nil
 }
+
+type ThreadApplicationServiceDeleteParams struct {
+	Ctx      context.Context
+	ThreadID int
+}
+
+func (svc *ThreadApplicationService) Delete(params ThreadApplicationServiceDeleteParams) error {
+	err := svc.threadDatasource.Delete(datasource.ThreadDatasourceDeleteParams{
+		Ctx:      params.Ctx,
+		ThreadID: params.ThreadID,
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

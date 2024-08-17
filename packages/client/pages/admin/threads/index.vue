@@ -88,7 +88,8 @@
           </td>
           <td>{{ $formatDate(item.createdAt) }}</td>
           <td>
-            <v-icon class="me-2" size="small" @click="router.push(`/admin/threads/${item.id}`)">mdi-pencil</v-icon>
+            <v-icon @click="router.push(`/admin/threads/${item.id}`)">mdi-pencil</v-icon>
+            <v-icon @click="() => deleteThread(item.id)">mdi-delete</v-icon>
           </td>
         </tr>
       </template>
@@ -193,6 +194,17 @@ async function updateStatus(threadId: number, status: number) {
   await $api.patch(`/admin/threads/${threadId}/status`, {
     status,
   });
+}
+
+async function deleteThread(threadId: number) {
+  if (confirm('本当に削除しますか？')) {
+    try {
+      await $api.delete(`/admin/threads/${threadId}`);
+      await fetchThreads({ page: 1, itemsPerPage: itemsPerPage.value, sortBy: sortBy.value, search: '' });
+    } catch (err) {
+      alert('通信中にエラーが発生しました');
+    }
+  }
 }
 
 onMounted(() => fetchThreads({ page: 1, itemsPerPage: itemsPerPage.value, sortBy: sortBy.value, search: '' }));

@@ -160,3 +160,20 @@ func (svc *ThreadApplicationService) UpdateStatus(params ThreadApplicationServic
 
 	return nil
 }
+
+type ThreadApplicationServiceDeleteParams struct {
+	Ctx      context.Context
+	ThreadID int
+}
+
+func (svc *ThreadApplicationService) Delete(params ThreadApplicationServiceDeleteParams) error {
+	err := svc.threadDatasource.Delete(datasource_admin.ThreadDatasourceDeleteParams{
+		Ctx:      params.Ctx,
+		ThreadId: params.ThreadID,
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

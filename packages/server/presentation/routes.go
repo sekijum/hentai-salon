@@ -40,6 +40,7 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 	{
 		threadGroup.GET("", controllers.ThreadController.FindAll)
 		threadGroup.GET("/:threadID", controllers.ThreadController.FindById)
+		threadGroup.DELETE("/:threadID", controllers.ThreadController.Delete)
 		threadGroup.POST("/:threadID/like", controllers.ThreadController.Like)
 		threadGroup.POST("/:threadID/unlike", controllers.ThreadController.Unlike)
 
@@ -73,6 +74,7 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 			userGroup.GET("/me/liked-comments", controllers.UserController.FindLikedComments)
 			userGroup.PUT("/me", controllers.UserController.Update)
 			userGroup.PATCH("/me/password", controllers.UserController.UpdatePassword)
+			userGroup.DELETE("/me", controllers.UserController.Suspended)
 		}
 	}
 
@@ -117,6 +119,7 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 			threadGroup.GET("/:threadID", controllers.ThreadAdminController.FindByID)
 			threadGroup.PUT("/:threadID", controllers.ThreadAdminController.Update)
 			threadGroup.PATCH("/:threadID/status", controllers.ThreadAdminController.UpdateStatus)
+			threadGroup.DELETE("/:threadID", controllers.ThreadAdminController.Delete)
 
 			commentGroup := threadGroup.Group("/:threadID/comments")
 			{

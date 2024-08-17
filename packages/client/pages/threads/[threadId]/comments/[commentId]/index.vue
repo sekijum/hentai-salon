@@ -78,6 +78,25 @@ function scrollToCommentBottom() {
 
 onMounted(async () => {
   await fetchComment();
+
+  useHead({
+    title: comment.value?.content,
+    meta: [
+      { name: 'description', content: comment.value?.content },
+      {
+        property: 'og:title',
+        content: comment.value?.content,
+      },
+      {
+        property: 'og:description',
+        content: comment.value?.content,
+      },
+      {
+        property: 'og:url',
+        content: location.href,
+      },
+    ],
+  });
 });
 
 async function fetchComment() {
@@ -96,29 +115,6 @@ watchEffect(() => {
   if (route.query.limit) {
     fetchComment();
   }
-});
-
-useHead({
-  title: comment.value?.content,
-  meta: [
-    { name: 'description', content: comment.value?.content },
-    {
-      property: 'og:title',
-      content: comment.value?.content,
-    },
-    {
-      property: 'og:description',
-      content: comment.value?.content,
-    },
-    {
-      property: 'og:image',
-      content: comment.value?.attachments[0].url || '',
-    },
-    {
-      property: 'og:url',
-      content: location.href,
-    },
-  ],
 });
 </script>
 

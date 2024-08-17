@@ -19,7 +19,6 @@
             variant="outlined"
             density="compact"
             dense
-            single-line
             :error-messages="errors"
           />
         </Field>
@@ -37,8 +36,8 @@
           clearable
           multiple
           dense
-          single-line
           :items="tagSuggestions"
+          @input="fetchTagSuggestions"
         />
       </div>
 
@@ -61,6 +60,16 @@
       <v-btn type="submit" color="primary" block :disabled="!meta?.valid" class="mt-5">作成</v-btn>
       <p class="note">＊反映には時間が掛かる場合があります＊</p>
     </Form>
+
+    <br />
+
+    <v-divider class="border-opacity-100" />
+
+    <br />
+
+    <div class="mx-2">
+      <v-btn block variant="outlined" color="red" @click="deleteThread">スレ削除</v-btn>
+    </div>
   </div>
 </template>
 
@@ -94,7 +103,6 @@ const form = ref<{
 });
 
 onMounted(async () => {
-  await fetchTagSuggestions();
   await fetchThread();
 });
 
@@ -113,9 +121,17 @@ const thread = ref<IThread>({
 
 const schema = yup.object({});
 
-async function fetchTagSuggestions() {
-  const response = await $api.get<string[]>('/tags/name');
-  tagSuggestions.value = response.data;
+async function fetchTagSuggestions(event) {
+  if (!event.target.value) {
+    tagSuggestions.value = [];
+    return;
+  }
+  const response = await $api.get<string[]>('/tags/name', {
+    params: {
+      keyword: event.target.value,
+    },
+  });
+  tagSuggestions.value = response.data ? response.data : [];
 }
 
 function handleThumbnailChange(event: Event) {
@@ -150,6 +166,18 @@ async function fetchThread() {
     thumbnailUrl: thread.value.thumbnailUrl,
     tagNameList: thread.value.tagNameList,
   };
+}
+
+async function deleteThread() {
+  if (confirm('スレを削除しますか？')) {
+    try {
+      const threadId = route.params.threadId;
+      await $api.delete(`/threads/${threadId}`);
+      router.push('/');
+    } catch (err) {
+      alert('通信中にエラーが発生しました');
+    }
+  }
 }
 
 useHead({

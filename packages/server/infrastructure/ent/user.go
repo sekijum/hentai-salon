@@ -25,7 +25,7 @@ type User struct {
 	Password string `json:"password,omitempty"`
 	// ProfileLink holds the value of the "profile_link" field.
 	ProfileLink *string `json:"profile_link,omitempty"`
-	// 0: Active, 1: Withdrawn, 2: Suspended, 2: Inactive
+	// 0: Active, 1: Withdrawn, 2: Suspended, 3: Inactive
 	Status int `json:"status,omitempty"`
 	// 0: Member, 1: Admin
 	Role int `json:"role,omitempty"`

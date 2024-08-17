@@ -137,7 +137,7 @@ var (
 				Symbol:     "thread_comments_threads_comments",
 				Columns:    []*schema.Column{ThreadCommentsColumns[6]},
 				RefColumns: []*schema.Column{ThreadsColumns[0]},
-				OnDelete:   schema.NoAction,
+				OnDelete:   schema.Cascade,
 			},
 			{
 				Symbol:     "thread_comments_thread_comments_replies",

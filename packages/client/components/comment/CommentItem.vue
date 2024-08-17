@@ -1,7 +1,7 @@
 <template>
   <div class="comment-item mx-2">
     <v-sheet class="d-flex bg-transparent">
-      <v-sheet class="me-auto">
+      <v-sheet class="me-auto bg-transparent">
         <template v-if="comment?.user?.id && comment?.user?.profileLink">
           <nuxt-link :to="comment.user.profileLink" target="_blank" rel="noopener">
             {{ username() }}
@@ -11,11 +11,11 @@
           {{ username() }}
         </template>
       </v-sheet>
-      <v-sheet>{{ $formatDate(comment.createdAt) }}</v-sheet>
+      <v-sheet class="bg-transparent">{{ $formatDate(comment.createdAt) }}</v-sheet>
     </v-sheet>
 
     <v-sheet class="d-flex bg-transparent">
-      <v-sheet class="me-auto">
+      <v-sheet class="me-auto bg-transparent">
         <template v-if="comment.parentCommentId">
           <nuxt-link
             class="text-decoration-none bg-transparent"
@@ -27,7 +27,7 @@
           </nuxt-link>
         </template>
       </v-sheet>
-      <v-sheet>
+      <v-sheet class="bg-transparent">
         <nuxt-link
           :to="`/threads/${threadId}/comments/${comment.id}`"
           class="text-decoration-none bg-transparent"
@@ -67,10 +67,10 @@
     </template>
 
     <v-sheet class="d-flex bg-transparent">
-      <v-sheet class="me-auto">
+      <v-sheet class="me-auto bg-transparent">
         <v-icon size="large" @click="toggleReplyForm">{{ showReplyForm ? 'mdi-close' : 'mdi-reply' }}</v-icon>
       </v-sheet>
-      <v-sheet>
+      <v-sheet class="bg-transparent">
         <nuxt-link
           :to="`/threads/${threadId}/comments/${comment.id}`"
           class="text-decoration-none bg-transparent"
@@ -80,7 +80,7 @@
           <v-icon size="large">mdi-comment</v-icon> {{ comment.replyCount }}
         </nuxt-link>
       </v-sheet>
-      <v-sheet>
+      <v-sheet class="bg-transparent">
         <v-icon size="large" class="text-decoration-none ml-2" @click="toggleLike">
           {{ isLiked ? 'mdi-thumb-up' : 'mdi-thumb-up-outline' }}
         </v-icon>

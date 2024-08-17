@@ -268,3 +268,20 @@ func (ds *ThreadDatasource) UpdateStatus(params ThreadDatasourceUpdateStatusPara
 
 	return thread, nil
 }
+
+type ThreadDatasourceDeleteParams struct {
+	Ctx      context.Context
+	ThreadId int
+}
+
+func (ds *ThreadDatasource) Delete(params ThreadDatasourceDeleteParams) error {
+	err := ds.client.
+		Thread.
+		DeleteOneID(params.ThreadId).
+		Exec(params.Ctx)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

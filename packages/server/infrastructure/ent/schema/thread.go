@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"entgo.io/ent"
+	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
@@ -32,7 +33,7 @@ func (Thread) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("board", Board.Type).Ref("threads").Unique().Field("board_id").Required(),
 		edge.From("owner", User.Type).Ref("threads").Unique().Field("user_id").Required(),
-		edge.To("comments", ThreadComment.Type),
+		edge.To("comments", ThreadComment.Type).Annotations(entsql.OnDelete(entsql.Cascade)),
 		edge.To("tags", Tag.Type).Through("thread_tags", ThreadTag.Type),
 		edge.From("liked_users", User.Type).Ref("liked_threads").Through("user_thread_like", UserThreadLike.Type),
 	}

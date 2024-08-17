@@ -37,10 +37,16 @@
           single-line
           dense
           :items="tagSuggestions"
-          @input="fetchTagSuggestions"
         />
       </div>
       <v-btn type="submit" color="primary" block @click="searchTagNameList">検索</v-btn>
+      <v-card-text>
+        <v-chip-group v-model="tagNameList" column multiple>
+          <template v-for="tag in tagSuggestions" :key="tag">
+            <v-chip size="x-small" :text="tag" :value="tag" variant="outlined" filter />
+          </template>
+        </v-chip-group>
+      </v-card-text>
     </template>
 
     <ThreadItem
@@ -73,7 +79,7 @@ const router = useRouter();
 const nuxtApp = useNuxtApp();
 
 const keyword = ref(route.query.keyword ?? '');
-const tagNameList = ref<number[]>(route.query.tagNameList ?? []);
+const tagNameList = ref<string[]>(route.query.tagNameList ?? []);
 const tagSuggestions = ref<string[]>([]);
 const { $api } = nuxtApp;
 
@@ -123,18 +129,10 @@ async function searchTagNameList() {
   await router.push({ ...{ query: { ...{ tagNameList: tagNameList.value }, ...{ filter: 'tags' } } } });
 }
 
-async function fetchTagSuggestions(event) {
-  if (!event.target.value) {
-    tagSuggestions.value = [];
-    return;
-  }
-  const response = await $api.get<string[]>('/tags/name', {
-    params: {
-      keyword: event.target.value,
-    },
-  });
+onMounted(async () => {
+  const response = await $api.get<string[]>('/tags/name');
   tagSuggestions.value = response.data ? response.data : [];
-}
+});
 
 useHead({
   title: '変態サロン | スレ一覧',

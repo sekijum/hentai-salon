@@ -701,3 +701,21 @@ func (svc *UserApplicationService) FindUserComments(params UserApplicationServic
 
 	return dto, nil
 }
+
+type UserApplicationServiceSuspendedParams struct {
+	Ctx    context.Context
+	UserID int
+	Qs     request.UserFindCommentsRequest
+}
+
+func (svc *UserApplicationService) Suspended(params UserApplicationServiceSuspendedParams) error {
+	err := svc.userDatasource.Suspended(datasource.UserDatasourceSuspendedParams{
+		Ctx:    params.Ctx,
+		UserID: params.UserID,
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

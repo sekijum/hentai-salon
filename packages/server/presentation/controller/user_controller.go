@@ -359,3 +359,22 @@ func (ctrl *UserController) FindComments(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, comments)
 }
+
+func (ctrl *UserController) Suspended(ctx *gin.Context) {
+	userID, exists := ctx.Get("userID")
+	if !exists {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "ユーザーIDがコンテキストに存在しません"})
+		return
+	}
+
+	err := ctrl.userApplicationService.Suspended(service.UserApplicationServiceSuspendedParams{
+		Ctx:    context.Background(),
+		UserID: userID.(int),
+	})
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, nil)
+}

@@ -37,7 +37,26 @@
       />
       <div id="media-bottom" />
 
-      <div class="fab-container">
+      <v-bottom-navigation color="teal" grow :fixed="true">
+        <v-btn @click="scrollToMediaBottom">
+          <v-icon>mdi-arrow-down</v-icon>
+        </v-btn>
+
+        <template v-if="payload?.user?.id === thread.userId">
+          <v-btn @click="editThread">
+            <v-icon>mdi-pencil</v-icon>
+          </v-btn>
+        </template>
+
+        <v-btn @click="toggleLike">
+          <v-icon>{{ thread.isLiked ? 'mdi-thumb-up' : 'mdi-thumb-up-outline' }}</v-icon>
+        </v-btn>
+
+        <v-btn @click="scrollToMediaTop">
+          <v-icon>mdi-arrow-up</v-icon>
+        </v-btn>
+      </v-bottom-navigation>
+      <!-- <div class="fab-container">
         <v-fab-transition v-if="payload?.user?.id === thread.userId">
           <v-btn icon large color="secondary" @click="editThread">
             <v-icon>mdi-pencil</v-icon>
@@ -61,7 +80,7 @@
             <v-icon>mdi-arrow-down</v-icon>
           </v-btn>
         </v-fab-transition>
-      </div>
+      </div> -->
     </template>
     <template v-else>
       <CommentForm @submit="fetchThread" :showReplyForm="true" :threadId="thread.id" />
@@ -80,7 +99,26 @@
 
       <CommentForm @submit="fetchThread" :showReplyForm="true" :threadId="thread.id" />
 
-      <div class="fab-container">
+      <v-bottom-navigation color="teal" grow :fixed="true">
+        <v-btn @click="scrollToCommentBottom">
+          <v-icon>mdi-arrow-down</v-icon>
+        </v-btn>
+
+        <template v-if="payload?.user?.id === thread.userId">
+          <v-btn @click="editThread">
+            <v-icon>mdi-pencil</v-icon>
+          </v-btn>
+        </template>
+
+        <v-btn @click="toggleLike">
+          <v-icon>{{ thread.isLiked ? 'mdi-thumb-up' : 'mdi-thumb-up-outline' }}</v-icon>
+        </v-btn>
+
+        <v-btn @click="scrollToCommentTop">
+          <v-icon>mdi-arrow-up</v-icon>
+        </v-btn>
+      </v-bottom-navigation>
+      <!-- <div class="fab-container">
         <v-fab-transition v-if="payload?.user?.id === thread.userId">
           <v-btn icon large color="secondary" @click="editThread">
             <v-icon>mdi-pencil</v-icon>
@@ -104,7 +142,7 @@
             <v-icon>mdi-arrow-down</v-icon>
           </v-btn>
         </v-fab-transition>
-      </div>
+      </div> -->
     </template>
 
     <v-divider />
@@ -198,6 +236,15 @@ function scrollToCommentBottom() {
 onMounted(async () => {
   await fetchThread();
   setThreadViewHistory(parseInt(route.params.threadId.toString(), 10));
+  useHead({
+    title: thread.value.title,
+    meta: [
+      { property: 'og:title', content: thread.value.title },
+      { name: 'description', content: thread.value.description },
+      { property: 'og:image', content: thread.value.thumbnailUrl || '/hentai-salon-logo/logo_transparent.png' },
+      { property: 'og:url', content: location.href },
+    ],
+  });
 });
 
 async function fetchThread() {
@@ -229,33 +276,6 @@ async function toggleLike() {
 const editThread = () => {
   router.push(`/threads/${thread.value.id}/edit`);
 };
-
-useHead({
-  title: thread.value?.title,
-  meta: [
-    { name: 'description', content: thread.value?.description },
-    {
-      property: 'og:title',
-      content: thread.value?.title,
-    },
-    {
-      property: 'og:description',
-      content: thread.value?.description,
-    },
-    {
-      property: 'og:image',
-      content: thread.value?.thumbnailUrl,
-    },
-    {
-      property: 'og:url',
-      content: location.href,
-    },
-  ],
-});
-
-useHead({
-  title: '変態サロン | スレ一覧',
-});
 
 watch(
   () => route.query.offset,

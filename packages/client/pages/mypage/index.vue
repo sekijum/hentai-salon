@@ -6,7 +6,7 @@
 
     <br />
 
-    <Form @submit="update" :validation-schema="schema" class="mx-2 mb-2" v-slot="{ meta }">
+    <Form @submit="update" :validation-schema="schema" class="mx-2" v-slot="{ meta }">
       <div class="field mb-2">
         <Field name="name" v-model="updateForm.name" v-slot="{ errors }">
           <v-text-field
@@ -49,11 +49,13 @@
       <v-btn type="submit" color="primary" block :disabled="!meta.valid">編集</v-btn>
     </Form>
 
+    <br />
+
     <v-divider class="border-opacity-100" />
 
     <br />
 
-    <Form @submit="updatePassword" :validation-schema="passwordSchema" class="mx-2 mb-2" v-slot="{ meta }">
+    <Form @submit="updatePassword" :validation-schema="passwordSchema" class="mx-2" v-slot="{ meta }">
       <div class="field mb-2">
         <Field v-model="updatePasswordForm.oldPassword" name="oldPassword" v-slot="{ errors }">
           <v-text-field
@@ -82,6 +84,16 @@
 
       <v-btn type="submit" color="primary" block :disabled="!meta.valid">パスワード編集</v-btn>
     </Form>
+
+    <br />
+
+    <v-divider class="border-opacity-100" />
+
+    <br />
+
+    <div class="mx-2">
+      <v-btn block variant="outlined" color="red" @click="deleteUser">アカウント削除</v-btn>
+    </div>
   </div>
 </template>
 
@@ -120,6 +132,7 @@ const router = useRouter();
 const route = useRoute();
 const nuxtApp = useNuxtApp();
 const { payload, $api } = nuxtApp;
+const { $storage } = useNuxtApp();
 
 const user = ref<IUser>();
 
@@ -175,6 +188,18 @@ async function updatePassword(_, { resetForm }: { resetForm: () => void }) {
       });
       fetchUser();
       resetForm();
+    } catch (err) {
+      alert('通信中にエラーが発生しました');
+    }
+  }
+}
+
+async function deleteUser() {
+  if (confirm('パスワードを削除しますか？')) {
+    try {
+      await $api.delete('/users/me');
+      $storage.removeItem('access_token');
+      router.go(0);
     } catch (err) {
       alert('通信中にエラーが発生しました');
     }

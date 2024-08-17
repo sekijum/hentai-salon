@@ -330,3 +330,21 @@ func (ds *UserDatasource) FindUserComments(params UserDatasourceFindUserComments
 
 	return comments, nil
 }
+
+type UserDatasourceSuspendedParams struct {
+	Ctx    context.Context
+	UserID int
+}
+
+func (ds *UserDatasource) Suspended(params UserDatasourceSuspendedParams) error {
+	err := ds.client.
+		User.
+		UpdateOneID(params.UserID).
+		SetStatus(2).
+		Exec(params.Ctx)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

@@ -359,3 +359,18 @@ func (ds *ThreadDatasource) UpdateTx(params ThreadDatasourceUpdateTxParams) (*mo
 
 	return thread, nil
 }
+
+type ThreadDatasourceDeleteParams struct {
+	Ctx      context.Context
+	ThreadID int
+}
+
+func (ds *ThreadDatasource) Delete(params ThreadDatasourceDeleteParams) error {
+	err := ds.client.Thread.
+		DeleteOneID(params.ThreadID).
+		Exec(params.Ctx)
+	if err != nil {
+		return err
+	}
+	return nil
+}
