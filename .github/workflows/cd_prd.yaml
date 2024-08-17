@@ -14,13 +14,6 @@ jobs:
   deploy-server-app:
     name: Server-Appデプロイ
     runs-on: ubuntu-latest
-    if: |
-      github.event.commits.*.modified.* matches 'docker/server/app/**' ||
-      github.event.commits.*.added.* matches 'docker/server/app/**' ||
-      github.event.commits.*.removed.* matches 'docker/server/app/**' ||
-      github.event.commits.*.modified.* matches 'packages/server/**' ||
-      github.event.commits.*.added.* matches 'packages/server/**' ||
-      github.event.commits.*.removed.* matches 'packages/server/**'
 
     steps:
       - name: Checkout
@@ -28,6 +21,17 @@ jobs:
         with:
           fetch-depth: 2
 
+      - name: 差分チェック
+        id: check_server_app_changes
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { execSync } = require('child_process');
+            const output = execSync('git diff --name-only HEAD^ HEAD').toString();
+            const hasChanges = output.split('\n').some(file => file.startsWith('docker/server/app') || file.startsWith('packages/server'));
+            return { hasChanges };
+          result-encoding: string
+          
       - name: AWS認証
         uses: aws-actions/configure-aws-credentials@v1-node16
         with:
@@ -76,16 +80,23 @@ jobs:
   deploy-server-proxy:
     name: Server-Proxyデプロイ
     runs-on: ubuntu-latest
-    if: |
-      github.event.commits.*.modified.* matches 'docker/server/proxy/**' ||
-      github.event.commits.*.added.* matches 'docker/server/proxy/**' ||
-      github.event.commits.*.removed.* matches 'docker/server/proxy/**'
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
           fetch-depth: 2
+
+      - name: 差分チェック
+        id: check_server_proxy_changes
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { execSync } = require('child_process');
+            const output = execSync('git diff --name-only HEAD^ HEAD').toString();
+            const hasChanges = output.split('\n').some(file => file.startsWith('docker/server/proxy'));
+            return { hasChanges };
+          result-encoding: string
 
       - name: AWS認証
         uses: aws-actions/configure-aws-credentials@v1-node16
@@ -121,19 +132,23 @@ jobs:
   deploy-client-app:
     name: Client-Appデプロイ
     runs-on: ubuntu-latest
-    if: |
-      github.event.commits.*.modified.* matches 'docker/client/app/**' ||
-      github.event.commits.*.added.* matches 'docker/client/app/**' ||
-      github.event.commits.*.removed.* matches 'docker/client/app/**' ||
-      github.event.commits.*.modified.* matches 'packages/client/**' ||
-      github.event.commits.*.added.* matches 'packages/client/**' ||
-      github.event.commits.*.removed.* matches 'packages/client/**'
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
           fetch-depth: 2
+
+      - name: 差分チェック
+        id: check_client_app_changes
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { execSync } = require('child_process');
+            const output = execSync('git diff --name-only HEAD^ HEAD').toString();
+            const hasChanges = output.split('\n').some(file => file.startsWith('docker/client/app') || file.startsWith('packages/client'));
+            return { hasChanges };
+          result-encoding: string
 
       - name: AWS認証
         uses: aws-actions/configure-aws-credentials@v1-node16
@@ -173,16 +188,23 @@ jobs:
   deploy-client-proxy:
     name: Client-Proxyデプロイ
     runs-on: ubuntu-latest
-    if: |
-      github.event.commits.*.modified.* matches 'docker/client/proxy/**' ||
-      github.event.commits.*.added.* matches 'docker/client/proxy/**' ||
-      github.event.commits.*.removed.* matches 'docker/client/proxy/**'
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
           fetch-depth: 2
+
+      - name: 差分チェック
+        id: check_client_proxy_changes
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { execSync } = require('child_process');
+            const output = execSync('git diff --name-only HEAD^ HEAD').toString();
+            const hasChanges = output.split('\n').some(file => file.startsWith('docker/client/proxy'));
+            return { hasChanges };
+          result-encoding: string
 
       - name: AWS認証
         uses: aws-actions/configure-aws-credentials@v1-node16
