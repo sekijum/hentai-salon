@@ -2,7 +2,7 @@ variable "ssm_app_env" {
   type = string
 }
 
-# server-app
+# server app
 variable "ssm_jwt_secret_key" {
   type = string
 }
@@ -37,8 +37,7 @@ variable "ssm_db_pass" {
   type = string
 }
 
-variable "adminer_allowed_cidr" {
-  description = "CIDR block allowed to access adminer"
-  type        = string
-  default     = "0.0.0.0/0"
+# client app
+variable "ssm_ga_measurement_id" {
+  type = string
 }
