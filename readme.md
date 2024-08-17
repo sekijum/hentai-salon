@@ -5,3 +5,5 @@
 ```
 cmd/dev/init.sh
 ```
+
+hoge
