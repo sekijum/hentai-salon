@@ -64,11 +64,11 @@ jobs:
         id: get-ecs-task
         run: |
           ECS_TASK_ID=$(aws ecs list-tasks --cluster hentai-salon-prd --service-name server --query 'taskArns[0]' --output text)
-          echo "task_id=$ECS_TASK_ID" >> $GITHUB_secrets
+          echo "task_id=$ECS_TASK_ID" >> $GITHUB_ENV
 
       - name: マイグレーション実行
         run: |
-          aws ecs execute-command --task "${{ secrets.task_id }}" \
+          aws ecs execute-command --task "${{ env.task_id }}" \
             --cluster hentai-salon-prd \
             --container server-app \
             --interactive \
