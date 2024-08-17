@@ -49,7 +49,7 @@ jobs:
           docker push ${{ secrets.ECR_SERVER_APP_URI }}
 
       - name: タスク定義デプロイ
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
           task-definition: hentai-salon-prd-server
           service: server
