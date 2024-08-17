@@ -45,7 +45,7 @@ jobs:
 
       - name: ECRにプッシュ
         run: |
-          docker tag server-app:latest ${{ secrets.ECR_SERVER_APP_URI }}:latest
+          docker tag hentai-salon-server-app:latest ${{ secrets.ECR_SERVER_APP_URI }}:latest
           docker push ${{ secrets.ECR_SERVER_APP_URI }}
 
       - name: タスク定義デプロイ
