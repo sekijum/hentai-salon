@@ -3,7 +3,7 @@
     <PageTitle title="コメント詳細" />
 
     <v-btn block @click="() => router.push(`/threads/${comment?.thread.id}`)">
-      <v-icon class="menu-icon">mdi-arrow-left</v-icon>{{ comment.thread.title }}へ移動
+      <v-icon class="menu-icon">mdi-arrow-left</v-icon>{{ comment.thread.title }}
     </v-btn>
 
     <v-divider />

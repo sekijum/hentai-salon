@@ -39,7 +39,7 @@
       </v-sheet>
     </v-sheet>
 
-    <OEmbedContent :text="comment.content" />
+    <CommentContent :text="comment.content" />
 
     <template v-if="comment.attachments && comment.attachments.length">
       <v-row :id="`gallery-${comment.id}`" class="pa-0 ma-0">
@@ -108,7 +108,7 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
 import CommentForm from '~/components/comment/CommentForm.vue';
-import OEmbedContent from '~/components/OEmbedContent.vue';
+import CommentContent from '~/components/comment/CommentContent.vue';
 import type { IThreadComment } from '~/types/thread-comment';
 import PhotoSwipeLightbox from 'photoswipe/lightbox';
 import 'photoswipe/style.css';
