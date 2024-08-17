@@ -37,7 +37,6 @@ import * as yup from 'yup';
 definePageMeta({ middleware: ['unauthentication-only'] });
 
 const nuxtApp = useNuxtApp();
-const router = useRouter();
 
 const { $api } = nuxtApp;
 
