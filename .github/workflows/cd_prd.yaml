@@ -150,7 +150,14 @@ jobs:
 
       - name: コンテナビルド
         run: |
-          docker compose -f ${{ env.COMPOSE_FILE }} build --no-cache --build-arg BUILDKIT_INLINE_CACHE=1 client-app
+          docker compose -f ${{ env.COMPOSE_FILE }} build \
+            --no-cache \
+            --build-arg APP_ENV=production \
+            --build-arg NUXT_PUBLIC_API_BASE_URL=server.hentai-salon.com \
+            --build-arg STATIC_URL=https://static.hentai-salon.com \
+            --build-arg GA_MEASUREMENT_ID=${{ secrets.GA_MEASUREMENT_ID }} \
+            --build-arg BUILDKIT_INLINE_CACHE=1 \
+            client-app
 
       - name: ECRにプッシュ
         run: |
