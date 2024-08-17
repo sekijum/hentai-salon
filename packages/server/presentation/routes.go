@@ -10,10 +10,6 @@ import (
 func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 	r.Use(middleware.RequestMiddleware(), middleware.OptionalAuthMiddleware())
 
-	r.GET("", func(c *gin.Context) {
-		c.JSON(200, gin.H{"message": "ok"})
-	})
-
 	r.GET("/health-check", func(c *gin.Context) {
 		c.JSON(200, gin.H{"message": "ok"})
 	})
