@@ -48,6 +48,10 @@ jobs:
           docker tag hentai-salon-server-app:latest ${{ secrets.ECR_SERVER_APP_URI }}:latest
           docker push ${{ secrets.ECR_SERVER_APP_URI }}
 
+      - name: タスク定義取得
+        run: |
+          aws ecs describe-task-definition --task-definition hentai-salon-prd-server --query taskDefinition > task-definition.json
+
       - name: タスク定義デプロイ
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
