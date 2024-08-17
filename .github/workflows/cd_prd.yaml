@@ -14,15 +14,14 @@ jobs:
   deploy-server-app:
     name: Server-Appデプロイ
     runs-on: ubuntu-latest
-    if: github.event.head_commit.message != 'skip ci' &&
-        (
-          contains(github.event.commits.*.modified, 'docker/server/app') ||
-          contains(github.event.commits.*.added, 'docker/server/app') ||
-          contains(github.event.commits.*.removed, 'docker/server/app') ||
-          contains(github.event.commits.*.modified, 'packages/server') ||
-          contains(github.event.commits.*.added, 'packages/server') ||
-          contains(github.event.commits.*.removed, 'packages/server')
-        )
+    if: |
+      github.event.commits.*.modified.* matches 'docker/server/app/**' ||
+      github.event.commits.*.added.* matches 'docker/server/app/**' ||
+      github.event.commits.*.removed.* matches 'docker/server/app/**' ||
+      github.event.commits.*.modified.* matches 'packages/server/**' ||
+      github.event.commits.*.added.* matches 'packages/server/**' ||
+      github.event.commits.*.removed.* matches 'packages/server/**'
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -77,12 +76,11 @@ jobs:
   deploy-server-proxy:
     name: Server-Proxyデプロイ
     runs-on: ubuntu-latest
-    if: github.event.head_commit.message != 'skip ci' &&
-        (
-          contains(github.event.commits.*.modified, 'docker/server/proxy') ||
-          contains(github.event.commits.*.added, 'docker/server/proxy') ||
-          contains(github.event.commits.*.removed, 'docker/server/proxy')
-        )
+    if: |
+      github.event.commits.*.modified.* matches 'docker/server/proxy/**' ||
+      github.event.commits.*.added.* matches 'docker/server/proxy/**' ||
+      github.event.commits.*.removed.* matches 'docker/server/proxy/**'
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -123,15 +121,14 @@ jobs:
   deploy-client-app:
     name: Client-Appデプロイ
     runs-on: ubuntu-latest
-    if: github.event.head_commit.message != 'skip ci' &&
-        (
-          contains(github.event.commits.*.modified, 'docker/client/app') ||
-          contains(github.event.commits.*.added, 'docker/client/app') ||
-          contains(github.event.commits.*.removed, 'docker/client/app') ||
-          contains(github.event.commits.*.modified, 'packages/client') ||
-          contains(github.event.commits.*.added, 'packages/client') ||
-          contains(github.event.commits.*.removed, 'packages/client')
-        )
+    if: |
+      github.event.commits.*.modified.* matches 'docker/client/app/**' ||
+      github.event.commits.*.added.* matches 'docker/client/app/**' ||
+      github.event.commits.*.removed.* matches 'docker/client/app/**' ||
+      github.event.commits.*.modified.* matches 'packages/client/**' ||
+      github.event.commits.*.added.* matches 'packages/client/**' ||
+      github.event.commits.*.removed.* matches 'packages/client/**'
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -176,12 +173,11 @@ jobs:
   deploy-client-proxy:
     name: Client-Proxyデプロイ
     runs-on: ubuntu-latest
-    if: github.event.head_commit.message != 'skip ci' &&
-        (
-          contains(github.event.commits.*.modified, 'docker/client/proxy') ||
-          contains(github.event.commits.*.added, 'docker/client/proxy') ||
-          contains(github.event.commits.*.removed, 'docker/client/proxy')
-        )
+    if: |
+      github.event.commits.*.modified.* matches 'docker/client/proxy/**' ||
+      github.event.commits.*.added.* matches 'docker/client/proxy/**' ||
+      github.event.commits.*.removed.* matches 'docker/client/proxy/**'
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
