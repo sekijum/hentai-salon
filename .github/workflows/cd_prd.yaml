@@ -55,7 +55,7 @@ jobs:
       - name: タスク定義デプロイ
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
-          task-definition: hentai-salon-prd-server
+          task-definition: task-definition.json
           service: server
           cluster: hentai-salon-prd
           wait-for-service-stability: true
