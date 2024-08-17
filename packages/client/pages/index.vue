@@ -34,8 +34,6 @@ import ThreadItem from '~/components/thread/ThreadItem.vue';
 import SwiperGrid from '~/components/SwiperGrid.vue';
 import type { IThreadCommentAttachmentForThread } from '~/types/thread-comment-attachment';
 
-const config = useRuntimeConfig();
-const route = useRoute();
 const router = useRouter();
 const nuxtApp = useNuxtApp();
 const { $api } = nuxtApp;
