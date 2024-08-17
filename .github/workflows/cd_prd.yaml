@@ -101,7 +101,7 @@ jobs:
 
       - name: コンテナビルド
         run: |
-          docker-compose -f ${{ env.COMPOSE_FILE }} build --no-cache --build-arg BUILDKIT_INLINE_CACHE=1 server-proxy
+          docker compose -f ${{ env.COMPOSE_FILE }} build --no-cache --build-arg BUILDKIT_INLINE_CACHE=1 server-proxy
 
       - name: ECRにプッシュ
         run: |
@@ -150,7 +150,7 @@ jobs:
 
       - name: コンテナビルド
         run: |
-          docker-compose -f ${{ env.COMPOSE_FILE }} build --no-cache --build-arg BUILDKIT_INLINE_CACHE=1 client-app
+          docker compose -f ${{ env.COMPOSE_FILE }} build --no-cache --build-arg BUILDKIT_INLINE_CACHE=1 client-app
 
       - name: ECRにプッシュ
         run: |
@@ -196,7 +196,7 @@ jobs:
 
       - name: コンテナビルド
         run: |
-          docker-compose -f ${{ env.COMPOSE_FILE }} build --no-cache --build-arg BUILDKIT_INLINE_CACHE=1 client-proxy
+          docker compose -f ${{ env.COMPOSE_FILE }} build --no-cache --build-arg BUILDKIT_INLINE_CACHE=1 client-proxy
 
       - name: ECRにプッシュ
         run: |
