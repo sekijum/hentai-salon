@@ -202,6 +202,7 @@ jobs:
       - name: 差分チェック
         id: check_client_proxy_changes
         uses: actions/github-script@v6
+        with:
           script: |
               const { execSync } = require('child_process');
               const output = execSync('git diff --name-only HEAD^ HEAD').toString();
