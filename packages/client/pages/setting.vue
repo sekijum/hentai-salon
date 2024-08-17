@@ -15,7 +15,6 @@
             <div v-if="item.key" class="d-flex justify-center align-center">
               <v-btn
                 v-if="item.key === 'thread-history-delete'"
-                small
                 class="spaced-button"
                 @click="clearThreadViewHistory"
                 block
