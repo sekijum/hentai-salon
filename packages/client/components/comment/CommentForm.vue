@@ -49,7 +49,7 @@
           single-line
           dense
           multiple
-          accept="image/jpeg,image/png,image/gif"
+          accept="image/jpeg,image/png,image/gif,image/webp"
           density="compact"
           chips
           @change="handleAttachmentsChange"
@@ -159,7 +159,7 @@ async function handleAttachmentsChange(event: Event): Promise<void> {
 
   const files = Array.from(input.files);
   const invalidFiles = files.filter(
-    file => !['image/jpeg', 'image/png', 'image/gif'].includes(file.type) || file.size > 1 * 1024 * 1024,
+    file => !['image/jpeg', 'image/png', 'image/gif', 'image/webp'].includes(file.type) || file.size > 1 * 1024 * 1024,
   );
 
   if (invalidFiles.length > 0) {
