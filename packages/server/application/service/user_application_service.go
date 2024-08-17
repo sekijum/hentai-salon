@@ -160,7 +160,6 @@ func (svc *UserApplicationService) Signin(params UserApplicationServiceSigninPar
 		return "", errors.New("秘密鍵が設定されていません")
 	}
 
-	// 管理者の場合、メール認証を送信する
 	if user.EntUser.Role == int(model.UserRoleAdmin) {
 		verificationToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 			"userID": user.EntUser.ID,

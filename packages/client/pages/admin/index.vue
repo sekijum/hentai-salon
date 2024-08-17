@@ -11,6 +11,4 @@ definePageMeta({
 });
 </script>
 
-<style scoped>
-/* 管理者ページ用のスタイルをここに追加します */
-</style>
+<style scoped></style>
