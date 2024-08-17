@@ -68,7 +68,7 @@ jobs:
             --cluster hentai-salon-prd \
             --container server-app \
             --interactive \
-            --command "atlas migrate apply --dir "file://./infrastructure/ent/migrate/migrations" --url "mysql://${{ secrets.DB_USER }}:${{ secrets.DB_PASS }}@${{ secrets.DB_HOST }}:${{ secrets.DB_PORT }}/${{ secrets.DB_NAME }""
+            --command "atlas migrate apply --dir 'file://./infrastructure/ent/migrate/migrations' --url 'mysql://${{ secrets.DB_USER }}:${{ secrets.DB_PASS }}@${{ secrets.DB_HOST }}:${{ secrets.DB_PORT }}/${{ secrets.DB_NAME }}'"
 
   deploy-server-proxy:
     name: Server-Proxyデプロイ
