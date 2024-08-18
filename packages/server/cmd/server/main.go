@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -17,6 +18,10 @@ import (
 
 func main() {
 	godotenv.Load()
+
+	for _, env := range os.Environ() {
+		fmt.Println(env)
+	}
 
 	controllers, cleanup, err := di.InitializeControllers()
 	if err != nil {
