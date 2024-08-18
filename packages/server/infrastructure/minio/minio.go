@@ -18,6 +18,10 @@ type MinioClient struct {
 }
 
 func NewMinioClient() (*MinioClient, error) {
+	if os.Getenv("APP_ENV") == "production" {
+		return nil, nil
+	}
+
 	MINIO_INTERNAL_ENDPOINT := os.Getenv("MINIO_INTERNAL_ENDPOINT")
 	MINIO_EXTERNAL_ENDPOINT := os.Getenv("MINIO_EXTERNAL_ENDPOINT")
 	MINIO_ROOT_USER := os.Getenv("MINIO_ROOT_USER")

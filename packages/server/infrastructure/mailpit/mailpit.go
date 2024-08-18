@@ -12,6 +12,10 @@ type MailpitClient struct {
 }
 
 func NewMailpitClient() *MailpitClient {
+	if os.Getenv("APP_ENV") == "production" {
+		return nil
+	}
+
 	host := os.Getenv("MAILPIT_HOST")
 	port := os.Getenv("MAILPIT_PORT")
 

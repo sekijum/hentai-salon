@@ -14,6 +14,10 @@ type SESClient struct {
 }
 
 func NewSESClient() (*SESClient, error) {
+	if os.Getenv("APP_ENV") != "production" {
+		return nil, nil
+	}
+
 	cfg, err := LoadAWSConfig()
 	if err != nil {
 		return nil, err

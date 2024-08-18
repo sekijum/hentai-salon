@@ -2,6 +2,7 @@ package aws
 
 import (
 	"context"
+	"os"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -14,6 +15,11 @@ type S3Client struct {
 }
 
 func NewS3Client() (*S3Client, error) {
+	// 本番環境ではMinioクライアントを作成しない
+	if os.Getenv("APP_ENV") != "production" {
+		return nil, nil
+	}
+
 	cfg, err := LoadAWSConfig()
 	if err != nil {
 		return nil, err
