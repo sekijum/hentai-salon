@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if ! [ -e "$2" ]; then
+if ! [ -e "$1" ]; then
     echo "ファイルが存在しません。"
 fi
 
-mysql -h 192.168.10.30 -u root -p $1 < $2
+mysql -h hentai-salon-mysql -u root -p hentai_salon < $1

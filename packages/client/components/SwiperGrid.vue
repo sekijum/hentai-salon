@@ -2,7 +2,7 @@
   <template v-if="commentAttachments?.length">
     <swiper
       id="gallery"
-      :slidesPerView="2"
+      :slidesPerView="getSlidesPerView()"
       :spaceBetween="5"
       :grid="getGridConfig()"
       :modules="modules"
@@ -69,7 +69,14 @@ const nuxtApp = useNuxtApp();
 const modules = [Grid, Autoplay];
 
 function getGridConfig() {
-  return { rows: Math.min(props.commentAttachments?.length, 3) };
+  const count = props.commentAttachments.length;
+  let rows = 1;
+  if (count > 4 && count <= 8) {
+    rows = 2;
+  } else if (count > 8) {
+    rows = 3;
+  }
+  return { rows: rows, fill: 'row' };
 }
 
 function getWidthFromUrl(url: string): number {
@@ -86,15 +93,34 @@ function getHeightFromUrl(url: string): number {
 
 const lightbox = ref<PhotoSwipeLightbox | null>();
 
-function calculateSwiperHeight(rows: number): string {
-  const rowHeight = 200;
+function calculateSwiperHeight(): string {
+  const count = props.commentAttachments.length;
+  let rows = 1;
+  if (count > 4 && count <= 8) {
+    rows = 2;
+  } else if (count > 8) {
+    rows = 3;
+  }
+  const rowHeight = 100;
   return `${rows * rowHeight}px`;
 }
 
 const swiperHeight = computed(() => {
-  const rows = Math.min(props.commentAttachments.length, 3);
-  return calculateSwiperHeight(rows);
+  return calculateSwiperHeight();
 });
+
+function getSlidesPerView(): number {
+  const count = props.commentAttachments.length;
+  if (count >= 4) {
+    return 4;
+  } else if (count === 3) {
+    return 3;
+  } else if (count === 2) {
+    return 2;
+  } else {
+    return 1;
+  }
+}
 
 onMounted(async () => {
   lightbox.value = new PhotoSwipeLightbox({
