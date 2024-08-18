@@ -16,10 +16,7 @@ import (
 )
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatalf("Error loading .env file")
-	}
+	godotenv.Load()
 
 	controllers, cleanup, err := di.InitializeControllers()
 	if err != nil {
