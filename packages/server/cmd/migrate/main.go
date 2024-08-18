@@ -18,10 +18,7 @@ import (
 )
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatalf("Error loading .env file")
-	}
+	godotenv.Load()
 
 	ctx := context.Background()
 	dir, err := atlas.NewLocalDir("/app/infrastructure/ent/migrate/migrations")
