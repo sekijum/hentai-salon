@@ -2,11 +2,7 @@
   <div>
     <PageTitle :title="thread.title" />
 
-    <h2 class="font-weight-regular page-description">
-      <span v-for="(line, index) in thread.description.split('\n')" :key="index">
-        {{ line }}<br v-if="index < thread.description.split('\n').length - 1" />
-      </span>
-    </h2>
+    <Content :text="thread.description" />
 
     <v-chip-group v-if="thread.tagNameList" active-class="primary--text" column>
       <v-chip size="x-small" v-for="(tagName, index) in thread.tagNameList" :key="`tag-${index}`">
@@ -165,6 +161,7 @@ import Pagination from '~/components/Pagination.vue';
 import MediaGallery from '~/components/MediaGallery.vue';
 import type { IThread } from '~/types/thread';
 import type { IThreadCommentAttachmentForThread } from '~/types/thread-comment-attachment';
+import Content from '~/components/Content.vue';
 
 const router = useRouter();
 const route = useRoute();
