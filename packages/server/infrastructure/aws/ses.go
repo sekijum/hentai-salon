@@ -2,7 +2,6 @@ package aws
 
 import (
 	"context"
-	"fmt"
 	"os"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -32,9 +31,6 @@ type SESClientSendEmail struct {
 }
 
 func (s *SESClient) SendEmail(params SESClientSendEmail) error {
-	fmt.Print("-----------------------------------------------------")
-	fmt.Print(params)
-	fmt.Print("-----------------------------------------------------")
 	input := &ses.SendEmailInput{
 		Source: aws.String("変態サロン <" + os.Getenv("MAIL_FROM_ADDRESS") + ">"),
 		Destination: &types.Destination{
