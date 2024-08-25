@@ -2,6 +2,7 @@ package aws
 
 import (
 	"context"
+	"errors"
 	"os"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -26,21 +27,29 @@ func NewSESClient() (*SESClient, error) {
 	return &SESClient{Client: client}, nil
 }
 
-func (s *SESClient) SendEmail(to, subject, body string) error {
+type SESClientSendEmail struct {
+	To, Subject, Body string
+}
+
+func (s *SESClient) SendEmail(params SESClientSendEmail) error {
+	if params.To == "" {
+		return errors.New("送信先アドレスが空です")
+	}
+
 	input := &ses.SendEmailInput{
 		Source: aws.String("変態サロン <" + os.Getenv("MAIL_FROM_ADDRESS") + ">"),
 		Destination: &types.Destination{
-			ToAddresses: []string{to},
+			ToAddresses: []string{params.To},
 		},
 		Message: &types.Message{
 			Subject: &types.Content{
 				Charset: aws.String("UTF-8"),
-				Data:    aws.String(subject),
+				Data:    aws.String(params.Subject),
 			},
 			Body: &types.Body{
 				Text: &types.Content{
 					Charset: aws.String("UTF-8"),
-					Data:    aws.String(body),
+					Data:    aws.String(params.Body),
 				},
 			},
 		},
