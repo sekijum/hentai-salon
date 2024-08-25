@@ -2,11 +2,12 @@ package response_admin
 
 import (
 	"server/domain/model"
+	"strconv"
 	"time"
 )
 
 type ThreadCommentResponse struct {
-	ID        uint64 `json:"id"`
+	ID        string `json:"id"`
 	ThreadID  int    `json:"threadId"`
 	UserID    *int   `json:"userId"`
 	Content   string `json:"content"`
@@ -23,7 +24,7 @@ type NewThreadCommentResponseParams struct {
 func NewThreadCommentResponse(params NewThreadCommentResponseParams) *ThreadCommentResponse {
 
 	return &ThreadCommentResponse{
-		ID:        params.ThreadComment.EntThreadComment.ID,
+		ID:        strconv.FormatUint(params.ThreadComment.EntThreadComment.ID, 10),
 		Content:   params.ThreadComment.EntThreadComment.Content,
 		CreatedAt: params.ThreadComment.EntThreadComment.CreatedAt.Format(time.RFC3339),
 		UpdatedAt: params.ThreadComment.EntThreadComment.UpdatedAt.Format(time.RFC3339),
