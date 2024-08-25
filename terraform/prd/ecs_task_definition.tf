@@ -21,6 +21,7 @@ resource "aws_ecs_task_definition" "server" {
           { name : "AWS_SECRET_ACCESS_KEY", valueFrom : aws_ssm_parameter.server_aws_secret_access_key.arn },
           { name : "AWS_DEFAULT_REGION", valueFrom : aws_ssm_parameter.server_aws_default_region.arn },
           { name : "AWS_BUCKET_NAME", valueFrom : aws_ssm_parameter.server_aws_bucket_name.arn },
+          { name : "MAIL_FROM_ADDRESS", valueFrom : aws_ssm_parameter.server_mail_from_address.arn },
           { name : "DB_PORT", valueFrom : aws_ssm_parameter.server_db_port.arn },
           { name : "DB_HOST", valueFrom : aws_ssm_parameter.server_db_host.arn },
           { name : "DB_USER", valueFrom : aws_ssm_parameter.server_db_user.arn },
