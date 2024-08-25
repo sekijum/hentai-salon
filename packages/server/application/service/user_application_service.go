@@ -192,12 +192,20 @@ Webページを開く
 `, user.EntUser.Name, verificationURL, os.Getenv("CLIENT_URL"))
 
 		if os.Getenv("APP_ENV") == "production" {
-			err = svc.sesClient.SendEmail(params.Email, emailSubject, emailBody)
+			err = svc.sesClient.SendEmail(aws.SESClientSendEmail{
+				To:      user.EntUser.Email,
+				Subject: emailSubject,
+				Body:    emailBody,
+			})
 			if err != nil {
 				return "", fmt.Errorf("メールの送信に失敗しました: %v", err)
 			}
 		} else {
-			err = svc.mailpitClient.SendEmail(params.Email, emailSubject, emailBody)
+			err = svc.mailpitClient.SendEmail(mailpit.MailpitClientSendEmail{
+				To:      user.EntUser.Email,
+				Subject: emailSubject,
+				Body:    emailBody,
+			})
 			if err != nil {
 				return "", fmt.Errorf("メールの送信に失敗しました: %v", err)
 			}
@@ -442,12 +450,20 @@ Webページを開く
 `, user.EntUser.Name, resetURL, clientURL)
 
 	if os.Getenv("APP_ENV") == "production" {
-		err = svc.sesClient.SendEmail(params.Body.Email, emailSubject, emailBody)
+		err = svc.sesClient.SendEmail(aws.SESClientSendEmail{
+			To:      params.Body.Email,
+			Subject: emailSubject,
+			Body:    emailBody,
+		})
 		if err != nil {
 			return fmt.Errorf("メールの送信に失敗しました: %v", err)
 		}
 	} else {
-		err = svc.mailpitClient.SendEmail(params.Body.Email, emailSubject, emailBody)
+		err = svc.mailpitClient.SendEmail(mailpit.MailpitClientSendEmail{
+			To:      params.Body.Email,
+			Subject: emailSubject,
+			Body:    emailBody,
+		})
 		if err != nil {
 			return fmt.Errorf("メールの送信に失敗しました: %v", err)
 		}

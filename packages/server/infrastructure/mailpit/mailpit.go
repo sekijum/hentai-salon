@@ -25,14 +25,18 @@ func NewMailpitClient() *MailpitClient {
 	}
 }
 
-func (c *MailpitClient) SendEmail(to, subject, body string) error {
+type MailpitClientSendEmail struct {
+	To, Subject, Body string
+}
+
+func (c *MailpitClient) SendEmail(params MailpitClientSendEmail) error {
 	mailFromAddress := os.Getenv("MAIL_FROM_ADDRESS")
 	from := mailFromAddress
 	msg := "From: " + from + "\n" +
-		"To: " + to + "\n" +
-		"Subject: " + subject + "\n\n" +
-		body
+		"To: " + params.To + "\n" +
+		"Subject: " + params.Subject + "\n\n" +
+		params.Body
 
 	addr := fmt.Sprintf("%s:%s", c.Host, c.Port)
-	return smtp.SendMail(addr, nil, from, []string{to}, []byte(msg))
+	return smtp.SendMail(addr, nil, from, []string{params.To}, []byte(msg))
 }

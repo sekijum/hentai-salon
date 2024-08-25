@@ -33,10 +33,10 @@ func InitDatabase() (*ent.Client, error) {
 
 	client := ent.NewClient(ent.Driver(driver))
 
-	err = CreateAdminUser(client)
-	if err != nil {
-		log.Fatalf("failed to create or find user: %v", err)
-	}
+	// err = CreateAdminUser(client)
+	// if err != nil {
+	// 	log.Fatalf("failed to create or find user: %v", err)
+	// }
 
 	return client, nil
 }
