@@ -65,6 +65,9 @@ func InitializeControllers() (*ControllersSet, func(), error) {
 	threadCommentAttachmentDatasource := datasource.NewThreadCommentAttachmentDatasource(client)
 	threadCommentAttachmentApplicationService := service.NewThreadCommentAttachmentApplicationService(threadCommentAttachmentDatasource, tagDatasource)
 	threadCommentAttachmentController := controller.NewThreadCommentAttachmentController(threadCommentAttachmentApplicationService)
+	adDatasource := datasource.NewAdDatasource(client)
+	adApplicationService := service.NewAdApplicationService(adDatasource)
+	adController := controller.NewAdController(adApplicationService)
 	datasource_adminUserDatasource := datasource_admin.NewUserDatasource(client)
 	service_adminUserApplicationService := service_admin.NewUserApplicationService(datasource_adminUserDatasource)
 	controller_adminUserController := controller_admin.NewUserController(service_adminUserApplicationService)
@@ -83,6 +86,9 @@ func InitializeControllers() (*ControllersSet, func(), error) {
 	datasource_adminTagDatasource := datasource_admin.NewTagDatasource(client)
 	service_adminTagApplicationService := service_admin.NewTagApplicationService(datasource_adminTagDatasource)
 	controller_adminTagController := controller_admin.NewTagController(service_adminTagApplicationService)
+	datasource_adminAdDatasource := datasource_admin.NewAdDatasource(client)
+	service_adminAdApplicationService := service_admin.NewAdApplicationService(datasource_adminAdDatasource)
+	controller_adminAdController := controller_admin.NewAdController(service_adminAdApplicationService)
 	controllersSet := &ControllersSet{
 		BoardController:                   boardController,
 		UserController:                    userController,
@@ -92,12 +98,14 @@ func InitializeControllers() (*ControllersSet, func(), error) {
 		StorageController:                 storageController,
 		ContactController:                 contactController,
 		ThreadCommentAttachmentController: threadCommentAttachmentController,
+		AdController:                      adController,
 		UserAdminController:               controller_adminUserController,
 		BoardAdminController:              controller_adminBoardController,
 		ThreadAdminController:             controller_adminThreadController,
 		ContactAdminController:            controller_adminContactController,
 		ThreadCommentAdminController:      controller_adminThreadCommentController,
 		TagAdminController:                controller_adminTagController,
+		AdAdminController:                 controller_adminAdController,
 	}
 	return controllersSet, func() {
 		cleanup()
@@ -108,11 +116,11 @@ func InitializeControllers() (*ControllersSet, func(), error) {
 
 var externalServiceSet = wire.NewSet(datasource.ProvideClient, aws.NewS3Client, aws.NewSESClient, minio.NewMinioClient, mailpit.NewMailpitClient)
 
-var controllerSet = wire.NewSet(controller.NewBoardController, controller.NewUserController, controller.NewThreadController, controller.NewThreadCommentController, controller.NewTagController, controller.NewStorageController, controller.NewContactController, controller.NewThreadCommentAttachmentController, controller_admin.NewUserController, controller_admin.NewBoardController, controller_admin.NewThreadController, controller_admin.NewContactController, controller_admin.NewThreadCommentController, controller_admin.NewTagController)
+var controllerSet = wire.NewSet(controller.NewBoardController, controller.NewUserController, controller.NewThreadController, controller.NewThreadCommentController, controller.NewTagController, controller.NewStorageController, controller.NewContactController, controller.NewThreadCommentAttachmentController, controller.NewAdController, controller_admin.NewUserController, controller_admin.NewBoardController, controller_admin.NewThreadController, controller_admin.NewContactController, controller_admin.NewThreadCommentController, controller_admin.NewTagController, controller_admin.NewAdController)
 
-var serviceSet = wire.NewSet(service.NewBoardApplicationService, service.NewUserApplicationService, service.NewThreadApplicationService, service.NewThreadCommentApplicationService, service.NewTagApplicationService, service.NewStorageApplicationService, service.NewContactApplicationService, service.NewThreadCommentAttachmentApplicationService, service_admin.NewUserApplicationService, service_admin.NewBoardApplicationService, service_admin.NewThreadApplicationService, service_admin.NewContactApplicationService, service_admin.NewThreadCommentApplicationService, service_admin.NewTagApplicationService)
+var serviceSet = wire.NewSet(service.NewBoardApplicationService, service.NewUserApplicationService, service.NewThreadApplicationService, service.NewThreadCommentApplicationService, service.NewTagApplicationService, service.NewStorageApplicationService, service.NewContactApplicationService, service.NewThreadCommentAttachmentApplicationService, service.NewAdApplicationService, service_admin.NewUserApplicationService, service_admin.NewBoardApplicationService, service_admin.NewThreadApplicationService, service_admin.NewContactApplicationService, service_admin.NewThreadCommentApplicationService, service_admin.NewTagApplicationService, service_admin.NewAdApplicationService)
 
-var datasourceSet = wire.NewSet(datasource.NewBoardDatasource, datasource.NewUserDatasource, datasource.NewThreadDatasource, datasource.NewThreadCommentDatasource, datasource.NewTagDatasource, datasource.NewContactDatasource, datasource.NewThreadCommentAttachmentDatasource, datasource_admin.NewUserDatasource, datasource_admin.NewBoardDatasource, datasource_admin.NewThreadDatasource, datasource_admin.NewContactDatasource, datasource_admin.NewThreadCommentDatasource, datasource_admin.NewTagDatasource)
+var datasourceSet = wire.NewSet(datasource.NewBoardDatasource, datasource.NewUserDatasource, datasource.NewThreadDatasource, datasource.NewThreadCommentDatasource, datasource.NewTagDatasource, datasource.NewContactDatasource, datasource.NewThreadCommentAttachmentDatasource, datasource.NewAdDatasource, datasource_admin.NewUserDatasource, datasource_admin.NewBoardDatasource, datasource_admin.NewThreadDatasource, datasource_admin.NewContactDatasource, datasource_admin.NewThreadCommentDatasource, datasource_admin.NewTagDatasource, datasource_admin.NewAdDatasource)
 
 type ControllersSet struct {
 	BoardController                   *controller.BoardController
@@ -123,6 +131,7 @@ type ControllersSet struct {
 	StorageController                 *controller.StorageController
 	ContactController                 *controller.ContactController
 	ThreadCommentAttachmentController *controller.ThreadCommentAttachmentController
+	AdController                      *controller.AdController
 
 	UserAdminController          *controller_admin.UserController
 	BoardAdminController         *controller_admin.BoardController
@@ -130,4 +139,5 @@ type ControllersSet struct {
 	ContactAdminController       *controller_admin.ContactController
 	ThreadCommentAdminController *controller_admin.ThreadCommentController
 	TagAdminController           *controller_admin.TagController
+	AdAdminController            *controller_admin.AdController
 }

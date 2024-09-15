@@ -8,6 +8,20 @@ import (
 )
 
 var (
+	// AdsColumns holds the columns for the "ads" table.
+	AdsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "content", Type: field.TypeString, Size: 2147483647},
+		{Name: "is_active", Type: field.TypeInt, Default: 1},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// AdsTable holds the schema information for the "ads" table.
+	AdsTable = &schema.Table{
+		Name:       "ads",
+		Columns:    AdsColumns,
+		PrimaryKey: []*schema.Column{AdsColumns[0]},
+	}
 	// BoardsColumns holds the columns for the "boards" table.
 	BoardsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -273,6 +287,7 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		AdsTable,
 		BoardsTable,
 		ContactsTable,
 		TagsTable,

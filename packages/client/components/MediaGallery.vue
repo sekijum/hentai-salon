@@ -19,6 +19,7 @@
           <p>{{ attachment.commentContent }}</p>
         </span>
       </nuxt-link>
+      <Ad v-if="(idx + 1) % 3 === 0" :content="getRandomContent()" />
     </v-col>
   </v-row>
 </template>
@@ -27,9 +28,11 @@
 import type { IThreadCommentAttachmentForThread } from '~/types/thread-comment-attachment';
 import PhotoSwipeLightbox from 'photoswipe/lightbox';
 import 'photoswipe/style.css';
+import Ad from '~/components/Ad.vue';
 
 const props = defineProps<{
   attachments: IThreadCommentAttachmentForThread[];
+  adContents: string[];
 }>();
 
 const route = useRoute();
@@ -89,6 +92,11 @@ onUnmounted(() => {
     lightbox.value = null;
   }
 });
+
+function getRandomContent() {
+  const randomIndex = Math.floor(Math.random() * props.adContents.length);
+  return props.adContents[randomIndex];
+}
 </script>
 
 <style>

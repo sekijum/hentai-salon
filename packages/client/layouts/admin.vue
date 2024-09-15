@@ -14,41 +14,27 @@
           @click="navigate('/admin')"
           value="dashboard"
         />
-        <v-list-item
-          prepend-icon="mdi-account"
-          title="ユーザー管理"
-          @click="navigate('/admin/users')"
-          value="user-management"
-        />
-        <v-list-item
-          prepend-icon="mdi-view-list"
-          title="板管理"
-          @click="navigate('/admin/boards')"
-          value="board-management"
-        />
+        <v-list-item prepend-icon="mdi-account" title="ユーザー管理" @click="navigate('/admin/users')" value="users" />
+        <v-list-item prepend-icon="mdi-view-list" title="板管理" @click="navigate('/admin/boards')" value="boards" />
         <v-list-item
           prepend-icon="mdi-forum-outline"
           title="スレ管理"
           @click="navigate('/admin/threads')"
-          value="thread-management"
+          value="threads"
         />
         <v-list-item
           prepend-icon="mdi-email-outline"
           title="問い合わせ"
           @click="navigate('/admin/contacts')"
-          value="inquiry-management"
+          value="contacts"
         />
-        <v-list-item
-          prepend-icon="mdi-tag-outline"
-          title="タグ"
-          @click="navigate('/admin/tags')"
-          value="tag-management"
-        />
+        <v-list-item prepend-icon="mdi-tag-outline" title="タグ" @click="navigate('/admin/tags')" value="tags" />
+        <v-list-item prepend-icon="mdi-cash-100" title="広告" @click="navigate('/admin/ads')" value="tag-management" />
         <v-list-item
           prepend-icon="mdi-arrow-right-bold"
           title="クライアント画面へ"
           @click="navigate('/')"
-          value="client-view"
+          value="ads"
         />
       </v-list>
     </v-navigation-drawer>

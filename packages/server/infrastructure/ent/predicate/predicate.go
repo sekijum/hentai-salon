@@ -6,6 +6,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
+// Ad is the predicate function for ad builders.
+type Ad func(*sql.Selector)
+
 // Board is the predicate function for board builders.
 type Board func(*sql.Selector)
 

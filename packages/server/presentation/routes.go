@@ -14,6 +14,7 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 		c.JSON(200, gin.H{"message": "ok"})
 	})
 
+	r.GET("/ads", controllers.AdController.FindAll)
 	r.POST("/contact", controllers.ContactController.Create)
 
 	r.POST("/signup", controllers.UserController.Signup)
@@ -79,6 +80,16 @@ func SetupRouter(r *gin.Engine, controllers *di.ControllersSet) {
 	adminGroup.Use(middleware.AdminMiddleware())
 	{
 		adminGroup.POST("/boards", controllers.BoardController.Create)
+
+		adGroup := adminGroup.Group("/ads")
+		{
+			adGroup.GET("", controllers.AdAdminController.FindAll)
+			adGroup.POST("", controllers.AdAdminController.Create)
+			adGroup.GET("/:adID", controllers.AdAdminController.FindByID)
+			adGroup.PUT("/:adID", controllers.AdAdminController.Update)
+			adGroup.DELETE("/:adID", controllers.AdAdminController.Delete)
+			adGroup.PATCH("/:adID/is-active", controllers.AdAdminController.UpdateIsActive)
+		}
 
 		userGroup := adminGroup.Group("/users")
 		{

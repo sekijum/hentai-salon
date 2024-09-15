@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"server/infrastructure/ent/ad"
 	"server/infrastructure/ent/board"
 	"server/infrastructure/ent/contact"
 	"server/infrastructure/ent/schema"
@@ -20,6 +21,22 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	adFields := schema.Ad{}.Fields()
+	_ = adFields
+	// adDescIsActive is the schema descriptor for is_active field.
+	adDescIsActive := adFields[2].Descriptor()
+	// ad.DefaultIsActive holds the default value on creation for the is_active field.
+	ad.DefaultIsActive = adDescIsActive.Default.(int)
+	// adDescCreatedAt is the schema descriptor for created_at field.
+	adDescCreatedAt := adFields[3].Descriptor()
+	// ad.DefaultCreatedAt holds the default value on creation for the created_at field.
+	ad.DefaultCreatedAt = adDescCreatedAt.Default.(func() time.Time)
+	// adDescUpdatedAt is the schema descriptor for updated_at field.
+	adDescUpdatedAt := adFields[4].Descriptor()
+	// ad.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	ad.DefaultUpdatedAt = adDescUpdatedAt.Default.(func() time.Time)
+	// ad.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	ad.UpdateDefaultUpdatedAt = adDescUpdatedAt.UpdateDefault.(func() time.Time)
 	boardFields := schema.Board{}.Fields()
 	_ = boardFields
 	// boardDescTitle is the schema descriptor for title field.

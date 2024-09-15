@@ -32,7 +32,7 @@
       <v-expansion-panel title="検索の使い方の説明">
         <v-expansion-panel-text>
           <ul>
-            <li><strong>id:</strong> 特定のユーザーIDで検索します。例: <code>id:123</code></li>
+            <li><strong>id:</strong> 特定の板IDで検索します。例: <code>id:123</code></li>
             <li>
               <strong>status:</strong> 特定のステータスを持つボードを検索します。以下の例を参照してください:
               <ul>
@@ -64,6 +64,7 @@
       must-sort
       no-data-text="検索結果は0件です"
       v-model:search="search"
+      class="border-sm"
     >
       <template #item="{ item }">
         <tr>

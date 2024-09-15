@@ -63,6 +63,7 @@
       must-sort
       no-data-text="検索結果は0件です"
       v-model:search="search"
+      class="border-sm"
     >
       <template #item="{ item }">
         <tr>
