@@ -34,6 +34,7 @@ var controllerSet = wire.NewSet(
 	controller.NewStorageController,
 	controller.NewContactController,
 	controller.NewThreadCommentAttachmentController,
+	controller.NewAdController,
 
 	controller_admin.NewUserController,
 	controller_admin.NewBoardController,
@@ -41,6 +42,7 @@ var controllerSet = wire.NewSet(
 	controller_admin.NewContactController,
 	controller_admin.NewThreadCommentController,
 	controller_admin.NewTagController,
+	controller_admin.NewAdController,
 )
 
 var serviceSet = wire.NewSet(
@@ -52,6 +54,7 @@ var serviceSet = wire.NewSet(
 	service.NewStorageApplicationService,
 	service.NewContactApplicationService,
 	service.NewThreadCommentAttachmentApplicationService,
+	service.NewAdApplicationService,
 
 	service_admin.NewUserApplicationService,
 	service_admin.NewBoardApplicationService,
@@ -59,6 +62,7 @@ var serviceSet = wire.NewSet(
 	service_admin.NewContactApplicationService,
 	service_admin.NewThreadCommentApplicationService,
 	service_admin.NewTagApplicationService,
+	service_admin.NewAdApplicationService,
 )
 
 var datasourceSet = wire.NewSet(
@@ -69,6 +73,7 @@ var datasourceSet = wire.NewSet(
 	datasource.NewTagDatasource,
 	datasource.NewContactDatasource,
 	datasource.NewThreadCommentAttachmentDatasource,
+	datasource.NewAdDatasource,
 
 	datasource_admin.NewUserDatasource,
 	datasource_admin.NewBoardDatasource,
@@ -76,6 +81,7 @@ var datasourceSet = wire.NewSet(
 	datasource_admin.NewContactDatasource,
 	datasource_admin.NewThreadCommentDatasource,
 	datasource_admin.NewTagDatasource,
+	datasource_admin.NewAdDatasource,
 )
 
 type ControllersSet struct {
@@ -87,6 +93,7 @@ type ControllersSet struct {
 	StorageController                 *controller.StorageController
 	ContactController                 *controller.ContactController
 	ThreadCommentAttachmentController *controller.ThreadCommentAttachmentController
+	AdController                      *controller.AdController
 
 	UserAdminController          *controller_admin.UserController
 	BoardAdminController         *controller_admin.BoardController
@@ -94,6 +101,7 @@ type ControllersSet struct {
 	ContactAdminController       *controller_admin.ContactController
 	ThreadCommentAdminController *controller_admin.ThreadCommentController
 	TagAdminController           *controller_admin.TagController
+	AdAdminController            *controller_admin.AdController
 }
 
 func InitializeControllers() (*ControllersSet, func(), error) {

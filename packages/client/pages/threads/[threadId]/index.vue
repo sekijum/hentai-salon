@@ -30,6 +30,7 @@
         :attachments="thread.attachments.data"
         :commentLimit="commentLimit"
         :threadId="thread.id"
+        :adContents="ads"
       />
       <div id="media-bottom" />
 
@@ -52,31 +53,6 @@
           <v-icon>mdi-arrow-up</v-icon>
         </v-btn>
       </v-bottom-navigation>
-      <!-- <div class="fab-container">
-        <v-fab-transition v-if="payload?.user?.id === thread.userId">
-          <v-btn icon large color="secondary" @click="editThread">
-            <v-icon>mdi-pencil</v-icon>
-          </v-btn>
-        </v-fab-transition>
-
-        <v-fab-transition>
-          <v-btn icon large color="primary" @click="toggleLike">
-            <v-icon>{{ thread.isLiked ? 'mdi-thumb-up' : 'mdi-thumb-up-outline' }}</v-icon>
-          </v-btn>
-        </v-fab-transition>
-
-        <v-fab-transition>
-          <v-btn icon large color="primary" @click="scrollToMediaTop">
-            <v-icon>mdi-arrow-up</v-icon>
-          </v-btn>
-        </v-fab-transition>
-
-        <v-fab-transition>
-          <v-btn icon large color="primary" @click="scrollToMediaBottom">
-            <v-icon>mdi-arrow-down</v-icon>
-          </v-btn>
-        </v-fab-transition>
-      </div> -->
     </template>
     <template v-else>
       <CommentForm @submit="fetchThread" :showReplyForm="true" :threadId="thread.id" />
@@ -90,6 +66,7 @@
         :commentLimit="commentLimit"
         :threadId="thread.id"
         @replied="fetchThread"
+        :adContents="ads"
       />
       <div id="comment-bottom" />
 
@@ -114,31 +91,6 @@
           <v-icon>mdi-arrow-up</v-icon>
         </v-btn>
       </v-bottom-navigation>
-      <!-- <div class="fab-container">
-        <v-fab-transition v-if="payload?.user?.id === thread.userId">
-          <v-btn icon large color="secondary" @click="editThread">
-            <v-icon>mdi-pencil</v-icon>
-          </v-btn>
-        </v-fab-transition>
-
-        <v-fab-transition>
-          <v-btn icon large color="primary" @click="toggleLike">
-            <v-icon>{{ thread.isLiked ? 'mdi-thumb-up' : 'mdi-thumb-up-outline' }}</v-icon>
-          </v-btn>
-        </v-fab-transition>
-
-        <v-fab-transition>
-          <v-btn icon large color="primary" @click="scrollToCommentTop">
-            <v-icon>mdi-arrow-up</v-icon>
-          </v-btn>
-        </v-fab-transition>
-
-        <v-fab-transition>
-          <v-btn icon large color="primary" @click="scrollToCommentBottom">
-            <v-icon>mdi-arrow-down</v-icon>
-          </v-btn>
-        </v-fab-transition>
-      </div> -->
     </template>
 
     <v-divider />
@@ -168,6 +120,7 @@ const route = useRoute();
 const nuxtApp = useNuxtApp();
 const { setThreadViewHistory, getThreadViewHistory, getCommentLimit } = useStorage();
 const commentAttachments = ref<IThreadCommentAttachmentForThread[]>([]);
+const ads = ref<string[]>([]);
 
 const { $api, payload } = nuxtApp;
 
@@ -245,6 +198,7 @@ async function fetchRelatedByHistoryComments() {
 }
 
 onMounted(async () => {
+  await fetchAds();
   await fetchThread();
   setThreadViewHistory(parseInt(route.params.threadId.toString(), 10));
   useHead({
@@ -284,6 +238,11 @@ async function toggleLike() {
   }
 }
 
+async function fetchAds() {
+  const response = await $api.get<string[]>('/ads');
+  ads.value = response.data;
+}
+
 const editThread = () => {
   router.push(`/threads/${thread.value.id}/edit`);
 };
@@ -297,15 +256,5 @@ watch(
 <style scoped>
 .page-description {
   font-size: 12px;
-}
-
-.fab-container {
-  position: fixed;
-  bottom: 16px;
-  right: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  z-index: 1000;
 }
 </style>
