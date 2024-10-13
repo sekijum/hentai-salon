@@ -2,13 +2,15 @@
   <div v-if="comment">
     <PageTitle title="コメント詳細" />
 
-    <v-btn block @click="() => router.push(`/threads/${comment?.thread.id}`)">
-      <v-icon class="menu-icon">mdi-arrow-left</v-icon>{{ comment.thread.title }}
-    </v-btn>
-
     <v-divider />
 
-    <CommentList :comments="[comment]" :commentLimit="commentLimit" :threadId="comment.thread.id" @replied="fetchComment" />
+    <CommentList
+      :comments="[comment]"
+      :commentLimit="commentLimit"
+      :threadId="comment.thread.id"
+      @replied="fetchComment"
+      :adContents="[]"
+    />
 
     <v-divider />
     <Pagination :totalCount="comment.replies.totalCount" :limit="commentLimit" />
@@ -21,18 +23,27 @@
       :commentLimit="commentLimit"
       :threadId="comment.thread.id"
       @replied="fetchComment"
+      :adContents="ads"
     />
     <div id="comment-bottom" />
 
     <Pagination :totalCount="comment.replies.totalCount" :limit="commentLimit" />
 
-    <v-btn icon large color="primary" class="fab fab-top" @click="scrollToCommentTop">
-      <v-icon>mdi-arrow-up</v-icon>
-    </v-btn>
+    <v-bottom-navigation color="teal" grow :fixed="true">
+      <v-btn @click="() => router.push(`/threads/${comment?.thread.id}`)">
+        <v-icon>mdi-arrow-left</v-icon>
 
-    <v-btn icon large color="primary" class="fab fab-bottom" @click="scrollToCommentBottom">
-      <v-icon>mdi-arrow-down</v-icon>
-    </v-btn>
+        <span>{{ comment.thread.title }}</span>
+      </v-btn>
+
+      <v-btn @click="scrollToCommentBottom">
+        <v-icon>mdi-arrow-down</v-icon>
+      </v-btn>
+
+      <v-btn @click="scrollToCommentTop">
+        <v-icon>mdi-arrow-up</v-icon>
+      </v-btn>
+    </v-bottom-navigation>
 
     <v-divider />
 
@@ -52,10 +63,11 @@ const router = useRouter();
 const nuxtApp = useNuxtApp();
 const { getCommentLimit } = useStorage();
 
-const { $api } = nuxtApp;
+const { $api, payload } = nuxtApp;
 
 const commentLimit = getCommentLimit();
 const comment = ref<IThreadComment>();
+const ads = ref<string[]>([]);
 
 function scrollToCommentTop() {
   const commentTop = document.getElementById('comment-top');
@@ -73,6 +85,7 @@ function scrollToCommentBottom() {
 
 onMounted(async () => {
   await fetchComment();
+  await fetchAds();
 
   useHead({
     title: comment.value?.content,
@@ -93,6 +106,11 @@ onMounted(async () => {
     ],
   });
 });
+
+async function fetchAds() {
+  const response = await $api.get<string[]>('/ads');
+  ads.value = response.data;
+}
 
 async function fetchComment() {
   const threadId = route.params.threadId;
