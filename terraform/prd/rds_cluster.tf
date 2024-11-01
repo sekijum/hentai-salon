@@ -16,6 +16,7 @@ resource "aws_rds_cluster" "this" {
   engine                    = "aurora-mysql"
   engine_version            = "8.0.mysql_aurora.3.07.1"
   port                      = "3306"
+  engine_mode               = "provisioned"
   database_name             = aws_ssm_parameter.server_db_name.value
   master_username           = aws_ssm_parameter.server_db_user.value
   master_password           = aws_ssm_parameter.server_db_pass.value
@@ -27,4 +28,19 @@ resource "aws_rds_cluster" "this" {
   apply_immediately         = true
 
   db_cluster_parameter_group_name = aws_rds_cluster_parameter_group.this.name
+
+  serverlessv2_scaling_configuration {
+    min_capacity = 0.5
+    max_capacity = 4
+  }
+}
+
+resource "aws_rds_cluster_instance" "this" {
+  count                = 1
+  identifier           = "${local.app_name}-database-cluster-instance"
+  cluster_identifier   = aws_rds_cluster.this.id
+  engine               = aws_rds_cluster.this.engine
+  engine_version       = aws_rds_cluster.this.engine_version
+  instance_class       = "db.serverless"
+  db_subnet_group_name = aws_rds_cluster.this.db_subnet_group_name
 }
